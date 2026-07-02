@@ -75,7 +75,7 @@ const Header = ({ onPostPropertyClick }) => {
   return (
     <header className="w-full fixed top-0 left-0 z-50">
       {/* Top Branding Section - Responsive */}
-      <div className="bg-[#dff4f1] py-3 px-4 sm:py-4 md:px-6 lg:px-7 flex items-center justify-center relative overflow-hidden shadow-md">
+      <div className="bg-[#E8F5F3] py-3 px-4 sm:py-4 md:px-6 lg:px-7 flex items-center justify-center relative overflow-hidden shadow-md">
         {/* Animated background bubbles */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="bubble bubble-1"></div>
@@ -99,11 +99,11 @@ const Header = ({ onPostPropertyClick }) => {
           {/* Logo with multiple animations */}
           <div className="relative">
             {/* Glow effect */}
-            <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-[#00695C] via-[#26A69A] to-[#00695C] opacity-10 animate-pulse-glow"></div>
+            <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-[#80CBC4] via-[#26A69A] to-[#80CBC4] opacity-10 animate-pulse-glow"></div>
             
             {/* Animated border - infinite rotating gradient */}
-            <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-[#00695C] via-[#26A69A] to-[#00695C] animate-spin-slow"></div>
-            <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-[#00695C] via-[#26A69A] to-[#00695C] animate-spin-slow-reverse opacity-70"></div>
+            <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-[#80CBC4] via-[#26A69A] to-[#80CBC4] animate-spin-slow"></div>
+            <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-[#80CBC4] via-[#26A69A] to-[#80CBC4] animate-spin-slow-reverse opacity-70"></div>
             
             {/* Shimmer effect overlay */}
             <div className="absolute -inset-1 rounded-full overflow-hidden">
@@ -115,7 +115,7 @@ const Header = ({ onPostPropertyClick }) => {
               <img 
                 src={logo} 
                 alt="Eliteinova Properties" 
-                className="h-10 w-auto sm:h-12 lg:h-15 rounded-full border-4 border-[#26A69A] relative z-10" 
+                className="h-10 w-auto sm:h-12 lg:h-15 rounded-full border-4 border-[#4DB6AC] relative z-10" 
               />
             </div>
           </div>
@@ -128,7 +128,7 @@ const Header = ({ onPostPropertyClick }) => {
               Eliteinova Properties
             </span>
             <span 
-              className="text-xs sm:text-sm lg:text-lg font-semibold text-[#00695C] tracking-wider -mt-1 sm:-mt-2 md:-mt-3 animate-pulse-text"
+              className="text-xs sm:text-sm lg:text-lg font-semibold text-[#00796B] tracking-wider -mt-1 sm:-mt-2 md:-mt-3 animate-pulse-text"
               style={{ fontFamily: "Pacifico, cursive" }}
             >
               No Brokerage
@@ -138,7 +138,7 @@ const Header = ({ onPostPropertyClick }) => {
       </div>
 
       {/* Navigation Bar */}
-      <nav className="bg-[#00695C] w-full px-2 sm:px-4 md:px-6 lg:px-8 relative shadow-lg">
+      <nav className="bg-[#00897B] w-full px-2 sm:px-4 md:px-6 lg:px-8 relative shadow-lg">
         <div className="flex items-center justify-between h-12">
           {/* Desktop Navigation - Shows on md and above */}
           <div className="hidden md:flex items-center h-full space-x-1 lg:space-x-2">
@@ -147,8 +147,8 @@ const Header = ({ onPostPropertyClick }) => {
               onClick={() => handleNavigation("/", "Home")} 
               className={`h-full px-3 lg:px-4 font-medium text-sm transition-colors duration-200 whitespace-nowrap ${
                 isActive("Home") 
-                  ? "bg-[#26A69A] text-white hover:bg-[#1D8D82]" 
-                  : "text-white hover:bg-[#00897B]"
+                  ? "bg-[#4DB6AC] text-white hover:bg-[#26A69A]" 
+                  : "text-white hover:bg-[#00796B]"
               }`}
             >
               Home
@@ -158,8 +158,8 @@ const Header = ({ onPostPropertyClick }) => {
             <div 
               className={`relative h-full flex items-center px-3 lg:px-4 cursor-pointer font-medium text-sm transition-colors duration-200 whitespace-nowrap ${
                 isActive("Customer Portal") 
-                  ? "bg-[#26A69A] text-white" 
-                  : "text-white hover:bg-[#00897B]"
+                  ? "bg-[#4DB6AC] text-white" 
+                  : "text-white hover:bg-[#00796B]"
               }`}
               onMouseEnter={() => setActiveDropdown("cp")} 
               onMouseLeave={() => setActiveDropdown(null)}
@@ -170,19 +170,19 @@ const Header = ({ onPostPropertyClick }) => {
               </span>
               
               {activeDropdown === "cp" && (
-                <div className="absolute top-full left-0 bg-[#00897B] shadow-lg border border-[#26A69A] min-w-[160px] lg:min-w-[180px] z-50 rounded-b">
+                <div className="absolute top-full left-0 bg-[#00796B] shadow-lg border border-[#4DB6AC] min-w-[160px] lg:min-w-[180px] z-50 rounded-b">
                   {Object.entries(customerPortalMenu).map(([key, sub]) => (
-                    <div key={key} className="group relative border-b border-[#26A69A] last:border-0">
+                    <div key={key} className="group relative border-b border-[#4DB6AC] last:border-0">
                       <button 
                         onClick={() => {
                           handleCustomerPortalClick(key);
                           setActiveMenu("Customer Portal");
                         }} 
-                        className="w-full px-4 py-2 hover:bg-[#E0F2F1] hover:text-[#00695C] text-left font-bold capitalize text-white text-sm transition-colors duration-150"
+                        className="w-full px-4 py-2 hover:bg-[#F0F8F7] hover:text-[#00695C] text-left font-bold capitalize text-white text-sm transition-colors duration-150"
                       >
                         {key}
                       </button>
-                      <div className="absolute left-full top-0 hidden group-hover:block bg-[#00897B] shadow-lg min-w-[150px] border border-[#26A69A] rounded">
+                      <div className="absolute left-full top-0 hidden group-hover:block bg-[#00796B] shadow-lg min-w-[150px] border border-[#4DB6AC] rounded">
                         {sub.map(s => (
                           <button 
                             key={s} 
@@ -190,7 +190,7 @@ const Header = ({ onPostPropertyClick }) => {
                               handleCustomerPortalClick(s);
                               setActiveMenu("Customer Portal");
                             }} 
-                            className="block w-full px-4 py-2 hover:bg-[#E0F2F1] hover:text-[#00695C] text-left text-white text-sm transition-colors duration-150 border-b border-[#26A69A] last:border-0"
+                            className="block w-full px-4 py-2 hover:bg-[#F0F8F7] hover:text-[#00695C] text-left text-white text-sm transition-colors duration-150 border-b border-[#4DB6AC] last:border-0"
                           >
                             {s}
                           </button>
@@ -208,8 +208,8 @@ const Header = ({ onPostPropertyClick }) => {
                 key={item.name} 
                 className={`relative h-full flex items-center px-3 lg:px-4 cursor-pointer font-medium text-sm transition-colors duration-200 whitespace-nowrap ${
                   isActive(item.name) 
-                    ? "bg-[#26A69A] text-white" 
-                    : "text-white hover:bg-[#00897B]"
+                    ? "bg-[#4DB6AC] text-white" 
+                    : "text-white hover:bg-[#00796B]"
                 }`}
                 onMouseEnter={() => setActiveDropdown(item.name)} 
                 onMouseLeave={() => setActiveDropdown(null)}
@@ -220,14 +220,14 @@ const Header = ({ onPostPropertyClick }) => {
                 </span>
                 
                 {activeDropdown === item.name && (
-                  <div className="absolute top-full left-0 bg-[#00897B] shadow-lg border border-[#26A69A] min-w-[160px] lg:min-w-[180px] z-50 rounded-b">
+                  <div className="absolute top-full left-0 bg-[#00796B] shadow-lg border border-[#4DB6AC] min-w-[160px] lg:min-w-[180px] z-50 rounded-b">
                     {item.items.map(m => (
                       <button 
                         key={m} 
                         onClick={() => {
                           handleOtherMenuClick(item.name, m);
                         }} 
-                        className="block w-full px-4 py-2 hover:bg-[#E0F2F1] hover:text-[#00695C] text-left text-white text-sm transition-colors duration-150 border-b border-[#26A69A] last:border-0"
+                        className="block w-full px-4 py-2 hover:bg-[#F0F8F7] hover:text-[#00695C] text-left text-white text-sm transition-colors duration-150 border-b border-[#4DB6AC] last:border-0"
                       >
                         {m}
                       </button>
@@ -241,7 +241,7 @@ const Header = ({ onPostPropertyClick }) => {
           {/* Mobile Menu Toggle Button - Shows only on sm screens */}
           <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden text-white hover:text-[#26A69A] transition-colors duration-200 p-2"
+            className="md:hidden text-white hover:text-[#4DB6AC] transition-colors duration-200 p-2"
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -253,28 +253,28 @@ const Header = ({ onPostPropertyClick }) => {
 
         {/* Mobile Menu - Shows only on sm screens */}
         {isMobileMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 right-0 bg-[#00695C] shadow-xl z-50 max-h-[80vh] overflow-y-auto">
+          <div className="md:hidden absolute top-full left-0 right-0 bg-[#00897B] shadow-xl z-50 max-h-[80vh] overflow-y-auto">
             <div className="flex flex-col py-2">
               {/* Home */}
               <button 
                 onClick={() => handleNavigation("/", "Home")} 
-                className={`w-full text-left px-4 py-3 font-medium text-sm transition-colors duration-200 border-b border-[#00897B] ${
+                className={`w-full text-left px-4 py-3 font-medium text-sm transition-colors duration-200 border-b border-[#00796B] ${
                   isActive("Home") 
-                    ? "bg-[#26A69A] text-white" 
-                    : "text-white hover:bg-[#00897B]"
+                    ? "bg-[#4DB6AC] text-white" 
+                    : "text-white hover:bg-[#00796B]"
                 }`}
               >
                 Home
               </button>
 
               {/* Customer Portal Mobile */}
-              <div className="border-b border-[#00897B]">
+              <div className="border-b border-[#00796B]">
                 <button 
                   onClick={() => toggleMobileDropdown("cp")}
                   className={`w-full text-left px-4 py-3 font-medium text-sm transition-colors duration-200 flex items-center justify-between ${
                     isActive("Customer Portal") 
-                      ? "bg-[#26A69A] text-white" 
-                      : "text-white hover:bg-[#00897B]"
+                      ? "bg-[#4DB6AC] text-white" 
+                      : "text-white hover:bg-[#00796B]"
                   }`}
                 >
                   <span>Customer Portal</span>
@@ -282,15 +282,15 @@ const Header = ({ onPostPropertyClick }) => {
                 </button>
                 
                 {mobileDropdown === "cp" && (
-                  <div className="bg-[#00897B]">
+                  <div className="bg-[#00796B]">
                     {Object.entries(customerPortalMenu).map(([key, sub]) => (
-                      <div key={key} className="border-b border-[#26A69A] last:border-0">
+                      <div key={key} className="border-b border-[#4DB6AC] last:border-0">
                         <button 
                           onClick={() => {
                             handleCustomerPortalClick(key);
                             setActiveMenu("Customer Portal");
                           }} 
-                          className="w-full text-left px-6 py-2.5 font-bold capitalize text-white text-sm hover:bg-[#26A69A] transition-colors duration-150"
+                          className="w-full text-left px-6 py-2.5 font-bold capitalize text-white text-sm hover:bg-[#4DB6AC] transition-colors duration-150"
                         >
                           {key}
                         </button>
@@ -302,7 +302,7 @@ const Header = ({ onPostPropertyClick }) => {
                                 handleCustomerPortalClick(s);
                                 setActiveMenu("Customer Portal");
                               }} 
-                              className="block w-full text-left px-4 py-2 hover:bg-[#26A69A] text-white text-sm transition-colors duration-150 border-t border-[#26A69A]"
+                              className="block w-full text-left px-4 py-2 hover:bg-[#4DB6AC] text-white text-sm transition-colors duration-150 border-t border-[#4DB6AC]"
                             >
                               {s}
                             </button>
@@ -316,13 +316,13 @@ const Header = ({ onPostPropertyClick }) => {
 
               {/* Other Menus Mobile */}
               {otherMenus.map((item) => (
-                <div key={item.name} className="border-b border-[#00897B]">
+                <div key={item.name} className="border-b border-[#00796B]">
                   <button 
                     onClick={() => toggleMobileDropdown(item.name)}
                     className={`w-full text-left px-4 py-3 font-medium text-sm transition-colors duration-200 flex items-center justify-between ${
                       isActive(item.name) 
-                        ? "bg-[#26A69A] text-white" 
-                        : "text-white hover:bg-[#00897B]"
+                        ? "bg-[#4DB6AC] text-white" 
+                        : "text-white hover:bg-[#00796B]"
                     }`}
                   >
                     <span>{item.name}</span>
@@ -330,14 +330,14 @@ const Header = ({ onPostPropertyClick }) => {
                   </button>
                   
                   {mobileDropdown === item.name && (
-                    <div className="bg-[#00897B]">
+                    <div className="bg-[#00796B]">
                       {item.items.map(m => (
                         <button 
                           key={m} 
                           onClick={() => {
                             handleOtherMenuClick(item.name, m);
                           }} 
-                          className="block w-full text-left px-6 py-2.5 hover:bg-[#26A69A] text-white text-sm transition-colors duration-150 border-t border-[#26A69A]"
+                          className="block w-full text-left px-6 py-2.5 hover:bg-[#4DB6AC] text-white text-sm transition-colors duration-150 border-t border-[#4DB6AC]"
                         >
                           {m}
                         </button>
@@ -357,7 +357,7 @@ const Header = ({ onPostPropertyClick }) => {
         .bubble {
           position: absolute;
           border-radius: 50%;
-          background: radial-gradient(circle at 30% 30%, rgba(38, 166, 154, 0.15), rgba(0, 105, 92, 0.1));
+          background: radial-gradient(circle at 30% 30%, rgba(38, 166, 154, 0.1), rgba(0, 105, 92, 0.05));
           animation: float-bubble linear infinite;
         }
         
@@ -438,10 +438,10 @@ const Header = ({ onPostPropertyClick }) => {
             opacity: 0;
           }
           20% {
-            opacity: 1;
+            opacity: 0.8;
           }
           80% {
-            opacity: 1;
+            opacity: 0.8;
           }
           100% {
             transform: translateY(-100vh) scale(1);
@@ -481,12 +481,12 @@ const Header = ({ onPostPropertyClick }) => {
         /* Pulse Glow */
         @keyframes pulse-glow {
           0%, 100% {
-            opacity: 0.2;
+            opacity: 0.1;
             transform: scale(1);
           }
           50% {
-            opacity: 0.5;
-            transform: scale(1.1);
+            opacity: 0.3;
+            transform: scale(1.05);
           }
         }
         
@@ -500,7 +500,7 @@ const Header = ({ onPostPropertyClick }) => {
           background: linear-gradient(
             90deg,
             transparent,
-            rgba(255, 255, 255, 0.2),
+            rgba(255, 255, 255, 0.15),
             transparent
           );
           animation: shimmer-slide 3s ease-in-out infinite;
