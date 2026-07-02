@@ -73,22 +73,42 @@ const Header = ({ onPostPropertyClick }) => {
   };
 
   return (
-    <header className="w-full h-12">
+    <header className="w-full fixed top-0 left-0 z-50">
       {/* Top Branding Section - Responsive */}
-      <div className="bg-[#d8e8e1] py-3 px-4 sm:py-4 md:px-6 lg:px-7 flex items-center justify-center">
+      <div className="bg-[#d8e8e1] py-3 px-4 sm:py-4 md:px-6 lg:px-7 flex items-center justify-center relative overflow-hidden shadow-md">
+        {/* Animated background bubbles */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="bubble bubble-1"></div>
+          <div className="bubble bubble-2"></div>
+          <div className="bubble bubble-3"></div>
+          <div className="bubble bubble-4"></div>
+          <div className="bubble bubble-5"></div>
+          <div className="bubble bubble-6"></div>
+          <div className="bubble bubble-7"></div>
+          <div className="bubble bubble-8"></div>
+        </div>
+
         <div 
           onClick={() => {
             navigate("/");
             setIsMobileMenuOpen(false);
             setActiveMenu("Home");
           }} 
-          className="cursor-pointer flex items-center gap-2 sm:gap-3"
+          className="cursor-pointer flex items-center gap-2 sm:gap-3 relative z-10"
         >
-          {/* Logo with animated border */}
+          {/* Logo with multiple animations */}
           <div className="relative">
+            {/* Glow effect */}
+            <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-[#1E3A36] via-[#9f7c31] to-[#1E3A36] opacity-10 animate-pulse-glow"></div>
+            
             {/* Animated border - infinite rotating gradient */}
             <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-[#1E3A36] via-[#9f7c31] to-[#1E3A36] animate-spin-slow"></div>
             <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-[#1E3A36] via-[#9f7c31] to-[#1E3A36] animate-spin-slow-reverse opacity-70"></div>
+            
+            {/* Shimmer effect overlay */}
+            <div className="absolute -inset-1 rounded-full overflow-hidden">
+              <div className="shimmer"></div>
+            </div>
             
             {/* Image container with jumping animation */}
             <div className="relative animate-jump">
@@ -100,15 +120,15 @@ const Header = ({ onPostPropertyClick }) => {
             </div>
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col relative">
             <span 
-              className="text-xl sm:text-2xl md:text-3xl lg:text-4xl h-13 font-bold bg-gradient-to-r from-[#1E3A36] via-[#9f7c31] to-[#1E3A36] bg-clip-text text-transparent"
+              className="text-xl sm:text-2xl md:text-3xl lg:text-4xl h-13 font-bold bg-gradient-to-r from-[#1E3A36] via-[#9f7c31] to-[#1E3A36] bg-clip-text text-transparent animate-shimmer-text"
               style={{ fontFamily: "Pacifico, cursive" }}
             >
               Eliteinova Properties
             </span>
             <span 
-              className="text-xs sm:text-sm lg:text-lg font-semibold text-[#82621e] tracking-wider -mt-1 sm:-mt-2 md:-mt-3"
+              className="text-xs sm:text-sm lg:text-lg font-semibold text-[#82621e] tracking-wider -mt-1 sm:-mt-2 md:-mt-3 animate-pulse-text"
               style={{ fontFamily: "Pacifico, cursive" }}
             >
               No Brokerage
@@ -118,7 +138,7 @@ const Header = ({ onPostPropertyClick }) => {
       </div>
 
       {/* Navigation Bar */}
-      <nav className="bg-[#1E3A36] w-full px-2 sm:px-4 md:px-6 lg:px-8 relative">
+      <nav className="bg-[#1E3A36] w-full px-2 sm:px-4 md:px-6 lg:px-8 relative shadow-lg">
         <div className="flex items-center justify-between h-12">
           {/* Desktop Navigation - Shows on md and above */}
           <div className="hidden md:flex items-center h-full space-x-1 lg:space-x-2">
@@ -331,8 +351,105 @@ const Header = ({ onPostPropertyClick }) => {
         )}
       </nav>
 
-      {/* Add custom animations */}
+      {/* Custom Animations */}
       <style jsx>{`
+        /* Bubble Animations */
+        .bubble {
+          position: absolute;
+          border-radius: 50%;
+          background: radial-gradient(circle at 30% 30%, rgba(157, 124, 49, 0.15), rgba(30, 58, 54, 0.1));
+          animation: float-bubble linear infinite;
+        }
+        
+        .bubble-1 {
+          width: 60px;
+          height: 60px;
+          left: 5%;
+          animation-duration: 10s;
+          animation-delay: 0s;
+        }
+        
+        .bubble-2 {
+          width: 40px;
+          height: 40px;
+          left: 15%;
+          top: 20%;
+          animation-duration: 12s;
+          animation-delay: 1s;
+        }
+        
+        .bubble-3 {
+          width: 80px;
+          height: 80px;
+          right: 10%;
+          top: -10%;
+          animation-duration: 14s;
+          animation-delay: 2s;
+        }
+        
+        .bubble-4 {
+          width: 50px;
+          height: 50px;
+          right: 25%;
+          top: 60%;
+          animation-duration: 10s;
+          animation-delay: 3s;
+        }
+        
+        .bubble-5 {
+          width: 35px;
+          height: 35px;
+          left: 45%;
+          top: 70%;
+          animation-duration: 14s;
+          animation-delay: 0.5s;
+        }
+        
+        .bubble-6 {
+          width: 70px;
+          height: 70px;
+          left: 70%;
+          top: 20%;
+          animation-duration: 13s;
+          animation-delay: 1.5s;
+        }
+        
+        .bubble-7 {
+          width: 45px;
+          height: 45px;
+          left: 30%;
+          top: -5%;
+          animation-duration: 7s;
+          animation-delay: 2.5s;
+        }
+        
+        .bubble-8 {
+          width: 55px;
+          height: 55px;
+          right: 40%;
+          top: 40%;
+          animation-duration: 10s;
+          animation-delay: 3.5s;
+        }
+        
+        @keyframes float-bubble {
+          0% {
+            transform: translateY(100%) scale(0);
+            opacity: 0;
+          }
+          20% {
+            opacity: 1;
+          }
+          80% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(-100vh) scale(1);
+            opacity: 0;
+          }
+        }
+        
+        /* Rotating Border Animations */
         @keyframes spin-slow {
           from {
             transform: rotate(0deg);
@@ -351,25 +468,100 @@ const Header = ({ onPostPropertyClick }) => {
           }
         }
         
+        
+        
+        /* Jump Animation */
         @keyframes jump {
           0%, 100% {
             transform: translateY(0);
           }
           50% {
-            transform: translateY(-2px);
+            transform: translateY(-5px);
           }
         }
         
+        /* Pulse Glow */
+        @keyframes pulse-glow {
+          0%, 100% {
+            opacity: 0.2;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.5;
+            transform: scale(1.1);
+          }
+        }
+        
+        /* Shimmer Effect */
+        .shimmer {
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 200%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent
+          );
+          animation: shimmer-slide 3s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer-slide {
+          0% {
+            transform: translateX(-50%);
+          }
+          100% {
+            transform: translateX(50%);
+          }
+        }
+        
+        /* Text Shimmer */
+        @keyframes shimmer-text {
+          0% {
+            background-position: -200% center;
+          }
+          100% {
+            background-position: 200% center;
+          }
+        }
+        
+        .animate-shimmer-text {
+          background-size: 200% auto;
+          animation: shimmer-text 3s linear infinite;
+        }
+        
+        /* Text Pulse */
+        @keyframes pulse-text {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.7;
+          }
+        }
+        
+        .animate-pulse-text {
+          animation: pulse-text 2s ease-in-out infinite;
+        }
+        
+        /* Animation Classes */
         .animate-spin-slow {
-          animation: spin-slow 1s linear infinite;
+          animation: spin-slow 7s linear infinite;
         }
         
         .animate-spin-slow-reverse {
-          animation: spin-slow-reverse 1s linear infinite;
+          animation: spin-slow-reverse 7s linear infinite;
         }
         
+       
         .animate-jump {
-          animation: jump 1s ease-in-out infinite;
+          animation: jump 3s ease-in-out infinite;
+        }
+        
+        .animate-pulse-glow {
+          animation: pulse-glow 2s ease-in-out infinite;
         }
       `}</style>
     </header>

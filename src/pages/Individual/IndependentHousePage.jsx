@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ChevronDown, Search, Home, MapPin, Star, Filter, X, Building, Landmark, Warehouse, Building2, Phone, Mail, MessageCircle, Clock } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-// import backgroundImage from "../../assets/house3.png";
+import backgroundImage from "../../assets/house3.png";
 import IndependentHouseFilter from "../../components/filters/Individual/IndependentHouseFilter";
 import IndependentHouse from "../../components/propertycard/Individual/IndependentHouse";
 
@@ -175,7 +175,7 @@ const IndependentHousePage = () => {
   return (
     <div className="w-full min-h-screen relative">
 
-      {/* ── Background ──
+      {/* ── Background ── */}
       <div
         className="fixed inset-0 z-0"
         style={{
@@ -184,7 +184,7 @@ const IndependentHousePage = () => {
           backgroundPosition: "center",
           backgroundAttachment: "fixed",
         }}
-      > */}
+      >
         <div className="absolute inset-0 bg-gradient-to-br from-teal-900/30 via-emerald-900/20 to-teal-900/40 animate-gradient-flow"></div>
         <div className="absolute inset-0 overflow-hidden">
           {[...Array(25)].map((_, i) => (
@@ -203,7 +203,7 @@ const IndependentHousePage = () => {
               }}
             ></div>
           ))}
-        {/* </div> */}
+        </div>
       </div>
 
       <div className="relative z-10">
