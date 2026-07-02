@@ -121,24 +121,28 @@ const Header = ({ onPostPropertyClick }) => {
           </div>
 
           <div className="flex flex-col relative">
-            <span 
-              className="text-xl sm:text-2xl md:text-3xl lg:text-4xl h-13 font-bold bg-gradient-to-r from-[#00695C] via-[#26A69A] to-[#00695C] bg-clip-text text-transparent animate-shimmer-text"
-              style={{ fontFamily: "Pacifico, cursive" }}
-            >
-              Eliteinova Properties
+          <span 
+            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl h-13 "
+            style={{ fontFamily: "Pacifico, cursive" }}
+          >
+            <span className="bg-gradient-to-r from-[#069c8a] via-[#358c83] to-[#0f7e71] bg-clip-text text-transparent font-bold">
+              Eliteinova
             </span>
-            <span 
-              className="text-xs sm:text-sm lg:text-lg font-semibold text-[#00796B] tracking-wider -mt-1 sm:-mt-2 md:-mt-3 animate-pulse-text"
-              style={{ fontFamily: "Pacifico, cursive" }}
-            >
-              No Brokerage
+            <span className="bg-gradient-to-r from-[#069c8a] via-[#358c83] to-[#0f7e71] bg-clip-text text-transparent text-base sm:text-lg md:text-xl lg:text-2xl ml-1 font-bold">
+              Properties
             </span>
-          </div>
+          </span>
+          <span 
+            className="text-xs sm:text-sm lg:text-sm font-semibold text-[#00796B] tracking-wider -mt-1 sm:-mt-2 md:-mt-3 font-normal"
+          >
+            Eliteinova Tech Pvt Ltd
+          </span>
+        </div>
         </div>
       </div>
 
       {/* Navigation Bar */}
-      <nav className="bg-[#00897B] w-full px-2 sm:px-4 md:px-6 lg:px-8 relative shadow-lg">
+      <nav className="bg-[#057b6f] w-full px-2 sm:px-4 md:px-6 lg:px-8 relative shadow-lg">
         <div className="flex items-center justify-between h-12">
           {/* Desktop Navigation - Shows on md and above */}
           <div className="hidden md:flex items-center h-full space-x-1 lg:space-x-2">
