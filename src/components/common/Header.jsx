@@ -99,7 +99,7 @@ const Header = ({ onPostPropertyClick }) => {
           {/* Logo with multiple animations */}
           <div className="relative">
             {/* Glow effect */}
-            <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-[#80CBC4] via-[#26A69A] to-[#80CBC4] opacity-10 animate-pulse-glow"></div>
+            <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-[#03413a] via-[#26A69A] to-[#0a635a] opacity-10 animate-pulse-glow"></div>
             
             {/* Animated border - infinite rotating gradient */}
             <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-[#80CBC4] via-[#26A69A] to-[#80CBC4] animate-spin-slow"></div>
@@ -142,7 +142,7 @@ const Header = ({ onPostPropertyClick }) => {
       </div>
 
       {/* Navigation Bar */}
-      <nav className="bg-[#057b6f] w-full px-2 sm:px-4 md:px-6 lg:px-8 relative shadow-lg">
+      <nav className="bg-[#108f82] w-full px-2 sm:px-4 md:px-6 lg:px-8 relative shadow-lg">
         <div className="flex items-center justify-between h-12">
           {/* Desktop Navigation - Shows on md and above */}
           <div className="hidden md:flex items-center h-full space-x-1 lg:space-x-2">
