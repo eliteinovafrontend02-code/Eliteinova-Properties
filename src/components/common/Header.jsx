@@ -75,7 +75,7 @@ const Header = ({ onPostPropertyClick }) => {
   return (
     <header className="w-full fixed top-0 left-0 z-50">
       {/* Top Branding Section - Responsive */}
-      <div className="bg-[#E0F2F1] py-3 px-4 sm:py-4 md:px-6 lg:px-7 flex items-center justify-center relative overflow-hidden shadow-md">
+      <div className="bg-[#dff4f1] py-3 px-4 sm:py-4 md:px-6 lg:px-7 flex items-center justify-center relative overflow-hidden shadow-md">
         {/* Animated background bubbles */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="bubble bubble-1"></div>
@@ -115,7 +115,7 @@ const Header = ({ onPostPropertyClick }) => {
               <img 
                 src={logo} 
                 alt="Eliteinova Properties" 
-                className="h-10 w-auto sm:h-12 lg:h-15 rounded-full border-4 border-[#E0F2F1] relative z-10" 
+                className="h-10 w-auto sm:h-12 lg:h-15 rounded-full border-4 border-[#26A69A] relative z-10" 
               />
             </div>
           </div>
@@ -147,8 +147,8 @@ const Header = ({ onPostPropertyClick }) => {
               onClick={() => handleNavigation("/", "Home")} 
               className={`h-full px-3 lg:px-4 font-medium text-sm transition-colors duration-200 whitespace-nowrap ${
                 isActive("Home") 
-                  ? "bg-[#26A69A] text-white hover:bg-[#1E8F84]" 
-                  : "text-white hover:bg-[#00796B]"
+                  ? "bg-[#26A69A] text-white hover:bg-[#1D8D82]" 
+                  : "text-white hover:bg-[#00897B]"
               }`}
             >
               Home
@@ -159,7 +159,7 @@ const Header = ({ onPostPropertyClick }) => {
               className={`relative h-full flex items-center px-3 lg:px-4 cursor-pointer font-medium text-sm transition-colors duration-200 whitespace-nowrap ${
                 isActive("Customer Portal") 
                   ? "bg-[#26A69A] text-white" 
-                  : "text-white hover:bg-[#00796B]"
+                  : "text-white hover:bg-[#00897B]"
               }`}
               onMouseEnter={() => setActiveDropdown("cp")} 
               onMouseLeave={() => setActiveDropdown(null)}
@@ -170,9 +170,9 @@ const Header = ({ onPostPropertyClick }) => {
               </span>
               
               {activeDropdown === "cp" && (
-                <div className="absolute top-full left-0 bg-[#00796B] shadow-lg border border-[#00897B] min-w-[160px] lg:min-w-[180px] z-50 rounded-b">
+                <div className="absolute top-full left-0 bg-[#00897B] shadow-lg border border-[#26A69A] min-w-[160px] lg:min-w-[180px] z-50 rounded-b">
                   {Object.entries(customerPortalMenu).map(([key, sub]) => (
-                    <div key={key} className="group relative border-b border-[#00897B] last:border-0">
+                    <div key={key} className="group relative border-b border-[#26A69A] last:border-0">
                       <button 
                         onClick={() => {
                           handleCustomerPortalClick(key);
@@ -182,7 +182,7 @@ const Header = ({ onPostPropertyClick }) => {
                       >
                         {key}
                       </button>
-                      <div className="absolute left-full top-0 hidden group-hover:block bg-[#00796B] shadow-lg min-w-[150px] border border-[#00897B] rounded">
+                      <div className="absolute left-full top-0 hidden group-hover:block bg-[#00897B] shadow-lg min-w-[150px] border border-[#26A69A] rounded">
                         {sub.map(s => (
                           <button 
                             key={s} 
@@ -190,7 +190,7 @@ const Header = ({ onPostPropertyClick }) => {
                               handleCustomerPortalClick(s);
                               setActiveMenu("Customer Portal");
                             }} 
-                            className="block w-full px-4 py-2 hover:bg-[#E0F2F1] hover:text-[#00695C] text-left text-white text-sm transition-colors duration-150 border-b border-[#00897B] last:border-0"
+                            className="block w-full px-4 py-2 hover:bg-[#E0F2F1] hover:text-[#00695C] text-left text-white text-sm transition-colors duration-150 border-b border-[#26A69A] last:border-0"
                           >
                             {s}
                           </button>
@@ -209,7 +209,7 @@ const Header = ({ onPostPropertyClick }) => {
                 className={`relative h-full flex items-center px-3 lg:px-4 cursor-pointer font-medium text-sm transition-colors duration-200 whitespace-nowrap ${
                   isActive(item.name) 
                     ? "bg-[#26A69A] text-white" 
-                    : "text-white hover:bg-[#00796B]"
+                    : "text-white hover:bg-[#00897B]"
                 }`}
                 onMouseEnter={() => setActiveDropdown(item.name)} 
                 onMouseLeave={() => setActiveDropdown(null)}
@@ -220,14 +220,14 @@ const Header = ({ onPostPropertyClick }) => {
                 </span>
                 
                 {activeDropdown === item.name && (
-                  <div className="absolute top-full left-0 bg-[#00796B] shadow-lg border border-[#00897B] min-w-[160px] lg:min-w-[180px] z-50 rounded-b">
+                  <div className="absolute top-full left-0 bg-[#00897B] shadow-lg border border-[#26A69A] min-w-[160px] lg:min-w-[180px] z-50 rounded-b">
                     {item.items.map(m => (
                       <button 
                         key={m} 
                         onClick={() => {
                           handleOtherMenuClick(item.name, m);
                         }} 
-                        className="block w-full px-4 py-2 hover:bg-[#E0F2F1] hover:text-[#00695C] text-left text-white text-sm transition-colors duration-150 border-b border-[#00897B] last:border-0"
+                        className="block w-full px-4 py-2 hover:bg-[#E0F2F1] hover:text-[#00695C] text-left text-white text-sm transition-colors duration-150 border-b border-[#26A69A] last:border-0"
                       >
                         {m}
                       </button>
@@ -258,23 +258,23 @@ const Header = ({ onPostPropertyClick }) => {
               {/* Home */}
               <button 
                 onClick={() => handleNavigation("/", "Home")} 
-                className={`w-full text-left px-4 py-3 font-medium text-sm transition-colors duration-200 border-b border-[#00796B] ${
+                className={`w-full text-left px-4 py-3 font-medium text-sm transition-colors duration-200 border-b border-[#00897B] ${
                   isActive("Home") 
                     ? "bg-[#26A69A] text-white" 
-                    : "text-white hover:bg-[#00796B]"
+                    : "text-white hover:bg-[#00897B]"
                 }`}
               >
                 Home
               </button>
 
               {/* Customer Portal Mobile */}
-              <div className="border-b border-[#00796B]">
+              <div className="border-b border-[#00897B]">
                 <button 
                   onClick={() => toggleMobileDropdown("cp")}
                   className={`w-full text-left px-4 py-3 font-medium text-sm transition-colors duration-200 flex items-center justify-between ${
                     isActive("Customer Portal") 
                       ? "bg-[#26A69A] text-white" 
-                      : "text-white hover:bg-[#00796B]"
+                      : "text-white hover:bg-[#00897B]"
                   }`}
                 >
                   <span>Customer Portal</span>
@@ -282,15 +282,15 @@ const Header = ({ onPostPropertyClick }) => {
                 </button>
                 
                 {mobileDropdown === "cp" && (
-                  <div className="bg-[#00796B]">
+                  <div className="bg-[#00897B]">
                     {Object.entries(customerPortalMenu).map(([key, sub]) => (
-                      <div key={key} className="border-b border-[#00897B] last:border-0">
+                      <div key={key} className="border-b border-[#26A69A] last:border-0">
                         <button 
                           onClick={() => {
                             handleCustomerPortalClick(key);
                             setActiveMenu("Customer Portal");
                           }} 
-                          className="w-full text-left px-6 py-2.5 font-bold capitalize text-white text-sm hover:bg-[#00897B] transition-colors duration-150"
+                          className="w-full text-left px-6 py-2.5 font-bold capitalize text-white text-sm hover:bg-[#26A69A] transition-colors duration-150"
                         >
                           {key}
                         </button>
@@ -302,7 +302,7 @@ const Header = ({ onPostPropertyClick }) => {
                                 handleCustomerPortalClick(s);
                                 setActiveMenu("Customer Portal");
                               }} 
-                              className="block w-full text-left px-4 py-2 hover:bg-[#00897B] text-white text-sm transition-colors duration-150 border-t border-[#00897B]"
+                              className="block w-full text-left px-4 py-2 hover:bg-[#26A69A] text-white text-sm transition-colors duration-150 border-t border-[#26A69A]"
                             >
                               {s}
                             </button>
@@ -316,13 +316,13 @@ const Header = ({ onPostPropertyClick }) => {
 
               {/* Other Menus Mobile */}
               {otherMenus.map((item) => (
-                <div key={item.name} className="border-b border-[#00796B]">
+                <div key={item.name} className="border-b border-[#00897B]">
                   <button 
                     onClick={() => toggleMobileDropdown(item.name)}
                     className={`w-full text-left px-4 py-3 font-medium text-sm transition-colors duration-200 flex items-center justify-between ${
                       isActive(item.name) 
                         ? "bg-[#26A69A] text-white" 
-                        : "text-white hover:bg-[#00796B]"
+                        : "text-white hover:bg-[#00897B]"
                     }`}
                   >
                     <span>{item.name}</span>
@@ -330,14 +330,14 @@ const Header = ({ onPostPropertyClick }) => {
                   </button>
                   
                   {mobileDropdown === item.name && (
-                    <div className="bg-[#00796B]">
+                    <div className="bg-[#00897B]">
                       {item.items.map(m => (
                         <button 
                           key={m} 
                           onClick={() => {
                             handleOtherMenuClick(item.name, m);
                           }} 
-                          className="block w-full text-left px-6 py-2.5 hover:bg-[#00897B] text-white text-sm transition-colors duration-150 border-t border-[#00897B]"
+                          className="block w-full text-left px-6 py-2.5 hover:bg-[#26A69A] text-white text-sm transition-colors duration-150 border-t border-[#26A69A]"
                         >
                           {m}
                         </button>
@@ -357,7 +357,7 @@ const Header = ({ onPostPropertyClick }) => {
         .bubble {
           position: absolute;
           border-radius: 50%;
-          background: radial-gradient(circle at 30% 30%, rgba(0, 105, 92, 0.15), rgba(38, 166, 154, 0.1));
+          background: radial-gradient(circle at 30% 30%, rgba(38, 166, 154, 0.15), rgba(0, 105, 92, 0.1));
           animation: float-bubble linear infinite;
         }
         
