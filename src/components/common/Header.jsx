@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X, ChevronLeft, Home, Building2, PlusCircle, Search, Wrench } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo1.png";
 
@@ -9,6 +9,7 @@ const Header = ({ onPostPropertyClick }) => {
   const [activeMenu, setActiveMenu] = useState("Home");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mobileDropdown, setMobileDropdown] = useState(null);
+  const [customerPortalSubDropdown, setCustomerPortalSubDropdown] = useState(null);
 
   const customerPortalMenu = {
     "Individual": ["Rent", "Buy", "Lease", "Sell"],
@@ -27,6 +28,7 @@ const Header = ({ onPostPropertyClick }) => {
   const handleCustomerPortalClick = (type) => {
     setActiveDropdown(null);
     setMobileDropdown(null);
+    setCustomerPortalSubDropdown(null);
     setIsMobileMenuOpen(false);
     const typeKey = type.toLowerCase().replace(/\s+/g, '-');
     
@@ -51,12 +53,14 @@ const Header = ({ onPostPropertyClick }) => {
     setActiveMenu(menuName);
     setActiveDropdown(null);
     setMobileDropdown(null);
+    setCustomerPortalSubDropdown(null);
     setIsMobileMenuOpen(false);
   };
 
   const handleOtherMenuClick = (itemName, subItem) => {
     setActiveDropdown(null);
     setMobileDropdown(null);
+    setCustomerPortalSubDropdown(null);
     setIsMobileMenuOpen(false);
     setActiveMenu(itemName);
     if (onPostPropertyClick) {
@@ -70,12 +74,21 @@ const Header = ({ onPostPropertyClick }) => {
 
   const toggleMobileDropdown = (menuName) => {
     setMobileDropdown(mobileDropdown === menuName ? null : menuName);
+    setCustomerPortalSubDropdown(null);
+  };
+
+  const toggleCustomerPortalSubDropdown = (key) => {
+    setCustomerPortalSubDropdown(customerPortalSubDropdown === key ? null : key);
+  };
+
+  const handleGoBack = () => {
+    navigate(-1);
   };
 
   return (
     <header className="w-full fixed top-0 left-0 z-50">
       {/* Top Branding Section - Responsive */}
-      <div className="bg-[#E8F5F3] py-3 px-4 sm:py-4 md:px-6 lg:px-7 flex items-center justify-center relative overflow-hidden shadow-md">
+      <div className="bg-[#E8F5F3] py-2 sm:py-3 md:py-4 px-3 sm:px-4 md:px-6 lg:px-7 flex items-center justify-between relative overflow-hidden shadow-md">
         {/* Animated background bubbles */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="bubble bubble-1"></div>
@@ -88,13 +101,26 @@ const Header = ({ onPostPropertyClick }) => {
           <div className="bubble bubble-8"></div>
         </div>
 
+        {/* Back Button - Left side */}
+        <button 
+          onClick={handleGoBack}
+          className="relative z-10 flex items-center gap-1 sm:gap-2 p-1 sm:p-2 rounded-full hover:bg-[#4DB6AC]/20 transition-colors duration-200 group"
+          aria-label="Go back"
+        >
+          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-[#00796B] group-hover:text-[#00695C] transition-colors duration-200" />
+          <span className="hidden sm:inline text-sm font-medium text-[#00796B] group-hover:text-[#00695C] transition-colors duration-200">
+            Back
+          </span>
+        </button>
+
+        {/* Logo and Text - Centered */}
         <div 
           onClick={() => {
             navigate("/");
             setIsMobileMenuOpen(false);
             setActiveMenu("Home");
           }} 
-          className="cursor-pointer flex items-center gap-2 sm:gap-3 relative z-10"
+          className="cursor-pointer flex items-center gap-1.5 sm:gap-2 md:gap-3 relative z-10 flex-1 justify-center"
         >
           {/* Logo with multiple animations */}
           <div className="relative">
@@ -115,190 +141,204 @@ const Header = ({ onPostPropertyClick }) => {
               <img 
                 src={logo} 
                 alt="Eliteinova Properties" 
-                className="h-10 w-auto sm:h-12 lg:h-15 rounded-full border-4 border-[#4DB6AC] relative z-10" 
+                className="h-8 w-auto sm:h-10 md:h-12 lg:h-15 rounded-full border-4 border-[#4DB6AC] relative z-10" 
               />
             </div>
           </div>
 
-          <div className="flex flex-col relative">
-          <span 
-            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl h-13 "
-            style={{ fontFamily: "Pacifico, cursive" }}
-          >
-            <span className="bg-gradient-to-r from-[#069c8a] via-[#358c83] to-[#0f7e71] bg-clip-text text-transparent font-bold">
-              Eliteinova
+          <div className="flex flex-col relative leading-tight">
+            <span 
+              className="text-base sm:text-xl md:text-2xl lg:text-4xl"
+              style={{ fontFamily: "Pacifico, cursive" }}
+            >
+              <span className="bg-gradient-to-r from-[#069c8a] via-[#358c83] to-[#0f7e71] bg-clip-text text-transparent font-bold">
+                Eliteinova
+              </span>
+              <span className="bg-gradient-to-r from-[#069c8a] via-[#358c83] to-[#0f7e71] bg-clip-text text-transparent text-xs sm:text-base md:text-xl lg:text-2xl ml-0.5 sm:ml-1 font-bold">
+                Properties
+              </span>
             </span>
-            <span className="bg-gradient-to-r from-[#069c8a] via-[#358c83] to-[#0f7e71] bg-clip-text text-transparent text-base sm:text-lg md:text-xl lg:text-2xl ml-1 font-bold">
-              Properties
+            <span 
+              className="text-[10px] xs:text-xs sm:text-sm lg:text-sm font-semibold text-[#00796B] tracking-wider -mt-0.5 sm:-mt-1 md:-mt-2 font-normal"
+            >
+              Eliteinova Tech Pvt Ltd
             </span>
-          </span>
-          <span 
-            className="text-xs sm:text-sm lg:text-sm font-semibold text-[#00796B] tracking-wider -mt-1 sm:-mt-2 md:-mt-3 font-normal"
-          >
-            Eliteinova Tech Pvt Ltd
-          </span>
+          </div>
         </div>
-        </div>
+
+        {/* Mobile Menu Toggle Button - Right side */}
+        <button 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="relative z-10 md:hidden p-1.5 sm:p-2 rounded-full hover:bg-[#4DB6AC]/20 transition-colors duration-200"
+          aria-label="Toggle menu"
+        >
+          {isMobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6 text-[#00796B]" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-[#00796B]" />}
+        </button>
+
+        {/* Desktop Back Button placeholder - to maintain spacing */}
+        <div className="hidden sm:block w-24"></div>
       </div>
 
-      {/* Navigation Bar */}
-      <nav className="bg-[#108f82] w-full px-2 sm:px-4 md:px-6 lg:px-8 relative shadow-lg">
-        <div className="flex items-center justify-between h-12">
-          {/* Desktop Navigation - Shows on md and above */}
-          <div className="hidden md:flex items-center h-full space-x-1 lg:space-x-2">
-            {/* Home */}
-            <button 
-              onClick={() => handleNavigation("/", "Home")} 
-              className={`h-full px-3 lg:px-4 font-medium text-sm transition-colors duration-200 whitespace-nowrap ${
-                isActive("Home") 
-                  ? "bg-[#4DB6AC] text-white hover:bg-[#26A69A]" 
-                  : "text-white hover:bg-[#00796B]"
-              }`}
-            >
-              Home
-            </button>
+      {/* Navigation Bar - Desktop Only */}
+      <nav className="hidden md:block bg-[#108f82] w-full px-2 sm:px-4 md:px-6 lg:px-8 relative shadow-lg">
+        <div className="flex items-center h-12 space-x-1 lg:space-x-2">
+          <button 
+            onClick={() => handleNavigation("/", "Home")} 
+            className={`h-full px-3 lg:px-4 font-medium text-sm transition-colors duration-200 whitespace-nowrap ${
+              isActive("Home") 
+                ? "bg-[#4DB6AC] text-white hover:bg-[#26A69A]" 
+                : "text-white hover:bg-[#00796B]"
+            }`}
+          >
+            Home
+          </button>
 
-            {/* Customer Portal */}
+          <div 
+            className={`relative h-full flex items-center px-3 lg:px-4 cursor-pointer font-medium text-sm transition-colors duration-200 whitespace-nowrap ${
+              isActive("Customer Portal") 
+                ? "bg-[#4DB6AC] text-white" 
+                : "text-white hover:bg-[#00796B]"
+            }`}
+            onMouseEnter={() => setActiveDropdown("cp")} 
+            onMouseLeave={() => setActiveDropdown(null)}
+          >
+            <span className="flex items-center gap-1 lg:gap-2">
+              Customer Portal 
+              <ChevronDown className="w-3 h-3" />
+            </span>
+            
+            {activeDropdown === "cp" && (
+              <div className="absolute top-full left-0 bg-[#00796B] shadow-lg border border-[#4DB6AC] min-w-[160px] lg:min-w-[180px] z-50 rounded-b">
+                {Object.entries(customerPortalMenu).map(([key, sub]) => (
+                  <div key={key} className="group relative border-b border-[#4DB6AC] last:border-0">
+                    <button 
+                      onClick={() => {
+                        handleCustomerPortalClick(key);
+                        setActiveMenu("Customer Portal");
+                      }} 
+                      className="w-full px-4 py-2 hover:bg-[#F0F8F7] hover:text-[#00695C] text-left font-bold capitalize text-white text-sm transition-colors duration-150"
+                    >
+                      {key}
+                    </button>
+                    <div className="absolute left-full top-0 hidden group-hover:block bg-[#00796B] shadow-lg min-w-[150px] border border-[#4DB6AC] rounded">
+                      {sub.map(s => (
+                        <button 
+                          key={s} 
+                          onClick={() => {
+                            handleCustomerPortalClick(s);
+                            setActiveMenu("Customer Portal");
+                          }} 
+                          className="block w-full px-4 py-2 hover:bg-[#F0F8F7] hover:text-[#00695C] text-left text-white text-sm transition-colors duration-150 border-b border-[#4DB6AC] last:border-0"
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {otherMenus.map((item) => (
             <div 
+              key={item.name} 
               className={`relative h-full flex items-center px-3 lg:px-4 cursor-pointer font-medium text-sm transition-colors duration-200 whitespace-nowrap ${
-                isActive("Customer Portal") 
+                isActive(item.name) 
                   ? "bg-[#4DB6AC] text-white" 
                   : "text-white hover:bg-[#00796B]"
               }`}
-              onMouseEnter={() => setActiveDropdown("cp")} 
+              onMouseEnter={() => setActiveDropdown(item.name)} 
               onMouseLeave={() => setActiveDropdown(null)}
             >
               <span className="flex items-center gap-1 lg:gap-2">
-                Customer Portal 
+                {item.name} 
                 <ChevronDown className="w-3 h-3" />
               </span>
               
-              {activeDropdown === "cp" && (
+              {activeDropdown === item.name && (
                 <div className="absolute top-full left-0 bg-[#00796B] shadow-lg border border-[#4DB6AC] min-w-[160px] lg:min-w-[180px] z-50 rounded-b">
-                  {Object.entries(customerPortalMenu).map(([key, sub]) => (
-                    <div key={key} className="group relative border-b border-[#4DB6AC] last:border-0">
-                      <button 
-                        onClick={() => {
-                          handleCustomerPortalClick(key);
-                          setActiveMenu("Customer Portal");
-                        }} 
-                        className="w-full px-4 py-2 hover:bg-[#F0F8F7] hover:text-[#00695C] text-left font-bold capitalize text-white text-sm transition-colors duration-150"
-                      >
-                        {key}
-                      </button>
-                      <div className="absolute left-full top-0 hidden group-hover:block bg-[#00796B] shadow-lg min-w-[150px] border border-[#4DB6AC] rounded">
-                        {sub.map(s => (
-                          <button 
-                            key={s} 
-                            onClick={() => {
-                              handleCustomerPortalClick(s);
-                              setActiveMenu("Customer Portal");
-                            }} 
-                            className="block w-full px-4 py-2 hover:bg-[#F0F8F7] hover:text-[#00695C] text-left text-white text-sm transition-colors duration-150 border-b border-[#4DB6AC] last:border-0"
-                          >
-                            {s}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                  {item.items.map(m => (
+                    <button 
+                      key={m} 
+                      onClick={() => {
+                        handleOtherMenuClick(item.name, m);
+                      }} 
+                      className="block w-full px-4 py-2 hover:bg-[#F0F8F7] hover:text-[#00695C] text-left text-white text-sm transition-colors duration-150 border-b border-[#4DB6AC] last:border-0"
+                    >
+                      {m}
+                    </button>
                   ))}
                 </div>
               )}
             </div>
-
-            {/* Other Menus */}
-            {otherMenus.map((item) => (
-              <div 
-                key={item.name} 
-                className={`relative h-full flex items-center px-3 lg:px-4 cursor-pointer font-medium text-sm transition-colors duration-200 whitespace-nowrap ${
-                  isActive(item.name) 
-                    ? "bg-[#4DB6AC] text-white" 
-                    : "text-white hover:bg-[#00796B]"
-                }`}
-                onMouseEnter={() => setActiveDropdown(item.name)} 
-                onMouseLeave={() => setActiveDropdown(null)}
-              >
-                <span className="flex items-center gap-1 lg:gap-2">
-                  {item.name} 
-                  <ChevronDown className="w-3 h-3" />
-                </span>
-                
-                {activeDropdown === item.name && (
-                  <div className="absolute top-full left-0 bg-[#00796B] shadow-lg border border-[#4DB6AC] min-w-[160px] lg:min-w-[180px] z-50 rounded-b">
-                    {item.items.map(m => (
-                      <button 
-                        key={m} 
-                        onClick={() => {
-                          handleOtherMenuClick(item.name, m);
-                        }} 
-                        className="block w-full px-4 py-2 hover:bg-[#F0F8F7] hover:text-[#00695C] text-left text-white text-sm transition-colors duration-150 border-b border-[#4DB6AC] last:border-0"
-                      >
-                        {m}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Mobile Menu Toggle Button - Shows only on sm screens */}
-          <button 
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden text-white hover:text-[#4DB6AC] transition-colors duration-200 p-2"
-            aria-label="Toggle menu"
-          >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-
-          {/* Spacer for desktop to maintain layout */}
-          <div className="hidden md:block"></div>
+          ))}
         </div>
+      </nav>
 
-        {/* Mobile Menu - Shows only on sm screens */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 right-0 bg-[#00897B] shadow-xl z-50 max-h-[80vh] overflow-y-auto">
-            <div className="flex flex-col py-2">
-              {/* Home */}
+      {/* Mobile Menu */}
+      <div 
+        className={`md:hidden fixed inset-0 top-[60px] sm:top-[68px] bg-[#E8F5F3] z-[100] transition-all duration-300 ${
+          isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
+        }`}
+      >
+        <div className="h-full overflow-y-auto bg-[#E8F5F3]">
+          <div className="flex flex-col min-h-full">
+            {/* Home */}
+            <button 
+              onClick={() => handleNavigation("/", "Home")} 
+              className={`w-full text-left px-6 py-4 font-medium text-base transition-colors duration-200 border-b border-[#B2DFDB] flex items-center gap-3 ${
+                isActive("Home") 
+                  ? "bg-[#4DB6AC] text-white" 
+                  : "text-[#00695C] hover:bg-[#D5F0EC]"
+              }`}
+            >
+              <Home className={`w-5 h-5 ${isActive("Home") ? "text-white" : "text-[#00796B]"}`} />
+              <span>Home</span>
+            </button>
+
+            {/* Customer Portal Mobile */}
+            <div className="border-b border-[#B2DFDB]">
               <button 
-                onClick={() => handleNavigation("/", "Home")} 
-                className={`w-full text-left px-4 py-3 font-medium text-sm transition-colors duration-200 border-b border-[#00796B] ${
-                  isActive("Home") 
+                onClick={() => toggleMobileDropdown("cp")}
+                className={`w-full text-left px-6 py-4 font-medium text-base transition-colors duration-200 flex items-center justify-between ${
+                  isActive("Customer Portal") 
                     ? "bg-[#4DB6AC] text-white" 
-                    : "text-white hover:bg-[#00796B]"
+                    : "text-[#00695C] hover:bg-[#D5F0EC]"
                 }`}
               >
-                Home
-              </button>
-
-              {/* Customer Portal Mobile */}
-              <div className="border-b border-[#00796B]">
-                <button 
-                  onClick={() => toggleMobileDropdown("cp")}
-                  className={`w-full text-left px-4 py-3 font-medium text-sm transition-colors duration-200 flex items-center justify-between ${
-                    isActive("Customer Portal") 
-                      ? "bg-[#4DB6AC] text-white" 
-                      : "text-white hover:bg-[#00796B]"
-                  }`}
-                >
+                <div className="flex items-center gap-3">
+                  <Building2 className={`w-5 h-5 ${isActive("Customer Portal") ? "text-white" : "text-[#00796B]"}`} />
                   <span>Customer Portal</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobileDropdown === "cp" ? "rotate-180" : ""}`} />
-                </button>
-                
-                {mobileDropdown === "cp" && (
-                  <div className="bg-[#00796B]">
-                    {Object.entries(customerPortalMenu).map(([key, sub]) => (
-                      <div key={key} className="border-b border-[#4DB6AC] last:border-0">
+                </div>
+                <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${mobileDropdown === "cp" ? "rotate-180" : ""} ${isActive("Customer Portal") ? "text-white" : "text-[#00796B]"}`} />
+              </button>
+              
+              {mobileDropdown === "cp" && (
+                <div className="bg-[#D5F0EC]">
+                  {Object.entries(customerPortalMenu).map(([key, sub]) => (
+                    <div key={key} className="border-b border-[#B2DFDB] last:border-0">
+                      <div className="flex items-center justify-between w-full">
                         <button 
                           onClick={() => {
                             handleCustomerPortalClick(key);
                             setActiveMenu("Customer Portal");
-                          }} 
-                          className="w-full text-left px-6 py-2.5 font-bold capitalize text-white text-sm hover:bg-[#4DB6AC] transition-colors duration-150"
+                          }}
+                          className="flex-1 text-left px-8 py-3 font-bold capitalize text-[#00695C] text-sm hover:bg-[#C5E8E3] transition-colors duration-150 flex items-center gap-2"
                         >
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#4DB6AC]"></span>
                           {key}
                         </button>
-                        <div className="pl-6">
+                        <button 
+                          onClick={() => toggleCustomerPortalSubDropdown(key)}
+                          className="px-4 py-3 hover:bg-[#C5E8E3] transition-colors duration-150"
+                        >
+                          <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${customerPortalSubDropdown === key ? "rotate-180" : ""} text-[#00796B]`} />
+                        </button>
+                      </div>
+                      
+                      {customerPortalSubDropdown === key && (
+                        <div className="pl-8 bg-[#E8F5F3]">
                           {sub.map(s => (
                             <button 
                               key={s} 
@@ -306,54 +346,85 @@ const Header = ({ onPostPropertyClick }) => {
                                 handleCustomerPortalClick(s);
                                 setActiveMenu("Customer Portal");
                               }} 
-                              className="block w-full text-left px-4 py-2 hover:bg-[#4DB6AC] text-white text-sm transition-colors duration-150 border-t border-[#4DB6AC]"
+                              className="block w-full text-left px-4 py-2.5 hover:bg-[#C5E8E3] text-[#00695C] text-sm transition-colors duration-150 border-t border-[#B2DFDB] flex items-center gap-2"
                             >
+                              <span className="w-1 h-1 rounded-full bg-[#80CBC4]"></span>
                               {s}
                             </button>
                           ))}
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
-              {/* Other Menus Mobile */}
-              {otherMenus.map((item) => (
-                <div key={item.name} className="border-b border-[#00796B]">
+            {/* Other Menus Mobile */}
+            {otherMenus.map((item) => {
+              const getIcon = (name) => {
+                switch(name) {
+                  case 'Post Property': return <PlusCircle className="w-5 h-5" />;
+                  case 'Find the Loan': return <Search className="w-5 h-5" />;
+                  case 'Services': return <Wrench className="w-5 h-5" />;
+                  default: return <Building2 className="w-5 h-5" />;
+                }
+              };
+
+              return (
+                <div key={item.name} className="border-b border-[#B2DFDB]">
                   <button 
                     onClick={() => toggleMobileDropdown(item.name)}
-                    className={`w-full text-left px-4 py-3 font-medium text-sm transition-colors duration-200 flex items-center justify-between ${
+                    className={`w-full text-left px-6 py-4 font-medium text-base transition-colors duration-200 flex items-center justify-between ${
                       isActive(item.name) 
                         ? "bg-[#4DB6AC] text-white" 
-                        : "text-white hover:bg-[#00796B]"
+                        : "text-[#00695C] hover:bg-[#D5F0EC]"
                     }`}
                   >
-                    <span>{item.name}</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobileDropdown === item.name ? "rotate-180" : ""}`} />
+                    <div className="flex items-center gap-3">
+                      {React.cloneElement(getIcon(item.name), { 
+                        className: `w-5 h-5 ${isActive(item.name) ? "text-white" : "text-[#00796B]"}`
+                      })}
+                      <span>{item.name}</span>
+                    </div>
+                    <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${mobileDropdown === item.name ? "rotate-180" : ""} ${isActive(item.name) ? "text-white" : "text-[#00796B]"}`} />
                   </button>
                   
                   {mobileDropdown === item.name && (
-                    <div className="bg-[#00796B]">
+                    <div className="bg-[#D5F0EC]">
                       {item.items.map(m => (
                         <button 
                           key={m} 
                           onClick={() => {
                             handleOtherMenuClick(item.name, m);
                           }} 
-                          className="block w-full text-left px-6 py-2.5 hover:bg-[#4DB6AC] text-white text-sm transition-colors duration-150 border-t border-[#4DB6AC]"
+                          className="block w-full text-left px-8 py-3 hover:bg-[#C5E8E3] text-[#00695C] text-sm transition-colors duration-150 border-t border-[#B2DFDB] flex items-center gap-2"
                         >
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#4DB6AC]"></span>
                           {m}
                         </button>
                       ))}
                     </div>
                   )}
                 </div>
-              ))}
+              );
+            })}
+
+            {/* Footer with Line - Always at bottom */}
+            <div className="mt-auto">
+              <div className="border-t border-[#B2DFDB]"></div>
+              <div className="px-6 py-4 bg-[#E8F5F3]">
+                <p className="text-[#00695C] text-xs text-center font-medium">
+                  © 2024 Eliteinova Properties
+                </p>
+                <p className="text-[#4DB6AC] text-xs text-center mt-1">
+                  Eliteinova Tech Pvt Ltd
+                </p>
+              </div>
             </div>
           </div>
-        )}
-      </nav>
+        </div>
+      </div>
 
       {/* Custom Animations */}
       <style jsx>{`
@@ -517,35 +588,6 @@ const Header = ({ onPostPropertyClick }) => {
           100% {
             transform: translateX(50%);
           }
-        }
-        
-        /* Text Shimmer */
-        @keyframes shimmer-text {
-          0% {
-            background-position: -200% center;
-          }
-          100% {
-            background-position: 200% center;
-          }
-        }
-        
-        .animate-shimmer-text {
-          background-size: 200% auto;
-          animation: shimmer-text 3s linear infinite;
-        }
-        
-        /* Text Pulse */
-        @keyframes pulse-text {
-          0%, 100% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.7;
-          }
-        }
-        
-        .animate-pulse-text {
-          animation: pulse-text 2s ease-in-out infinite;
         }
         
         /* Animation Classes */
