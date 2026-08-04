@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { User, Menu, ChevronDown, X, Sparkles, Settings, LogOut, Home, Building, Landmark, Warehouse, TrendingUp, Shield, DollarSign, Wrench, PaintBucket, Droplets, Heart, Star, Zap, CheckCircle, Award, MapPin, Globe, Phone, Mail, Calendar, Clock, Briefcase } from "lucide-react";
+import { User, Menu, ChevronDown, X, Sparkles, Settings, LogOut, Home, Building, Landmark, Warehouse, TrendingUp, Shield, DollarSign, Wrench, PaintBucket, Droplets, Heart, Star, Zap, CheckCircle, Award, MapPin, Globe, Phone, Mail, Calendar, Clock, Briefcase, Users, Briefcase as OfficeIcon, Menu as MenuIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo1.png";
 
@@ -93,9 +93,23 @@ const Header = ({ onPostPropertyClick }) => {
     loan: false,
     services: false,
     profile: false,
+    admin: false,
     customerSub: {},
     postSub: {}
   });
+  
+  // Refs for dropdown containers
+  const dropdownRefs = {
+    admin: useRef(null),
+    profile: useRef(null),
+    customer: useRef(null),
+    post: useRef(null),
+    loan: useRef(null),
+    services: useRef(null)
+  };
+  
+  // Timer refs for hover delay
+  const hoverTimerRef = useRef(null);
   
   const navigate = useNavigate();
 
@@ -137,6 +151,21 @@ const Header = ({ onPostPropertyClick }) => {
     { label: "Property Management", icon: "🏢", path: "/profile/property-management" }
   ];
 
+  const adminMenu = [
+    { 
+      label: "Admin", 
+      icon: <Users className="w-4 h-4" />, 
+      path: "/admin",
+      description: "Admin Panel"
+    },
+    { 
+      label: "Office", 
+      icon: <OfficeIcon className="w-4 h-4" />, 
+      path: "/office",
+      description: "Office Dashboard"
+    }
+  ];
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
@@ -145,8 +174,41 @@ const Header = ({ onPostPropertyClick }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Click outside handler for dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Check if click is outside all dropdown containers
+      const isOutsideAll = Object.values(dropdownRefs).every(ref => 
+        ref.current && !ref.current.contains(event.target)
+      );
+      
+      if (isOutsideAll && activeDropdown) {
+        setActiveDropdown(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [activeDropdown]);
+
+  // Clean up hover timer
+  useEffect(() => {
+    return () => {
+      if (hoverTimerRef.current) {
+        clearTimeout(hoverTimerRef.current);
+      }
+    };
+  }, []);
+
   // Handle profile navigation
   const handleProfileNavigation = (path) => {
+    setActiveDropdown(null);
+    setMobileMenuOpen(false);
+    navigate(path);
+  };
+
+  // Handle admin navigation
+  const handleAdminNavigation = (path) => {
     setActiveDropdown(null);
     setMobileMenuOpen(false);
     navigate(path);
@@ -405,6 +467,7 @@ const Header = ({ onPostPropertyClick }) => {
         loan: false,
         services: false,
         profile: false,
+        admin: false,
         customerSub: {},
         postSub: {}
       });
@@ -415,10 +478,6 @@ const Header = ({ onPostPropertyClick }) => {
     setMobileDropdowns(prev => ({
       ...prev,
       [key]: !prev[key],
-      ...(key !== 'customerSub' && key !== 'postSub' && Object.keys(prev).reduce((acc, k) => {
-        if (k !== key && k !== 'customerSub' && k !== 'postSub') acc[k] = false;
-        return acc;
-      }, {}))
     }));
   };
 
@@ -440,6 +499,37 @@ const Header = ({ onPostPropertyClick }) => {
         [key]: !prev.postSub[key]
       }
     }));
+  };
+
+  // Dropdown handlers with improved logic
+  const handleDropdownToggle = (dropdown) => {
+    setActiveDropdown(activeDropdown === dropdown ? null : dropdown);
+  };
+
+  const handleDropdownEnter = (dropdown) => {
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+    setActiveDropdown(dropdown);
+  };
+
+  const handleDropdownLeave = (e, dropdown) => {
+    // Check if the mouse is moving to the dropdown content
+    const relatedTarget = e.relatedTarget;
+    const currentRef = dropdownRefs[dropdown];
+    
+    if (currentRef && currentRef.current && relatedTarget) {
+      if (currentRef.current.contains(relatedTarget)) {
+        return;
+      }
+    }
+    
+    // Use a small delay to prevent accidental closing
+    hoverTimerRef.current = setTimeout(() => {
+      setActiveDropdown(null);
+      hoverTimerRef.current = null;
+    }, 100);
   };
 
   return (
@@ -548,12 +638,59 @@ const Header = ({ onPostPropertyClick }) => {
 
             {/* Profile Section - Desktop */}
             <div className="hidden md:flex items-center gap-3">
+              {/* Admin Hamburger Dropdown */}
               <div
+                ref={dropdownRefs.admin}
                 className="relative"
-                onMouseEnter={() => setActiveDropdown("profile")}
-                onMouseLeave={() => setActiveDropdown(null)}
+                onMouseEnter={() => handleDropdownEnter("admin")}
+                onMouseLeave={(e) => handleDropdownLeave(e, "admin")}
               >
-                <button className="group relative flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-white/40">
+                <button 
+                  className="group relative flex items-center justify-center w-10 h-10 rounded-full bg-[#26A69A]/30 backdrop-blur-sm hover:bg-[#26A69A]/50 transition-all duration-300 border border-white/20 hover:border-white/40"
+                  onClick={() => handleDropdownToggle("admin")}
+                >
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center shadow-lg shadow-[#00695C]/30 group-hover:scale-110 transition-transform duration-300">
+                    <MenuIcon className="w-4 h-4 text-white" />
+                  </div>
+                </button>
+
+                {activeDropdown === "admin" && (
+                  <div className="absolute top-full right-0 mt-2 bg-white/95 backdrop-blur-xl rounded-xl shadow-2xl shadow-[#00695C]/20 z-50 min-w-[200px] border border-white/30 animate-dropdown overflow-hidden">
+                    <div className="p-2">
+                      {adminMenu.map((item, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleAdminNavigation(item.path)}
+                          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 transition-all duration-300 group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00695C]/10 to-[#26A69A]/10 flex items-center justify-center text-[#00695C] group-hover:scale-110 transition-transform duration-300">
+                            {item.icon}
+                          </div>
+                          <div className="flex flex-col items-start">
+                            <span className="text-sm font-semibold text-gray-800 group-hover:text-[#00695C] transition-colors">
+                              {item.label}
+                            </span>
+                            <span className="text-[10px] text-gray-500">{item.description}</span>
+                          </div>
+                          <ChevronDown className="w-3.5 h-3.5 ml-auto text-gray-400 group-hover:text-[#00695C] transition-colors -rotate-90" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Profile Dropdown */}
+              <div
+                ref={dropdownRefs.profile}
+                className="relative"
+                onMouseEnter={() => handleDropdownEnter("profile")}
+                onMouseLeave={(e) => handleDropdownLeave(e, "profile")}
+              >
+                <button 
+                  className="group relative flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-white/40"
+                  onClick={() => handleDropdownToggle("profile")}
+                >
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg shadow-yellow-500/30">
                     <User className="w-4 h-4 text-white" />
                   </div>
@@ -583,7 +720,6 @@ const Header = ({ onPostPropertyClick }) => {
                       <button
                         onClick={() => {
                           setActiveDropdown(null);
-                          // Add logout logic here
                           navigate("/logout");
                         }}
                         className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gradient-to-r from-red-50 to-pink-50 transition-all duration-300 group"
@@ -629,9 +765,10 @@ const Header = ({ onPostPropertyClick }) => {
             </button>
 
             <div
+              ref={dropdownRefs.customer}
               className="relative h-full"
-              onMouseEnter={() => setActiveDropdown("customer")}
-              onMouseLeave={() => setActiveDropdown(null)}
+              onMouseEnter={() => handleDropdownEnter("customer")}
+              onMouseLeave={(e) => handleDropdownLeave(e, "customer")}
             >
               <button 
                 onClick={() => navigate("/customer-portal")}
@@ -670,9 +807,10 @@ const Header = ({ onPostPropertyClick }) => {
             </div>
 
             <div
+              ref={dropdownRefs.post}
               className="relative h-full"
-              onMouseEnter={() => setActiveDropdown("post")}
-              onMouseLeave={() => setActiveDropdown(null)}
+              onMouseEnter={() => handleDropdownEnter("post")}
+              onMouseLeave={(e) => handleDropdownLeave(e, "post")}
             >
               <button
                 onClick={() => navigate("/post-property")}
@@ -711,9 +849,10 @@ const Header = ({ onPostPropertyClick }) => {
             </div>
 
             <div
+              ref={dropdownRefs.loan}
               className="relative h-full"
-              onMouseEnter={() => setActiveDropdown("loan")}
-              onMouseLeave={() => setActiveDropdown(null)}
+              onMouseEnter={() => handleDropdownEnter("loan")}
+              onMouseLeave={(e) => handleDropdownLeave(e, "loan")}
             >
               <button className="group relative px-5 h-full text-white font-medium text-sm tracking-wide hover:bg-white/5 flex items-center gap-2 transition-all duration-300">
                 <Landmark className="w-4 h-4" />
@@ -736,9 +875,10 @@ const Header = ({ onPostPropertyClick }) => {
             </div>
 
             <div
+              ref={dropdownRefs.services}
               className="relative h-full"
-              onMouseEnter={() => setActiveDropdown("services")}
-              onMouseLeave={() => setActiveDropdown(null)}
+              onMouseEnter={() => handleDropdownEnter("services")}
+              onMouseLeave={(e) => handleDropdownLeave(e, "services")}
             >
               <button className="group relative px-5 h-full text-white font-medium text-sm tracking-wide hover:bg-white/5 flex items-center gap-2 transition-all duration-300">
                 <Settings className="w-4 h-4" />
@@ -763,7 +903,7 @@ const Header = ({ onPostPropertyClick }) => {
         </nav>
       </header>
 
-      {/* Mobile Profile Section */}
+      {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div 
           className="md:hidden fixed inset-0 z-50 animate-fade"
@@ -793,8 +933,48 @@ const Header = ({ onPostPropertyClick }) => {
               </button>
             </div>
             
-            {/* Profile Section in Mobile */}
+            {/* Admin Section in Mobile */}
             <div className="px-4 py-3 border-b border-white/10 animate-slide-item" style={{ animationDelay: '0ms' }}>
+              <div 
+                className="flex items-center gap-3 cursor-pointer"
+                onClick={() => toggleMobileDropdown('admin')}
+              >
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center shadow-lg shadow-[#00695C]/30">
+                  <MenuIcon className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-white font-semibold text-sm">Admin Panel</p>
+                  <p className="text-white/60 text-xs">Manage admin & office</p>
+                </div>
+                <ChevronDown className={`w-4 h-4 text-white transition-transform duration-300 ${mobileDropdowns.admin ? 'rotate-180' : ''}`} />
+              </div>
+              
+              {mobileDropdowns.admin && (
+                <div className="mt-2 space-y-1 pl-3">
+                  {adminMenu.map((item, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        handleAdminNavigation(item.path);
+                        toggleMobileMenu();
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-300"
+                    >
+                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-[#00695C]/20 to-[#26A69A]/20 flex items-center justify-center text-[#00695C]">
+                        {item.icon}
+                      </div>
+                      <div className="flex flex-col items-start flex-1">
+                        <span className="text-white text-sm font-medium">{item.label}</span>
+                        <span className="text-white/50 text-[10px]">{item.description}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            {/* Profile Section in Mobile */}
+            <div className="px-4 py-3 border-b border-white/10 animate-slide-item" style={{ animationDelay: '50ms' }}>
               <div 
                 className="flex items-center gap-3 cursor-pointer"
                 onClick={() => toggleMobileDropdown('profile')}
@@ -846,12 +1026,12 @@ const Header = ({ onPostPropertyClick }) => {
                   toggleMobileMenu();
                 }}
                 className="w-full text-left text-white font-medium py-3 border-b border-white/5 text-sm animate-slide-item"
-                style={{ animationDelay: '50ms' }}
+                style={{ animationDelay: '100ms' }}
               >
                 🏠 Home
               </button>
               
-              <div className="border-b border-white/5 animate-slide-item" style={{ animationDelay: '100ms' }}>
+              <div className="border-b border-white/5 animate-slide-item" style={{ animationDelay: '150ms' }}>
                 <div 
                   className="flex items-center justify-between py-3 cursor-pointer"
                   onClick={() => toggleMobileDropdown('customer')}
@@ -896,7 +1076,7 @@ const Header = ({ onPostPropertyClick }) => {
                 )}
               </div>
               
-              <div className="border-b border-white/5 animate-slide-item" style={{ animationDelay: '150ms' }}>
+              <div className="border-b border-white/5 animate-slide-item" style={{ animationDelay: '200ms' }}>
                 <div 
                   className="flex items-center justify-between py-3 cursor-pointer"
                   onClick={() => toggleMobileDropdown('post')}
@@ -941,7 +1121,7 @@ const Header = ({ onPostPropertyClick }) => {
                 )}
               </div>
 
-              <div className="border-b border-white/5 animate-slide-item" style={{ animationDelay: '200ms' }}>
+              <div className="border-b border-white/5 animate-slide-item" style={{ animationDelay: '250ms' }}>
                 <div 
                   className="flex items-center justify-between py-3 cursor-pointer"
                   onClick={() => toggleMobileDropdown('loan')}
@@ -969,7 +1149,7 @@ const Header = ({ onPostPropertyClick }) => {
                 )}
               </div>
               
-              <div className="border-b border-white/5 animate-slide-item" style={{ animationDelay: '250ms' }}>
+              <div className="border-b border-white/5 animate-slide-item" style={{ animationDelay: '300ms' }}>
                 <div 
                   className="flex items-center justify-between py-3 cursor-pointer"
                   onClick={() => toggleMobileDropdown('services')}
