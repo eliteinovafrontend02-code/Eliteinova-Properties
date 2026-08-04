@@ -78,10 +78,10 @@ const OwnerProfile = () => {
     postedDate: '15-06-2025',
     description: 'Luxury villa with garden, pool, and premium interiors. This stunning property features modern architecture with premium finishes throughout. The villa offers spacious living areas, a beautiful garden, and a swimming pool.',
     images: [
-      '/src/assets/Villa/villa1_1.png',
-      '/src/assets/Villa/villa1_2.png',
-      '/src/assets/Villa/villa1_3.png',
-      '/src/assets/Villa/villa1_4.png'
+      "/villa1_1.png",
+      "/villa1_2.png",
+      "/villa1_3.png",
+      "/villa1_4.png"
     ],
     features: ['4 BHK', 'Swimming Pool', 'Garden', 'Smart Home', 'Premium Interiors'],
     views: 245,
