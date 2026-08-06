@@ -104,6 +104,7 @@ import PropertyManagementFormModal from "./components/Forms/PropertyManagementFo
 
 //import all profiles
 import OwnerProfile from "./components/profiles/OwnerProfile";
+import AgentProfile from "./components/profiles/AgentProfile";
 
 
 function AppLayout() {
@@ -180,6 +181,7 @@ function AppLayout() {
 
           {/* My Profile  Routes */}
            <Route path="/profile/owner" element={<OwnerProfile/>} />
+           <Route path="/profile/agent" element={<AgentProfile/>} />
 
           <Route path="/" element={<HomePage />} />
           <Route path="/customer-portal" element={<CustomerPortalPage />} />

@@ -18,6 +18,7 @@ import {
   Dumbbell, Waves, ParkingCircle, Sprout, Leaf, ChevronLeft, ChevronRight
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
 
 // Rent Options for Property Details & Pricing
 const bedroomOptions = ["Studio", "1 BHK", "2 BHK", "3 BHK", "4+ BHK"];
@@ -35,6 +36,73 @@ const availableAmenities = [
   "Swimming Pool", "Garden", "Smart Home", "Sea View", "Lake View", "City View"
 ];
 
+
+// Defined outside OwnerProfile so its component identity stays stable across
+// parent re-renders (e.g. clicking Next/Prev). If this were declared inside
+// OwnerProfile, every state update there would recreate this function and
+// React would unmount + remount the whole modal instead of just swapping the image.
+const MediaLightboxModal = ({ items, index, onClose, onNavigate, onDelete }) => {
+  if (!items || items.length === 0) return null;
+  const current = items[index];
+
+  const goPrev = () => onNavigate((index - 1 + items.length) % items.length);
+  const goNext = () => onNavigate((index + 1) % items.length);
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 backdrop-blur-md animate-fadeIn p-4" onClick={onClose}>
+      <div className="relative max-w-4xl max-h-[85vh] w-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+        <button
+          onClick={onClose}
+          className="absolute -top-10 right-0 text-white/80 hover:text-white transition-all duration-300 hover:rotate-90 hover:scale-110"
+        >
+          <X className="w-7 h-7" />
+        </button>
+
+        {items.length > 1 && (
+          <button
+            onClick={goPrev}
+            className="absolute left-0 sm:-left-14 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-2.5 transition-all duration-300 z-10"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+        )}
+
+        <div className="w-full flex flex-col items-center gap-3 animate-scaleIn">
+          {current.type === 'video' ? (
+            <video src={current.url} controls autoPlay className="max-w-full max-h-[75vh] rounded-2xl shadow-2xl bg-black" />
+          ) : (
+            <img src={current.url} alt={current.name || 'Preview'} className="max-w-full max-h-[75vh] rounded-2xl shadow-2xl object-contain bg-black/20" />
+          )}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 text-white/80 text-xs font-medium">
+              <span>{current.name}</span>
+              {items.length > 1 && <span>· {index + 1} / {items.length}</span>}
+            </div>
+            {onDelete && (
+              <button
+                onClick={onDelete}
+                title="Delete this file"
+                className="flex items-center gap-1 bg-red-500/90 hover:bg-red-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-lg transition-all duration-300 hover:scale-105"
+              >
+                <Trash2 className="w-3 h-3" />
+                Delete
+              </button>
+            )}
+          </div>
+        </div>
+
+        {items.length > 1 && (
+          <button
+            onClick={goNext}
+            className="absolute right-0 sm:-right-14 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-2.5 transition-all duration-300 z-10"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const OwnerProfile = () => {
   const navigate = useNavigate();
@@ -60,6 +128,9 @@ const OwnerProfile = () => {
   const [floorPlanPreview, setFloorPlanPreview] = useState(null);
   const [videoPreview, setVideoPreview] = useState(null);
   const [customAmenitiesList, setCustomAmenitiesList] = useState([]);
+  const [showMediaLightbox, setShowMediaLightbox] = useState(false);
+  const [lightboxItems, setLightboxItems] = useState([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
   
   const fileInputRefs = useRef({});
   const profilePhotoInputRef = useRef(null);
@@ -360,7 +431,17 @@ const OwnerProfile = () => {
   };
 
   const handleMultipleFileUpload = (field, files) => {
-    const fileArray = Array.from(files);
+    let fileArray = Array.from(files);
+
+    if (field === 'propertyPhotos') {
+      const existingCount = documents.propertyPhotos.length;
+      const remainingSlots = Math.max(0, 3 - existingCount);
+      if (fileArray.length > remainingSlots) {
+        alert('Property Photos allows a maximum of 3 images.');
+      }
+      fileArray = fileArray.slice(0, remainingSlots);
+    }
+
     if (fileArray.length > 0) {
       setDocuments(prev => ({
         ...prev,
@@ -496,6 +577,134 @@ const OwnerProfile = () => {
     }
   };
 
+  const getFileStatusLabel = (field) => {
+    const files = documents[field];
+    const hasFiles = Array.isArray(files) ? files.length > 0 : files !== null;
+    if (!hasFiles) return null;
+    return Array.isArray(files) ? `${files.length} uploaded` : 'Uploaded';
+  };
+
+  const openMediaLightbox = (field, type) => {
+    const val = documents[field];
+    if (!val) return;
+    const files = Array.isArray(val) ? val : [val];
+    if (files.length === 0) return;
+    const items = files.map((f, i) => ({
+      type,
+      url: URL.createObjectURL(f),
+      name: f.name,
+      field,
+      docIndex: Array.isArray(val) ? i : undefined,
+    }));
+    setLightboxItems(items);
+    setLightboxIndex(0);
+    setShowMediaLightbox(true);
+  };
+
+  const handleDeleteLightboxItem = () => {
+    const item = lightboxItems[lightboxIndex];
+    if (!item) return;
+
+    setDocuments(prev => {
+      if (item.docIndex === undefined) {
+        return { ...prev, [item.field]: null };
+      }
+      return { ...prev, [item.field]: prev[item.field].filter((_, i) => i !== item.docIndex) };
+    });
+
+    setLightboxItems(prevItems => {
+      const newItems = prevItems
+        .filter((_, i) => i !== lightboxIndex)
+        .map((it, i) => (it.docIndex !== undefined ? { ...it, docIndex: i } : it));
+      if (newItems.length === 0) {
+        setShowMediaLightbox(false);
+      } else {
+        setLightboxIndex(idx => Math.min(idx, newItems.length - 1));
+      }
+      return newItems;
+    });
+
+    showSuccessToast();
+  };
+
+  // ============ INVOICE PDF HANDLER ============
+
+  const handleDownloadInvoice = () => {
+    const doc = new jsPDF();
+    const teal = [0, 105, 92];
+
+    // Header band
+    doc.setFillColor(...teal);
+    doc.rect(0, 0, 210, 28, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(18);
+    doc.setFont(undefined, 'bold');
+    doc.text('Owner Profile Invoice', 14, 17);
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 196, 17, { align: 'right' });
+
+    doc.setTextColor(30, 30, 30);
+    let y = 40;
+
+    const section = (title) => {
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(...teal);
+      doc.text(title, 14, y);
+      doc.setDrawColor(...teal);
+      doc.line(14, y + 1.5, 196, y + 1.5);
+      y += 8;
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(30, 30, 30);
+      doc.setFontSize(10.5);
+    };
+
+    const row = (label, value) => {
+      doc.setFont(undefined, 'bold');
+      doc.text(`${label}:`, 14, y);
+      doc.setFont(undefined, 'normal');
+      doc.text(String(value || 'Not specified'), 65, y);
+      y += 7;
+    };
+
+    section('Personal Details');
+    row('Full Name', editForm.fullName);
+    row('Mobile Number', editForm.mobileNumber);
+    row('Email Address', editForm.emailAddress);
+    row('Date of Birth', editForm.dateOfBirth);
+    row('Gender', editForm.gender);
+    y += 4;
+
+    section('Address Details');
+    row('Address Line 1', editForm.addressLine1);
+    row('Address Line 2', editForm.addressLine2);
+    row('City', editForm.city);
+    row('District', editForm.district);
+    row('State', editForm.state);
+    row('PIN Code', editForm.pinCode);
+    y += 4;
+
+    section('Identity & Bank Details');
+    row('Aadhaar Number', editForm.aadhaarNumber);
+    row('PAN Number', editForm.panNumber);
+    row('Bank Name', editForm.bankName);
+    row('Account Number', editForm.accountNumber);
+    row('IFSC Code', editForm.ifscCode);
+    row('UPI ID', editForm.upiId);
+    y += 4;
+
+    section('Properties Summary');
+    row('Total Properties', properties.length);
+    row('Active Listings', properties.filter(p => p.status === 'Active').length);
+
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text('This is a system-generated document.', 14, 287);
+
+    doc.save(`Invoice_${editForm.fullName.replace(/\s+/g, '_')}.pdf`);
+  };
+
   // ============ PROPERTY HANDLERS ============
   
   const handleViewDetails = (property) => {
@@ -588,6 +797,32 @@ const OwnerProfile = () => {
     setProperties(prev => prev.filter(p => p.id !== propertyToDelete.id));
     setShowDeletePropertyConfirm(false);
     setPropertyToDelete(null);
+    showSuccessToast();
+  };
+
+  // ============ PROPERTY DETAILS IMAGE HANDLERS ============
+
+  const handleAddPropertyDetailImages = (propertyId, files) => {
+    const fileArray = Array.from(files);
+    if (fileArray.length === 0) return;
+    const newUrls = fileArray.map((f) => URL.createObjectURL(f));
+
+    setProperties(prev =>
+      prev.map(p => p.id === propertyId ? { ...p, images: [...(p.images || []), ...newUrls] } : p)
+    );
+    setSelectedProperty(prev =>
+      prev && prev.id === propertyId ? { ...prev, images: [...(prev.images || []), ...newUrls] } : prev
+    );
+    showSuccessToast();
+  };
+
+  const handleRemovePropertyDetailImage = (propertyId, imageIndex) => {
+    setProperties(prev =>
+      prev.map(p => p.id === propertyId ? { ...p, images: (p.images || []).filter((_, i) => i !== imageIndex) } : p)
+    );
+    setSelectedProperty(prev =>
+      prev && prev.id === propertyId ? { ...prev, images: (prev.images || []).filter((_, i) => i !== imageIndex) } : prev
+    );
     showSuccessToast();
   };
 
@@ -1290,11 +1525,20 @@ const OwnerProfile = () => {
     );
   };
 
-  const PropertyDetailsModal = ({ property, onClose }) => {
+  const PropertyDetailsModal = ({ property, onClose, onAddImages, onRemoveImage }) => {
     if (!property) return null;
 
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const images = property.images || ['https://via.placeholder.com/400x300/CCCCCC/666666?text=No+Image'];
+    const detailImageInputRef = useRef(null);
+    const rawImages = property.images || [];
+    const hasImages = rawImages.length > 0;
+    const images = hasImages ? rawImages : ['https://via.placeholder.com/400x300/CCCCCC/666666?text=No+Image'];
+
+    useEffect(() => {
+      if (currentImageIndex >= images.length) {
+        setCurrentImageIndex(Math.max(0, images.length - 1));
+      }
+    }, [images.length]);
 
     const nextImage = () => {
       setCurrentImageIndex((prev) => (prev + 1) % images.length);
@@ -1302,6 +1546,18 @@ const OwnerProfile = () => {
 
     const prevImage = () => {
       setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    };
+
+    const handleAddImagesChange = (e) => {
+      const files = e.target.files;
+      if (files && files.length > 0) {
+        onAddImages(property.id, files);
+      }
+      e.target.value = '';
+    };
+
+    const handleDeleteImage = (idx) => {
+      onRemoveImage(property.id, idx);
     };
 
     return (
@@ -1355,6 +1611,17 @@ const OwnerProfile = () => {
                 </>
               )}
 
+              {hasImages && (
+                <button
+                  onClick={() => handleDeleteImage(currentImageIndex)}
+                  title="Delete this image"
+                  className="absolute bottom-2 left-2 flex items-center gap-1 bg-red-500/90 hover:bg-red-600 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg shadow-lg transition-all duration-300 hover:scale-105"
+                >
+                  <Trash2 className="w-3 h-3" />
+                  Delete
+                </button>
+              )}
+
               <div className="absolute top-2 right-2">
                 <span className={`px-2.5 py-0.5 rounded-lg text-[10px] font-bold shadow-lg ${
                   property.status === 'Active' ? 'bg-green-500 text-white' :
@@ -1364,6 +1631,27 @@ const OwnerProfile = () => {
                   {property.status}
                 </span>
               </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] text-gray-500 font-medium">
+                {hasImages ? `${images.length} image${images.length > 1 ? 's' : ''}` : 'No images uploaded yet'}
+              </p>
+              <button
+                onClick={() => detailImageInputRef.current?.click()}
+                className="flex items-center gap-1.5 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+              >
+                <Upload className="w-3 h-3" />
+                Add Image
+              </button>
+              <input
+                ref={detailImageInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handleAddImagesChange}
+              />
             </div>
 
             {images.length > 1 && (
@@ -1486,7 +1774,7 @@ const OwnerProfile = () => {
                   {images.map((img, idx) => (
                     <div 
                       key={idx} 
-                      className={`relative rounded-lg overflow-hidden bg-gray-100 aspect-square cursor-pointer border-2 transition-all duration-300 hover:scale-105 ${
+                      className={`group/thumb relative rounded-lg overflow-hidden bg-gray-100 aspect-square cursor-pointer border-2 transition-all duration-300 hover:scale-105 ${
                         currentImageIndex === idx ? 'border-[#00695C] shadow-md' : 'border-gray-200 hover:border-gray-400'
                       }`}
                       onClick={() => setCurrentImageIndex(idx)}
@@ -1505,6 +1793,18 @@ const OwnerProfile = () => {
                             Active
                           </div>
                         </div>
+                      )}
+                      {hasImages && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteImage(idx);
+                          }}
+                          title="Delete image"
+                          className="absolute top-1 right-1 bg-red-500/90 hover:bg-red-600 text-white p-1 rounded-md shadow-lg opacity-0 group-hover/thumb:opacity-100 transition-all duration-300"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
                       )}
                     </div>
                   ))}
@@ -1639,51 +1939,6 @@ const OwnerProfile = () => {
       </div>
     );
 
-    const AnimatedFileCard = ({ label, field, icon, description, delay = 0 }) => {
-      const files = documents[field];
-      const hasFiles = Array.isArray(files) ? files.length > 0 : files !== null;
-      return (
-        <div
-          className="group/fcard relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#00695C]/[0.06] to-[#26A69A]/[0.06] border border-[#00695C]/10 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 animate-fade-up"
-          style={{ animationDelay: `${delay}s` }}
-        >
-          <div className="absolute -inset-px rounded-2xl bg-gradient-to-r from-[#00695C]/0 via-[#26A69A]/40 to-[#00695C]/0 opacity-0 group-hover/fcard:opacity-100 blur-sm transition-opacity duration-500 -z-10" />
-          <div className="absolute top-0 left-[-100%] w-full h-[1px] bg-gradient-to-r from-transparent via-[#26A69A]/60 to-transparent group-hover/fcard:left-full transition-all duration-[1100ms] ease-out" />
-          <div className="absolute -top-8 -right-8 w-20 h-20 bg-gradient-to-br from-[#26A69A]/10 to-[#00695C]/10 rounded-full blur-2xl opacity-0 group-hover/fcard:opacity-100 group-hover/fcard:scale-125 transition-all duration-500" />
-          <div className="relative p-3.5 text-center">
-            <div className="relative inline-block mb-2">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#00695C] to-[#26A69A] blur-md opacity-0 group-hover/fcard:opacity-60 transition-opacity duration-500" />
-              <div className="relative p-2.5 rounded-xl bg-gradient-to-br from-[#00695C] to-[#26A69A] shadow-lg transform group-hover/fcard:scale-110 group-hover/fcard:rotate-6 transition-all duration-300">
-                <div className="text-white">{icon}</div>
-              </div>
-              {hasFiles && (
-                <span className="absolute -top-1.5 -right-1.5 bg-white rounded-full p-0.5 shadow-md animate-fadeIn">
-                  <CheckCircle className="w-4 h-4 text-[#00695C]" />
-                </span>
-              )}
-            </div>
-            <p className="text-xs font-bold text-gray-700">{label}</p>
-            {description && <p className="text-[10px] text-gray-400 mt-0.5">{description}</p>}
-            <div className="mt-2.5">
-              {hasFiles ? (
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#00695C] bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 px-2.5 py-1 rounded-full border border-[#00695C]/20">
-                  <Check className="w-3 h-3" />
-                  {Array.isArray(files) ? `${files.length} uploaded` : 'Uploaded'}
-                </span>
-              ) : (
-                <span className="inline-block bg-gray-100 px-2.5 py-1 rounded-full text-[10px] text-gray-400 font-medium">
-                  No file
-                </span>
-              )}
-            </div>
-          </div>
-          <div className="h-[2px] w-full bg-gray-100 overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-[#00695C] to-[#26A69A] w-0 group-hover/fcard:w-full transition-all duration-700 ease-out" />
-          </div>
-        </div>
-      );
-    };
-
   switch (activeSection) {
     case 'personal': {
       const personalFields = [editForm.fullName, editForm.mobileNumber, editForm.emailAddress, editForm.dateOfBirth, editForm.gender, documents.passportPhoto];
@@ -1753,7 +2008,7 @@ const OwnerProfile = () => {
     }
 
     case 'property': {
-      const propertyDocFields = ['coverImage', 'propertyPhotos', 'propertyVideo', 'floorPlan'];
+      const propertyDocFields = ['coverImage', 'propertyPhotos', 'propertyVideo'];
       const filledCount = propertyDocFields.filter(f => {
         const v = documents[f];
         return Array.isArray(v) ? v.length > 0 : v !== null;
@@ -1767,11 +2022,70 @@ const OwnerProfile = () => {
             filled={filledCount}
             total={propertyDocFields.length}
           />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 w-full">
-            <AnimatedFileCard label="Cover Image" field="coverImage" icon={<Camera className="w-6 h-6" />} description="Main property image" delay={0.05} />
-            <AnimatedFileCard label="Property Photos" field="propertyPhotos" icon={<Image className="w-6 h-6" />} description="Multiple property images" delay={0.12} />
-            <AnimatedFileCard label="Property Video" field="propertyVideo" icon={<Video className="w-6 h-6" />} description="Property walkthrough" delay={0.19} />
-            <AnimatedFileCard label="Floor Plan" field="floorPlan" icon={<FileText className="w-6 h-6" />} description="Property layout" delay={0.26} />
+          <div className="flex flex-wrap justify-start gap-3 w-full">
+            <div className="w-full sm:w-56">
+              <AnimatedCard label="Cover Image" icon={<Camera className="w-4 h-4" />} delay={0.05}>
+                {getFileStatusLabel('coverImage') ? (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => openMediaLightbox('coverImage', 'image')}
+                      className="text-[13px] font-semibold text-[#00695C] underline underline-offset-2 decoration-[#00695C]/40 hover:text-[#004D40] hover:decoration-[#004D40] transition-colors"
+                    >
+                      View Image
+                    </button>
+                    <button
+                      onClick={() => removeFile('coverImage')}
+                      title="Remove Cover Image"
+                      className="p-1 rounded-md text-red-500 hover:text-white hover:bg-red-500 transition-colors duration-300"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <span className="text-[13px] text-gray-400 font-medium italic">Not specified</span>
+                )}
+              </AnimatedCard>
+            </div>
+            <div className="w-full sm:w-56">
+              <AnimatedCard label="Property Photos" icon={<Image className="w-4 h-4" />} delay={0.12}>
+                {getFileStatusLabel('propertyPhotos') ? (
+                  <button
+                    onClick={() => openMediaLightbox('propertyPhotos', 'image')}
+                    className="text-[13px] font-semibold text-[#00695C] underline underline-offset-2 decoration-[#00695C]/40 hover:text-[#004D40] hover:decoration-[#004D40] transition-colors"
+                  >
+                    View Photos ({documents.propertyPhotos.length})
+                  </button>
+                ) : (
+                  <span className="text-[13px] text-gray-400 font-medium italic">Not specified</span>
+                )}
+                {getFileStatusLabel('propertyPhotos') && (
+                  <p className="text-[10px] text-gray-400 mt-1">Open to view &amp; delete individual photos</p>
+                )}
+              </AnimatedCard>
+            </div>
+            <div className="w-full sm:w-56">
+              <AnimatedCard label="Property Video" icon={<Video className="w-4 h-4" />} delay={0.19}>
+                {getFileStatusLabel('propertyVideo') ? (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => openMediaLightbox('propertyVideo', 'video')}
+                      className="text-[13px] font-semibold text-[#00695C] underline underline-offset-2 decoration-[#00695C]/40 hover:text-[#004D40] hover:decoration-[#004D40] transition-colors"
+                    >
+                      Watch Video
+                    </button>
+                    <button
+                      onClick={() => removeFile('propertyVideo')}
+                      title="Remove Property Video"
+                      className="p-1 rounded-md text-red-500 hover:text-white hover:bg-red-500 transition-colors duration-300"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <span className="text-[13px] text-gray-400 font-medium italic">Not specified</span>
+                )}
+              </AnimatedCard>
+            </div>
           </div>
         </div>
       );
@@ -1792,17 +2106,17 @@ const OwnerProfile = () => {
             filled={filledCount}
             total={legalDocFields.length}
           />
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 w-full">
-            <AnimatedFileCard label="Sale Deed" field="saleDeed" icon={<FileCheck className="w-6 h-6" />} description="Property ownership" delay={0.03} />
-            <AnimatedFileCard label="Floor Plan" field="floorPlanOptional" icon={<FileCheck className="w-6 h-6" />} description="Property layout plan" delay={0.07} />
-            <AnimatedFileCard label="Patta / Chitta" field="pattaChitta" icon={<FileCheck className="w-6 h-6" />} description="Land ownership" delay={0.11} />
-            <AnimatedFileCard label="Encumbrance Certificate" field="encumbranceCertificate" icon={<FileCheck className="w-6 h-6" />} description="Property encumbrance" delay={0.15} />
-            <AnimatedFileCard label="Property Tax Receipt" field="propertyTaxReceipt" icon={<FileCheck className="w-6 h-6" />} description="Tax payment proof" delay={0.19} />
-            <AnimatedFileCard label="Building Approval Plan" field="buildingApprovalPlan" icon={<FileCheck className="w-6 h-6" />} description="Construction approval" delay={0.23} />
-            <AnimatedFileCard label="Completion Certificate" field="completionCertificate" icon={<FileCheck className="w-6 h-6" />} description="Construction completion" delay={0.27} />
-            <AnimatedFileCard label="Occupancy Certificate" field="occupancyCertificate" icon={<FileCheck className="w-6 h-6" />} description="Building occupancy" delay={0.31} />
-            <AnimatedFileCard label="Rental Agreement" field="rentalAgreement" icon={<FileCheck className="w-6 h-6" />} description="Tenancy agreement" delay={0.35} />
-            <AnimatedFileCard label="Other Documents" field="otherDocuments" icon={<FileText className="w-6 h-6" />} description="Additional documents" delay={0.39} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 w-full">
+            <AnimatedCard label="Sale Deed" value={getFileStatusLabel('saleDeed')} icon={<FileCheck className="w-4 h-4" />} delay={0.03} />
+            <AnimatedCard label="Floor Plan" value={getFileStatusLabel('floorPlanOptional')} icon={<FileCheck className="w-4 h-4" />} delay={0.07} />
+            <AnimatedCard label="Patta / Chitta" value={getFileStatusLabel('pattaChitta')} icon={<FileCheck className="w-4 h-4" />} delay={0.11} />
+            <AnimatedCard label="Encumbrance Certificate" value={getFileStatusLabel('encumbranceCertificate')} icon={<FileCheck className="w-4 h-4" />} delay={0.15} />
+            <AnimatedCard label="Property Tax Receipt" value={getFileStatusLabel('propertyTaxReceipt')} icon={<FileCheck className="w-4 h-4" />} delay={0.19} />
+            <AnimatedCard label="Building Approval Plan" value={getFileStatusLabel('buildingApprovalPlan')} icon={<FileCheck className="w-4 h-4" />} delay={0.23} />
+            <AnimatedCard label="Completion Certificate" value={getFileStatusLabel('completionCertificate')} icon={<FileCheck className="w-4 h-4" />} delay={0.27} />
+            <AnimatedCard label="Occupancy Certificate" value={getFileStatusLabel('occupancyCertificate')} icon={<FileCheck className="w-4 h-4" />} delay={0.31} />
+            <AnimatedCard label="Rental Agreement" value={getFileStatusLabel('rentalAgreement')} icon={<FileCheck className="w-4 h-4" />} delay={0.35} />
+            <AnimatedCard label="Other Documents" value={getFileStatusLabel('otherDocuments')} icon={<FileText className="w-4 h-4" />} delay={0.39} />
           </div>
         </div>
       );
@@ -2155,12 +2469,11 @@ const OwnerProfile = () => {
                   </div>
                   Property Images
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
                   {[
-                    { name: 'coverImage', label: 'Cover Image' },
-                    { name: 'propertyPhotos', label: 'Property Photos', multiple: true },
-                    { name: 'propertyVideo', label: 'Property Video' },
-                    { name: 'floorPlan', label: 'Floor Plan' },
+                    { name: 'coverImage', label: 'Cover Image', hint: 'Only 1 image' },
+                    { name: 'propertyPhotos', label: 'Property Photos', multiple: true, hint: 'Max 3 images' },
+                    { name: 'propertyVideo', label: 'Property Video', hint: 'Only 1 video' },
                   ].map((doc) => (
                     <div key={doc.name} className="border-3 border-dashed border-gray-300 rounded-2xl p-4 text-center hover:border-[#00695C] transition-all duration-300 hover:bg-[#00695C]/5 group w-full">
                       <label className="block text-xs font-medium text-gray-600 cursor-pointer">
@@ -2168,6 +2481,7 @@ const OwnerProfile = () => {
                           <Upload className="w-6 h-6 text-white" />
                         </div>
                         <span className="block font-bold">{doc.label}</span>
+                        <span className="block text-[10px] text-gray-400 mt-0.5">{doc.hint}</span>
                         <input 
                           type="file" 
                           className="hidden" 
@@ -2182,6 +2496,7 @@ const OwnerProfile = () => {
                                 handleFileUpload(doc.name, files[0]);
                               }
                             }
+                            e.target.value = '';
                           }} 
                         />
                       </label>
@@ -2493,7 +2808,24 @@ const OwnerProfile = () => {
           onClose={() => {
             setShowPropertyDetails(false);
             setSelectedProperty(null);
-          }} 
+          }}
+          onAddImages={handleAddPropertyDetailImages}
+          onRemoveImage={handleRemovePropertyDetailImage}
+        />
+      )}
+
+      {/* Media Lightbox (uploaded property images / video preview) */}
+      {showMediaLightbox && lightboxItems.length > 0 && (
+        <MediaLightboxModal
+          items={lightboxItems}
+          index={lightboxIndex}
+          onNavigate={setLightboxIndex}
+          onDelete={handleDeleteLightboxItem}
+          onClose={() => {
+            setShowMediaLightbox(false);
+            setLightboxItems([]);
+            setLightboxIndex(0);
+          }}
         />
       )}
 
@@ -2620,6 +2952,16 @@ const OwnerProfile = () => {
               />
             ))}
           </div>
+
+          {/* Download Invoice PDF - right side end of the profile card */}
+          <button
+            onClick={handleDownloadInvoice}
+            title="Download Invoice PDF"
+            className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg hover:from-[#005A4F] hover:to-[#1B9E8E] hover:scale-105 transition-all duration-300"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Download Invoice</span>
+          </button>
 
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6 w-full relative z-10">
             <div className="relative flex-shrink-0">
