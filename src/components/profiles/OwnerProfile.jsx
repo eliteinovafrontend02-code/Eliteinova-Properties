@@ -15,7 +15,8 @@ import {
   Zap as ZapIcon, Rocket, Crown, Diamond,
   Search, Filter, Grid as GridIcon, List,
   Eye as ViewIcon, Bed, Bath, Trees, Wifi, Shield as ShieldIcon, 
-  Dumbbell, Waves, ParkingCircle, Sprout, Leaf, ChevronLeft, ChevronRight
+  Dumbbell, Waves, ParkingCircle, Sprout, Leaf, ChevronLeft, ChevronRight,
+  File, FolderOpen, FileImage, FileSpreadsheet, FileArchive, ImagePlus
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
@@ -36,11 +37,88 @@ const availableAmenities = [
   "Swimming Pool", "Garden", "Smart Home", "Sea View", "Lake View", "City View"
 ];
 
+// ============ PDF VIEWER MODAL ============
+const PdfViewerModal = ({ file, onClose }) => {
+  if (!file) return null;
+  
+  const fileUrl = typeof file === 'string' ? file : URL.createObjectURL(file);
+  const fileName = typeof file === 'string' ? file.split('/').pop() || 'document.pdf' : file.name || 'document.pdf';
 
-// Defined outside OwnerProfile so its component identity stays stable across
-// parent re-renders (e.g. clicking Next/Prev). If this were declared inside
-// OwnerProfile, every state update there would recreate this function and
-// React would unmount + remount the whole modal instead of just swapping the image.
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/85 backdrop-blur-md animate-fadeIn p-4">
+      <div className="relative w-full max-w-5xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+        <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] px-6 py-4 flex items-center justify-between flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <FileText className="w-5 h-5 text-white" />
+            <h3 className="text-white font-bold text-lg truncate max-w-md">{fileName}</h3>
+          </div>
+          <button 
+            onClick={onClose}
+            className="text-white/80 hover:text-white transition-all duration-300 hover:rotate-90 hover:scale-110"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+        <div className="flex-1 overflow-auto bg-gray-100 p-4">
+          <embed src={fileUrl} type="application/pdf" className="w-full h-full min-h-[70vh]" />
+        </div>
+        <div className="px-6 py-3 bg-gray-50 border-t border-gray-200 flex justify-between items-center flex-shrink-0">
+          <span className="text-sm text-gray-500">{fileName}</span>
+          <button
+            onClick={() => window.open(fileUrl, '_blank')}
+            className="flex items-center gap-2 px-4 py-2 bg-[#00695C] text-white rounded-xl text-sm font-bold hover:bg-[#005A4F] transition-all duration-300"
+          >
+            <ExternalLink className="w-4 h-4" />
+            Open in New Tab
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============ TOGGLE SWITCH COMPONENT ============
+const ToggleSwitch = ({ isOn, onToggle, size = 'sm' }) => {
+  const sizes = {
+    sm: {
+      container: 'w-8 h-4',
+      circle: 'w-3 h-3',
+      translate: 'translate-x-4',
+    },
+    md: {
+      container: 'w-10 h-5',
+      circle: 'w-4 h-4',
+      translate: 'translate-x-5',
+    },
+    lg: {
+      container: 'w-12 h-6',
+      circle: 'w-5 h-5',
+      translate: 'translate-x-6',
+    },
+  };
+
+  const selectedSize = sizes[size] || sizes.sm;
+
+  return (
+    <button
+      type="button"
+      className={`relative inline-flex flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#00695C] focus:ring-offset-2 ${
+        isOn ? 'bg-[#00695C]' : 'bg-gray-300'
+      } ${selectedSize.container}`}
+      onClick={onToggle}
+      role="switch"
+      aria-checked={isOn}
+    >
+      <span
+        className={`pointer-events-none inline-block transform rounded-full bg-white shadow-lg ring-0 transition-all duration-300 ease-in-out ${
+          isOn ? selectedSize.translate : 'translate-x-0'
+        } ${selectedSize.circle}`}
+      />
+    </button>
+  );
+};
+
+// ============ MEDIA LIGHTBOX MODAL ============
 const MediaLightboxModal = ({ items, index, onClose, onNavigate, onDelete }) => {
   if (!items || items.length === 0) return null;
   const current = items[index];
@@ -104,6 +182,66 @@ const MediaLightboxModal = ({ items, index, onClose, onNavigate, onDelete }) => 
   );
 };
 
+// ============ PDF FILE CARD COMPONENT ============
+const PdfFileCard = ({ file, onDelete, onView }) => {
+  const fileName = file.name || 'document.pdf';
+  const fileSize = file.size ? (file.size / 1024 / 1024).toFixed(1) + ' MB' : 'Unknown size';
+  
+  const getPdfIcon = () => {
+    const ext = fileName.split('.').pop().toLowerCase();
+    switch(ext) {
+      case 'pdf': return <FileText className="w-6 h-6 text-red-500" />;
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+      case 'webp': return <FileImage className="w-6 h-6 text-blue-500" />;
+      case 'xls':
+      case 'xlsx':
+      case 'csv': return <FileSpreadsheet className="w-6 h-6 text-green-500" />;
+      case 'zip':
+      case 'rar':
+      case '7z': return <FileArchive className="w-6 h-6 text-yellow-500" />;
+      default: return <File className="w-6 h-6 text-gray-500" />;
+    }
+  };
+
+  return (
+    <div className="group flex items-center gap-3 bg-white rounded-xl p-3 border border-gray-200 hover:border-[#00695C]/40 hover:shadow-md transition-all duration-300">
+      <div className="flex-shrink-0 p-2 bg-gray-50 rounded-lg group-hover:bg-[#00695C]/5 transition-colors duration-300">
+        {getPdfIcon()}
+      </div>
+      
+      <div className="flex-1 min-w-0">
+        <button
+          onClick={onView}
+          className="text-sm font-medium text-gray-800 hover:text-[#00695C] transition-colors duration-300 truncate block w-full text-left hover:underline"
+        >
+          {fileName}
+        </button>
+        <span className="text-xs text-gray-400">{fileSize}</span>
+      </div>
+
+      <div className="flex items-center gap-1.5">
+        <button
+          onClick={onView}
+          className="p-1.5 text-[#00695C] hover:bg-[#00695C]/10 rounded-lg transition-colors duration-300"
+          title="View PDF"
+        >
+          <Eye className="w-4 h-4" />
+        </button>
+        <button
+          onClick={onDelete}
+          className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-300"
+          title="Delete file"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const OwnerProfile = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('personal');
@@ -132,6 +270,9 @@ const OwnerProfile = () => {
   const [lightboxItems, setLightboxItems] = useState([]);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   
+  const [showPdfViewer, setShowPdfViewer] = useState(false);
+  const [pdfToView, setPdfToView] = useState(null);
+  
   const fileInputRefs = useRef({});
   const profilePhotoInputRef = useRef(null);
 
@@ -145,7 +286,7 @@ const OwnerProfile = () => {
       area: '2500 sq ft',
       location: 'Pune, Maharashtra',
       postedDate: '15-06-2025',
-      description: 'Luxury villa with garden, pool, and premium interiors. This stunning property features modern architecture with premium finishes throughout. The villa offers spacious living areas, a beautiful garden, and a swimming pool.',
+      description: 'Luxury villa with garden, pool, and premium interiors.',
       images: [
         "/villa1_1.png",
         "/villa1_2.png",
@@ -301,38 +442,6 @@ const OwnerProfile = () => {
       propertyTitle: 'Downtown Studio',
       propertyType: 'Apartment'
     },
-    {
-      id: 'PROP-006',
-      name: 'Green Valley Apartment',
-      type: 'Apartment',
-      status: 'Active',
-      price: '₹45,00,000',
-      area: '1200 sq ft',
-      location: 'Mumbai, Maharashtra',
-      postedDate: '15-06-2025',
-      description: 'Beautiful 2 BHK apartment with modern amenities and sea view.',
-      images: ['https://via.placeholder.com/400x300/00695C/ffffff?text=Green+Valley'],
-      features: ['2 BHK', 'Sea View', 'Modern Kitchen', 'Parking'],
-      views: 245,
-      inquiries: 12,
-      bedrooms: '2 BHK',
-      bathrooms: '2',
-      furnishing: 'Fully Furnished',
-      parking: '2 Cars',
-      propertyCategory: 'residential',
-      listedBy: 'owner',
-      listingPurpose: 'For Sale',
-      expectedPrice: '4500000',
-      maintenance: '2000',
-      availableFrom: '2025-07-01',
-      selectedAmenities: ['Gated Community', '24/7 Security', 'Parking'],
-      propertyAddress: '123, Green Valley Apartments, Mumbai',
-      propertyCity: 'Mumbai',
-      builtUpArea: '1200',
-      carpetArea: '1000',
-      propertyTitle: 'Green Valley Apartment',
-      propertyType: 'Apartment'
-    },
   ]);
 
   const [editForm, setEditForm] = useState({
@@ -379,6 +488,48 @@ const OwnerProfile = () => {
     otherDocuments: [],
   });
 
+  // ============ PDF HANDLERS ============
+  const handlePdfUpload = (field, file) => {
+    if (file) {
+      if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+        setDocuments(prev => ({
+          ...prev,
+          [field]: file
+        }));
+        showSuccessToast();
+      } else {
+        alert('Please upload a valid PDF file.');
+      }
+    }
+  };
+
+  const handlePdfView = (field) => {
+    const file = documents[field];
+    if (file) {
+      setPdfToView(file);
+      setShowPdfViewer(true);
+    }
+  };
+
+  const handlePdfDelete = (field) => {
+    setDeleteItem({ field });
+    setShowDeleteConfirm(true);
+  };
+
+  // ============ TOGGLE STATUS HANDLER ============
+  const handleToggleStatus = (property) => {
+    const newStatus = property.status === 'Active' ? 'Inactive' : 'Active';
+    setProperties(prev => 
+      prev.map(p => 
+        p.id === property.id 
+          ? { ...p, status: newStatus } 
+          : p
+      )
+    );
+    showSuccessToast();
+  };
+
+  // ============ NAVIGATION ============
   const handleNavigateBack = () => {
     if (window.history.length > 2) {
       navigate(-1);
@@ -628,12 +779,10 @@ const OwnerProfile = () => {
   };
 
   // ============ INVOICE PDF HANDLER ============
-
   const handleDownloadInvoice = () => {
     const doc = new jsPDF();
     const teal = [0, 105, 92];
 
-    // Header band
     doc.setFillColor(...teal);
     doc.rect(0, 0, 210, 28, 'F');
     doc.setTextColor(255, 255, 255);
@@ -706,7 +855,6 @@ const OwnerProfile = () => {
   };
 
   // ============ PROPERTY HANDLERS ============
-  
   const handleViewDetails = (property) => {
     setSelectedProperty(property);
     setShowPropertyDetails(true);
@@ -723,6 +871,12 @@ const OwnerProfile = () => {
     }
     if (property.selectedAmenities) {
       setCustomAmenitiesList(property.selectedAmenities.filter(a => !availableAmenities.includes(a)));
+    }
+    if (property.propertyVideo) {
+      setVideoPreview(property.propertyVideo);
+    }
+    if (property.floorPlan) {
+      setFloorPlanPreview(property.floorPlan);
     }
     setShowEditPropertyModal(true);
   };
@@ -756,26 +910,17 @@ const OwnerProfile = () => {
     handlePropertyEditChange('selectedAmenities', editingProperty.selectedAmenities.filter(a => a !== amenity));
   };
 
-  const handleSavePropertyEdit = () => {
-    const updatedProperty = { ...editingProperty };
-    
-    if (documents.coverImage) {
-      const coverUrl = URL.createObjectURL(documents.coverImage);
-      if (updatedProperty.images) {
-        updatedProperty.images[0] = coverUrl;
-      } else {
-        updatedProperty.images = [coverUrl];
-      }
+  const handleSavePropertyEdit = (updatedProperty) => {
+    if (updatedProperty) {
+      setProperties(prev => 
+        prev.map(p => p.id === updatedProperty.id ? updatedProperty : p)
+      );
+    } else if (editingProperty) {
+      // Fallback: use editingProperty if no updatedProperty provided
+      setProperties(prev => 
+        prev.map(p => p.id === editingProperty.id ? editingProperty : p)
+      );
     }
-    
-    if (documents.propertyPhotos && documents.propertyPhotos.length > 0) {
-      const photoUrls = documents.propertyPhotos.map(f => URL.createObjectURL(f));
-      updatedProperty.images = [...(updatedProperty.images || []), ...photoUrls];
-    }
-    
-    setProperties(prev => 
-      prev.map(p => p.id === updatedProperty.id ? updatedProperty : p)
-    );
     
     setShowEditPropertyModal(false);
     setEditingProperty(null);
@@ -801,7 +946,6 @@ const OwnerProfile = () => {
   };
 
   // ============ PROPERTY DETAILS IMAGE HANDLERS ============
-
   const handleAddPropertyDetailImages = (propertyId, files) => {
     const fileArray = Array.from(files);
     if (fileArray.length === 0) return;
@@ -826,63 +970,7 @@ const OwnerProfile = () => {
     showSuccessToast();
   };
 
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    const newImages = [...editingProperty.images, ...files.map(f => URL.createObjectURL(f))];
-    handlePropertyEditChange('images', newImages);
-    setImagePreviews(newImages);
-  };
-
-  const removeImage = (index) => {
-    const newImages = editingProperty.images.filter((_, i) => i !== index);
-    handlePropertyEditChange('images', newImages);
-    setImagePreviews(newImages);
-  };
-
-  const handleCoverImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const preview = URL.createObjectURL(file);
-      setCoverPreview(preview);
-      handlePropertyEditChange('coverImage', file);
-    }
-  };
-
-  const removeCoverImage = () => {
-    setCoverPreview(null);
-    handlePropertyEditChange('coverImage', null);
-  };
-
-  const handleVideoUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const preview = URL.createObjectURL(file);
-      setVideoPreview(preview);
-      handlePropertyEditChange('propertyVideo', file);
-    }
-  };
-
-  const removeVideo = () => {
-    setVideoPreview(null);
-    handlePropertyEditChange('propertyVideo', null);
-  };
-
-  const handleFloorPlanUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const preview = URL.createObjectURL(file);
-      setFloorPlanPreview(preview);
-      handlePropertyEditChange('floorPlan', file);
-    }
-  };
-
-  const removeFloorPlan = () => {
-    setFloorPlanPreview(null);
-    handlePropertyEditChange('floorPlan', null);
-  };
-
   // ============ FILTER PROPERTIES ============
-  
   const getFilteredProperties = () => {
     let filtered = [...properties];
     
@@ -917,18 +1005,15 @@ const OwnerProfile = () => {
   };
 
   // ============ SECTION DEFINITIONS ============
-  
   const sections = [
     { id: 'personal', title: 'Personal Details', icon: User },
     { id: 'address', title: 'Address Details', icon: MapPin },
-    { id: 'property', title: 'Property Images', icon: Image },
     { id: 'legal', title: 'Legal Documents', icon: FileText },
     { id: 'bank', title: 'Bank & Verification', icon: Banknote },
     { id: 'communication', title: 'Communication', icon: MessageCircle },
   ];
 
   // ============ COMPONENTS ============
-
   const InfoCard = ({ label, value, icon, children }) => {
     const [isHovered, setIsHovered] = useState(false);
     
@@ -967,113 +1052,24 @@ const OwnerProfile = () => {
     );
   };
 
-  const FileCard = ({ label, field, icon, description }) => {
-    const files = documents[field];
-    const hasFiles = Array.isArray(files) ? files.length > 0 : files !== null;
-    const [isHovered, setIsHovered] = useState(false);
-
-    return (
-      <div 
-        className="relative group overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-lg transition-all duration-300 w-full border border-[#00695C]/10"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        style={{
-          transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-br from-[#00695C]/5 to-[#26A69A]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        <div className="relative p-3 text-center">
-          <div className="flex flex-col items-center">
-            <div className={`p-2 rounded-xl bg-gradient-to-br from-[#00695C] to-[#26A69A] shadow-lg transform group-hover:scale-110 transition-all duration-300 mb-2`}>
-              <div className="text-white">
-                {icon || <FileText className="w-5 h-5" />}
-              </div>
-            </div>
-            <span className="text-xs font-bold text-gray-700">{label}</span>
-            {description && <span className="text-[10px] text-gray-400 mt-0.5">{description}</span>}
-          </div>
-          {hasFiles ? (
-            <div className="mt-2 space-y-1.5 animate-fadeIn">
-              {Array.isArray(files) ? (
-                files.slice(0, 2).map((file, index) => (
-                  <div key={index} className="flex items-center justify-between bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 rounded-lg p-2 shadow-sm border border-[#00695C]/20 group-hover:border-[#00695C]/40 transition-all duration-300">
-                    <span className="text-[10px] truncate flex-1 font-medium text-gray-700">
-                      {getFileIcon(file.name)} {file.name}
-                    </span>
-                    <span className="text-[10px] text-[#00695C] font-semibold bg-[#00695C]/10 px-2 py-0.5 rounded-full">✓</span>
-                  </div>
-                ))
-              ) : (
-                <div className="flex items-center justify-between bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 rounded-lg p-2 shadow-sm border border-[#00695C]/20">
-                  <span className="text-[10px] truncate flex-1 font-medium text-gray-700">
-                    {getFileIcon(files.name)} {files.name}
-                  </span>
-                  <span className="text-[10px] text-[#00695C] font-semibold bg-[#00695C]/10 px-2 py-0.5 rounded-full">✓</span>
-                </div>
-              )}
-              {Array.isArray(files) && files.length > 2 && (
-                <span className="text-[10px] text-gray-400">+{files.length - 2} more</span>
-              )}
-            </div>
-          ) : (
-            <div className="mt-2">
-              <span className="inline-block bg-gray-100 px-3 py-1 rounded-lg text-[10px] text-gray-400 font-medium">
-                No file
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  // ============ MODALS ============
-
-  const DeletePropertyConfirmModal = ({ property, onConfirm, onCancel }) => {
-    if (!property) return null;
-
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn p-4">
-        <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full animate-scaleIn p-6">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="bg-red-100 p-3 rounded-2xl">
-              <AlertTriangle className="w-8 h-8 text-red-500 animate-pulse" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-800">Delete Property</h3>
-          </div>
-          <p className="text-gray-600 mb-2">
-            Are you sure you want to delete <span className="font-bold text-[#00695C]">{property.name}</span>?
-          </p>
-          <p className="text-sm text-red-500 mb-6">This action cannot be undone.</p>
-          <div className="flex justify-end gap-3">
-            <button
-              onClick={onCancel}
-              className="px-6 py-3 rounded-2xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={onConfirm}
-              className="px-6 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold hover:from-red-600 hover:to-rose-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // ============ ENHANCED EDIT PROPERTY MODAL ============
-  
+  // ============ EDIT PROPERTY MODAL ============
   const EditPropertyModal = ({ property, onSave, onCancel }) => {
     if (!property) return null;
 
-    const editSteps = ['Property Details', 'Pricing & Amenities'];
+    const editSteps = ['Property Details', 'Pricing & Amenities', 'Media Upload'];
 
     const [localStep, setLocalStep] = useState(0);
     const [localProperty, setLocalProperty] = useState({ ...property });
     const [localCustomAmenities, setLocalCustomAmenities] = useState([]);
+    
+    const [localImagePreviews, setLocalImagePreviews] = useState([]);
+    const [localCoverPreview, setLocalCoverPreview] = useState(null);
+    const [localVideoPreview, setLocalVideoPreview] = useState(null);
+    const [localFloorPlanPreview, setLocalFloorPlanPreview] = useState(null);
+    const [localCoverImage, setLocalCoverImage] = useState(null);
+    const [localVideoFile, setLocalVideoFile] = useState(null);
+    const [localFloorPlanFile, setLocalFloorPlanFile] = useState(null);
+    const [newImageFiles, setNewImageFiles] = useState([]);
 
     useEffect(() => {
       setLocalProperty({ ...property });
@@ -1081,7 +1077,87 @@ const OwnerProfile = () => {
         const custom = property.selectedAmenities.filter(a => !availableAmenities.includes(a));
         setLocalCustomAmenities(custom);
       }
+      if (property.images && property.images.length > 0) {
+        setLocalImagePreviews(property.images.map(img => img));
+      }
     }, [property]);
+
+    const handleLocalImageUpload = (e) => {
+      const files = Array.from(e.target.files);
+      const remainingSlots = Math.max(0, 3 - localImagePreviews.length);
+      if (files.length > remainingSlots) {
+        alert(`You can only upload ${remainingSlots} more image(s). Maximum 3 images allowed.`);
+      }
+      const limitedFiles = files.slice(0, remainingSlots);
+      const newPreviews = limitedFiles.map(file => URL.createObjectURL(file));
+      setLocalImagePreviews([...localImagePreviews, ...newPreviews]);
+      setNewImageFiles([...newImageFiles, ...limitedFiles]);
+    };
+
+    const removeLocalImage = (index) => {
+      const newPreviews = localImagePreviews.filter((_, i) => i !== index);
+      setLocalImagePreviews(newPreviews);
+      const newFiles = newImageFiles.filter((_, i) => i !== index);
+      setNewImageFiles(newFiles);
+    };
+
+    const handleLocalCoverImageUpload = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        if (file.size > 2 * 1024 * 1024) {
+          alert('Cover image must be less than 2MB');
+          return;
+        }
+        setLocalCoverPreview(URL.createObjectURL(file));
+        setLocalCoverImage(file);
+      }
+    };
+
+    const removeLocalCoverImage = () => {
+      if (localCoverPreview) URL.revokeObjectURL(localCoverPreview);
+      setLocalCoverPreview(null);
+      setLocalCoverImage(null);
+    };
+
+    const handleLocalVideoUpload = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        if (file.size > 10 * 1024 * 1024) {
+          alert('Video must be less than 10MB');
+          return;
+        }
+        setLocalVideoPreview(URL.createObjectURL(file));
+        setLocalVideoFile(file);
+      }
+    };
+
+    const removeLocalVideo = () => {
+      if (localVideoPreview) URL.revokeObjectURL(localVideoPreview);
+      setLocalVideoPreview(null);
+      setLocalVideoFile(null);
+    };
+
+    const handleLocalFloorPlanUpload = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        if (file.type !== 'application/pdf') {
+          alert('Floor plan must be a PDF file');
+          return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          alert('Floor plan must be less than 5MB');
+          return;
+        }
+        setLocalFloorPlanPreview(URL.createObjectURL(file));
+        setLocalFloorPlanFile(file);
+      }
+    };
+
+    const removeLocalFloorPlan = () => {
+      if (localFloorPlanPreview) URL.revokeObjectURL(localFloorPlanPreview);
+      setLocalFloorPlanPreview(null);
+      setLocalFloorPlanFile(null);
+    };
 
     const handleLocalChange = (field, value) => {
       setLocalProperty(prev => ({ ...prev, [field]: value }));
@@ -1133,22 +1209,47 @@ const OwnerProfile = () => {
     };
 
     const handleLocalSave = () => {
-      onSave(localProperty);
-      handleSavePropertyEdit();
+      const updatedProperty = {
+        ...localProperty,
+      };
+      
+      let finalImages = [...localImagePreviews];
+      
+      if (newImageFiles.length > 0) {
+        const newUrls = newImageFiles.map(f => URL.createObjectURL(f));
+        finalImages = [...finalImages, ...newUrls];
+      }
+      
+      if (localCoverImage) {
+        const coverUrl = URL.createObjectURL(localCoverImage);
+        finalImages = [coverUrl, ...finalImages.filter((_, i) => i !== 0)];
+        updatedProperty.coverImage = localCoverImage;
+      }
+      
+      updatedProperty.images = finalImages;
+      
+      if (localVideoFile) {
+        updatedProperty.propertyVideo = localVideoFile;
+      }
+      
+      if (localFloorPlanFile) {
+        updatedProperty.floorPlan = localFloorPlanFile;
+      }
+      
+      onSave(updatedProperty);
     };
 
     const handleLocalCancel = () => {
       onCancel();
       setLocalStep(0);
       setLocalCustomAmenities([]);
+      localImagePreviews.forEach(preview => {
+        if (preview.startsWith('blob:')) URL.revokeObjectURL(preview);
+      });
+      if (localCoverPreview) URL.revokeObjectURL(localCoverPreview);
+      if (localVideoPreview) URL.revokeObjectURL(localVideoPreview);
+      if (localFloorPlanPreview) URL.revokeObjectURL(localFloorPlanPreview);
     };
-
-    useEffect(() => {
-      if (showEditPropertyModal) {
-        setLocalStep(0);
-        setLocalCustomAmenities([]);
-      }
-    }, [showEditPropertyModal]);
 
     const renderStepContent = () => {
       if (localStep === 0) {
@@ -1329,7 +1430,7 @@ const OwnerProfile = () => {
             </div>
           </div>
         );
-      } else {
+      } else if (localStep === 1) {
         return (
           <div className="space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -1445,6 +1546,92 @@ const OwnerProfile = () => {
             </div>
           </div>
         );
+      } else {
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-2 pb-2 border-b-2 border-green-50">
+              <div className="w-1 h-4 bg-[#00695C] rounded" />
+              <h3 className="text-sm font-bold text-[#00695C]">Media Upload</h3>
+            </div>
+            <p className="text-xs text-gray-400 mb-3">📸 Upload property images and media</p>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Upload Cover Image</label>
+              <div className="border-2 border-dashed border-teal-300 rounded-xl p-4 text-center hover:bg-green-50 transition-colors">
+                <input type="file" accept="image/*" className="hidden" id="edit-cover" onChange={handleLocalCoverImageUpload} />
+                <label htmlFor="edit-cover" className="cursor-pointer flex flex-col items-center">
+                  <ImagePlus className="mx-auto mb-2 w-8 h-8 text-[#00695C]" />
+                  <span className="text-sm font-semibold text-[#00695C]">Upload Cover Image</span>
+                  <span className="text-xs text-gray-400 mt-1">JPG, PNG (Max 2MB)</span>
+                </label>
+              </div>
+              {localCoverPreview && (
+                <div className="mt-2 relative">
+                  <img src={localCoverPreview} alt="Cover" className="w-full h-24 object-cover rounded-lg border border-gray-200" />
+                  <button onClick={removeLocalCoverImage} className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600">✕</button>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Upload Property Photos (Max 3)</label>
+              <div className="border-2 border-dashed border-teal-300 rounded-xl p-4 text-center hover:bg-green-50 transition-colors">
+                <input type="file" accept="image/*" multiple className="hidden" id="edit-photos" onChange={handleLocalImageUpload} disabled={localImagePreviews.length >= 3} />
+                <label htmlFor="edit-photos" className={`cursor-pointer flex flex-col items-center ${localImagePreviews.length >= 3 ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                  <ImagePlus className="mx-auto mb-2 w-8 h-8 text-[#00695C]" />
+                  <span className="text-sm font-semibold text-[#00695C]">Upload Property Photos</span>
+                  <span className="text-xs text-gray-400 mt-1">Max 3 photos</span>
+                </label>
+              </div>
+              {localImagePreviews.length > 0 && (
+                <div className="mt-3 grid grid-cols-3 gap-2">
+                  {localImagePreviews.map((preview, idx) => (
+                    <div key={idx} className="relative">
+                      <img src={preview} alt={`Preview ${idx + 1}`} className="w-full h-20 object-cover rounded-lg border border-gray-200" />
+                      <button onClick={() => removeLocalImage(idx)} className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600">✕</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Upload Property Video (Optional)</label>
+              <div className="border-2 border-dashed border-teal-300 rounded-xl p-4 text-center hover:bg-green-50 transition-colors">
+                <input type="file" accept="video/mp4,video/mov" className="hidden" id="edit-video" onChange={handleLocalVideoUpload} />
+                <label htmlFor="edit-video" className="cursor-pointer flex flex-col items-center">
+                  <Video className="mx-auto mb-2 w-8 h-8 text-[#00695C]" />
+                  <span className="text-sm font-semibold text-[#00695C]">Upload Property Video Tour</span>
+                  <span className="text-xs text-gray-400 mt-1">MP4/MOV (Max 10MB)</span>
+                </label>
+              </div>
+              {localVideoPreview && (
+                <div className="mt-2 relative">
+                  <video src={localVideoPreview} controls className="w-full h-32 object-cover rounded-lg border border-gray-200" />
+                  <button onClick={removeLocalVideo} className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full text-sm flex items-center justify-center hover:bg-red-600">✕</button>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Upload Floor Plan (PDF)</label>
+              <div className="border-2 border-dashed border-teal-300 rounded-xl p-4 text-center hover:bg-green-50 transition-colors">
+                <input type="file" accept=".pdf" className="hidden" id="edit-floorplan" onChange={handleLocalFloorPlanUpload} />
+                <label htmlFor="edit-floorplan" className="cursor-pointer flex flex-col items-center">
+                  <FileText className="mx-auto mb-2 w-8 h-8 text-[#00695C]" />
+                  <span className="text-sm font-semibold text-[#00695C]">Upload Floor Plan</span>
+                  <span className="text-xs text-gray-400 mt-1">PDF (Max 5MB)</span>
+                </label>
+              </div>
+              {localFloorPlanPreview && (
+                <div className="mt-2 relative">
+                  <p className="text-sm text-green-600">✓ {localFloorPlanFile?.name}</p>
+                  <button onClick={removeLocalFloorPlan} className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600">✕</button>
+                </div>
+              )}
+            </div>
+          </div>
+        );
       }
     };
 
@@ -1525,6 +1712,7 @@ const OwnerProfile = () => {
     );
   };
 
+  // ============ PROPERTY DETAILS MODAL ============
   const PropertyDetailsModal = ({ property, onClose, onAddImages, onRemoveImage }) => {
     if (!property) return null;
 
@@ -1622,14 +1810,15 @@ const OwnerProfile = () => {
                 </button>
               )}
 
-              <div className="absolute top-2 right-2">
-                <span className={`px-2.5 py-0.5 rounded-lg text-[10px] font-bold shadow-lg ${
-                  property.status === 'Active' ? 'bg-green-500 text-white' :
-                  property.status === 'Pending' ? 'bg-yellow-500 text-white' :
-                  'bg-red-500 text-white'
-                }`}>
-                  {property.status}
+              <div className="absolute top-2 right-2 flex items-center gap-2 bg-black/50 backdrop-blur-sm px-2.5 py-1.5 rounded-xl">
+                <span className="text-white text-[10px] font-bold">
+                  {property.status === 'Active' ? 'ON' : 'OFF'}
                 </span>
+                <ToggleSwitch 
+                  isOn={property.status === 'Active'} 
+                  onToggle={() => handleToggleStatus(property)}
+                  size="sm"
+                />
               </div>
             </div>
 
@@ -1840,10 +2029,44 @@ const OwnerProfile = () => {
     );
   };
 
-  // ============ RENDER FUNCTIONS ============
+  // ============ DELETE PROPERTY CONFIRM MODAL ============
+  const DeletePropertyConfirmModal = ({ property, onConfirm, onCancel }) => {
+    if (!property) return null;
 
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn p-4">
+        <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full animate-scaleIn p-6">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="bg-red-100 p-3 rounded-2xl">
+              <AlertTriangle className="w-8 h-8 text-red-500 animate-pulse" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800">Delete Property</h3>
+          </div>
+          <p className="text-gray-600 mb-2">
+            Are you sure you want to delete <span className="font-bold text-[#00695C]">{property.name}</span>?
+          </p>
+          <p className="text-sm text-red-500 mb-6">This action cannot be undone.</p>
+          <div className="flex justify-end gap-3">
+            <button
+              onClick={onCancel}
+              className="px-6 py-3 rounded-2xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={onConfirm}
+              className="px-6 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold hover:from-red-600 hover:to-rose-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ============ RENDER FUNCTIONS ============
   const renderSectionContent = () => {
-    // ---- Shared animated building blocks used by every tab for a consistent look ----
     const RingBadge = ({ pct }) => {
       const circumference = 2 * Math.PI * 15.5;
       const dashOffset = circumference - (pct / 100) * circumference;
@@ -1939,315 +2162,473 @@ const OwnerProfile = () => {
       </div>
     );
 
-  switch (activeSection) {
-    case 'personal': {
-      const personalFields = [editForm.fullName, editForm.mobileNumber, editForm.emailAddress, editForm.dateOfBirth, editForm.gender, documents.passportPhoto];
-      const filledCount = personalFields.filter(Boolean).length;
+    switch (activeSection) {
+      case 'personal': {
+        const personalFields = [editForm.fullName, editForm.mobileNumber, editForm.emailAddress, editForm.dateOfBirth, editForm.gender, documents.passportPhoto];
+        const filledCount = personalFields.filter(Boolean).length;
 
-      return (
-        <div className="w-full animate-slideUp">
-          <SectionHeader
-            title="Personal Details"
-            subtitle="Manage your personal information"
-            filled={filledCount}
-            total={personalFields.length}
-          />
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 w-full">
-            <div className="space-y-3 w-full">
-              <AnimatedCard label="Full Name" value={editForm.fullName} icon={<User className="w-4 h-4" />} delay={0.05} />
-              <AnimatedCard label="Mobile Number" value={editForm.mobileNumber} icon={<Phone className="w-4 h-4" />} delay={0.12} />
-              <AnimatedCard label="Email Address" value={editForm.emailAddress} icon={<Mail className="w-4 h-4" />} delay={0.19} />
+        return (
+          <div className="w-full animate-slideUp">
+            <SectionHeader
+              title="Personal Details"
+              subtitle="Manage your personal information"
+              filled={filledCount}
+              total={personalFields.length}
+            />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 w-full">
+              <div className="space-y-3 w-full">
+                <AnimatedCard label="Full Name" value={editForm.fullName} icon={<User className="w-4 h-4" />} delay={0.05} />
+                <AnimatedCard label="Mobile Number" value={editForm.mobileNumber} icon={<Phone className="w-4 h-4" />} delay={0.12} />
+                <AnimatedCard label="Email Address" value={editForm.emailAddress} icon={<Mail className="w-4 h-4" />} delay={0.19} />
+              </div>
+              <div className="space-y-3 w-full">
+                <AnimatedCard label="Date of Birth" value={formatDateForDisplay(editForm.dateOfBirth)} icon={<Calendar className="w-4 h-4" />} delay={0.26} />
+                <AnimatedCard label="Gender" value={editForm.gender} icon={<User className="w-4 h-4" />} delay={0.33} />
+                <AnimatedCard label="Profile Photo" icon={<Camera className="w-4 h-4" />} delay={0.4}>
+                  <div className="flex items-center gap-2">
+                    {documents.passportPhoto ? (
+                      <span className="inline-flex items-center gap-1.5 text-xs text-[#00695C] font-bold bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 px-3 py-1.5 rounded-lg border border-[#00695C]/20 animate-fadeIn">
+                        <Check className="w-3.5 h-3.5" />
+                        Uploaded
+                      </span>
+                    ) : (
+                      <span className="text-xs text-gray-400 font-medium italic">No photo uploaded</span>
+                    )}
+                  </div>
+                </AnimatedCard>
+              </div>
             </div>
-            <div className="space-y-3 w-full">
-              <AnimatedCard label="Date of Birth" value={formatDateForDisplay(editForm.dateOfBirth)} icon={<Calendar className="w-4 h-4" />} delay={0.26} />
-              <AnimatedCard label="Gender" value={editForm.gender} icon={<User className="w-4 h-4" />} delay={0.33} />
-              <AnimatedCard label="Profile Photo" icon={<Camera className="w-4 h-4" />} delay={0.4}>
-                <div className="flex items-center gap-2">
-                  {documents.passportPhoto ? (
-                    <span className="inline-flex items-center gap-1.5 text-xs text-[#00695C] font-bold bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 px-3 py-1.5 rounded-lg border border-[#00695C]/20 animate-fadeIn">
-                      <Check className="w-3.5 h-3.5" />
-                      Uploaded
-                    </span>
+          </div>
+        );
+      }
+
+      case 'address': {
+        const addressFields = [editForm.addressLine1, editForm.addressLine2, editForm.city, editForm.district, editForm.state, editForm.pinCode];
+        const filledCount = addressFields.filter(Boolean).length;
+
+        return (
+          <div className="w-full animate-slideUp">
+            <SectionHeader
+              title="Address Details"
+              subtitle="Your current residential address information"
+              filled={filledCount}
+              total={addressFields.length}
+            />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 w-full">
+              <div className="space-y-3 w-full">
+                <AnimatedCard label="Address Line 1" value={editForm.addressLine1} icon={<MapPin className="w-4 h-4" />} delay={0.05} />
+                <AnimatedCard label="Address Line 2" value={editForm.addressLine2} icon={<MapPin className="w-4 h-4" />} delay={0.12} />
+                <AnimatedCard label="City" value={editForm.city} icon={<Building className="w-4 h-4" />} delay={0.19} />
+              </div>
+              <div className="space-y-3 w-full">
+                <AnimatedCard label="District" value={editForm.district} icon={<Landmark className="w-4 h-4" />} delay={0.26} />
+                <AnimatedCard label="State" value={editForm.state} icon={<Globe className="w-4 h-4" />} delay={0.33} />
+                <AnimatedCard label="PIN Code" value={editForm.pinCode} icon={<MapPin className="w-4 h-4" />} delay={0.4} />
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      case 'property': {
+        const propertyDocFields = ['coverImage', 'propertyPhotos', 'propertyVideo'];
+        const filledCount = propertyDocFields.filter(f => {
+          const v = documents[f];
+          return Array.isArray(v) ? v.length > 0 : v !== null;
+        }).length;
+
+        return (
+          <div className="w-full animate-slideUp">
+            <SectionHeader
+              title="Property Images"
+              subtitle="Visual documentation of your property"
+              filled={filledCount}
+              total={propertyDocFields.length}
+            />
+            <div className="flex flex-wrap justify-start gap-3 w-full">
+              <div className="w-full sm:w-56">
+                <AnimatedCard label="Cover Image" icon={<Camera className="w-4 h-4" />} delay={0.05}>
+                  {getFileStatusLabel('coverImage') ? (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => openMediaLightbox('coverImage', 'image')}
+                        className="text-[13px] font-semibold text-[#00695C] underline underline-offset-2 decoration-[#00695C]/40 hover:text-[#004D40] hover:decoration-[#004D40] transition-colors"
+                      >
+                        View Image
+                      </button>
+                      <button
+                        onClick={() => removeFile('coverImage')}
+                        title="Remove Cover Image"
+                        className="p-1 rounded-md text-red-500 hover:text-white hover:bg-red-500 transition-colors duration-300"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   ) : (
-                    <span className="text-xs text-gray-400 font-medium italic">No photo uploaded</span>
+                    <span className="text-[13px] text-gray-400 font-medium italic">Not specified</span>
+                  )}
+                </AnimatedCard>
+              </div>
+              <div className="w-full sm:w-56">
+                <AnimatedCard label="Property Photos" icon={<Image className="w-4 h-4" />} delay={0.12}>
+                  {getFileStatusLabel('propertyPhotos') ? (
+                    <button
+                      onClick={() => openMediaLightbox('propertyPhotos', 'image')}
+                      className="text-[13px] font-semibold text-[#00695C] underline underline-offset-2 decoration-[#00695C]/40 hover:text-[#004D40] hover:decoration-[#004D40] transition-colors"
+                    >
+                      View Photos ({documents.propertyPhotos.length})
+                    </button>
+                  ) : (
+                    <span className="text-[13px] text-gray-400 font-medium italic">Not specified</span>
+                  )}
+                  {getFileStatusLabel('propertyPhotos') && (
+                    <p className="text-[10px] text-gray-400 mt-1">Open to view &amp; delete individual photos</p>
+                  )}
+                </AnimatedCard>
+              </div>
+              <div className="w-full sm:w-56">
+                <AnimatedCard label="Property Video" icon={<Video className="w-4 h-4" />} delay={0.19}>
+                  {getFileStatusLabel('propertyVideo') ? (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => openMediaLightbox('propertyVideo', 'video')}
+                        className="text-[13px] font-semibold text-[#00695C] underline underline-offset-2 decoration-[#00695C]/40 hover:text-[#004D40] hover:decoration-[#004D40] transition-colors"
+                      >
+                        Watch Video
+                      </button>
+                      <button
+                        onClick={() => removeFile('propertyVideo')}
+                        title="Remove Property Video"
+                        className="p-1 rounded-md text-red-500 hover:text-white hover:bg-red-500 transition-colors duration-300"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <span className="text-[13px] text-gray-400 font-medium italic">Not specified</span>
+                  )}
+                </AnimatedCard>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      case 'legal': {
+        const legalDocFields = ['saleDeed', 'floorPlanOptional', 'pattaChitta', 'encumbranceCertificate', 'propertyTaxReceipt', 'buildingApprovalPlan', 'completionCertificate', 'occupancyCertificate', 'rentalAgreement', 'otherDocuments'];
+        const filledCount = legalDocFields.filter(f => {
+          const v = documents[f];
+          return Array.isArray(v) ? v.length > 0 : v !== null;
+        }).length;
+
+        return (
+          <div className="w-full animate-slideUp">
+            <SectionHeader
+              title="Legal Documents"
+              subtitle="All legal documents for property verification"
+              filled={filledCount}
+              total={legalDocFields.length}
+            />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 w-full">
+              {[
+                { field: 'saleDeed', label: 'Sale Deed', icon: <FileCheck className="w-4 h-4" /> },
+                { field: 'floorPlanOptional', label: 'Floor Plan', icon: <FileCheck className="w-4 h-4" /> },
+                { field: 'pattaChitta', label: 'Patta / Chitta', icon: <FileCheck className="w-4 h-4" /> },
+                { field: 'encumbranceCertificate', label: 'Encumbrance Certificate', icon: <FileCheck className="w-4 h-4" /> },
+                { field: 'propertyTaxReceipt', label: 'Property Tax Receipt', icon: <FileCheck className="w-4 h-4" /> },
+                { field: 'buildingApprovalPlan', label: 'Building Approval Plan', icon: <FileCheck className="w-4 h-4" /> },
+                { field: 'completionCertificate', label: 'Completion Certificate', icon: <FileCheck className="w-4 h-4" /> },
+                { field: 'occupancyCertificate', label: 'Occupancy Certificate', icon: <FileCheck className="w-4 h-4" /> },
+                { field: 'rentalAgreement', label: 'Rental Agreement', icon: <FileCheck className="w-4 h-4" /> },
+              ].map((doc) => {
+                const file = documents[doc.field];
+                const hasFile = file !== null && file !== undefined;
+
+                return (
+                  <div 
+                    key={doc.field}
+                    className="group relative overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-lg transition-all duration-300 w-full border border-[#00695C]/10 hover:border-[#00695C]/30"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#00695C]/5 to-[#26A69A]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="relative p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <div className="p-1.5 rounded-lg bg-gradient-to-br from-[#00695C] to-[#26A69A] shadow-lg transform group-hover:scale-110 transition-all duration-300">
+                            <div className="text-white">
+                              {doc.icon}
+                            </div>
+                          </div>
+                          <span className="text-xs font-bold text-gray-700">{doc.label}</span>
+                        </div>
+                        {hasFile && (
+                          <span className="text-[10px] text-[#00695C] font-bold bg-[#00695C]/10 px-2 py-0.5 rounded-full animate-fadeIn">
+                            ✓
+                          </span>
+                        )}
+                      </div>
+
+                      {hasFile ? (
+                        <div className="flex items-center gap-2 bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 rounded-lg p-1.5 border border-[#00695C]/20 group-hover:border-[#00695C]/40 transition-all duration-300">
+                          <button
+                            onClick={() => handlePdfView(doc.field)}
+                            className="flex-1 text-[10px] text-[#00695C] font-medium hover:underline truncate text-left flex items-center gap-1"
+                          >
+                            <FileText className="w-3 h-3 flex-shrink-0" />
+                            <span className="truncate">{typeof file === 'string' ? file.split('/').pop() : file.name}</span>
+                          </button>
+                          <button
+                            onClick={() => handlePdfDelete(doc.field)}
+                            className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors duration-300 flex-shrink-0"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="border-2 border-dashed border-gray-200 rounded-lg p-2 text-center hover:border-[#00695C] hover:bg-[#00695C]/5 transition-all duration-300 group/upload">
+                          <label className="block cursor-pointer">
+                            <div className="flex items-center justify-center gap-2">
+                              <div className="p-1 bg-gray-100 rounded-lg group-hover/upload:bg-[#00695C]/10 transition-colors duration-300">
+                                <Upload className="w-3.5 h-3.5 text-gray-400 group-hover/upload:text-[#00695C] transition-colors duration-300" />
+                              </div>
+                              <span className="text-[10px] font-medium text-gray-500 group-hover/upload:text-[#00695C] transition-colors duration-300">
+                                Upload PDF
+                              </span>
+                            </div>
+                            <input 
+                              type="file" 
+                              className="hidden" 
+                              accept=".pdf"
+                              onChange={(e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                  handlePdfUpload(doc.field, file);
+                                }
+                                e.target.value = '';
+                              }} 
+                            />
+                          </label>
+                        </div>
+                      )}
+                    </div>
+                    <div className="h-[2px] w-full bg-gray-100 overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-[#00695C] to-[#26A69A] w-0 group-hover:w-full transition-all duration-700 ease-out" />
+                    </div>
+                  </div>
+                );
+              })}
+
+              <div className="group relative overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-lg transition-all duration-300 w-full border border-[#00695C]/10 hover:border-[#00695C]/30">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#00695C]/5 to-[#26A69A]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-gradient-to-br from-[#00695C] to-[#26A69A] shadow-lg transform group-hover:scale-110 transition-all duration-300">
+                        <div className="text-white">
+                          <FileText className="w-4 h-4" />
+                        </div>
+                      </div>
+                      <span className="text-xs font-bold text-gray-700">Other Documents</span>
+                    </div>
+                    {documents.otherDocuments.length > 0 && (
+                      <span className="text-[10px] text-[#00695C] font-bold bg-[#00695C]/10 px-2 py-0.5 rounded-full animate-fadeIn">
+                        {documents.otherDocuments.length}
+                      </span>
+                    )}
+                  </div>
+
+                  {documents.otherDocuments.length > 0 ? (
+                    <div className="space-y-1 max-h-32 overflow-y-auto">
+                      {documents.otherDocuments.map((file, index) => (
+                        <div key={index} className="flex items-center justify-between bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 rounded-lg p-1.5 border border-[#00695C]/20 group-hover:border-[#00695C]/40 transition-all duration-300">
+                          <button
+                            onClick={() => {
+                              setPdfToView(file);
+                              setShowPdfViewer(true);
+                            }}
+                            className="flex-1 text-[10px] text-[#00695C] font-medium hover:underline truncate text-left flex items-center gap-1"
+                          >
+                            <FileText className="w-3 h-3 flex-shrink-0" />
+                            <span className="truncate">{file.name}</span>
+                          </button>
+                          <button
+                            onClick={() => removeFile('otherDocuments', index)}
+                            className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors duration-300 flex-shrink-0"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="border-2 border-dashed border-gray-200 rounded-lg p-2 text-center hover:border-[#00695C] hover:bg-[#00695C]/5 transition-all duration-300 group/upload">
+                      <label className="block cursor-pointer">
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="p-1 bg-gray-100 rounded-lg group-hover/upload:bg-[#00695C]/10 transition-colors duration-300">
+                            <Upload className="w-3.5 h-3.5 text-gray-400 group-hover/upload:text-[#00695C] transition-colors duration-300" />
+                          </div>
+                          <span className="text-[10px] font-medium text-gray-500 group-hover/upload:text-[#00695C] transition-colors duration-300">
+                            Upload Multiple
+                          </span>
+                        </div>
+                        <input 
+                          type="file" 
+                          className="hidden" 
+                          accept=".pdf"
+                          multiple
+                          onChange={(e) => {
+                            const files = e.target.files;
+                            if (files && files.length > 0) {
+                              const fileArray = Array.from(files);
+                              setDocuments(prev => ({
+                                ...prev,
+                                otherDocuments: [...prev.otherDocuments, ...fileArray]
+                              }));
+                              showSuccessToast();
+                            }
+                            e.target.value = '';
+                          }} 
+                        />
+                      </label>
+                    </div>
                   )}
                 </div>
-              </AnimatedCard>
+                <div className="h-[2px] w-full bg-gray-100 overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-[#00695C] to-[#26A69A] w-0 group-hover:w-full transition-all duration-700 ease-out" />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      );
-    }
+        );
+      }
 
-    case 'address': {
-      const addressFields = [editForm.addressLine1, editForm.addressLine2, editForm.city, editForm.district, editForm.state, editForm.pinCode];
-      const filledCount = addressFields.filter(Boolean).length;
+      case 'bank': {
+        const bankFields = [editForm.accountHolderName, editForm.bankName, editForm.accountNumber, editForm.ifscCode, editForm.upiId, editForm.aadhaarNumber, editForm.panNumber, documents.aadhaarCard, documents.panCard];
+        const filledCount = bankFields.filter(Boolean).length;
 
-      return (
-        <div className="w-full animate-slideUp">
-          <SectionHeader
-            title="Address Details"
-            subtitle="Your current residential address information"
-            filled={filledCount}
-            total={addressFields.length}
-          />
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 w-full">
-            <div className="space-y-3 w-full">
-              <AnimatedCard label="Address Line 1" value={editForm.addressLine1} icon={<MapPin className="w-4 h-4" />} delay={0.05} />
-              <AnimatedCard label="Address Line 2" value={editForm.addressLine2} icon={<MapPin className="w-4 h-4" />} delay={0.12} />
-              <AnimatedCard label="City" value={editForm.city} icon={<Building className="w-4 h-4" />} delay={0.19} />
-            </div>
-            <div className="space-y-3 w-full">
-              <AnimatedCard label="District" value={editForm.district} icon={<Landmark className="w-4 h-4" />} delay={0.26} />
-              <AnimatedCard label="State" value={editForm.state} icon={<Globe className="w-4 h-4" />} delay={0.33} />
-              <AnimatedCard label="PIN Code" value={editForm.pinCode} icon={<MapPin className="w-4 h-4" />} delay={0.4} />
+        return (
+          <div className="w-full animate-slideUp">
+            <SectionHeader
+              title="Bank & Verification Details"
+              subtitle="Financial and identity verification information"
+              filled={filledCount}
+              total={bankFields.length}
+            />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 w-full">
+              <div className="space-y-3 w-full">
+                <AnimatedCard label="Account Holder Name" value={editForm.accountHolderName} icon={<User className="w-4 h-4" />} delay={0.05} />
+                <AnimatedCard label="Bank Name" value={editForm.bankName} icon={<Building className="w-4 h-4" />} delay={0.11} />
+                <AnimatedCard label="Account Number" value={editForm.accountNumber} icon={<CreditCard className="w-4 h-4" />} delay={0.17} />
+                <AnimatedCard label="IFSC Code" value={editForm.ifscCode} icon={<Banknote className="w-4 h-4" />} delay={0.23} />
+                <AnimatedCard label="UPI ID" value={editForm.upiId} icon={<Globe className="w-4 h-4" />} delay={0.29} />
+              </div>
+              <div className="space-y-3 w-full">
+                <AnimatedCard label="Aadhaar Number" value={editForm.aadhaarNumber} icon={<Shield className="w-4 h-4" />} delay={0.35} />
+                <AnimatedCard label="PAN Number" value={editForm.panNumber} icon={<CreditCard className="w-4 h-4" />} delay={0.41} />
+                <AnimatedCard label="Identity Verification" icon={<FileCheck className="w-4 h-4" />} delay={0.47}>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2 text-xs bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 p-2 rounded-lg border border-[#00695C]/15">
+                      <Check className={`w-4 h-4 ${documents.aadhaarCard ? 'text-[#00695C]' : 'text-gray-300'}`} />
+                      <span className={documents.aadhaarCard ? 'text-gray-700 font-medium' : 'text-gray-400'}>
+                        Aadhaar Card: {documents.aadhaarCard ? '✓ Uploaded' : '✗ Not uploaded'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 p-2 rounded-lg border border-[#00695C]/15">
+                      <Check className={`w-4 h-4 ${documents.panCard ? 'text-[#00695C]' : 'text-gray-300'}`} />
+                      <span className={documents.panCard ? 'text-gray-700 font-medium' : 'text-gray-400'}>
+                        PAN Card: {documents.panCard ? '✓ Uploaded' : '✗ Not uploaded'}
+                      </span>
+                    </div>
+                  </div>
+                </AnimatedCard>
+              </div>
             </div>
           </div>
-        </div>
-      );
-    }
+        );
+      }
 
-    case 'property': {
-      const propertyDocFields = ['coverImage', 'propertyPhotos', 'propertyVideo'];
-      const filledCount = propertyDocFields.filter(f => {
-        const v = documents[f];
-        return Array.isArray(v) ? v.length > 0 : v !== null;
-      }).length;
+      case 'communication': {
+        const commFields = [editForm.preferredMethods.length > 0, editForm.preferredTimes.length > 0, editForm.additionalNotes];
+        const filledCount = commFields.filter(Boolean).length;
 
-      return (
-        <div className="w-full animate-slideUp">
-          <SectionHeader
-            title="Property Images"
-            subtitle="Visual documentation of your property"
-            filled={filledCount}
-            total={propertyDocFields.length}
-          />
-          <div className="flex flex-wrap justify-start gap-3 w-full">
-            <div className="w-full sm:w-56">
-              <AnimatedCard label="Cover Image" icon={<Camera className="w-4 h-4" />} delay={0.05}>
-                {getFileStatusLabel('coverImage') ? (
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => openMediaLightbox('coverImage', 'image')}
-                      className="text-[13px] font-semibold text-[#00695C] underline underline-offset-2 decoration-[#00695C]/40 hover:text-[#004D40] hover:decoration-[#004D40] transition-colors"
-                    >
-                      View Image
-                    </button>
-                    <button
-                      onClick={() => removeFile('coverImage')}
-                      title="Remove Cover Image"
-                      className="p-1 rounded-md text-red-500 hover:text-white hover:bg-red-500 transition-colors duration-300"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ) : (
-                  <span className="text-[13px] text-gray-400 font-medium italic">Not specified</span>
-                )}
+        return (
+          <div className="w-full animate-slideUp">
+            <SectionHeader
+              title="Communication Preferences"
+              subtitle="How and when to contact you"
+              filled={filledCount}
+              total={commFields.length}
+            />
+            <div className="grid grid-cols-1 gap-3 w-full">
+              <AnimatedCard label="Preferred Contact Method" icon={<MessageCircle className="w-4 h-4" />} delay={0.05}>
+                <div className="flex flex-wrap gap-1.5">
+                  {['Phone Call', 'WhatsApp', 'Email'].map((method) => {
+                    const isSelected = editForm.preferredMethods.includes(method);
+                    return (
+                      <span
+                        key={method}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ${
+                          isSelected
+                            ? 'bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white shadow-lg transform scale-105'
+                            : 'bg-gray-100 text-gray-500 border border-gray-200'
+                        }`}
+                      >
+                        {method === 'Phone Call' && '📞'}
+                        {method === 'WhatsApp' && '💬'}
+                        {method === 'Email' && '✉️'}
+                        {' '}{method}
+                        {isSelected && <Check className="w-3 h-3 ml-1" />}
+                      </span>
+                    );
+                  })}
+                </div>
+                <div className="mt-1 text-xs text-gray-500 font-medium">
+                  Selected: {editForm.preferredMethods.length > 0 ? editForm.preferredMethods.join(', ') : 'None selected'}
+                </div>
               </AnimatedCard>
-            </div>
-            <div className="w-full sm:w-56">
-              <AnimatedCard label="Property Photos" icon={<Image className="w-4 h-4" />} delay={0.12}>
-                {getFileStatusLabel('propertyPhotos') ? (
-                  <button
-                    onClick={() => openMediaLightbox('propertyPhotos', 'image')}
-                    className="text-[13px] font-semibold text-[#00695C] underline underline-offset-2 decoration-[#00695C]/40 hover:text-[#004D40] hover:decoration-[#004D40] transition-colors"
-                  >
-                    View Photos ({documents.propertyPhotos.length})
-                  </button>
-                ) : (
-                  <span className="text-[13px] text-gray-400 font-medium italic">Not specified</span>
-                )}
-                {getFileStatusLabel('propertyPhotos') && (
-                  <p className="text-[10px] text-gray-400 mt-1">Open to view &amp; delete individual photos</p>
-                )}
+
+              <AnimatedCard label="Preferred Contact Time" icon={<Clock className="w-4 h-4" />} delay={0.15}>
+                <div className="flex flex-wrap gap-1.5">
+                  {['Morning', 'Afternoon', 'Evening', 'Anytime'].map((time) => {
+                    const isSelected = editForm.preferredTimes.includes(time);
+                    return (
+                      <span
+                        key={time}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ${
+                          isSelected
+                            ? 'bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white shadow-lg transform scale-105'
+                            : 'bg-gray-100 text-gray-500 border border-gray-200'
+                        }`}
+                      >
+                        {time}
+                        {isSelected && <Check className="w-3 h-3 ml-1" />}
+                      </span>
+                    );
+                  })}
+                </div>
+                <div className="mt-1 text-xs text-gray-500 font-medium">
+                  Selected: {editForm.preferredTimes.length > 0 ? editForm.preferredTimes.join(', ') : 'None selected'}
+                </div>
               </AnimatedCard>
-            </div>
-            <div className="w-full sm:w-56">
-              <AnimatedCard label="Property Video" icon={<Video className="w-4 h-4" />} delay={0.19}>
-                {getFileStatusLabel('propertyVideo') ? (
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => openMediaLightbox('propertyVideo', 'video')}
-                      className="text-[13px] font-semibold text-[#00695C] underline underline-offset-2 decoration-[#00695C]/40 hover:text-[#004D40] hover:decoration-[#004D40] transition-colors"
-                    >
-                      Watch Video
-                    </button>
-                    <button
-                      onClick={() => removeFile('propertyVideo')}
-                      title="Remove Property Video"
-                      className="p-1 rounded-md text-red-500 hover:text-white hover:bg-red-500 transition-colors duration-300"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ) : (
-                  <span className="text-[13px] text-gray-400 font-medium italic">Not specified</span>
-                )}
-              </AnimatedCard>
-            </div>
-          </div>
-        </div>
-      );
-    }
 
-    case 'legal': {
-      const legalDocFields = ['saleDeed', 'floorPlanOptional', 'pattaChitta', 'encumbranceCertificate', 'propertyTaxReceipt', 'buildingApprovalPlan', 'completionCertificate', 'occupancyCertificate', 'rentalAgreement', 'otherDocuments'];
-      const filledCount = legalDocFields.filter(f => {
-        const v = documents[f];
-        return Array.isArray(v) ? v.length > 0 : v !== null;
-      }).length;
-
-      return (
-        <div className="w-full animate-slideUp">
-          <SectionHeader
-            title="Legal Documents"
-            subtitle="All legal documents for property verification"
-            filled={filledCount}
-            total={legalDocFields.length}
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 w-full">
-            <AnimatedCard label="Sale Deed" value={getFileStatusLabel('saleDeed')} icon={<FileCheck className="w-4 h-4" />} delay={0.03} />
-            <AnimatedCard label="Floor Plan" value={getFileStatusLabel('floorPlanOptional')} icon={<FileCheck className="w-4 h-4" />} delay={0.07} />
-            <AnimatedCard label="Patta / Chitta" value={getFileStatusLabel('pattaChitta')} icon={<FileCheck className="w-4 h-4" />} delay={0.11} />
-            <AnimatedCard label="Encumbrance Certificate" value={getFileStatusLabel('encumbranceCertificate')} icon={<FileCheck className="w-4 h-4" />} delay={0.15} />
-            <AnimatedCard label="Property Tax Receipt" value={getFileStatusLabel('propertyTaxReceipt')} icon={<FileCheck className="w-4 h-4" />} delay={0.19} />
-            <AnimatedCard label="Building Approval Plan" value={getFileStatusLabel('buildingApprovalPlan')} icon={<FileCheck className="w-4 h-4" />} delay={0.23} />
-            <AnimatedCard label="Completion Certificate" value={getFileStatusLabel('completionCertificate')} icon={<FileCheck className="w-4 h-4" />} delay={0.27} />
-            <AnimatedCard label="Occupancy Certificate" value={getFileStatusLabel('occupancyCertificate')} icon={<FileCheck className="w-4 h-4" />} delay={0.31} />
-            <AnimatedCard label="Rental Agreement" value={getFileStatusLabel('rentalAgreement')} icon={<FileCheck className="w-4 h-4" />} delay={0.35} />
-            <AnimatedCard label="Other Documents" value={getFileStatusLabel('otherDocuments')} icon={<FileText className="w-4 h-4" />} delay={0.39} />
-          </div>
-        </div>
-      );
-    }
-
-    case 'bank': {
-      const bankFields = [editForm.accountHolderName, editForm.bankName, editForm.accountNumber, editForm.ifscCode, editForm.upiId, editForm.aadhaarNumber, editForm.panNumber, documents.aadhaarCard, documents.panCard];
-      const filledCount = bankFields.filter(Boolean).length;
-
-      return (
-        <div className="w-full animate-slideUp">
-          <SectionHeader
-            title="Bank & Verification Details"
-            subtitle="Financial and identity verification information"
-            filled={filledCount}
-            total={bankFields.length}
-          />
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 w-full">
-            <div className="space-y-3 w-full">
-              <AnimatedCard label="Account Holder Name" value={editForm.accountHolderName} icon={<User className="w-4 h-4" />} delay={0.05} />
-              <AnimatedCard label="Bank Name" value={editForm.bankName} icon={<Building className="w-4 h-4" />} delay={0.11} />
-              <AnimatedCard label="Account Number" value={editForm.accountNumber} icon={<CreditCard className="w-4 h-4" />} delay={0.17} />
-              <AnimatedCard label="IFSC Code" value={editForm.ifscCode} icon={<Banknote className="w-4 h-4" />} delay={0.23} />
-              <AnimatedCard label="UPI ID" value={editForm.upiId} icon={<Globe className="w-4 h-4" />} delay={0.29} />
-            </div>
-            <div className="space-y-3 w-full">
-              <AnimatedCard label="Aadhaar Number" value={editForm.aadhaarNumber} icon={<Shield className="w-4 h-4" />} delay={0.35} />
-              <AnimatedCard label="PAN Number" value={editForm.panNumber} icon={<CreditCard className="w-4 h-4" />} delay={0.41} />
-              <AnimatedCard label="Identity Verification" icon={<FileCheck className="w-4 h-4" />} delay={0.47}>
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-2 text-xs bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 p-2 rounded-lg border border-[#00695C]/15">
-                    <Check className={`w-4 h-4 ${documents.aadhaarCard ? 'text-[#00695C]' : 'text-gray-300'}`} />
-                    <span className={documents.aadhaarCard ? 'text-gray-700 font-medium' : 'text-gray-400'}>
-                      Aadhaar Card: {documents.aadhaarCard ? '✓ Uploaded' : '✗ Not uploaded'}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 p-2 rounded-lg border border-[#00695C]/15">
-                    <Check className={`w-4 h-4 ${documents.panCard ? 'text-[#00695C]' : 'text-gray-300'}`} />
-                    <span className={documents.panCard ? 'text-gray-700 font-medium' : 'text-gray-400'}>
-                      PAN Card: {documents.panCard ? '✓ Uploaded' : '✗ Not uploaded'}
-                    </span>
-                  </div>
+              <AnimatedCard label="Additional Notes" icon={<Info className="w-4 h-4" />} delay={0.25}>
+                <div className="p-2 text-xs text-gray-800 bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 rounded-lg border border-[#00695C]/20 font-medium">
+                  {editForm.additionalNotes || 'No additional notes'}
                 </div>
               </AnimatedCard>
             </div>
           </div>
-        </div>
-      );
-    }
+        );
+      }
 
-    case 'communication': {
-      const commFields = [editForm.preferredMethods.length > 0, editForm.preferredTimes.length > 0, editForm.additionalNotes];
-      const filledCount = commFields.filter(Boolean).length;
-
-      return (
-        <div className="w-full animate-slideUp">
-          <SectionHeader
-            title="Communication Preferences"
-            subtitle="How and when to contact you"
-            filled={filledCount}
-            total={commFields.length}
-          />
-          <div className="grid grid-cols-1 gap-3 w-full">
-            <AnimatedCard label="Preferred Contact Method" icon={<MessageCircle className="w-4 h-4" />} delay={0.05}>
-              <div className="flex flex-wrap gap-1.5">
-                {['Phone Call', 'WhatsApp', 'Email'].map((method) => {
-                  const isSelected = editForm.preferredMethods.includes(method);
-                  return (
-                    <span
-                      key={method}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ${
-                        isSelected
-                          ? 'bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white shadow-lg transform scale-105'
-                          : 'bg-gray-100 text-gray-500 border border-gray-200'
-                      }`}
-                    >
-                      {method === 'Phone Call' && '📞'}
-                      {method === 'WhatsApp' && '💬'}
-                      {method === 'Email' && '✉️'}
-                      {' '}{method}
-                      {isSelected && <Check className="w-3 h-3 ml-1" />}
-                    </span>
-                  );
-                })}
-              </div>
-              <div className="mt-1 text-xs text-gray-500 font-medium">
-                Selected: {editForm.preferredMethods.length > 0 ? editForm.preferredMethods.join(', ') : 'None selected'}
-              </div>
-            </AnimatedCard>
-
-            <AnimatedCard label="Preferred Contact Time" icon={<Clock className="w-4 h-4" />} delay={0.15}>
-              <div className="flex flex-wrap gap-1.5">
-                {['Morning', 'Afternoon', 'Evening', 'Anytime'].map((time) => {
-                  const isSelected = editForm.preferredTimes.includes(time);
-                  return (
-                    <span
-                      key={time}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ${
-                        isSelected
-                          ? 'bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white shadow-lg transform scale-105'
-                          : 'bg-gray-100 text-gray-500 border border-gray-200'
-                      }`}
-                    >
-                      {time}
-                      {isSelected && <Check className="w-3 h-3 ml-1" />}
-                    </span>
-                  );
-                })}
-              </div>
-              <div className="mt-1 text-xs text-gray-500 font-medium">
-                Selected: {editForm.preferredTimes.length > 0 ? editForm.preferredTimes.join(', ') : 'None selected'}
-              </div>
-            </AnimatedCard>
-
-            <AnimatedCard label="Additional Notes" icon={<Info className="w-4 h-4" />} delay={0.25}>
-              <div className="p-2 text-xs text-gray-800 bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 rounded-lg border border-[#00695C]/20 font-medium">
-                {editForm.additionalNotes || 'No additional notes'}
-              </div>
-            </AnimatedCard>
-          </div>
-        </div>
-      );
-    }
-
-    default:
-      return null;
+      default:
+        return null;
     }
   };
 
   // ============ FORMAT HELPERS ============
-
   const formatDateForDisplay = (dateStr) => {
     if (!dateStr) return 'Not specified';
     if (dateStr.match(/^\d{2}-\d{2}-\d{4}$/)) return dateStr;
@@ -2268,19 +2649,24 @@ const OwnerProfile = () => {
   };
 
   // ============ MAIN RENDER ============
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#00695C]/5 via-teal-50/50 to-[#26A69A]/5 pt-20 pb-12 w-full relative overflow-hidden">
-      {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-[#00695C]/10 to-[#26A69A]/10 rounded-full blur-3xl animate-float" />
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-[#26A69A]/10 to-[#00695C]/10 rounded-full blur-3xl animate-float-delayed" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-[#00695C]/5 to-[#26A69A]/5 rounded-full blur-3xl animate-pulse-slow" />
       </div>
 
-      {/* ============================================================ */}
-      {/* MODALS - All modals remain at the top level */}
-      {/* ============================================================ */}
+      {/* PDF Viewer Modal */}
+      {showPdfViewer && pdfToView && (
+        <PdfViewerModal 
+          file={pdfToView} 
+          onClose={() => {
+            setShowPdfViewer(false);
+            setPdfToView(null);
+          }} 
+        />
+      )}
 
       {showProfilePhotoDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn">
@@ -2398,7 +2784,6 @@ const OwnerProfile = () => {
                       )}
                     </div>
                   ))}
-                  {/* Profile Photo Upload in Edit Modal */}
                   <div className="space-y-1.5 w-full">
                     <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
                       <span>📸</span> Profile Photo
@@ -2425,8 +2810,6 @@ const OwnerProfile = () => {
                   </div>
                 </div>
               </div>
-
-            
 
               {/* Address Details */}
               <div className="space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-6 shadow-sm border border-[#00695C]/10">
@@ -2461,56 +2844,7 @@ const OwnerProfile = () => {
                 </div>
               </div>
 
-              {/* Property Images */}
-              <div className="space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-6 shadow-sm border border-[#00695C]/10">
-                <h3 className="text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-3">
-                  <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl">
-                    <Image className="w-4 h-4 text-white" />
-                  </div>
-                  Property Images
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
-                  {[
-                    { name: 'coverImage', label: 'Cover Image', hint: 'Only 1 image' },
-                    { name: 'propertyPhotos', label: 'Property Photos', multiple: true, hint: 'Max 3 images' },
-                    { name: 'propertyVideo', label: 'Property Video', hint: 'Only 1 video' },
-                  ].map((doc) => (
-                    <div key={doc.name} className="border-3 border-dashed border-gray-300 rounded-2xl p-4 text-center hover:border-[#00695C] transition-all duration-300 hover:bg-[#00695C]/5 group w-full">
-                      <label className="block text-xs font-medium text-gray-600 cursor-pointer">
-                        <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-3 rounded-2xl w-12 h-12 mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
-                          <Upload className="w-6 h-6 text-white" />
-                        </div>
-                        <span className="block font-bold">{doc.label}</span>
-                        <span className="block text-[10px] text-gray-400 mt-0.5">{doc.hint}</span>
-                        <input 
-                          type="file" 
-                          className="hidden" 
-                          multiple={doc.multiple || false}
-                          accept={doc.name === 'propertyVideo' ? 'video/*' : 'image/*'}
-                          onChange={(e) => {
-                            const files = e.target.files;
-                            if (files && files.length > 0) {
-                              if (doc.multiple) {
-                                handleMultipleFileUpload(doc.name, files);
-                              } else {
-                                handleFileUpload(doc.name, files[0]);
-                              }
-                            }
-                            e.target.value = '';
-                          }} 
-                        />
-                      </label>
-                      {documents[doc.name] && (
-                        <span className="text-xs text-[#00695C] block mt-3 font-bold bg-[#00695C]/10 px-3 py-1.5 rounded-full animate-fadeIn">
-                          {Array.isArray(documents[doc.name]) ? `${documents[doc.name].length} uploaded` : '✓ Uploaded'}
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Legal Documents */}
+              {/* Legal Documents - PDF Upload in Edit Profile */}
               <div className="space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-6 shadow-sm border border-[#00695C]/10">
                 <h3 className="text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-3">
                   <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl">
@@ -2518,69 +2852,129 @@ const OwnerProfile = () => {
                   </div>
                   Legal Documents
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
                   {[
-                    { name: 'saleDeed', label: 'Sale Deed' },
-                    { name: 'floorPlanOptional', label: 'Floor Plan' },
-                    { name: 'pattaChitta', label: 'Patta / Chitta' },
-                    { name: 'encumbranceCertificate', label: 'Encumbrance Certificate' },
-                    { name: 'propertyTaxReceipt', label: 'Property Tax Receipt' },
-                    { name: 'buildingApprovalPlan', label: 'Building Approval Plan' },
-                    { name: 'completionCertificate', label: 'Completion Certificate' },
-                    { name: 'occupancyCertificate', label: 'Occupancy Certificate' },
-                    { name: 'rentalAgreement', label: 'Rental Agreement' },
-                  ].map((doc) => (
-                    <div key={doc.name} className="border-3 border-dashed border-gray-300 rounded-2xl p-3 text-center hover:border-[#00695C] transition-all duration-300 hover:bg-[#00695C]/5 group w-full">
-                      <label className="block text-xs font-medium text-gray-600 cursor-pointer">
-                        <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-2xl w-10 h-10 mx-auto mb-2 group-hover:scale-110 transition-transform duration-300">
-                          <Upload className="w-5 h-5 text-white" />
+                    { field: 'saleDeed', label: 'Sale Deed' },
+                    { field: 'floorPlanOptional', label: 'Floor Plan' },
+                    { field: 'pattaChitta', label: 'Patta / Chitta' },
+                    { field: 'encumbranceCertificate', label: 'Encumbrance Certificate' },
+                    { field: 'propertyTaxReceipt', label: 'Property Tax Receipt' },
+                    { field: 'buildingApprovalPlan', label: 'Building Approval Plan' },
+                    { field: 'completionCertificate', label: 'Completion Certificate' },
+                    { field: 'occupancyCertificate', label: 'Occupancy Certificate' },
+                    { field: 'rentalAgreement', label: 'Rental Agreement' },
+                  ].map((doc) => {
+                    const file = documents[doc.field];
+                    const hasFile = file !== null && file !== undefined;
+
+                    return (
+                      <div key={doc.field} className="border-2 border-gray-200 rounded-xl p-3 hover:border-[#00695C] transition-all duration-300 hover:shadow-md bg-white">
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="text-xs font-bold text-gray-700">{doc.label}</label>
+                          {hasFile && (
+                            <span className="text-[10px] text-[#00695C] font-bold bg-[#00695C]/10 px-2 py-0.5 rounded-full">✓</span>
+                          )}
                         </div>
-                        <span className="text-xs font-bold">{doc.label}</span>
-                        <input 
-                          type="file" 
-                          className="hidden" 
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          onChange={(e) => {
-                            const file = e.target.files[0];
-                            if (file) {
-                              setDocuments(prev => ({ ...prev, [doc.name]: file }));
-                              showSuccessToast();
-                            }
-                          }} 
-                        />
-                      </label>
-                      {documents[doc.name] && (
-                        <span className="text-xs text-[#00695C] block mt-2 font-bold bg-[#00695C]/10 px-2 py-1 rounded-full animate-fadeIn">
-                          ✓ Uploaded
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                  <div className="border-3 border-dashed border-gray-300 rounded-2xl p-3 text-center hover:border-[#00695C] transition-all duration-300 hover:bg-[#00695C]/5 group w-full">
-                    <label className="block text-xs font-medium text-gray-600 cursor-pointer">
-                      <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-2xl w-10 h-10 mx-auto mb-2 group-hover:scale-110 transition-transform duration-300">
-                        <Upload className="w-5 h-5 text-white" />
+                        {hasFile ? (
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handlePdfView(doc.field)}
+                              className="text-xs text-[#00695C] font-medium hover:underline flex items-center gap-1"
+                            >
+                              <FileText className="w-3 h-3" />
+                              {typeof file === 'string' ? file.split('/').pop() : file.name}
+                            </button>
+                            <button
+                              onClick={() => handlePdfDelete(doc.field)}
+                              className="text-red-400 hover:text-red-600 transition-colors"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ) : (
+                          <label className="block cursor-pointer">
+                            <div className="flex items-center gap-2 text-xs text-gray-500 hover:text-[#00695C] transition-colors">
+                              <Upload className="w-4 h-4" />
+                              <span>Upload PDF</span>
+                            </div>
+                            <input 
+                              type="file" 
+                              className="hidden" 
+                              accept=".pdf"
+                              onChange={(e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                  handlePdfUpload(doc.field, file);
+                                }
+                                e.target.value = '';
+                              }} 
+                            />
+                          </label>
+                        )}
                       </div>
-                      <span className="text-xs font-bold">Other Documents</span>
-                      <input 
-                        type="file" 
-                        className="hidden" 
-                        multiple 
-                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                        onChange={(e) => {
-                          const files = e.target.files;
-                          if (files && files.length > 0) {
-                            handleMultipleFileUpload('otherDocuments', files);
-                          }
-                        }} 
-                      />
-                    </label>
+                    );
+                  })}
+                </div>
+                <div className="border-2 border-gray-200 rounded-xl p-3 hover:border-[#00695C] transition-all duration-300 hover:shadow-md bg-white">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold text-gray-700">Other Documents</label>
                     {documents.otherDocuments.length > 0 && (
-                      <span className="text-xs text-[#00695C] block mt-2 font-bold bg-[#00695C]/10 px-2 py-1 rounded-full animate-fadeIn">
-                        {documents.otherDocuments.length} uploaded
+                      <span className="text-[10px] text-[#00695C] font-bold bg-[#00695C]/10 px-2 py-0.5 rounded-full">
+                        {documents.otherDocuments.length}
                       </span>
                     )}
                   </div>
+                  {documents.otherDocuments.length > 0 ? (
+                    <div className="space-y-1 max-h-32 overflow-y-auto">
+                      {documents.otherDocuments.map((file, index) => (
+                        <div key={index} className="flex items-center justify-between bg-gray-50 rounded-lg p-2">
+                          <button
+                            onClick={() => {
+                              setPdfToView(file);
+                              setShowPdfViewer(true);
+                            }}
+                            className="text-xs text-[#00695C] font-medium hover:underline flex items-center gap-1 truncate max-w-[150px]"
+                          >
+                            <FileText className="w-3 h-3 flex-shrink-0" />
+                            <span className="truncate">{file.name}</span>
+                          </button>
+                          <button
+                            onClick={() => removeFile('otherDocuments', index)}
+                            className="text-red-400 hover:text-red-600 transition-colors flex-shrink-0"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <label className="block cursor-pointer">
+                      <div className="flex items-center gap-2 text-xs text-gray-500 hover:text-[#00695C] transition-colors">
+                        <Upload className="w-4 h-4" />
+                        <span>Upload Multiple PDFs</span>
+                      </div>
+                      <input 
+                        type="file" 
+                        className="hidden" 
+                        accept=".pdf"
+                        multiple
+                        onChange={(e) => {
+                          const files = e.target.files;
+                          if (files && files.length > 0) {
+                            const fileArray = Array.from(files);
+                            setDocuments(prev => ({
+                              ...prev,
+                              otherDocuments: [...prev.otherDocuments, ...fileArray]
+                            }));
+                            showSuccessToast();
+                          }
+                          e.target.value = '';
+                        }} 
+                      />
+                    </label>
+                  )}
                 </div>
               </div>
 
@@ -2616,7 +3010,7 @@ const OwnerProfile = () => {
                 </div>
               </div>
 
-                {/* Identity Verification */}
+              {/* Identity Verification */}
               <div className="space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-6 shadow-sm border border-[#00695C]/10">
                 <h3 className="text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-3">
                   <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl">
@@ -2645,7 +3039,7 @@ const OwnerProfile = () => {
                   <div className="col-span-2 space-y-2 w-full">
                     <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">Upload Documents</label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div className="border-3 border-dashed border-gray-300 rounded-2xl p-4 text-center hover:border-[#00695C] transition-all duration-300 hover:bg-[#00695C]/5 group">
+                      <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:border-[#00695C] transition-all duration-300 hover:bg-[#00695C]/5 group">
                         <label className="block text-xs font-medium text-gray-600 cursor-pointer">
                           <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl w-10 h-10 mx-auto mb-2 group-hover:scale-110 transition-transform duration-300">
                             <Upload className="w-5 h-5 text-white" />
@@ -2670,7 +3064,7 @@ const OwnerProfile = () => {
                           </span>
                         )}
                       </div>
-                      <div className="border-3 border-dashed border-gray-300 rounded-2xl p-4 text-center hover:border-[#00695C] transition-all duration-300 hover:bg-[#00695C]/5 group">
+                      <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:border-[#00695C] transition-all duration-300 hover:bg-[#00695C]/5 group">
                         <label className="block text-xs font-medium text-gray-600 cursor-pointer">
                           <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl w-10 h-10 mx-auto mb-2 group-hover:scale-110 transition-transform duration-300">
                             <Upload className="w-5 h-5 text-white" />
@@ -2814,7 +3208,7 @@ const OwnerProfile = () => {
         />
       )}
 
-      {/* Media Lightbox (uploaded property images / video preview) */}
+      {/* Media Lightbox */}
       {showMediaLightbox && lightboxItems.length > 0 && (
         <MediaLightboxModal
           items={lightboxItems}
@@ -2833,7 +3227,7 @@ const OwnerProfile = () => {
       {showEditPropertyModal && editingProperty && (
         <EditPropertyModal
           property={editingProperty}
-          onSave={setEditingProperty}
+          onSave={handleSavePropertyEdit}
           onCancel={() => {
             setShowEditPropertyModal(false);
             setEditingProperty(null);
@@ -2875,14 +3269,11 @@ const OwnerProfile = () => {
         </div>
       )}
 
-      {/* ============================================================ */}
       {/* MAIN CONTENT */}
-      {/* ============================================================ */}
       <div className="container mx-auto px-4 max-w-full w-full relative z-10 -mt-15">
         
-        {/* 1. HEADER */}
+        {/* HEADER */}
         <div className="relative overflow-hidden rounded-3xl mb-6 w-full animate-fade-up">
-          {/* decorative background */}
           <div className="absolute inset-0 bg-gradient-to-r from-[#00695C]/[0.04] via-[#26A69A]/[0.06] to-[#00695C]/[0.04] rounded-3xl" />
           <div className="absolute -top-16 -left-10 w-40 h-40 bg-gradient-to-br from-[#00695C]/10 to-[#26A69A]/10 rounded-full blur-3xl animate-pulse-slow pointer-events-none" />
           <div className="absolute -bottom-16 -right-10 w-40 h-40 bg-gradient-to-br from-[#26A69A]/10 to-[#00695C]/10 rounded-full blur-3xl animate-pulse-slow pointer-events-none" style={{ animationDelay: '1.2s' }} />
@@ -2929,7 +3320,7 @@ const OwnerProfile = () => {
           </div>
         </div>
 
-        {/* 2. PROFILE CARD - Reduced Size */}
+        {/* PROFILE CARD */}
         <div className="relative bg-[#00695C]/5 backdrop-blur-sm rounded-2xl shadow-xl p-6 mb-6 w-full hover:shadow-2xl transition-all duration-500 border border-[#00695C]/20 overflow-hidden group">
           <div className="absolute top-0 left-[-100%] w-full h-[2px] bg-gradient-to-r from-transparent via-[#26A69A] to-transparent group-hover:left-full transition-all duration-[900ms] ease-out" />
 
@@ -2953,7 +3344,6 @@ const OwnerProfile = () => {
             ))}
           </div>
 
-          {/* Download Invoice PDF - right side end of the profile card */}
           <button
             onClick={handleDownloadInvoice}
             title="Download Invoice PDF"
@@ -2996,6 +3386,9 @@ const OwnerProfile = () => {
             <div className="flex-1 text-center md:text-left w-full">
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-1.5">
                 <h2 className="text-2xl font-bold text-gray-800">{editForm.fullName}</h2>
+                <span className="text-xs text-[#00695C] font-medium bg-gray-100 px-3 py-1 rounded-full border border-gray-200">
+                  Owner ID: #OWN-{editForm.mobileNumber?.slice(-4) || '0000'}
+                </span>
                 <span className="relative overflow-hidden bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white px-3 py-0.5 rounded-full text-[10px] font-bold">
                   Verified Owner
                   <span className="absolute inset-y-0 left-[-60%] w-[40%] bg-gradient-to-r from-transparent via-white/80 to-transparent animate-shimmer" />
@@ -3021,17 +3414,12 @@ const OwnerProfile = () => {
                     {[editForm.addressLine1, editForm.addressLine2, editForm.city, editForm.district, editForm.state, editForm.pinCode].filter(Boolean).join(', ')}
                   </span>
                 </span>
-                {documents.coverImage && (
-                  <span className="flex items-center gap-1.5 bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 text-[#00695C] px-3 py-1.5 rounded-xl text-[10px] font-bold shadow-sm hover:scale-105 transition-transform duration-300 border border-[#00695C]/20">
-                    <Image className="w-3 h-3" /> Cover Image Uploaded
-                  </span>
-                )}
               </div>
             </div>
           </div>
         </div>
 
-        {/* 3. TAB NAVIGATION - Reduced Size */}
+        {/* TAB NAVIGATION */}
         <div className="bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] backdrop-blur-sm rounded-2xl shadow-xl p-2 mb-6 border border-[#00695C]/20 w-full overflow-x-auto">
           <div className="flex gap-1.5 min-w-max">
             {sections.map((tab) => {
@@ -3068,7 +3456,7 @@ const OwnerProfile = () => {
           </div>
         </div>
 
-        {/* 4. TAB CONTENT - Reduced Size */}
+        {/* TAB CONTENT */}
         <div className="bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] backdrop-blur-sm rounded-2xl shadow-xl p-5 mb-6 border border-[#00695C]/20 w-full relative overflow-hidden">
           <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-[#00695C]/5 to-[#26A69A]/5 rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-br from-[#26A69A]/5 to-[#00695C]/5 rounded-full blur-3xl" />
@@ -3077,7 +3465,7 @@ const OwnerProfile = () => {
           </div>
         </div>
 
-        {/* 5. PROPERTIES SECTION - Reduced Size */}
+        {/* PROPERTIES SECTION */}
         <div className="bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] backdrop-blur-sm rounded-2xl shadow-xl p-5 mb-6 w-full border border-[#00695C]/20 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-[#00695C]/5 to-[#26A69A]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
           
@@ -3133,7 +3521,7 @@ const OwnerProfile = () => {
                   }`}
                   aria-label="Grid view"
                 >
-                  <GridIcon className="w-3.5 h-3.5" />
+                  <GridIcon className="w-4.5 h-4.5" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
@@ -3144,7 +3532,7 @@ const OwnerProfile = () => {
                   }`}
                   aria-label="List view"
                 >
-                  <List className="w-3.5 h-3.5" />
+                  <List className="w-4.5 h-4.5" />
                 </button>
               </div>
             </div>
@@ -3153,94 +3541,66 @@ const OwnerProfile = () => {
           {filteredProperties.length > 0 ? (
             <div>
               {viewMode === 'grid' ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {filteredProperties.map((property, index) => (
                     <div
                       key={property.id}
-                      className="group relative bg-gradient-to-br from-white via-[#00695C]/5 to-[#26A69A]/10 backdrop-blur-sm rounded-xl shadow-md hover:shadow-lg transition-all duration-500 border border-[#00695C]/10 hover:border-[#00695C]/25 overflow-hidden animate-fade-up hover:-translate-y-1.5"
+                      className="group relative bg-teal-100/30 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-[#00695C]/10 overflow-hidden hover:-translate-y-1"
                       style={{ animationDelay: `${index * 0.08}s` }}
                     >
-                      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                        {Array.from({ length: 4 }).map((_, i) => (
-                          <span
-                            key={i}
-                            className="absolute rounded-full bg-[#00695C]/5 animate-float-particle"
-                            style={{
-                              left: `${Math.random() * 100}%`,
-                              top: `${Math.random() * 100}%`,
-                              width: `${3 + Math.random() * 4}px`,
-                              height: `${3 + Math.random() * 4}px`,
-                              animationDuration: `${8 + Math.random() * 12}s`,
-                              animationDelay: `${Math.random() * 10}s`,
-                            }}
-                          />
-                        ))}
-                      </div>
-
-                      <div className="absolute -inset-0.5 bg-gradient-to-r from-[#00695C]/10 via-[#26A69A]/15 to-[#00695C]/10 rounded-xl opacity-0 group-hover:opacity-100 blur-md transition-opacity duration-500 pointer-events-none" />
-                      <div className="absolute top-0 left-[-100%] w-full h-[1px] bg-gradient-to-r from-transparent via-[#26A69A]/30 to-transparent group-hover:left-full transition-all duration-700 pointer-events-none" />
-                      <div className="absolute bottom-0 right-[-100%] w-full h-[1px] bg-gradient-to-l from-transparent via-[#26A69A]/30 to-transparent group-hover:right-full transition-all duration-700 delay-200 pointer-events-none" />
-
-                      <div className="relative h-28 overflow-hidden">
+                      <div className="relative w-full h-46 bg-gray-100 overflow-hidden">
                         <img 
-                          src={property.images?.[0] || 'https://via.placeholder.com/400x300/CCCCCC/666666?text=No+Image'} 
+                          src={property.images?.[0] || 'https://via.placeholder.com/400x400/CCCCCC/666666?text=No+Image'} 
                           alt={property.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           onError={(e) => {
-                            e.target.src = 'https://via.placeholder.com/400x300/CCCCCC/666666?text=No+Image';
+                            e.target.src = 'https://via.placeholder.com/400x400/CCCCCC/666666?text=No+Image';
                           }}
                         />
-                        
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-70 group-hover:opacity-80 transition-opacity duration-300" />
-
-                        <div className="absolute top-1.5 right-1.5">
-                          <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold shadow-lg backdrop-blur-sm flex items-center gap-0.5 transition-all duration-300 hover:scale-105 ${
-                            property.status === 'Active' ? 'bg-emerald-400/80 text-white' :
-                            property.status === 'Pending' ? 'bg-amber-400/80 text-white' :
-                            'bg-rose-400/80 text-white'
-                          }`}>
-                            <span className={`w-0.5 h-0.5 rounded-full animate-pulse ${property.status === 'Active' ? 'bg-white' : property.status === 'Pending' ? 'bg-white' : 'bg-white'}`} />
-                            {property.status}
-                          </span>
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent p-3">
+                          <p className="text-white font-bold text-lg drop-shadow-lg">
+                            {property.price}
+                          </p>
                         </div>
-
-                        <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-between">
-                          <div className="flex items-center gap-1">
-                            <p className="text-white font-bold text-xs drop-shadow-lg bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded-lg border border-white/10">
-                              {property.price}
-                            </p>
-                          </div>
-                        </div>
-
                         {property.images && property.images.length > 1 && (
-                          <div className="absolute bottom-1.5 right-1.5 bg-black/30 backdrop-blur-sm text-white text-[7px] px-1.5 py-0.5 rounded-full border border-white/10 flex items-center gap-0.5">
-                            <Image className="w-2 h-2" />
+                          <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                            <Image className="w-3.5 h-3.5" />
                             {property.images.length}
                           </div>
                         )}
                       </div>
 
-                      <div className="p-2.5 space-y-1">
-                        <div className="group/title">
-                          <h3 className="font-bold text-gray-800 text-[11px] group-hover:text-[#00695C] transition-colors duration-300 line-clamp-1 relative">
+                      <div className="p-4 space-y-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <h3 className="font-bold text-gray-800 text-base hover:text-[#00695C] transition-colors duration-300 line-clamp-1 flex-1">
                             {property.name}
-                            <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-gradient-to-r from-[#00695C]/40 to-[#26A69A]/40 group-hover/title:w-full transition-all duration-300" />
                           </h3>
-                          <p className="text-[8px] text-gray-400 font-medium flex items-center gap-1 mt-0.5">
-                            <span className="bg-gray-100 px-1.5 py-0.5 rounded-full">{property.id}</span>
-                            <span className="w-0.5 h-0.5 rounded-full bg-gray-300" />
-                            <span className="text-gray-400">{property.postedDate}</span>
-                          </p>
-                        </div>
-
-                        <div className="flex items-center gap-1 text-[10px] text-gray-600 group/location">
-                          <div className="p-0.5 bg-[#00695C]/8 rounded-lg group-hover/location:rotate-12 transition-transform duration-300">
-                            <MapPin className="w-2.5 h-2.5 text-[#00695C]/70" />
+                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                            <span className={`text-[10px] font-bold ${
+                              property.status === 'Active' ? 'text-green-600' : 'text-gray-400'
+                            }`}>
+                              {property.status === 'Active' ? 'Active' : 'Inactive'}
+                            </span>
+                            <ToggleSwitch 
+                              isOn={property.status === 'Active'} 
+                              onToggle={() => handleToggleStatus(property)}
+                              size="sm"
+                            />
                           </div>
-                          <span className="font-medium truncate text-[9px] group-hover/location:text-[#00695C] transition-colors duration-300">{property.location}</span>
                         </div>
 
-                        <div className="flex flex-wrap gap-0.5">
+                        <p className="text-xs text-gray-500 font-medium flex items-center gap-2">
+                          <span className="bg-gray-100 px-2 py-0.5 rounded-full">{property.id}</span>
+                          <span className="w-1 h-1 rounded-full bg-gray-300" />
+                          <span>{property.postedDate}</span>
+                        </p>
+
+                        <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                          <MapPin className="w-4 h-4 text-[#00695C] flex-shrink-0" />
+                          <span className="font-medium truncate">{property.location}</span>
+                        </div>
+
+                        <div className="flex flex-wrap gap-1.5">
                           {[
                             { icon: Building, label: property.type },
                             { icon: Layers, label: property.area },
@@ -3248,77 +3608,53 @@ const OwnerProfile = () => {
                           ].map((item, idx) => (
                             <span 
                               key={idx}
-                              className="flex items-center gap-0.5 bg-[#00695C]/5 px-1.5 py-0.5 rounded-lg text-[7px] font-medium text-[#00695C]/80 border border-[#00695C]/8 hover:border-[#00695C]/20 transition-all duration-300 hover:scale-105 hover:shadow-sm"
+                              className="flex items-center gap-1 bg-[#00695C]/5 px-2.5 py-1 rounded-lg text-xs font-medium text-[#00695C] border border-[#00695C]/10"
                             >
-                              <item.icon className="w-2 h-2" />
+                              <item.icon className="w-3.5 h-3.5" />
                               {item.label}
                             </span>
                           ))}
                         </div>
 
-                        <div className="flex items-center justify-between pt-1 border-t border-[#00695C]/8">
-                          <span className="text-[7px] text-gray-400 font-medium flex items-center gap-0.5 bg-gray-50/80 px-1.5 py-0.5 rounded-lg">
-                            <Calendar className="w-2 h-2 text-[#00695C]/60" />
-                            {property.postedDate}
-                          </span>
-                          <div className="flex items-center gap-0.5">
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                handleViewDetails(property);
-                              }}
-                              className="p-1 bg-gradient-to-r from-[#00695C]/80 to-[#26A69A]/80 text-white rounded-lg hover:shadow-[0_0_10px_rgba(0,105,92,0.3)] transition-all duration-300 hover:scale-110 hover:-rotate-6"
-                              title="View"
-                              type="button"
-                            >
-                              <ViewIcon className="w-2.5 h-2.5" />
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                handleEditProperty(property);
-                              }}
-                              className="p-1 bg-gradient-to-r from-blue-400/80 to-blue-500/80 text-white rounded-lg hover:shadow-[0_0_10px_rgba(59,130,246,0.3)] transition-all duration-300 hover:scale-110 hover:-rotate-6"
-                              title="Edit"
-                              type="button"
-                            >
-                              <Edit2 className="w-2.5 h-2.5" />
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                handleDeleteProperty(property);
-                              }}
-                              className="p-1 bg-gradient-to-r from-red-400/80 to-red-500/80 text-white rounded-lg hover:shadow-[0_0_10px_rgba(239,68,68,0.3)] transition-all duration-300 hover:scale-110 hover:-rotate-6"
-                              title="Delete"
-                              type="button"
-                            >
-                              <Trash2 className="w-2.5 h-2.5" />
-                            </button>
-                          </div>
+                        <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
+                          <button
+                            onClick={() => handleViewDetails(property)}
+                            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-lg text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
+                          >
+                            <ViewIcon className="w-4 h-4" />
+                            View
+                          </button>
+                          <button
+                            onClick={() => handleEditProperty(property)}
+                            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProperty(property)}
+                            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Delete
+                          </button>
                         </div>
                       </div>
-
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#00695C]/0 via-[#26A69A]/30 to-[#00695C]/0 scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left pointer-events-none" />
-                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#00695C]/0 via-[#26A69A]/3 to-[#00695C]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                     </div>
                   ))}
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full min-w-[700px] text-xs">
+                  <table className="w-full min-w-[700px] text-sm">
                     <thead>
                       <tr className="border-b-2 border-gray-200 bg-gray-50">
-                        <th className="text-left py-2 px-3 text-[10px] font-bold text-gray-700 uppercase tracking-wider">Property</th>
-                        <th className="text-left py-2 px-3 text-[10px] font-bold text-gray-700 uppercase tracking-wider">Type</th>
-                        <th className="text-left py-2 px-3 text-[10px] font-bold text-gray-700 uppercase tracking-wider">Status</th>
-                        <th className="text-left py-2 px-3 text-[10px] font-bold text-gray-700 uppercase tracking-wider">Price</th>
-                        <th className="text-left py-2 px-3 text-[10px] font-bold text-gray-700 uppercase tracking-wider">Area</th>
-                        <th className="text-left py-2 px-3 text-[10px] font-bold text-gray-700 uppercase tracking-wider">Location</th>
-                        <th className="text-right py-2 px-3 text-[10px] font-bold text-gray-700 uppercase tracking-wider">Actions</th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Property</th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Type</th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Price</th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Area</th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Location</th>
+                        <th className="text-right py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -3327,9 +3663,9 @@ const OwnerProfile = () => {
                           key={property.id}
                           className="hover:bg-[#00695C]/3 transition-colors duration-200 group"
                         >
-                          <td className="py-2 px-3">
-                            <div className="flex items-center gap-2">
-                              <div className="w-8 h-8 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                                 <img 
                                   src={property.images?.[0] || 'https://via.placeholder.com/100x100/CCCCCC/666666?text=No+Image'} 
                                   alt={property.name}
@@ -3340,16 +3676,29 @@ const OwnerProfile = () => {
                                 />
                               </div>
                               <div>
-                                <p className="font-bold text-xs text-gray-800 group-hover:text-[#00695C] transition-colors">
-                                  {property.name}
-                                </p>
-                                <p className="text-[9px] text-gray-500">{property.id}</p>
+                                <div className="flex items-center gap-2">
+                                  <p className="font-bold text-sm text-gray-800 group-hover:text-[#00695C] transition-colors">
+                                    {property.name}
+                                  </p>
+                                  <div className="flex items-center gap-1">
+                                    <span className={`text-[10px] font-bold ${
+                                      property.status === 'Active' ? 'text-green-600' : 'text-gray-400'
+                                    }`}>
+                                      {property.status === 'Active' ? 'Active' : 'Inactive'}
+                                    </span>
+                                    <ToggleSwitch 
+                                      isOn={property.status === 'Active'} 
+                                      onToggle={() => handleToggleStatus(property)}
+                                      size="sm"
+                                    />
+                                  </div>
+                                </div>
+                                <p className="text-xs text-gray-500">{property.id}</p>
                               </div>
                             </div>
                           </td>
-                          <td className="py-2 px-3 text-xs text-gray-700">{property.type}</td>
-                          <td className="py-2 px-3">
-                            <span className={`px-1.5 py-0.5 rounded-lg text-[9px] font-bold ${
+                          <td className="py-3 px-4">
+                            <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${
                               property.status === 'Active' ? 'bg-green-100 text-green-700' :
                               property.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
                               'bg-red-100 text-red-700'
@@ -3357,31 +3706,32 @@ const OwnerProfile = () => {
                               {property.status}
                             </span>
                           </td>
-                          <td className="py-2 px-3 text-xs font-bold text-gray-800">{property.price}</td>
-                          <td className="py-2 px-3 text-xs text-gray-700">{property.area}</td>
-                          <td className="py-2 px-3 text-xs text-gray-700 truncate max-w-[120px]">{property.location}</td>
-                          <td className="py-2 px-3 text-right">
-                            <div className="flex items-center justify-end gap-1">
+                          <td className="py-3 px-4 text-sm text-gray-700">{property.type}</td>
+                          <td className="py-3 px-4 text-sm font-bold text-gray-800">{property.price}</td>
+                          <td className="py-3 px-4 text-sm text-gray-700">{property.area}</td>
+                          <td className="py-3 px-4 text-sm text-gray-700 truncate max-w-[150px]">{property.location}</td>
+                          <td className="py-3 px-4 text-right">
+                            <div className="flex items-center justify-end gap-2">
                               <button
                                 onClick={() => handleViewDetails(property)}
-                                className="p-1 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-lg hover:shadow-lg transition-all duration-300 hover:scale-110"
-                                title="View Details"
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#00695C] text-white rounded-lg text-xs font-bold hover:bg-[#005A4F] transition-all duration-300"
                               >
-                                <ViewIcon className="w-3 h-3" />
+                                <ViewIcon className="w-3.5 h-3.5" />
+                                View
                               </button>
                               <button
                                 onClick={() => handleEditProperty(property)}
-                                className="p-1 bg-blue-500 text-white rounded-lg hover:shadow-lg transition-all duration-300 hover:scale-110"
-                                title="Edit Property"
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 text-white rounded-lg text-xs font-bold hover:bg-blue-600 transition-all duration-300"
                               >
-                                <Edit2 className="w-3 h-3" />
+                                <Edit2 className="w-3.5 h-3.5" />
+                                Edit
                               </button>
                               <button
                                 onClick={() => handleDeleteProperty(property)}
-                                className="p-1 bg-red-500 text-white rounded-lg hover:shadow-lg transition-all duration-300 hover:scale-110"
-                                title="Delete Property"
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500 text-white rounded-lg text-xs font-bold hover:bg-red-600 transition-all duration-300"
                               >
-                                <Trash2 className="w-3 h-3" />
+                                <Trash2 className="w-3.5 h-3.5" />
+                                Delete
                               </button>
                             </div>
                           </td>
@@ -3424,7 +3774,7 @@ const OwnerProfile = () => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes slideDown {
           from { opacity: 0; transform: translateY(-20px) scale(0.95); }
           to { opacity: 1; transform: translateY(0) scale(1); }
