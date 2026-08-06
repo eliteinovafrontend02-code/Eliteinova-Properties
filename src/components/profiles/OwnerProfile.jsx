@@ -27,7 +27,7 @@ const bathroomOptions = ["1", "2", "3", "4+"];
 const furnishingOptions = ["Fully Furnished", "Semi Furnished", "Unfurnished"];
 const parkingOptions = ["1 Car", "2 Cars", "3+ Cars"];
 const propertyTypeOptions = ["Apartment", "Independent House", "Independent Villa", "Duplex Residential Unit", "Commercial", "Land"];
-const statusOptions = ["Active", "Pending", "Inactive"];
+const statusOptions = ["Active", "Inactive"];
 const listingPurposeOptions = ["For Rent", "For Sale", "For Lease"];
 
 const availableAmenities = [
@@ -1810,16 +1810,7 @@ const OwnerProfile = () => {
                 </button>
               )}
 
-              <div className="absolute top-2 right-2 flex items-center gap-2 bg-black/50 backdrop-blur-sm px-2.5 py-1.5 rounded-xl">
-                <span className="text-white text-[10px] font-bold">
-                  {property.status === 'Active' ? 'ON' : 'OFF'}
-                </span>
-                <ToggleSwitch 
-                  isOn={property.status === 'Active'} 
-                  onToggle={() => handleToggleStatus(property)}
-                  size="sm"
-                />
-              </div>
+              
             </div>
 
             <div className="flex items-center justify-between">
@@ -3507,7 +3498,6 @@ const OwnerProfile = () => {
               >
                 <option value="all">All</option>
                 <option value="active">Active</option>
-                <option value="pending">Pending</option>
                 <option value="inactive">Inactive</option>
               </select>
               
