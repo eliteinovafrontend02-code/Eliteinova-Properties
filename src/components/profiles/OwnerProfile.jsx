@@ -45,31 +45,33 @@ const PdfViewerModal = ({ file, onClose }) => {
   const fileName = typeof file === 'string' ? file.split('/').pop() || 'document.pdf' : file.name || 'document.pdf';
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/85 backdrop-blur-md animate-fadeIn p-4">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/85 backdrop-blur-md animate-fadeIn p-2 sm:p-4 md:p-6 lg:p-8">
       <div className="relative w-full max-w-5xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
-        <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] px-6 py-4 flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center gap-3">
-            <FileText className="w-5 h-5 text-white" />
-            <h3 className="text-white font-bold text-lg truncate max-w-md">{fileName}</h3>
+        <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-3 md:py-4 lg:py-5 flex items-center justify-between flex-shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 lg:gap-4 min-w-0">
+            <FileText className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white flex-shrink-0" />
+            <h3 className="text-white font-bold text-xs sm:text-sm md:text-lg lg:text-xl truncate max-w-[100px] sm:max-w-[200px] md:max-w-md lg:max-w-lg">
+              {fileName}
+            </h3>
           </div>
           <button 
             onClick={onClose}
-            className="text-white/80 hover:text-white transition-all duration-300 hover:rotate-90 hover:scale-110"
+            className="text-white/80 hover:text-white transition-all duration-300 hover:rotate-90 hover:scale-110 flex-shrink-0"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
-        <div className="flex-1 overflow-auto bg-gray-100 p-4">
-          <embed src={fileUrl} type="application/pdf" className="w-full h-full min-h-[70vh]" />
+        <div className="flex-1 overflow-auto bg-gray-100 p-2 sm:p-3 md:p-4 lg:p-6">
+          <embed src={fileUrl} type="application/pdf" className="w-full h-[50vh] sm:h-[60vh] md:h-[70vh] lg:h-[75vh] min-h-[300px] sm:min-h-[400px] md:min-h-[500px]" />
         </div>
-        <div className="px-6 py-3 bg-gray-50 border-t border-gray-200 flex justify-between items-center flex-shrink-0">
-          <span className="text-sm text-gray-500">{fileName}</span>
+        <div className="px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-3 md:py-4 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-2 flex-shrink-0">
+          <span className="text-[10px] sm:text-xs md:text-sm lg:text-base text-gray-500 truncate max-w-[120px] sm:max-w-[200px] md:max-w-[300px] lg:max-w-full">{fileName}</span>
           <button
             onClick={() => window.open(fileUrl, '_blank')}
-            className="flex items-center gap-2 px-4 py-2 bg-[#00695C] text-white rounded-xl text-sm font-bold hover:bg-[#005A4F] transition-all duration-300"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 lg:px-6 py-1.5 sm:py-2 md:py-2.5 bg-[#00695C] text-white rounded-xl text-[10px] sm:text-xs md:text-sm lg:text-base font-bold hover:bg-[#005A4F] transition-all duration-300 w-full sm:w-auto justify-center"
           >
-            <ExternalLink className="w-4 h-4" />
-            Open in New Tab
+            <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span>Open in New Tab</span>
           </button>
         </div>
       </div>
@@ -81,19 +83,19 @@ const PdfViewerModal = ({ file, onClose }) => {
 const ToggleSwitch = ({ isOn, onToggle, size = 'sm' }) => {
   const sizes = {
     sm: {
-      container: 'w-8 h-4',
-      circle: 'w-3 h-3',
-      translate: 'translate-x-4',
+      container: 'w-7 h-3.5 sm:w-8 sm:h-4',
+      circle: 'w-2.5 h-2.5 sm:w-3 sm:h-3',
+      translate: 'translate-x-3.5 sm:translate-x-4',
     },
     md: {
-      container: 'w-10 h-5',
-      circle: 'w-4 h-4',
-      translate: 'translate-x-5',
+      container: 'w-9 h-4.5 sm:w-10 sm:h-5',
+      circle: 'w-3.5 h-3.5 sm:w-4 sm:h-4',
+      translate: 'translate-x-4.5 sm:translate-x-5',
     },
     lg: {
-      container: 'w-12 h-6',
-      circle: 'w-5 h-5',
-      translate: 'translate-x-6',
+      container: 'w-11 h-5.5 sm:w-12 sm:h-6',
+      circle: 'w-4.5 h-4.5 sm:w-5 sm:h-5',
+      translate: 'translate-x-5.5 sm:translate-x-6',
     },
   };
 
@@ -127,42 +129,42 @@ const MediaLightboxModal = ({ items, index, onClose, onNavigate, onDelete }) => 
   const goNext = () => onNavigate((index + 1) % items.length);
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 backdrop-blur-md animate-fadeIn p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 backdrop-blur-md animate-fadeIn p-2 sm:p-4 md:p-6" onClick={onClose}>
       <div className="relative max-w-4xl max-h-[85vh] w-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={onClose}
-          className="absolute -top-10 right-0 text-white/80 hover:text-white transition-all duration-300 hover:rotate-90 hover:scale-110"
+          className="absolute -top-8 sm:-top-10 right-0 text-white/80 hover:text-white transition-all duration-300 hover:rotate-90 hover:scale-110"
         >
-          <X className="w-7 h-7" />
+          <X className="w-5 h-5 sm:w-7 sm:h-7" />
         </button>
 
         {items.length > 1 && (
           <button
             onClick={goPrev}
-            className="absolute left-0 sm:-left-14 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-2.5 transition-all duration-300 z-10"
+            className="absolute left-1 sm:-left-14 md:-left-16 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-1.5 sm:p-2.5 md:p-3 transition-all duration-300 z-10"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-4 h-4 sm:w-6 sm:h-6" />
           </button>
         )}
 
-        <div className="w-full flex flex-col items-center gap-3 animate-scaleIn">
+        <div className="w-full flex flex-col items-center gap-2 sm:gap-3 md:gap-4 animate-scaleIn">
           {current.type === 'video' ? (
-            <video src={current.url} controls autoPlay className="max-w-full max-h-[75vh] rounded-2xl shadow-2xl bg-black" />
+            <video src={current.url} controls autoPlay className="max-w-full max-h-[60vh] sm:max-h-[70vh] md:max-h-[75vh] rounded-2xl shadow-2xl bg-black" />
           ) : (
-            <img src={current.url} alt={current.name || 'Preview'} className="max-w-full max-h-[75vh] rounded-2xl shadow-2xl object-contain bg-black/20" />
+            <img src={current.url} alt={current.name || 'Preview'} className="max-w-full max-h-[60vh] sm:max-h-[70vh] md:max-h-[75vh] rounded-2xl shadow-2xl object-contain bg-black/20" />
           )}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 text-white/80 text-xs font-medium">
-              <span>{current.name}</span>
+          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 md:gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-white/80 text-[10px] sm:text-xs md:text-sm font-medium">
+              <span className="truncate max-w-[100px] sm:max-w-[200px] md:max-w-full">{current.name}</span>
               {items.length > 1 && <span>· {index + 1} / {items.length}</span>}
             </div>
             {onDelete && (
               <button
                 onClick={onDelete}
                 title="Delete this file"
-                className="flex items-center gap-1 bg-red-500/90 hover:bg-red-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-lg transition-all duration-300 hover:scale-105"
+                className="flex items-center gap-0.5 sm:gap-1 bg-red-500/90 hover:bg-red-600 text-white text-[9px] sm:text-[10px] md:text-[11px] font-bold px-1.5 sm:px-2 md:px-2.5 py-0.5 sm:py-1 rounded-lg shadow-lg transition-all duration-300 hover:scale-105"
               >
-                <Trash2 className="w-3 h-3" />
+                <Trash2 className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3" />
                 Delete
               </button>
             )}
@@ -172,9 +174,9 @@ const MediaLightboxModal = ({ items, index, onClose, onNavigate, onDelete }) => 
         {items.length > 1 && (
           <button
             onClick={goNext}
-            className="absolute right-0 sm:-right-14 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-2.5 transition-all duration-300 z-10"
+            className="absolute right-1 sm:-right-14 md:-right-16 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-1.5 sm:p-2.5 md:p-3 transition-all duration-300 z-10"
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6" />
           </button>
         )}
       </div>
@@ -190,52 +192,52 @@ const PdfFileCard = ({ file, onDelete, onView }) => {
   const getPdfIcon = () => {
     const ext = fileName.split('.').pop().toLowerCase();
     switch(ext) {
-      case 'pdf': return <FileText className="w-6 h-6 text-red-500" />;
+      case 'pdf': return <FileText className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-red-500" />;
       case 'jpg':
       case 'jpeg':
       case 'png':
       case 'gif':
-      case 'webp': return <FileImage className="w-6 h-6 text-blue-500" />;
+      case 'webp': return <FileImage className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-500" />;
       case 'xls':
       case 'xlsx':
-      case 'csv': return <FileSpreadsheet className="w-6 h-6 text-green-500" />;
+      case 'csv': return <FileSpreadsheet className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-green-500" />;
       case 'zip':
       case 'rar':
-      case '7z': return <FileArchive className="w-6 h-6 text-yellow-500" />;
-      default: return <File className="w-6 h-6 text-gray-500" />;
+      case '7z': return <FileArchive className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-yellow-500" />;
+      default: return <File className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-gray-500" />;
     }
   };
 
   return (
-    <div className="group flex items-center gap-3 bg-white rounded-xl p-3 border border-gray-200 hover:border-[#00695C]/40 hover:shadow-md transition-all duration-300">
-      <div className="flex-shrink-0 p-2 bg-gray-50 rounded-lg group-hover:bg-[#00695C]/5 transition-colors duration-300">
+    <div className="group flex items-center gap-2 sm:gap-2.5 md:gap-3 bg-white rounded-xl p-2 sm:p-2.5 md:p-3 border border-gray-200 hover:border-[#00695C]/40 hover:shadow-md transition-all duration-300">
+      <div className="flex-shrink-0 p-1 sm:p-1.5 md:p-2 bg-gray-50 rounded-lg group-hover:bg-[#00695C]/5 transition-colors duration-300">
         {getPdfIcon()}
       </div>
       
       <div className="flex-1 min-w-0">
         <button
           onClick={onView}
-          className="text-sm font-medium text-gray-800 hover:text-[#00695C] transition-colors duration-300 truncate block w-full text-left hover:underline"
+          className="text-xs sm:text-sm font-medium text-gray-800 hover:text-[#00695C] transition-colors duration-300 truncate block w-full text-left hover:underline"
         >
           {fileName}
         </button>
-        <span className="text-xs text-gray-400">{fileSize}</span>
+        <span className="text-[9px] sm:text-[10px] md:text-xs text-gray-400">{fileSize}</span>
       </div>
 
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-0.5 sm:gap-1 md:gap-1.5">
         <button
           onClick={onView}
-          className="p-1.5 text-[#00695C] hover:bg-[#00695C]/10 rounded-lg transition-colors duration-300"
+          className="p-1 sm:p-1.5 text-[#00695C] hover:bg-[#00695C]/10 rounded-lg transition-colors duration-300"
           title="View PDF"
         >
-          <Eye className="w-4 h-4" />
+          <Eye className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
         </button>
         <button
           onClick={onDelete}
-          className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-300"
+          className="p-1 sm:p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-300"
           title="Delete file"
         >
-          <Trash2 className="w-4 h-4" />
+          <Trash2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
         </button>
       </div>
     </div>
@@ -1255,7 +1257,7 @@ const OwnerProfile = () => {
       if (localStep === 0) {
         return (
           <div className="space-y-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-0.5">Property Title</label>
                 <input
@@ -1307,8 +1309,8 @@ const OwnerProfile = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="md:col-span-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="sm:col-span-2">
                 <label className="block text-xs font-bold text-gray-700 mb-0.5">Property Address</label>
                 <textarea
                   value={localProperty.propertyAddress || localProperty.location || ''}
@@ -1433,7 +1435,7 @@ const OwnerProfile = () => {
       } else if (localStep === 1) {
         return (
           <div className="space-y-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-0.5">Expected Price</label>
                 <input
@@ -1456,7 +1458,7 @@ const OwnerProfile = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-0.5">Available From</label>
                 <input
@@ -1636,27 +1638,28 @@ const OwnerProfile = () => {
     };
 
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn p-4">
-        <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col animate-scaleIn">
-          <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] px-6 py-4 flex items-center justify-between rounded-t-3xl flex-shrink-0">
-            <div className="flex items-center gap-3">
-              <Edit2 className="w-5 h-5 text-white" />
-              <h2 className="text-white text-xl font-bold">Edit Property</h2>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn p-2 sm:p-4 md:p-6">
+        <div className="bg-white rounded-3xl shadow-2xl w-full max-w-[90%] sm:max-w-[95%]
+         lg:max-w-3xl max-h-[80vh] flex flex-col animate-scaleIn">
+          <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 flex items-center justify-between rounded-t-3xl flex-shrink-0">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Edit2 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+              <h2 className="text-white text-lg sm:text-xl font-bold">Edit Property</h2>
             </div>
             <button 
               onClick={handleLocalCancel}
               className="text-white/80 hover:text-white transition-all duration-300 hover:rotate-90 hover:scale-110"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
           </div>
 
-          <div className="flex border-b border-gray-100 flex-shrink-0 px-4 pt-2">
+          <div className="flex border-b border-gray-100 flex-shrink-0 px-3 sm:px-4 pt-2 overflow-x-auto">
             {editSteps.map((stepName, idx) => (
               <button
                 key={idx}
                 onClick={() => setLocalStep(idx)}
-                className={`px-4 py-2.5 text-sm font-bold border-b-2 transition-all ${
+                className={`px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap ${
                   localStep === idx
                     ? 'border-[#00695C] text-[#00695C]'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -1667,41 +1670,41 @@ const OwnerProfile = () => {
             ))}
           </div>
 
-          <div className="p-6 overflow-y-auto flex-1">
+          <div className="p-4 sm:p-6 overflow-y-auto flex-1">
             {renderStepContent()}
           </div>
 
-          <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 rounded-b-3xl flex justify-between items-center flex-shrink-0">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 border-t border-gray-100 rounded-b-3xl flex flex-wrap justify-between items-center gap-3 flex-shrink-0">
             <div className="flex gap-2">
               {localStep > 0 && (
                 <button
                   onClick={handleLocalBack}
-                  className="px-4 py-2 text-sm font-bold text-[#00695C] bg-teal-50 rounded-xl hover:bg-teal-100 transition-all"
+                  className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-[#00695C] bg-teal-50 rounded-xl hover:bg-teal-100 transition-all"
                 >
                   ← Back
                 </button>
               )}
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3">
               <button
                 onClick={handleLocalCancel}
-                className="px-6 py-2.5 rounded-xl border-2 border-gray-300 text-gray-700 text-sm font-bold hover:bg-gray-100 transition-all duration-300"
+                className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl border-2 border-gray-300 text-gray-700 text-xs sm:text-sm font-bold hover:bg-gray-100 transition-all duration-300"
               >
                 Cancel
               </button>
               {localStep < editSteps.length - 1 ? (
                 <button
                   onClick={handleLocalNext}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white text-sm font-bold hover:shadow-lg transition-all duration-300 flex items-center gap-2"
+                  className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white text-xs sm:text-sm font-bold hover:shadow-lg transition-all duration-300 flex items-center gap-1 sm:gap-2"
                 >
                   Next →
                 </button>
               ) : (
                 <button
                   onClick={handleLocalSave}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white text-sm font-bold hover:shadow-lg transition-all duration-300 flex items-center gap-2"
+                  className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white text-xs sm:text-sm font-bold hover:shadow-lg transition-all duration-300 flex items-center gap-1 sm:gap-2"
                 >
-                  <Save className="w-4 h-4" />
+                  <Save className="w-3 h-3 sm:w-4 sm:h-4" />
                   Save Changes
                 </button>
               )}
@@ -1749,14 +1752,14 @@ const OwnerProfile = () => {
     };
 
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn p-2 sm:p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col animate-scaleIn">
-          <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] px-4 py-3 flex items-center justify-between rounded-t-2xl flex-shrink-0">
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="bg-white/20 p-1.5 rounded-lg">
-                <Home className="w-4 h-4 text-white" />
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn p-2 sm:p-4 md:p-6">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-[90%]  sm:max-w-[95%]  lg:max-w-2xl h-[80vh] flex flex-col animate-scaleIn">
+          <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] px-3 sm:px-4 md:px-5 py-2 sm:py-3 flex items-center justify-between rounded-t-2xl flex-shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+              <div className="bg-white/20 p-1 sm:p-1.5 rounded-lg">
+                <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
               </div>
-              <h2 className="text-white text-lg sm:text-xl font-bold truncate">
+              <h2 className="text-white text-base sm:text-lg md:text-xl font-bold truncate">
                 {property.name}
               </h2>
             </div>
@@ -1764,12 +1767,12 @@ const OwnerProfile = () => {
               onClick={onClose}
               className="text-white/80 hover:text-white transition-all duration-300 hover:rotate-90 hover:scale-110 flex-shrink-0"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
 
-          <div className="p-4 overflow-y-auto flex-1 space-y-4">
-            <div className="relative rounded-xl overflow-hidden bg-gray-100 h-56 sm:h-64">
+          <div className="p-3 sm:p-4 overflow-y-auto flex-1 space-y-3 sm:space-y-4">
+            <div className="relative rounded-xl overflow-hidden bg-gray-100 h-48 sm:h-56 md:h-64">
               <img 
                 src={images[currentImageIndex]} 
                 alt={property.name}
@@ -1783,17 +1786,17 @@ const OwnerProfile = () => {
                 <>
                   <button
                     onClick={prevImage}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-all duration-300"
+                    className="absolute left-1.5 sm:left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 sm:p-2 transition-all duration-300"
                   >
-                    <ChevronLeft className="w-5 h-5" />
+                    <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                   <button
                     onClick={nextImage}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-all duration-300"
+                    className="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 sm:p-2 transition-all duration-300"
                   >
-                    <ChevronRight className="w-5 h-5" />
+                    <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
-                  <div className="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] px-2.5 py-0.5 rounded-full">
+                  <div className="absolute bottom-1.5 sm:bottom-2 right-1.5 sm:right-2 bg-black/60 text-white text-[9px] sm:text-[10px] px-2 sm:px-2.5 py-0.5 rounded-full">
                     {currentImageIndex + 1} / {images.length}
                   </div>
                 </>
@@ -1803,25 +1806,23 @@ const OwnerProfile = () => {
                 <button
                   onClick={() => handleDeleteImage(currentImageIndex)}
                   title="Delete this image"
-                  className="absolute bottom-2 left-2 flex items-center gap-1 bg-red-500/90 hover:bg-red-600 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg shadow-lg transition-all duration-300 hover:scale-105"
+                  className="absolute bottom-1.5 sm:bottom-2 left-1.5 sm:left-2 flex items-center gap-1 bg-red-500/90 hover:bg-red-600 text-white text-[9px] sm:text-[10px] font-bold px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg shadow-lg transition-all duration-300 hover:scale-105"
                 >
-                  <Trash2 className="w-3 h-3" />
+                  <Trash2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                   Delete
                 </button>
               )}
-
-              
             </div>
 
             <div className="flex items-center justify-between">
-              <p className="text-[10px] text-gray-500 font-medium">
+              <p className="text-[9px] sm:text-[10px] text-gray-500 font-medium">
                 {hasImages ? `${images.length} image${images.length > 1 ? 's' : ''}` : 'No images uploaded yet'}
               </p>
               <button
                 onClick={() => detailImageInputRef.current?.click()}
-                className="flex items-center gap-1.5 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+                className="flex items-center gap-1 sm:gap-1.5 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white text-[9px] sm:text-[10px] font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
               >
-                <Upload className="w-3 h-3" />
+                <Upload className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                 Add Image
               </button>
               <input
@@ -1835,12 +1836,12 @@ const OwnerProfile = () => {
             </div>
 
             {images.length > 1 && (
-              <div className="flex gap-1.5 overflow-x-auto pb-1.5">
+              <div className="flex gap-1 sm:gap-1.5 overflow-x-auto pb-1 sm:pb-1.5">
                 {images.map((img, idx) => (
                   <button
                     key={idx}
                     onClick={() => setCurrentImageIndex(idx)}
-                    className={`flex-shrink-0 w-16 h-12 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
+                    className={`flex-shrink-0 w-12 sm:w-14 md:w-16 h-9 sm:h-10 md:h-12 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
                       currentImageIndex === idx ? 'border-[#00695C] shadow-md' : 'border-gray-200 hover:border-gray-400'
                     }`}
                   >
@@ -1857,76 +1858,76 @@ const OwnerProfile = () => {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-2">
-              <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-                <div className="p-1.5 bg-[#00695C]/10 rounded-lg">
-                  <Building className="w-3.5 h-3.5 text-[#00695C]" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-gray-50 rounded-lg">
+                <div className="p-1 sm:p-1.5 bg-[#00695C]/10 rounded-lg">
+                  <Building className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00695C]" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Property ID</p>
-                  <p className="text-xs font-bold text-gray-800">{property.id}</p>
+                  <p className="text-[9px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-wider">Property ID</p>
+                  <p className="text-[10px] sm:text-xs font-bold text-gray-800">{property.id}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-                <div className="p-1.5 bg-[#00695C]/10 rounded-lg">
-                  <CreditCard className="w-3.5 h-3.5 text-[#00695C]" />
+              <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-gray-50 rounded-lg">
+                <div className="p-1 sm:p-1.5 bg-[#00695C]/10 rounded-lg">
+                  <CreditCard className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00695C]" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Price</p>
-                  <p className="text-xs font-bold text-gray-800">{property.price}</p>
+                  <p className="text-[9px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-wider">Price</p>
+                  <p className="text-[10px] sm:text-xs font-bold text-gray-800">{property.price}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-                <div className="p-1.5 bg-[#00695C]/10 rounded-lg">
-                  <Bed className="w-3.5 h-3.5 text-[#00695C]" />
+              <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-gray-50 rounded-lg">
+                <div className="p-1 sm:p-1.5 bg-[#00695C]/10 rounded-lg">
+                  <Bed className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00695C]" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Bedrooms</p>
-                  <p className="text-xs font-bold text-gray-800">{property.bedrooms || 'N/A'}</p>
+                  <p className="text-[9px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-wider">Bedrooms</p>
+                  <p className="text-[10px] sm:text-xs font-bold text-gray-800">{property.bedrooms || 'N/A'}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-                <div className="p-1.5 bg-[#00695C]/10 rounded-lg">
-                  <Bath className="w-3.5 h-3.5 text-[#00695C]" />
+              <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-gray-50 rounded-lg">
+                <div className="p-1 sm:p-1.5 bg-[#00695C]/10 rounded-lg">
+                  <Bath className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00695C]" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Bathrooms</p>
-                  <p className="text-xs font-bold text-gray-800">{property.bathrooms || 'N/A'}</p>
+                  <p className="text-[9px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-wider">Bathrooms</p>
+                  <p className="text-[10px] sm:text-xs font-bold text-gray-800">{property.bathrooms || 'N/A'}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-                <div className="p-1.5 bg-[#00695C]/10 rounded-lg">
-                  <MapPin className="w-3.5 h-3.5 text-[#00695C]" />
+              <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-gray-50 rounded-lg">
+                <div className="p-1 sm:p-1.5 bg-[#00695C]/10 rounded-lg">
+                  <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00695C]" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Location</p>
-                  <p className="text-xs font-bold text-gray-800 truncate">{property.location}</p>
+                  <p className="text-[9px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-wider">Location</p>
+                  <p className="text-[10px] sm:text-xs font-bold text-gray-800 truncate">{property.location}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-                <div className="p-1.5 bg-[#00695C]/10 rounded-lg">
-                  <Calendar className="w-3.5 h-3.5 text-[#00695C]" />
+              <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-gray-50 rounded-lg">
+                <div className="p-1 sm:p-1.5 bg-[#00695C]/10 rounded-lg">
+                  <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00695C]" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Posted</p>
-                  <p className="text-xs font-bold text-gray-800">{property.postedDate}</p>
+                  <p className="text-[9px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-wider">Posted</p>
+                  <p className="text-[10px] sm:text-xs font-bold text-gray-800">{property.postedDate}</p>
                 </div>
               </div>
             </div>
 
             {property.description && (
-              <div className="bg-gray-50 rounded-lg p-3">
-                <h3 className="text-[11px] font-bold text-gray-700 mb-1">Description</h3>
-                <p className="text-xs text-gray-600 leading-relaxed">{property.description}</p>
+              <div className="bg-gray-50 rounded-lg p-2 sm:p-3">
+                <h3 className="text-[10px] sm:text-[11px] font-bold text-gray-700 mb-0.5 sm:mb-1">Description</h3>
+                <p className="text-[10px] sm:text-xs text-gray-600 leading-relaxed">{property.description}</p>
               </div>
             )}
 
             {property.features && property.features.length > 0 && (
               <div>
-                <h3 className="text-[11px] font-bold text-gray-700 mb-1.5">Features</h3>
-                <div className="flex flex-wrap gap-1.5">
+                <h3 className="text-[10px] sm:text-[11px] font-bold text-gray-700 mb-1 sm:mb-1.5">Features</h3>
+                <div className="flex flex-wrap gap-1 sm:gap-1.5">
                   {property.features.map((feature, index) => (
-                    <span key={index} className="px-2.5 py-1 bg-[#00695C]/10 text-[#00695C] rounded-lg text-[10px] font-bold">
+                    <span key={index} className="px-2 sm:px-2.5 py-0.5 sm:py-1 bg-[#00695C]/10 text-[#00695C] rounded-lg text-[9px] sm:text-[10px] font-bold">
                       {feature}
                     </span>
                   ))}
@@ -1936,10 +1937,10 @@ const OwnerProfile = () => {
 
             {property.selectedAmenities && property.selectedAmenities.length > 0 && (
               <div>
-                <h3 className="text-[11px] font-bold text-gray-700 mb-1.5">Amenities</h3>
-                <div className="flex flex-wrap gap-1.5">
+                <h3 className="text-[10px] sm:text-[11px] font-bold text-gray-700 mb-1 sm:mb-1.5">Amenities</h3>
+                <div className="flex flex-wrap gap-1 sm:gap-1.5">
                   {property.selectedAmenities.map((amenity, index) => (
-                    <span key={index} className="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-bold">
+                    <span key={index} className="px-2 sm:px-2.5 py-0.5 sm:py-1 bg-blue-50 text-blue-600 rounded-lg text-[9px] sm:text-[10px] font-bold">
                       {amenity}
                     </span>
                   ))}
@@ -1949,8 +1950,8 @@ const OwnerProfile = () => {
 
             {images.length > 0 && (
               <div>
-                <h3 className="text-[11px] font-bold text-gray-700 mb-2">All Property Images</h3>
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                <h3 className="text-[10px] sm:text-[11px] font-bold text-gray-700 mb-1.5 sm:mb-2">All Property Images</h3>
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-1.5 sm:gap-2">
                   {images.map((img, idx) => (
                     <div 
                       key={idx} 
@@ -1969,7 +1970,7 @@ const OwnerProfile = () => {
                       />
                       {currentImageIndex === idx && (
                         <div className="absolute inset-0 bg-[#00695C]/20 flex items-center justify-center">
-                          <div className="bg-[#00695C] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                          <div className="bg-[#00695C] text-white text-[8px] sm:text-[10px] font-bold px-1 sm:px-2 py-0.5 rounded-full">
                             Active
                           </div>
                         </div>
@@ -1981,9 +1982,9 @@ const OwnerProfile = () => {
                             handleDeleteImage(idx);
                           }}
                           title="Delete image"
-                          className="absolute top-1 right-1 bg-red-500/90 hover:bg-red-600 text-white p-1 rounded-md shadow-lg opacity-0 group-hover/thumb:opacity-100 transition-all duration-300"
+                          className="absolute top-0.5 sm:top-1 right-0.5 sm:right-1 bg-red-500/90 hover:bg-red-600 text-white p-0.5 sm:p-1 rounded-md shadow-lg opacity-0 group-hover/thumb:opacity-100 transition-all duration-300"
                         >
-                          <Trash2 className="w-3 h-3" />
+                          <Trash2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         </button>
                       )}
                     </div>
@@ -1993,15 +1994,15 @@ const OwnerProfile = () => {
             )}
           </div>
 
-          <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 rounded-b-2xl flex flex-wrap gap-2.5 flex-shrink-0">
+          <div className="px-3 sm:px-4 py-2 sm:py-3 bg-gray-50 border-t border-gray-100 rounded-b-2xl flex flex-wrap gap-2 sm:gap-2.5 flex-shrink-0">
             <button 
               onClick={() => {
                 onClose();
                 handleEditProperty(property);
               }}
-              className="flex-1 min-w-[100px] px-4 py-2.5 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-xl text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+              className="flex-1 min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-xl text-xs sm:text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-1 sm:gap-2"
             >
-              <Edit2 className="w-4 h-4" />
+              <Edit2 className="w-3 h-3 sm:w-4 sm:h-4" />
               Edit Property
             </button>
             <button 
@@ -2009,9 +2010,9 @@ const OwnerProfile = () => {
                 onClose();
                 handleDeleteProperty(property);
               }}
-              className="flex-1 min-w-[100px] px-4 py-2.5 bg-red-500 text-white rounded-xl text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+              className="flex-1 min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-2 sm:py-2.5 bg-red-500 text-white rounded-xl text-xs sm:text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-1 sm:gap-2"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
               Delete
             </button>
           </div>
@@ -2025,28 +2026,28 @@ const OwnerProfile = () => {
     if (!property) return null;
 
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn p-4">
-        <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full animate-scaleIn p-6">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="bg-red-100 p-3 rounded-2xl">
-              <AlertTriangle className="w-8 h-8 text-red-500 animate-pulse" />
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn p-3 sm:p-4 md:p-6">
+        <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full animate-scaleIn p-4 sm:p-6 md:p-8">
+          <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+            <div className="bg-red-100 p-2 sm:p-3 rounded-2xl">
+              <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 text-red-500 animate-pulse" />
             </div>
-            <h3 className="text-xl font-bold text-gray-800">Delete Property</h3>
+            <h3 className="text-lg sm:text-xl font-bold text-gray-800">Delete Property</h3>
           </div>
-          <p className="text-gray-600 mb-2">
+          <p className="text-sm sm:text-base text-gray-600 mb-2">
             Are you sure you want to delete <span className="font-bold text-[#00695C]">{property.name}</span>?
           </p>
-          <p className="text-sm text-red-500 mb-6">This action cannot be undone.</p>
-          <div className="flex justify-end gap-3">
+          <p className="text-xs sm:text-sm text-red-500 mb-4 sm:mb-6">This action cannot be undone.</p>
+          <div className="flex justify-end gap-2 sm:gap-3">
             <button
               onClick={onCancel}
-              className="px-6 py-3 rounded-2xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105"
+              className="px-4 sm:px-6 py-2 sm:py-3 rounded-2xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105 text-sm sm:text-base"
             >
               Cancel
             </button>
             <button
               onClick={onConfirm}
-              className="px-6 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold hover:from-red-600 hover:to-rose-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+              className="px-4 sm:px-6 py-2 sm:py-3 rounded-2xl bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold hover:from-red-600 hover:to-rose-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-sm sm:text-base"
             >
               Delete
             </button>
@@ -2093,14 +2094,14 @@ const OwnerProfile = () => {
     const SectionHeader = ({ title, subtitle, filled, total }) => {
       const pct = total ? Math.round((filled / total) * 100) : null;
       return (
-        <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-5 gap-2 sm:gap-3">
           <div className="flex items-center">
-            <div className="w-1 h-8 bg-gradient-to-b from-[#00695C] to-[#26A69A] mr-3 rounded-full animate-pulse-slow"></div>
+            <div className="w-1 h-6 sm:h-8 bg-gradient-to-b from-[#00695C] to-[#26A69A] mr-2 sm:mr-3 rounded-full animate-pulse-slow"></div>
             <div>
-              <h2 className="text-lg font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
+              <h2 className="text-base sm:text-lg font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
                 {title}
               </h2>
-              <p className="text-xs text-gray-500">{subtitle}</p>
+              <p className="text-[10px] sm:text-xs text-gray-500">{subtitle}</p>
             </div>
           </div>
           {pct !== null && (
@@ -2124,27 +2125,27 @@ const OwnerProfile = () => {
         <div className="absolute -inset-px rounded-2xl bg-gradient-to-r from-[#00695C]/0 via-[#26A69A]/40 to-[#00695C]/0 opacity-0 group-hover/acard:opacity-100 blur-sm transition-opacity duration-500 -z-10" />
         <div className="absolute top-0 left-[-100%] w-full h-[1px] bg-gradient-to-r from-transparent via-[#26A69A]/60 to-transparent group-hover/acard:left-full transition-all duration-[1100ms] ease-out" />
         <div className="absolute -top-8 -right-8 w-20 h-20 bg-gradient-to-br from-[#26A69A]/10 to-[#00695C]/10 rounded-full blur-2xl opacity-0 group-hover/acard:opacity-100 group-hover/acard:scale-125 transition-all duration-500" />
-        <div className="relative p-3.5 flex items-start gap-3">
+        <div className="relative p-2.5 sm:p-3.5 flex items-start gap-2 sm:gap-3">
           <div className="relative flex-shrink-0">
             <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#00695C] to-[#26A69A] blur-md opacity-0 group-hover/acard:opacity-60 transition-opacity duration-500" />
-            <div className="relative p-2.5 rounded-xl bg-gradient-to-br from-[#00695C] to-[#26A69A] shadow-lg transform group-hover/acard:scale-110 group-hover/acard:rotate-6 transition-all duration-300">
+            <div className="relative p-2 sm:p-2.5 rounded-xl bg-gradient-to-br from-[#00695C] to-[#26A69A] shadow-lg transform group-hover/acard:scale-110 group-hover/acard:rotate-6 transition-all duration-300">
               <div className="text-white">{icon}</div>
             </div>
           </div>
           <div className="flex-1 min-w-0">
-            <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase tracking-wider group-hover/acard:text-[#00695C] transition-colors duration-300">
+            <label className="block text-[9px] sm:text-[10px] font-bold text-gray-500 mb-0.5 sm:mb-1 uppercase tracking-wider group-hover/acard:text-[#00695C] transition-colors duration-300">
               {label}
             </label>
             {children ? (
               children
             ) : (
-              <div className="text-[13px] text-gray-800 font-semibold break-words">
+              <div className="text-xs sm:text-[13px] text-gray-800 font-semibold break-words">
                 {value || <span className="text-gray-400 font-medium italic">Not specified</span>}
               </div>
             )}
           </div>
           {value && !children && (
-            <CheckCircle className="w-4 h-4 text-[#00695C]/30 group-hover/acard:text-[#00695C] flex-shrink-0 transition-colors duration-300" />
+            <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00695C]/30 group-hover/acard:text-[#00695C] flex-shrink-0 transition-colors duration-300" />
           )}
         </div>
         <div className="h-[2px] w-full bg-gray-100 overflow-hidden">
@@ -2166,24 +2167,24 @@ const OwnerProfile = () => {
               filled={filledCount}
               total={personalFields.length}
             />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
               <div className="space-y-3 w-full">
-                <AnimatedCard label="Full Name" value={editForm.fullName} icon={<User className="w-4 h-4" />} delay={0.05} />
-                <AnimatedCard label="Mobile Number" value={editForm.mobileNumber} icon={<Phone className="w-4 h-4" />} delay={0.12} />
-                <AnimatedCard label="Email Address" value={editForm.emailAddress} icon={<Mail className="w-4 h-4" />} delay={0.19} />
+                <AnimatedCard label="Full Name" value={editForm.fullName} icon={<User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.05} />
+                <AnimatedCard label="Mobile Number" value={editForm.mobileNumber} icon={<Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.12} />
+                <AnimatedCard label="Email Address" value={editForm.emailAddress} icon={<Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.19} />
               </div>
               <div className="space-y-3 w-full">
-                <AnimatedCard label="Date of Birth" value={formatDateForDisplay(editForm.dateOfBirth)} icon={<Calendar className="w-4 h-4" />} delay={0.26} />
-                <AnimatedCard label="Gender" value={editForm.gender} icon={<User className="w-4 h-4" />} delay={0.33} />
-                <AnimatedCard label="Profile Photo" icon={<Camera className="w-4 h-4" />} delay={0.4}>
+                <AnimatedCard label="Date of Birth" value={formatDateForDisplay(editForm.dateOfBirth)} icon={<Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.26} />
+                <AnimatedCard label="Gender" value={editForm.gender} icon={<User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.33} />
+                <AnimatedCard label="Profile Photo" icon={<Camera className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.4}>
                   <div className="flex items-center gap-2">
                     {documents.passportPhoto ? (
-                      <span className="inline-flex items-center gap-1.5 text-xs text-[#00695C] font-bold bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 px-3 py-1.5 rounded-lg border border-[#00695C]/20 animate-fadeIn">
-                        <Check className="w-3.5 h-3.5" />
+                      <span className="inline-flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs text-[#00695C] font-bold bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-[#00695C]/20 animate-fadeIn">
+                        <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                         Uploaded
                       </span>
                     ) : (
-                      <span className="text-xs text-gray-400 font-medium italic">No photo uploaded</span>
+                      <span className="text-[10px] sm:text-xs text-gray-400 font-medium italic">No photo uploaded</span>
                     )}
                   </div>
                 </AnimatedCard>
@@ -2205,16 +2206,16 @@ const OwnerProfile = () => {
               filled={filledCount}
               total={addressFields.length}
             />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
               <div className="space-y-3 w-full">
-                <AnimatedCard label="Address Line 1" value={editForm.addressLine1} icon={<MapPin className="w-4 h-4" />} delay={0.05} />
-                <AnimatedCard label="Address Line 2" value={editForm.addressLine2} icon={<MapPin className="w-4 h-4" />} delay={0.12} />
-                <AnimatedCard label="City" value={editForm.city} icon={<Building className="w-4 h-4" />} delay={0.19} />
+                <AnimatedCard label="Address Line 1" value={editForm.addressLine1} icon={<MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.05} />
+                <AnimatedCard label="Address Line 2" value={editForm.addressLine2} icon={<MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.12} />
+                <AnimatedCard label="City" value={editForm.city} icon={<Building className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.19} />
               </div>
               <div className="space-y-3 w-full">
-                <AnimatedCard label="District" value={editForm.district} icon={<Landmark className="w-4 h-4" />} delay={0.26} />
-                <AnimatedCard label="State" value={editForm.state} icon={<Globe className="w-4 h-4" />} delay={0.33} />
-                <AnimatedCard label="PIN Code" value={editForm.pinCode} icon={<MapPin className="w-4 h-4" />} delay={0.4} />
+                <AnimatedCard label="District" value={editForm.district} icon={<Landmark className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.26} />
+                <AnimatedCard label="State" value={editForm.state} icon={<Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.33} />
+                <AnimatedCard label="PIN Code" value={editForm.pinCode} icon={<MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.4} />
               </div>
             </div>
           </div>
@@ -2238,65 +2239,65 @@ const OwnerProfile = () => {
             />
             <div className="flex flex-wrap justify-start gap-3 w-full">
               <div className="w-full sm:w-56">
-                <AnimatedCard label="Cover Image" icon={<Camera className="w-4 h-4" />} delay={0.05}>
+                <AnimatedCard label="Cover Image" icon={<Camera className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.05}>
                   {getFileStatusLabel('coverImage') ? (
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => openMediaLightbox('coverImage', 'image')}
-                        className="text-[13px] font-semibold text-[#00695C] underline underline-offset-2 decoration-[#00695C]/40 hover:text-[#004D40] hover:decoration-[#004D40] transition-colors"
+                        className="text-xs sm:text-[13px] font-semibold text-[#00695C] underline underline-offset-2 decoration-[#00695C]/40 hover:text-[#004D40] hover:decoration-[#004D40] transition-colors"
                       >
                         View Image
                       </button>
                       <button
                         onClick={() => removeFile('coverImage')}
                         title="Remove Cover Image"
-                        className="p-1 rounded-md text-red-500 hover:text-white hover:bg-red-500 transition-colors duration-300"
+                        className="p-0.5 sm:p-1 rounded-md text-red-500 hover:text-white hover:bg-red-500 transition-colors duration-300"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                       </button>
                     </div>
                   ) : (
-                    <span className="text-[13px] text-gray-400 font-medium italic">Not specified</span>
+                    <span className="text-xs sm:text-[13px] text-gray-400 font-medium italic">Not specified</span>
                   )}
                 </AnimatedCard>
               </div>
               <div className="w-full sm:w-56">
-                <AnimatedCard label="Property Photos" icon={<Image className="w-4 h-4" />} delay={0.12}>
+                <AnimatedCard label="Property Photos" icon={<Image className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.12}>
                   {getFileStatusLabel('propertyPhotos') ? (
                     <button
                       onClick={() => openMediaLightbox('propertyPhotos', 'image')}
-                      className="text-[13px] font-semibold text-[#00695C] underline underline-offset-2 decoration-[#00695C]/40 hover:text-[#004D40] hover:decoration-[#004D40] transition-colors"
+                      className="text-xs sm:text-[13px] font-semibold text-[#00695C] underline underline-offset-2 decoration-[#00695C]/40 hover:text-[#004D40] hover:decoration-[#004D40] transition-colors"
                     >
                       View Photos ({documents.propertyPhotos.length})
                     </button>
                   ) : (
-                    <span className="text-[13px] text-gray-400 font-medium italic">Not specified</span>
+                    <span className="text-xs sm:text-[13px] text-gray-400 font-medium italic">Not specified</span>
                   )}
                   {getFileStatusLabel('propertyPhotos') && (
-                    <p className="text-[10px] text-gray-400 mt-1">Open to view &amp; delete individual photos</p>
+                    <p className="text-[9px] sm:text-[10px] text-gray-400 mt-0.5 sm:mt-1">Open to view &amp; delete individual photos</p>
                   )}
                 </AnimatedCard>
               </div>
               <div className="w-full sm:w-56">
-                <AnimatedCard label="Property Video" icon={<Video className="w-4 h-4" />} delay={0.19}>
+                <AnimatedCard label="Property Video" icon={<Video className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.19}>
                   {getFileStatusLabel('propertyVideo') ? (
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => openMediaLightbox('propertyVideo', 'video')}
-                        className="text-[13px] font-semibold text-[#00695C] underline underline-offset-2 decoration-[#00695C]/40 hover:text-[#004D40] hover:decoration-[#004D40] transition-colors"
+                        className="text-xs sm:text-[13px] font-semibold text-[#00695C] underline underline-offset-2 decoration-[#00695C]/40 hover:text-[#004D40] hover:decoration-[#004D40] transition-colors"
                       >
                         Watch Video
                       </button>
                       <button
                         onClick={() => removeFile('propertyVideo')}
                         title="Remove Property Video"
-                        className="p-1 rounded-md text-red-500 hover:text-white hover:bg-red-500 transition-colors duration-300"
+                        className="p-0.5 sm:p-1 rounded-md text-red-500 hover:text-white hover:bg-red-500 transition-colors duration-300"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                       </button>
                     </div>
                   ) : (
-                    <span className="text-[13px] text-gray-400 font-medium italic">Not specified</span>
+                    <span className="text-xs sm:text-[13px] text-gray-400 font-medium italic">Not specified</span>
                   )}
                 </AnimatedCard>
               </div>
@@ -2321,17 +2322,17 @@ const OwnerProfile = () => {
               total={legalDocFields.length}
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2 sm:gap-3 w-full">
               {[
-                { field: 'saleDeed', label: 'Sale Deed', icon: <FileCheck className="w-4 h-4" /> },
-                { field: 'floorPlanOptional', label: 'Floor Plan', icon: <FileCheck className="w-4 h-4" /> },
-                { field: 'pattaChitta', label: 'Patta / Chitta', icon: <FileCheck className="w-4 h-4" /> },
-                { field: 'encumbranceCertificate', label: 'Encumbrance Certificate', icon: <FileCheck className="w-4 h-4" /> },
-                { field: 'propertyTaxReceipt', label: 'Property Tax Receipt', icon: <FileCheck className="w-4 h-4" /> },
-                { field: 'buildingApprovalPlan', label: 'Building Approval Plan', icon: <FileCheck className="w-4 h-4" /> },
-                { field: 'completionCertificate', label: 'Completion Certificate', icon: <FileCheck className="w-4 h-4" /> },
-                { field: 'occupancyCertificate', label: 'Occupancy Certificate', icon: <FileCheck className="w-4 h-4" /> },
-                { field: 'rentalAgreement', label: 'Rental Agreement', icon: <FileCheck className="w-4 h-4" /> },
+                { field: 'saleDeed', label: 'Sale Deed', icon: <FileCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> },
+                { field: 'floorPlanOptional', label: 'Floor Plan', icon: <FileCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> },
+                { field: 'pattaChitta', label: 'Patta / Chitta', icon: <FileCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> },
+                { field: 'encumbranceCertificate', label: 'Encumbrance Certificate', icon: <FileCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> },
+                { field: 'propertyTaxReceipt', label: 'Property Tax Receipt', icon: <FileCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> },
+                { field: 'buildingApprovalPlan', label: 'Building Approval Plan', icon: <FileCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> },
+                { field: 'completionCertificate', label: 'Completion Certificate', icon: <FileCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> },
+                { field: 'occupancyCertificate', label: 'Occupancy Certificate', icon: <FileCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> },
+                { field: 'rentalAgreement', label: 'Rental Agreement', icon: <FileCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> },
               ].map((doc) => {
                 const file = documents[doc.field];
                 const hasFile = file !== null && file !== undefined;
@@ -2342,48 +2343,48 @@ const OwnerProfile = () => {
                     className="group relative overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-lg transition-all duration-300 w-full border border-[#00695C]/10 hover:border-[#00695C]/30"
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-[#00695C]/5 to-[#26A69A]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="relative p-3">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <div className="p-1.5 rounded-lg bg-gradient-to-br from-[#00695C] to-[#26A69A] shadow-lg transform group-hover:scale-110 transition-all duration-300">
+                    <div className="relative p-2.5 sm:p-3">
+                      <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                        <div className="flex items-center gap-1.5 sm:gap-2">
+                          <div className="p-1 sm:p-1.5 rounded-lg bg-gradient-to-br from-[#00695C] to-[#26A69A] shadow-lg transform group-hover:scale-110 transition-all duration-300">
                             <div className="text-white">
                               {doc.icon}
                             </div>
                           </div>
-                          <span className="text-xs font-bold text-gray-700">{doc.label}</span>
+                          <span className="text-[10px] sm:text-xs font-bold text-gray-700">{doc.label}</span>
                         </div>
                         {hasFile && (
-                          <span className="text-[10px] text-[#00695C] font-bold bg-[#00695C]/10 px-2 py-0.5 rounded-full animate-fadeIn">
+                          <span className="text-[9px] sm:text-[10px] text-[#00695C] font-bold bg-[#00695C]/10 px-1.5 sm:px-2 py-0.5 rounded-full animate-fadeIn">
                             ✓
                           </span>
                         )}
                       </div>
 
                       {hasFile ? (
-                        <div className="flex items-center gap-2 bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 rounded-lg p-1.5 border border-[#00695C]/20 group-hover:border-[#00695C]/40 transition-all duration-300">
+                        <div className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 rounded-lg p-1 sm:p-1.5 border border-[#00695C]/20 group-hover:border-[#00695C]/40 transition-all duration-300">
                           <button
                             onClick={() => handlePdfView(doc.field)}
-                            className="flex-1 text-[10px] text-[#00695C] font-medium hover:underline truncate text-left flex items-center gap-1"
+                            className="flex-1 text-[9px] sm:text-[10px] text-[#00695C] font-medium hover:underline truncate text-left flex items-center gap-0.5 sm:gap-1"
                           >
-                            <FileText className="w-3 h-3 flex-shrink-0" />
+                            <FileText className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
                             <span className="truncate">{typeof file === 'string' ? file.split('/').pop() : file.name}</span>
                           </button>
                           <button
                             onClick={() => handlePdfDelete(doc.field)}
-                            className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors duration-300 flex-shrink-0"
+                            className="p-0.5 sm:p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors duration-300 flex-shrink-0"
                             title="Delete"
                           >
-                            <Trash2 className="w-3 h-3" />
+                            <Trash2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                           </button>
                         </div>
                       ) : (
-                        <div className="border-2 border-dashed border-gray-200 rounded-lg p-2 text-center hover:border-[#00695C] hover:bg-[#00695C]/5 transition-all duration-300 group/upload">
+                        <div className="border-2 border-dashed border-gray-200 rounded-lg p-1.5 sm:p-2 text-center hover:border-[#00695C] hover:bg-[#00695C]/5 transition-all duration-300 group/upload">
                           <label className="block cursor-pointer">
-                            <div className="flex items-center justify-center gap-2">
-                              <div className="p-1 bg-gray-100 rounded-lg group-hover/upload:bg-[#00695C]/10 transition-colors duration-300">
-                                <Upload className="w-3.5 h-3.5 text-gray-400 group-hover/upload:text-[#00695C] transition-colors duration-300" />
+                            <div className="flex items-center justify-center gap-1.5 sm:gap-2">
+                              <div className="p-0.5 sm:p-1 bg-gray-100 rounded-lg group-hover/upload:bg-[#00695C]/10 transition-colors duration-300">
+                                <Upload className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400 group-hover/upload:text-[#00695C] transition-colors duration-300" />
                               </div>
-                              <span className="text-[10px] font-medium text-gray-500 group-hover/upload:text-[#00695C] transition-colors duration-300">
+                              <span className="text-[9px] sm:text-[10px] font-medium text-gray-500 group-hover/upload:text-[#00695C] transition-colors duration-300">
                                 Upload PDF
                               </span>
                             </div>
@@ -2412,18 +2413,18 @@ const OwnerProfile = () => {
 
               <div className="group relative overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-lg transition-all duration-300 w-full border border-[#00695C]/10 hover:border-[#00695C]/30">
                 <div className="absolute inset-0 bg-gradient-to-br from-[#00695C]/5 to-[#26A69A]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="relative p-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg bg-gradient-to-br from-[#00695C] to-[#26A69A] shadow-lg transform group-hover:scale-110 transition-all duration-300">
+                <div className="relative p-2.5 sm:p-3">
+                  <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <div className="p-1 sm:p-1.5 rounded-lg bg-gradient-to-br from-[#00695C] to-[#26A69A] shadow-lg transform group-hover:scale-110 transition-all duration-300">
                         <div className="text-white">
-                          <FileText className="w-4 h-4" />
+                          <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </div>
                       </div>
-                      <span className="text-xs font-bold text-gray-700">Other Documents</span>
+                      <span className="text-[10px] sm:text-xs font-bold text-gray-700">Other Documents</span>
                     </div>
                     {documents.otherDocuments.length > 0 && (
-                      <span className="text-[10px] text-[#00695C] font-bold bg-[#00695C]/10 px-2 py-0.5 rounded-full animate-fadeIn">
+                      <span className="text-[9px] sm:text-[10px] text-[#00695C] font-bold bg-[#00695C]/10 px-1.5 sm:px-2 py-0.5 rounded-full animate-fadeIn">
                         {documents.otherDocuments.length}
                       </span>
                     )}
@@ -2432,35 +2433,35 @@ const OwnerProfile = () => {
                   {documents.otherDocuments.length > 0 ? (
                     <div className="space-y-1 max-h-32 overflow-y-auto">
                       {documents.otherDocuments.map((file, index) => (
-                        <div key={index} className="flex items-center justify-between bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 rounded-lg p-1.5 border border-[#00695C]/20 group-hover:border-[#00695C]/40 transition-all duration-300">
+                        <div key={index} className="flex items-center justify-between bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 rounded-lg p-1 sm:p-1.5 border border-[#00695C]/20 group-hover:border-[#00695C]/40 transition-all duration-300">
                           <button
                             onClick={() => {
                               setPdfToView(file);
                               setShowPdfViewer(true);
                             }}
-                            className="flex-1 text-[10px] text-[#00695C] font-medium hover:underline truncate text-left flex items-center gap-1"
+                            className="flex-1 text-[9px] sm:text-[10px] text-[#00695C] font-medium hover:underline truncate text-left flex items-center gap-0.5 sm:gap-1"
                           >
-                            <FileText className="w-3 h-3 flex-shrink-0" />
+                            <FileText className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
                             <span className="truncate">{file.name}</span>
                           </button>
                           <button
                             onClick={() => removeFile('otherDocuments', index)}
-                            className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors duration-300 flex-shrink-0"
+                            className="p-0.5 sm:p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors duration-300 flex-shrink-0"
                             title="Delete"
                           >
-                            <Trash2 className="w-3 h-3" />
+                            <Trash2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                           </button>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="border-2 border-dashed border-gray-200 rounded-lg p-2 text-center hover:border-[#00695C] hover:bg-[#00695C]/5 transition-all duration-300 group/upload">
+                    <div className="border-2 border-dashed border-gray-200 rounded-lg p-1.5 sm:p-2 text-center hover:border-[#00695C] hover:bg-[#00695C]/5 transition-all duration-300 group/upload">
                       <label className="block cursor-pointer">
-                        <div className="flex items-center justify-center gap-2">
-                          <div className="p-1 bg-gray-100 rounded-lg group-hover/upload:bg-[#00695C]/10 transition-colors duration-300">
-                            <Upload className="w-3.5 h-3.5 text-gray-400 group-hover/upload:text-[#00695C] transition-colors duration-300" />
+                        <div className="flex items-center justify-center gap-1.5 sm:gap-2">
+                          <div className="p-0.5 sm:p-1 bg-gray-100 rounded-lg group-hover/upload:bg-[#00695C]/10 transition-colors duration-300">
+                            <Upload className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400 group-hover/upload:text-[#00695C] transition-colors duration-300" />
                           </div>
-                          <span className="text-[10px] font-medium text-gray-500 group-hover/upload:text-[#00695C] transition-colors duration-300">
+                          <span className="text-[9px] sm:text-[10px] font-medium text-gray-500 group-hover/upload:text-[#00695C] transition-colors duration-300">
                             Upload Multiple
                           </span>
                         </div>
@@ -2507,27 +2508,27 @@ const OwnerProfile = () => {
               filled={filledCount}
               total={bankFields.length}
             />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
               <div className="space-y-3 w-full">
-                <AnimatedCard label="Account Holder Name" value={editForm.accountHolderName} icon={<User className="w-4 h-4" />} delay={0.05} />
-                <AnimatedCard label="Bank Name" value={editForm.bankName} icon={<Building className="w-4 h-4" />} delay={0.11} />
-                <AnimatedCard label="Account Number" value={editForm.accountNumber} icon={<CreditCard className="w-4 h-4" />} delay={0.17} />
-                <AnimatedCard label="IFSC Code" value={editForm.ifscCode} icon={<Banknote className="w-4 h-4" />} delay={0.23} />
-                <AnimatedCard label="UPI ID" value={editForm.upiId} icon={<Globe className="w-4 h-4" />} delay={0.29} />
+                <AnimatedCard label="Account Holder Name" value={editForm.accountHolderName} icon={<User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.05} />
+                <AnimatedCard label="Bank Name" value={editForm.bankName} icon={<Building className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.11} />
+                <AnimatedCard label="Account Number" value={editForm.accountNumber} icon={<CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.17} />
+                <AnimatedCard label="IFSC Code" value={editForm.ifscCode} icon={<Banknote className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.23} />
+                <AnimatedCard label="UPI ID" value={editForm.upiId} icon={<Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.29} />
               </div>
               <div className="space-y-3 w-full">
-                <AnimatedCard label="Aadhaar Number" value={editForm.aadhaarNumber} icon={<Shield className="w-4 h-4" />} delay={0.35} />
-                <AnimatedCard label="PAN Number" value={editForm.panNumber} icon={<CreditCard className="w-4 h-4" />} delay={0.41} />
-                <AnimatedCard label="Identity Verification" icon={<FileCheck className="w-4 h-4" />} delay={0.47}>
+                <AnimatedCard label="Aadhaar Number" value={editForm.aadhaarNumber} icon={<Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.35} />
+                <AnimatedCard label="PAN Number" value={editForm.panNumber} icon={<CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.41} />
+                <AnimatedCard label="Identity Verification" icon={<FileCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.47}>
                   <div className="space-y-1.5">
-                    <div className="flex items-center gap-2 text-xs bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 p-2 rounded-lg border border-[#00695C]/15">
-                      <Check className={`w-4 h-4 ${documents.aadhaarCard ? 'text-[#00695C]' : 'text-gray-300'}`} />
+                    <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 p-1.5 sm:p-2 rounded-lg border border-[#00695C]/15">
+                      <Check className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${documents.aadhaarCard ? 'text-[#00695C]' : 'text-gray-300'}`} />
                       <span className={documents.aadhaarCard ? 'text-gray-700 font-medium' : 'text-gray-400'}>
                         Aadhaar Card: {documents.aadhaarCard ? '✓ Uploaded' : '✗ Not uploaded'}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 p-2 rounded-lg border border-[#00695C]/15">
-                      <Check className={`w-4 h-4 ${documents.panCard ? 'text-[#00695C]' : 'text-gray-300'}`} />
+                    <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 p-1.5 sm:p-2 rounded-lg border border-[#00695C]/15">
+                      <Check className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${documents.panCard ? 'text-[#00695C]' : 'text-gray-300'}`} />
                       <span className={documents.panCard ? 'text-gray-700 font-medium' : 'text-gray-400'}>
                         PAN Card: {documents.panCard ? '✓ Uploaded' : '✗ Not uploaded'}
                       </span>
@@ -2553,14 +2554,14 @@ const OwnerProfile = () => {
               total={commFields.length}
             />
             <div className="grid grid-cols-1 gap-3 w-full">
-              <AnimatedCard label="Preferred Contact Method" icon={<MessageCircle className="w-4 h-4" />} delay={0.05}>
-                <div className="flex flex-wrap gap-1.5">
+              <AnimatedCard label="Preferred Contact Method" icon={<MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.05}>
+                <div className="flex flex-wrap gap-1 sm:gap-1.5">
                   {['Phone Call', 'WhatsApp', 'Email'].map((method) => {
                     const isSelected = editForm.preferredMethods.includes(method);
                     return (
                       <span
                         key={method}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ${
+                        className={`inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-bold transition-all duration-300 ${
                           isSelected
                             ? 'bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white shadow-lg transform scale-105'
                             : 'bg-gray-100 text-gray-500 border border-gray-200'
@@ -2570,42 +2571,42 @@ const OwnerProfile = () => {
                         {method === 'WhatsApp' && '💬'}
                         {method === 'Email' && '✉️'}
                         {' '}{method}
-                        {isSelected && <Check className="w-3 h-3 ml-1" />}
+                        {isSelected && <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 ml-0.5 sm:ml-1" />}
                       </span>
                     );
                   })}
                 </div>
-                <div className="mt-1 text-xs text-gray-500 font-medium">
+                <div className="mt-0.5 sm:mt-1 text-[9px] sm:text-xs text-gray-500 font-medium">
                   Selected: {editForm.preferredMethods.length > 0 ? editForm.preferredMethods.join(', ') : 'None selected'}
                 </div>
               </AnimatedCard>
 
-              <AnimatedCard label="Preferred Contact Time" icon={<Clock className="w-4 h-4" />} delay={0.15}>
-                <div className="flex flex-wrap gap-1.5">
+              <AnimatedCard label="Preferred Contact Time" icon={<Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.15}>
+                <div className="flex flex-wrap gap-1 sm:gap-1.5">
                   {['Morning', 'Afternoon', 'Evening', 'Anytime'].map((time) => {
                     const isSelected = editForm.preferredTimes.includes(time);
                     return (
                       <span
                         key={time}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ${
+                        className={`inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-bold transition-all duration-300 ${
                           isSelected
                             ? 'bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white shadow-lg transform scale-105'
                             : 'bg-gray-100 text-gray-500 border border-gray-200'
                         }`}
                       >
                         {time}
-                        {isSelected && <Check className="w-3 h-3 ml-1" />}
+                        {isSelected && <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 ml-0.5 sm:ml-1" />}
                       </span>
                     );
                   })}
                 </div>
-                <div className="mt-1 text-xs text-gray-500 font-medium">
+                <div className="mt-0.5 sm:mt-1 text-[9px] sm:text-xs text-gray-500 font-medium">
                   Selected: {editForm.preferredTimes.length > 0 ? editForm.preferredTimes.join(', ') : 'None selected'}
                 </div>
               </AnimatedCard>
 
-              <AnimatedCard label="Additional Notes" icon={<Info className="w-4 h-4" />} delay={0.25}>
-                <div className="p-2 text-xs text-gray-800 bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 rounded-lg border border-[#00695C]/20 font-medium">
+              <AnimatedCard label="Additional Notes" icon={<Info className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.25}>
+                <div className="p-1.5 sm:p-2 text-[10px] sm:text-xs text-gray-800 bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 rounded-lg border border-[#00695C]/20 font-medium">
                   {editForm.additionalNotes || 'No additional notes'}
                 </div>
               </AnimatedCard>
@@ -2641,7 +2642,7 @@ const OwnerProfile = () => {
 
   // ============ MAIN RENDER ============
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#00695C]/5 via-teal-50/50 to-[#26A69A]/5 pt-20 pb-12 w-full relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#00695C]/5 via-teal-50/50 to-[#26A69A]/5 pt-16 sm:pt-20 pb-8 sm:pb-12 w-full relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-[#00695C]/10 to-[#26A69A]/10 rounded-full blur-3xl animate-float" />
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-[#26A69A]/10 to-[#00695C]/10 rounded-full blur-3xl animate-float-delayed" />
@@ -2660,25 +2661,25 @@ const OwnerProfile = () => {
       )}
 
       {showProfilePhotoDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full mx-4 p-8 transform transition-all duration-300 scale-100 animate-scaleIn">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="bg-red-100 p-3 rounded-2xl">
-                <AlertTriangle className="w-8 h-8 text-red-500 animate-pulse" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn p-3 sm:p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full mx-2 sm:mx-4 p-5 sm:p-8 transform transition-all duration-300 scale-100 animate-scaleIn">
+            <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+              <div className="bg-red-100 p-2 sm:p-3 rounded-2xl">
+                <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 text-red-500 animate-pulse" />
               </div>
-              <h3 className="text-xl font-bold text-gray-800">Delete Profile Photo</h3>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-800">Delete Profile Photo</h3>
             </div>
-            <p className="text-gray-600 mb-6">Are you sure you want to delete your profile photo? This action cannot be undone.</p>
-            <div className="flex justify-end gap-3">
+            <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Are you sure you want to delete your profile photo? This action cannot be undone.</p>
+            <div className="flex justify-end gap-2 sm:gap-3">
               <button
                 onClick={() => setShowProfilePhotoDeleteConfirm(false)}
-                className="px-6 py-3 rounded-2xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105"
+                className="px-4 sm:px-6 py-2 sm:py-3 rounded-2xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105 text-sm sm:text-base"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmProfilePhotoDelete}
-                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold hover:from-red-600 hover:to-rose-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+                className="px-4 sm:px-6 py-2 sm:py-3 rounded-2xl bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold hover:from-red-600 hover:to-rose-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-sm sm:text-base"
               >
                 Delete
               </button>
@@ -2688,28 +2689,28 @@ const OwnerProfile = () => {
       )}
 
       {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full mx-4 p-8 transform transition-all duration-300 scale-100 animate-scaleIn">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="bg-red-100 p-3 rounded-2xl">
-                <AlertTriangle className="w-8 h-8 text-red-500 animate-pulse" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn p-3 sm:p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full mx-2 sm:mx-4 p-5 sm:p-8 transform transition-all duration-300 scale-100 animate-scaleIn">
+            <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+              <div className="bg-red-100 p-2 sm:p-3 rounded-2xl">
+                <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 text-red-500 animate-pulse" />
               </div>
-              <h3 className="text-xl font-bold text-gray-800">Confirm Delete</h3>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-800">Confirm Delete</h3>
             </div>
-            <p className="text-gray-600 mb-6">Are you sure you want to delete this file? This action cannot be undone.</p>
-            <div className="flex justify-end gap-3">
+            <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Are you sure you want to delete this file? This action cannot be undone.</p>
+            <div className="flex justify-end gap-2 sm:gap-3">
               <button
                 onClick={() => {
                   setShowDeleteConfirm(false);
                   setDeleteItem(null);
                 }}
-                className="px-6 py-3 rounded-2xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105"
+                className="px-4 sm:px-6 py-2 sm:py-3 rounded-2xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105 text-sm sm:text-base"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDelete}
-                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold hover:from-red-600 hover:to-rose-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+                className="px-4 sm:px-6 py-2 sm:py-3 rounded-2xl bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold hover:from-red-600 hover:to-rose-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-sm sm:text-base"
               >
                 Delete
               </button>
@@ -2719,12 +2720,12 @@ const OwnerProfile = () => {
       )}
 
       {showEditModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn w-full">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-[90%] sm:max-w-[95%] lg:max-w-2xl mx-4 overflow-hidden max-h-[75vh] flex flex-col animate-scaleIn">
-            <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] px-8 py-5 flex items-center justify-between flex-shrink-0">
-              <h2 className="text-white text-xl font-bold flex items-center gap-3">
-                <div className="bg-white/20 p-2 rounded-xl">
-                  <Edit2 className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn w-full p-2 sm:p-4">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-[95%] sm:max-w-[90%] md:max-w-2xl mx-auto overflow-hidden max-h-[80vh] sm:max-h-[75vh] flex flex-col animate-scaleIn">
+            <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 flex items-center justify-between flex-shrink-0">
+              <h2 className="text-white text-lg sm:text-xl font-bold flex items-center gap-2 sm:gap-3">
+                <div className="bg-white/20 p-1.5 sm:p-2 rounded-xl">
+                  <Edit2 className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 Edit Profile
               </h2>
@@ -2732,19 +2733,19 @@ const OwnerProfile = () => {
                 onClick={() => setShowEditModal(false)} 
                 className="text-white/80 hover:text-white transition-all duration-300 hover:rotate-90 hover:scale-110"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
             </div>
-            <div className="px-8 py-6 space-y-6 overflow-y-auto flex-1 w-full bg-gray-50">
+            <div className="px-4 sm:px-6 md:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6 overflow-y-auto flex-1 w-full bg-gray-50">
               {/* Personal Details */}
-              <div className="space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-6 shadow-sm border border-[#00695C]/10">
-                <h3 className="text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-3">
-                  <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl">
-                    <User className="w-4 h-4 text-white" />
+              <div className="space-y-3 sm:space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-4 sm:p-5 md:p-6 shadow-sm border border-[#00695C]/10">
+                <h3 className="text-xs sm:text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-2 sm:gap-3">
+                  <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-1.5 sm:p-2 rounded-xl">
+                    <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                   </div>
                   Personal Details
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full">
                   {[
                     { name: 'fullName', label: 'Full Name', emoji: '👤' },
                     { name: 'mobileNumber', label: 'Mobile Number', emoji: '📱' },
@@ -2752,9 +2753,9 @@ const OwnerProfile = () => {
                     { name: 'dateOfBirth', label: 'Date of Birth', type: 'date', emoji: '🎂' },
                     { name: 'gender', label: 'Gender', emoji: '⚥' },
                   ].map((field) => (
-                    <div key={field.name} className="space-y-1.5 w-full">
-                      <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                        <span>{field.emoji}</span> {field.label}
+                    <div key={field.name} className="space-y-1 sm:space-y-1.5 w-full">
+                      <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                        <span className="text-sm sm:text-base">{field.emoji}</span> {field.label}
                       </label>
                       {field.name === 'dateOfBirth' ? (
                         <input
@@ -2762,7 +2763,7 @@ const OwnerProfile = () => {
                           name={field.name}
                           value={formatDateForInput(editForm.dateOfBirth)}
                           onChange={handleDateChange}
-                          className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
+                          className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-800 outline-none transition-all duration-300"
                         />
                       ) : (
                         <input
@@ -2770,27 +2771,27 @@ const OwnerProfile = () => {
                           name={field.name}
                           value={editForm[field.name]}
                           onChange={handleEditChange}
-                          className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
+                          className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-800 outline-none transition-all duration-300"
                         />
                       )}
                     </div>
                   ))}
-                  <div className="space-y-1.5 w-full">
-                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                      <span>📸</span> Profile Photo
+                  <div className="space-y-1 sm:space-y-1.5 w-full">
+                    <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                      <span className="text-sm sm:text-base">📸</span> Profile Photo
                     </label>
-                    <div className="flex items-center gap-3">
-                      <div className="flex gap-2">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="flex gap-1.5 sm:gap-2">
                         <button
                           onClick={() => profilePhotoInputRef.current?.click()}
-                          className="px-3 py-1.5 bg-[#00695C] text-white rounded-lg text-xs font-bold hover:bg-[#005A4F] transition-all duration-300"
+                          className="px-2 sm:px-3 py-1 sm:py-1.5 bg-[#00695C] text-white rounded-lg text-[10px] sm:text-xs font-bold hover:bg-[#005A4F] transition-all duration-300"
                         >
                           Upload
                         </button>
                         {documents.passportPhoto && (
                           <button
                             onClick={handleProfilePhotoDelete}
-                            className="px-3 py-1.5 bg-red-500 text-white rounded-lg text-xs font-bold hover:bg-red-600 transition-all duration-300"
+                            className="px-2 sm:px-3 py-1 sm:py-1.5 bg-red-500 text-white rounded-lg text-[10px] sm:text-xs font-bold hover:bg-red-600 transition-all duration-300"
                           >
                             Delete
                           </button>
@@ -2803,14 +2804,14 @@ const OwnerProfile = () => {
               </div>
 
               {/* Address Details */}
-              <div className="space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-6 shadow-sm border border-[#00695C]/10">
-                <h3 className="text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-3">
-                  <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl">
-                    <MapPin className="w-4 h-4 text-white" />
+              <div className="space-y-3 sm:space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-4 sm:p-5 md:p-6 shadow-sm border border-[#00695C]/10">
+                <h3 className="text-xs sm:text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-2 sm:gap-3">
+                  <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-1.5 sm:p-2 rounded-xl">
+                    <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                   </div>
                   Address Details
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full">
                   {[
                     { name: 'addressLine1', label: 'Address Line 1', emoji: '🏠' },
                     { name: 'addressLine2', label: 'Address Line 2', emoji: '🏠' },
@@ -2819,16 +2820,16 @@ const OwnerProfile = () => {
                     { name: 'state', label: 'State', emoji: '🌍' },
                     { name: 'pinCode', label: 'PIN Code', emoji: '📍' },
                   ].map((field) => (
-                    <div key={field.name} className="space-y-1.5 w-full">
-                      <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                        <span>{field.emoji}</span> {field.label}
+                    <div key={field.name} className="space-y-1 sm:space-y-1.5 w-full">
+                      <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                        <span className="text-sm sm:text-base">{field.emoji}</span> {field.label}
                       </label>
                       <input
                         type="text"
                         name={field.name}
                         value={editForm[field.name]}
                         onChange={handleEditChange}
-                        className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
+                        className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-800 outline-none transition-all duration-300"
                       />
                     </div>
                   ))}
@@ -2836,14 +2837,14 @@ const OwnerProfile = () => {
               </div>
 
               {/* Legal Documents - PDF Upload in Edit Profile */}
-              <div className="space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-6 shadow-sm border border-[#00695C]/10">
-                <h3 className="text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-3">
-                  <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl">
-                    <FileText className="w-4 h-4 text-white" />
+              <div className="space-y-3 sm:space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-4 sm:p-5 md:p-6 shadow-sm border border-[#00695C]/10">
+                <h3 className="text-xs sm:text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-2 sm:gap-3">
+                  <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-1.5 sm:p-2 rounded-xl">
+                    <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                   </div>
                   Legal Documents
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 w-full">
                   {[
                     { field: 'saleDeed', label: 'Sale Deed' },
                     { field: 'floorPlanOptional', label: 'Floor Plan' },
@@ -2859,20 +2860,20 @@ const OwnerProfile = () => {
                     const hasFile = file !== null && file !== undefined;
 
                     return (
-                      <div key={doc.field} className="border-2 border-gray-200 rounded-xl p-3 hover:border-[#00695C] transition-all duration-300 hover:shadow-md bg-white">
-                        <div className="flex items-center justify-between mb-2">
-                          <label className="text-xs font-bold text-gray-700">{doc.label}</label>
+                      <div key={doc.field} className="border-2 border-gray-200 rounded-xl p-2 sm:p-3 hover:border-[#00695C] transition-all duration-300 hover:shadow-md bg-white">
+                        <div className="flex items-center justify-between mb-1 sm:mb-2">
+                          <label className="text-[10px] sm:text-xs font-bold text-gray-700">{doc.label}</label>
                           {hasFile && (
-                            <span className="text-[10px] text-[#00695C] font-bold bg-[#00695C]/10 px-2 py-0.5 rounded-full">✓</span>
+                            <span className="text-[9px] sm:text-[10px] text-[#00695C] font-bold bg-[#00695C]/10 px-1.5 sm:px-2 py-0.5 rounded-full">✓</span>
                           )}
                         </div>
                         {hasFile ? (
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1 sm:gap-2">
                             <button
                               onClick={() => handlePdfView(doc.field)}
-                              className="text-xs text-[#00695C] font-medium hover:underline flex items-center gap-1"
+                              className="text-[10px] sm:text-xs text-[#00695C] font-medium hover:underline flex items-center gap-0.5 sm:gap-1"
                             >
-                              <FileText className="w-3 h-3" />
+                              <FileText className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                               {typeof file === 'string' ? file.split('/').pop() : file.name}
                             </button>
                             <button
@@ -2880,13 +2881,13 @@ const OwnerProfile = () => {
                               className="text-red-400 hover:text-red-600 transition-colors"
                               title="Delete"
                             >
-                              <Trash2 className="w-3 h-3" />
+                              <Trash2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                             </button>
                           </div>
                         ) : (
                           <label className="block cursor-pointer">
-                            <div className="flex items-center gap-2 text-xs text-gray-500 hover:text-[#00695C] transition-colors">
-                              <Upload className="w-4 h-4" />
+                            <div className="flex items-center gap-1 sm:gap-2 text-[10px] sm:text-xs text-gray-500 hover:text-[#00695C] transition-colors">
+                              <Upload className="w-3 h-3 sm:w-4 sm:h-4" />
                               <span>Upload PDF</span>
                             </div>
                             <input 
@@ -2907,11 +2908,11 @@ const OwnerProfile = () => {
                     );
                   })}
                 </div>
-                <div className="border-2 border-gray-200 rounded-xl p-3 hover:border-[#00695C] transition-all duration-300 hover:shadow-md bg-white">
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="text-xs font-bold text-gray-700">Other Documents</label>
+                <div className="border-2 border-gray-200 rounded-xl p-2 sm:p-3 hover:border-[#00695C] transition-all duration-300 hover:shadow-md bg-white">
+                  <div className="flex items-center justify-between mb-1 sm:mb-2">
+                    <label className="text-[10px] sm:text-xs font-bold text-gray-700">Other Documents</label>
                     {documents.otherDocuments.length > 0 && (
-                      <span className="text-[10px] text-[#00695C] font-bold bg-[#00695C]/10 px-2 py-0.5 rounded-full">
+                      <span className="text-[9px] sm:text-[10px] text-[#00695C] font-bold bg-[#00695C]/10 px-1.5 sm:px-2 py-0.5 rounded-full">
                         {documents.otherDocuments.length}
                       </span>
                     )}
@@ -2919,15 +2920,15 @@ const OwnerProfile = () => {
                   {documents.otherDocuments.length > 0 ? (
                     <div className="space-y-1 max-h-32 overflow-y-auto">
                       {documents.otherDocuments.map((file, index) => (
-                        <div key={index} className="flex items-center justify-between bg-gray-50 rounded-lg p-2">
+                        <div key={index} className="flex items-center justify-between bg-gray-50 rounded-lg p-1.5 sm:p-2">
                           <button
                             onClick={() => {
                               setPdfToView(file);
                               setShowPdfViewer(true);
                             }}
-                            className="text-xs text-[#00695C] font-medium hover:underline flex items-center gap-1 truncate max-w-[150px]"
+                            className="text-[10px] sm:text-xs text-[#00695C] font-medium hover:underline flex items-center gap-0.5 sm:gap-1 truncate max-w-[100px] sm:max-w-[150px]"
                           >
-                            <FileText className="w-3 h-3 flex-shrink-0" />
+                            <FileText className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
                             <span className="truncate">{file.name}</span>
                           </button>
                           <button
@@ -2935,15 +2936,15 @@ const OwnerProfile = () => {
                             className="text-red-400 hover:text-red-600 transition-colors flex-shrink-0"
                             title="Delete"
                           >
-                            <Trash2 className="w-3 h-3" />
+                            <Trash2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                           </button>
                         </div>
                       ))}
                     </div>
                   ) : (
                     <label className="block cursor-pointer">
-                      <div className="flex items-center gap-2 text-xs text-gray-500 hover:text-[#00695C] transition-colors">
-                        <Upload className="w-4 h-4" />
+                      <div className="flex items-center gap-1 sm:gap-2 text-[10px] sm:text-xs text-gray-500 hover:text-[#00695C] transition-colors">
+                        <Upload className="w-3 h-3 sm:w-4 sm:h-4" />
                         <span>Upload Multiple PDFs</span>
                       </div>
                       <input 
@@ -2970,14 +2971,14 @@ const OwnerProfile = () => {
               </div>
 
               {/* Bank Details */}
-              <div className="space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-6 shadow-sm border border-[#00695C]/10">
-                <h3 className="text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-3">
-                  <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl">
-                    <Banknote className="w-4 h-4 text-white" />
+              <div className="space-y-3 sm:space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-4 sm:p-5 md:p-6 shadow-sm border border-[#00695C]/10">
+                <h3 className="text-xs sm:text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-2 sm:gap-3">
+                  <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-1.5 sm:p-2 rounded-xl">
+                    <Banknote className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                   </div>
                   Bank Details
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full">
                   {[
                     { name: 'accountHolderName', label: 'Account Holder Name', emoji: '👤' },
                     { name: 'bankName', label: 'Bank Name', emoji: '🏦' },
@@ -2985,16 +2986,16 @@ const OwnerProfile = () => {
                     { name: 'ifscCode', label: 'IFSC Code', emoji: '🔢' },
                     { name: 'upiId', label: 'UPI ID', emoji: '📱' },
                   ].map((field) => (
-                    <div key={field.name} className="space-y-1.5 w-full">
-                      <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                        <span>{field.emoji}</span> {field.label}
+                    <div key={field.name} className="space-y-1 sm:space-y-1.5 w-full">
+                      <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                        <span className="text-sm sm:text-base">{field.emoji}</span> {field.label}
                       </label>
                       <input
                         type="text"
                         name={field.name}
                         value={editForm[field.name]}
                         onChange={handleEditChange}
-                        className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
+                        className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-800 outline-none transition-all duration-300"
                       />
                     </div>
                   ))}
@@ -3002,40 +3003,40 @@ const OwnerProfile = () => {
               </div>
 
               {/* Identity Verification */}
-              <div className="space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-6 shadow-sm border border-[#00695C]/10">
-                <h3 className="text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-3">
-                  <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl">
-                    <Shield className="w-4 h-4 text-white" />
+              <div className="space-y-3 sm:space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-4 sm:p-5 md:p-6 shadow-sm border border-[#00695C]/10">
+                <h3 className="text-xs sm:text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-2 sm:gap-3">
+                  <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-1.5 sm:p-2 rounded-xl">
+                    <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                   </div>
                   Identity Verification
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full">
                   {[
                     { name: 'aadhaarNumber', label: 'Aadhaar Number', emoji: '🆔' },
                     { name: 'panNumber', label: 'PAN Number', emoji: '📄' },
                   ].map((field) => (
-                    <div key={field.name} className="space-y-1.5 w-full">
-                      <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                        <span>{field.emoji}</span> {field.label}
+                    <div key={field.name} className="space-y-1 sm:space-y-1.5 w-full">
+                      <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                        <span className="text-sm sm:text-base">{field.emoji}</span> {field.label}
                       </label>
                       <input
                         type="text"
                         name={field.name}
                         value={editForm[field.name]}
                         onChange={handleEditChange}
-                        className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
+                        className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-800 outline-none transition-all duration-300"
                       />
                     </div>
                   ))}
-                  <div className="col-span-2 space-y-2 w-full">
-                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">Upload Documents</label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:border-[#00695C] transition-all duration-300 hover:bg-[#00695C]/5 group">
-                        <label className="block text-xs font-medium text-gray-600 cursor-pointer">
-                          <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl w-10 h-10 mx-auto mb-2 group-hover:scale-110 transition-transform duration-300">
-                            <Upload className="w-5 h-5 text-white" />
+                  <div className="col-span-1 sm:col-span-2 space-y-1.5 sm:space-y-2 w-full">
+                    <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider">Upload Documents</label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                      <div className="border-2 border-dashed border-gray-300 rounded-xl p-3 sm:p-4 text-center hover:border-[#00695C] transition-all duration-300 hover:bg-[#00695C]/5 group">
+                        <label className="block text-[10px] sm:text-xs font-medium text-gray-600 cursor-pointer">
+                          <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-1.5 sm:p-2 rounded-xl w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform duration-300">
+                            <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                           </div>
-                          <span className="text-xs font-bold">Aadhaar Card</span>
+                          <span className="text-[10px] sm:text-xs font-bold">Aadhaar Card</span>
                           <input 
                             type="file" 
                             className="hidden" 
@@ -3050,17 +3051,17 @@ const OwnerProfile = () => {
                           />
                         </label>
                         {documents.aadhaarCard && (
-                          <span className="text-xs text-[#00695C] block mt-2 font-bold bg-[#00695C]/10 px-2 py-1 rounded-full animate-fadeIn">
+                          <span className="text-[9px] sm:text-xs text-[#00695C] block mt-1 sm:mt-2 font-bold bg-[#00695C]/10 px-1.5 sm:px-2 py-0.5 rounded-full animate-fadeIn">
                             ✓ Uploaded
                           </span>
                         )}
                       </div>
-                      <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:border-[#00695C] transition-all duration-300 hover:bg-[#00695C]/5 group">
-                        <label className="block text-xs font-medium text-gray-600 cursor-pointer">
-                          <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl w-10 h-10 mx-auto mb-2 group-hover:scale-110 transition-transform duration-300">
-                            <Upload className="w-5 h-5 text-white" />
+                      <div className="border-2 border-dashed border-gray-300 rounded-xl p-3 sm:p-4 text-center hover:border-[#00695C] transition-all duration-300 hover:bg-[#00695C]/5 group">
+                        <label className="block text-[10px] sm:text-xs font-medium text-gray-600 cursor-pointer">
+                          <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-1.5 sm:p-2 rounded-xl w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform duration-300">
+                            <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                           </div>
-                          <span className="text-xs font-bold">PAN Card</span>
+                          <span className="text-[10px] sm:text-xs font-bold">PAN Card</span>
                           <input 
                             type="file" 
                             className="hidden" 
@@ -3075,7 +3076,7 @@ const OwnerProfile = () => {
                           />
                         </label>
                         {documents.panCard && (
-                          <span className="text-xs text-[#00695C] block mt-2 font-bold bg-[#00695C]/10 px-2 py-1 rounded-full animate-fadeIn">
+                          <span className="text-[9px] sm:text-xs text-[#00695C] block mt-1 sm:mt-2 font-bold bg-[#00695C]/10 px-1.5 sm:px-2 py-0.5 rounded-full animate-fadeIn">
                             ✓ Uploaded
                           </span>
                         )}
@@ -3086,17 +3087,17 @@ const OwnerProfile = () => {
               </div>
 
               {/* Communication Preferences */}
-              <div className="space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-6 shadow-sm border border-[#00695C]/10">
-                <h3 className="text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-3">
-                  <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl">
-                    <MessageCircle className="w-4 h-4 text-white" />
+              <div className="space-y-3 sm:space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-4 sm:p-5 md:p-6 shadow-sm border border-[#00695C]/10">
+                <h3 className="text-xs sm:text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-2 sm:gap-3">
+                  <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-1.5 sm:p-2 rounded-xl">
+                    <MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                   </div>
                   Communication Preferences
                 </h3>
-                <div className="space-y-4 w-full">
+                <div className="space-y-3 sm:space-y-4 w-full">
                   <div className="w-full">
-                    <label className="block text-xs font-bold text-gray-700 mb-2">Preferred Contact Method</label>
-                    <div className="flex flex-wrap gap-3">
+                    <label className="block text-[10px] sm:text-xs font-bold text-gray-700 mb-1 sm:mb-2">Preferred Contact Method</label>
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2 md:gap-3">
                       {['Phone Call', 'WhatsApp', 'Email'].map((method) => {
                         const isSelected = editForm.preferredMethods.includes(method);
                         return (
@@ -3104,26 +3105,26 @@ const OwnerProfile = () => {
                             key={method}
                             type="button"
                             onClick={() => togglePreference('preferredMethods', method)}
-                            className={`px-5 py-2.5 rounded-2xl text-sm font-bold transition-all duration-300 cursor-pointer ${
+                            className={`px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 rounded-2xl text-[10px] sm:text-xs md:text-sm font-bold transition-all duration-300 cursor-pointer ${
                               isSelected
                                 ? 'bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white shadow-lg transform scale-105'
                                 : 'bg-gray-100 text-gray-600 border-2 border-gray-200 hover:border-[#00695C] hover:bg-[#00695C]/5'
                             }`}
                           >
                             {method}
-                            {isSelected && <Check className="w-4 h-4 ml-2 inline" />}
+                            {isSelected && <Check className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2 inline" />}
                           </button>
                         );
                       })}
                     </div>
-                    <div className="mt-2 text-xs text-gray-500 font-medium">
+                    <div className="mt-1 sm:mt-2 text-[9px] sm:text-xs text-gray-500 font-medium">
                       Selected: {editForm.preferredMethods.length > 0 ? editForm.preferredMethods.join(', ') : 'None selected'}
                     </div>
                   </div>
 
                   <div className="w-full">
-                    <label className="block text-xs font-bold text-gray-700 mb-2">Preferred Contact Time</label>
-                    <div className="flex flex-wrap gap-3">
+                    <label className="block text-[10px] sm:text-xs font-bold text-gray-700 mb-1 sm:mb-2">Preferred Contact Time</label>
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2 md:gap-3">
                       {['Morning', 'Afternoon', 'Evening', 'Anytime'].map((time) => {
                         const isSelected = editForm.preferredTimes.includes(time);
                         return (
@@ -3131,53 +3132,53 @@ const OwnerProfile = () => {
                             key={time}
                             type="button"
                             onClick={() => togglePreference('preferredTimes', time)}
-                            className={`px-5 py-2.5 rounded-2xl text-sm font-bold transition-all duration-300 cursor-pointer ${
+                            className={`px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 rounded-2xl text-[10px] sm:text-xs md:text-sm font-bold transition-all duration-300 cursor-pointer ${
                               isSelected
                                 ? 'bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white shadow-lg transform scale-105'
                                 : 'bg-gray-100 text-gray-600 border-2 border-gray-200 hover:border-[#00695C] hover:bg-[#00695C]/5'
                             }`}
                           >
                             {time}
-                            {isSelected && <Check className="w-4 h-4 ml-2 inline" />}
+                            {isSelected && <Check className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2 inline" />}
                           </button>
                         );
                       })}
                     </div>
-                    <div className="mt-2 text-xs text-gray-500 font-medium">
+                    <div className="mt-1 sm:mt-2 text-[9px] sm:text-xs text-gray-500 font-medium">
                       Selected: {editForm.preferredTimes.length > 0 ? editForm.preferredTimes.join(', ') : 'None selected'}
                     </div>
                   </div>
 
                   <div className="w-full">
-                    <label className="block text-xs font-bold text-gray-700 mb-2">Additional Notes</label>
+                    <label className="block text-[10px] sm:text-xs font-bold text-gray-700 mb-1 sm:mb-2">Additional Notes</label>
                     <textarea
                       name="additionalNotes"
                       value={editForm.additionalNotes}
                       onChange={handleEditChange}
-                      rows="4"
-                      className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300 resize-y"
+                      rows="3 sm:rows-4"
+                      className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-800 outline-none transition-all duration-300 resize-y"
                       placeholder="Enter any additional notes or special requests..."
                     />
                   </div>
                 </div>
               </div>
             </div>
-            <div className="px-8 py-5 bg-white border-t-2 border-gray-100 flex flex-col sm:flex-row justify-end gap-3 flex-shrink-0">
+            <div className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 bg-white border-t-2 border-gray-100 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 flex-shrink-0">
               <button 
                 onClick={() => setShowEditModal(false)} 
-                className="px-8 py-3 rounded-2xl border-2 border-gray-300 text-gray-700 text-sm font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105 w-full sm:w-auto"
+                className="px-4 sm:px-6 md:px-8 py-2 sm:py-3 rounded-2xl border-2 border-gray-300 text-gray-700 text-xs sm:text-sm font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105 w-full sm:w-auto"
               >
                 Cancel
               </button>
               <button 
                 onClick={handleSave} 
                 disabled={isLoading}
-                className="px-8 py-3 rounded-2xl bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white text-sm font-bold hover:from-[#005A4F] hover:to-[#1B9E8E] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2 justify-center w-full sm:w-auto hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 sm:px-6 md:px-8 py-2 sm:py-3 rounded-2xl bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white text-xs sm:text-sm font-bold hover:from-[#005A4F] hover:to-[#1B9E8E] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-1.5 sm:gap-2 justify-center w-full sm:w-auto hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
-                  <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 border-3 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  <Save className="w-4 h-4" />
+                  <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 )}
                 {isLoading ? 'Saving...' : 'Save Changes'}
               </button>
@@ -3246,87 +3247,88 @@ const OwnerProfile = () => {
 
       {/* Success Message */}
       {showSuccess && (
-        <div className="fixed top-55 right-4 z-50 bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 border-2 border-[#00695C]/30 rounded-2xl p-2 flex items-center gap-4 shadow-xl animate-slideDown max-w-md backdrop-blur-sm">
-          <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-3 rounded-2xl animate-bounce-in">
-            <CheckCircle className="w-6 h-6 text-white" />
+        <div className="fixed top-20 sm:top-24 md:top-28 right-2 sm:right-4 z-50 bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 border-2 border-[#00695C]/30 rounded-2xl p-2 sm:p-3 flex items-center gap-3 sm:gap-4 shadow-xl animate-slideDown max-w-xs sm:max-w-md backdrop-blur-sm">
+          <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 sm:p-3 rounded-2xl animate-bounce-in">
+            <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
           <div>
-            <p className="text-[#00695C] font-bold text-lg">Success!</p>
-            <p className="text-[#00695C]/80 text-sm">Operation completed successfully!</p>
+            <p className="text-[#00695C] font-bold text-base sm:text-lg">Success!</p>
+            <p className="text-[#00695C]/80 text-[10px] sm:text-sm">Operation completed successfully!</p>
           </div>
           <button onClick={() => setShowSuccess(false)} className="text-[#00695C] hover:text-[#004D40] ml-auto hover:rotate-90 transition-transform duration-300 hover:scale-110">
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
       )}
 
       {/* MAIN CONTENT */}
-      <div className="container mx-auto px-4 max-w-full w-full relative z-10 -mt-15">
+      <div className="container mx-auto px-2 sm:px-4 md:px-6 max-w-full w-full relative z-10 -mt-12 sm:-mt-15">
         
         {/* HEADER */}
-        <div className="relative overflow-hidden rounded-3xl mb-6 w-full animate-fade-up">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#00695C]/[0.04] via-[#26A69A]/[0.06] to-[#00695C]/[0.04] rounded-3xl" />
+        <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl mb-4 sm:mb-6 w-full animate-fade-up">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#00695C]/[0.04] via-[#26A69A]/[0.06] to-[#00695C]/[0.04] rounded-2xl sm:rounded-3xl" />
           <div className="absolute -top-16 -left-10 w-40 h-40 bg-gradient-to-br from-[#00695C]/10 to-[#26A69A]/10 rounded-full blur-3xl animate-pulse-slow pointer-events-none" />
           <div className="absolute -bottom-16 -right-10 w-40 h-40 bg-gradient-to-br from-[#26A69A]/10 to-[#00695C]/10 rounded-full blur-3xl animate-pulse-slow pointer-events-none" style={{ animationDelay: '1.2s' }} />
           <div className="absolute top-0 left-[-100%] w-full h-[1px] bg-gradient-to-r from-transparent via-[#26A69A]/50 to-transparent animate-shimmer pointer-events-none" />
 
-          <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full p-4 sm:p-5">
-            <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 w-full p-3 sm:p-4 md:p-5">
+            <div className="flex items-center gap-2 sm:gap-3 md:gap-4 w-full sm:w-auto">
               <button
                 onClick={handleNavigateBack}
-                className="relative p-3 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-110 hover:-rotate-12 group border border-[#00695C]/10 overflow-hidden"
+                className="relative p-2 sm:p-3 bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-110 hover:-rotate-12 group border border-[#00695C]/10 overflow-hidden"
                 aria-label="Go back"
               >
-                <span className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#00695C]/0 to-[#26A69A]/0 group-hover:from-[#00695C]/10 group-hover:to-[#26A69A]/10 transition-all duration-300" />
-                <ArrowLeft className="relative w-5 h-5 text-gray-600 group-hover:text-[#00695C] group-hover:-translate-x-0.5 transition-all duration-300" />
+                <span className="absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#00695C]/0 to-[#26A69A]/0 group-hover:from-[#00695C]/10 group-hover:to-[#26A69A]/10 transition-all duration-300" />
+                <ArrowLeft className="relative w-4 h-4 sm:w-5 sm:h-5 text-gray-600 group-hover:text-[#00695C] group-hover:-translate-x-0.5 transition-all duration-300" />
               </button>
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent flex items-center gap-3 relative">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent flex items-center gap-2 sm:gap-3 relative">
                   <div className="relative flex-shrink-0">
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#00695C] to-[#26A69A] blur-lg opacity-40 animate-pulse-slow" />
-                    <div className="absolute -inset-1 rounded-2xl border-2 border-[#26A69A]/30 animate-spin-slow" />
-                    <div className="relative bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2.5 rounded-2xl shadow-lg ">
-                      <User className="w-6 h-6 text-white" />
+                    <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-r from-[#00695C] to-[#26A69A] blur-lg opacity-40 animate-pulse-slow" />
+                    <div className="absolute -inset-0.5 sm:-inset-1 rounded-xl sm:rounded-2xl border-2 border-[#26A69A]/30 animate-spin-slow" />
+                    <div className="relative bg-gradient-to-r from-[#00695C] to-[#26A69A] p-1.5 sm:p-2 md:p-2.5 rounded-xl sm:rounded-2xl shadow-lg">
+                      <User className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
                     </div>
                   </div>
-                  <span className="relative">
+                  <span className="relative text-base sm:text-xl md:text-2xl lg:text-3xl">
                     Owner Profile
-                    <span className="absolute -bottom-1 left-0 h-[3px] w-full bg-gradient-to-r from-[#00695C] to-[#26A69A] rounded-full scale-x-0 origin-left animate-underline-grow" />
+                    <span className="absolute -bottom-0.5 sm:-bottom-1 left-0 h-[2px] sm:h-[3px] w-full bg-gradient-to-r from-[#00695C] to-[#26A69A] rounded-full scale-x-0 origin-left animate-underline-grow" />
                   </span>
                 </h1>
-                <p className="text-xs text-gray-500 mt-1.5 ml-1 flex items-center gap-1.5">
-                  <Sparkles className="w-3 h-3 text-[#26A69A] animate-pulse" />
-                  Manage your owner profile and property information
+                <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1.5 ml-0.5 sm:ml-1 flex items-center gap-1 sm:gap-1.5">
+                  <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#26A69A] animate-pulse" />
+                  <span className="hidden lg:inline">Manage your owner profile and property information</span>
+                  <span className=" inline lg:hidden">Manage your profile</span>
                 </p>
               </div>
             </div>
             <button
               onClick={() => setShowEditModal(true)}
-              className="relative flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#00695C] to-[#26A69A] hover:from-[#005A4F] hover:to-[#1B9E8E] text-white rounded-2xl font-bold transition-all duration-300 shadow-lg hover:shadow-2xl w-full sm:w-auto justify-center transform hover:scale-105 hover:-translate-y-1 group text-sm overflow-hidden"
+              className="relative flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 bg-gradient-to-r from-[#00695C] to-[#26A69A] hover:from-[#005A4F] hover:to-[#1B9E8E] text-white rounded-xl sm:rounded-2xl font-bold transition-all duration-300 shadow-lg hover:shadow-2xl w-full sm:w-auto justify-center transform hover:scale-105 hover:-translate-y-1 group text-xs sm:text-sm overflow-hidden"
             >
               <span className="absolute top-0 left-[-100%] w-full h-full bg-gradient-to-r from-transparent via-white/25 to-transparent group-hover:left-full transition-all duration-700 ease-out" />
-              <Edit2 className="relative w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
+              <Edit2 className="relative w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:rotate-12 transition-transform duration-300" />
               <span className="relative">Edit Profile</span>
             </button>
           </div>
         </div>
 
         {/* PROFILE CARD */}
-        <div className="relative bg-[#00695C]/5 backdrop-blur-sm rounded-2xl shadow-xl p-6 mb-6 w-full hover:shadow-2xl transition-all duration-500 border border-[#00695C]/20 overflow-hidden group">
+        <div className="relative bg-[#00695C]/5 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-5 md:p-6 mb-4 sm:mb-6 w-full hover:shadow-2xl transition-all duration-500 border border-[#00695C]/20 overflow-hidden group">
           <div className="absolute top-0 left-[-100%] w-full h-[2px] bg-gradient-to-r from-transparent via-[#26A69A] to-transparent group-hover:left-full transition-all duration-[900ms] ease-out" />
 
           <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-[#00695C]/10 to-[#26A69A]/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
           <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-br from-[#26A69A]/10 to-[#00695C]/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
 
-          <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-2xl">
-            {Array.from({ length: 10 }).map((_, i) => (
+          <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-xl sm:rounded-2xl">
+            {Array.from({ length: 8 }).map((_, i) => (
               <span
                 key={i}
                 className="absolute bottom-[-40px] rounded-full border border-white/50 animate-bubble"
                 style={{
                   left: `${Math.random() * 100}%`,
-                  width: `${4 + Math.random() * 10}px`,
-                  height: `${4 + Math.random() * 10}px`,
+                  width: `${3 + Math.random() * 8}px`,
+                  height: `${3 + Math.random() * 8}px`,
                   background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(38,166,154,0.35) 60%, rgba(0,105,92,0.15) 100%)',
                   animationDuration: `${6 + Math.random() * 6}s`,
                   animationDelay: `${Math.random() * 8}s`,
@@ -3338,21 +3340,21 @@ const OwnerProfile = () => {
           <button
             onClick={handleDownloadInvoice}
             title="Download Invoice PDF"
-            className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg hover:from-[#005A4F] hover:to-[#1B9E8E] hover:scale-105 transition-all duration-300"
+            className="absolute top-2 sm:top-3 md:top-4 right-2 sm:right-3 md:right-4 z-20 flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 md:px-3.5 py-1.5 sm:py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold shadow-md hover:shadow-lg hover:from-[#005A4F] hover:to-[#1B9E8E] hover:scale-105 transition-all duration-300"
           >
-            <Download className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Download Invoice</span>
+            <Download className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+            <span className="hidden lg:inline">Download Invoice</span>
           </button>
 
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6 w-full relative z-10">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-4 sm:gap-5 md:gap-6 w-full relative z-10">
             <div className="relative flex-shrink-0">
-              <div className="absolute -inset-1 rounded-[24px] animate-spin-slow"
+              <div className="absolute -inset-0.5 sm:-inset-1 rounded-[20px] sm:rounded-[24px] animate-spin-slow"
                    style={{ background: 'conic-gradient(from 0deg, #00695C, #26A69A, #7fd6c9, #26A69A, #00695C)' }} />
-              <div className="relative w-28 h-28 rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-[#00695C]/20 to-[#26A69A]/20 flex items-center justify-center ring-4 ring-white/60">
+              <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-[#00695C]/20 to-[#26A69A]/20 flex items-center justify-center ring-3 sm:ring-4 ring-white/60">
                 {documents.passportPhoto ? (
                   <img src={URL.createObjectURL(documents.passportPhoto)} alt={editForm.fullName} className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-5xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
+                  <span className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
                     {editForm.fullName.charAt(0)}
                   </span>
                 )}
@@ -3360,48 +3362,48 @@ const OwnerProfile = () => {
 
               {documents.passportPhoto && (
                 <button onClick={handleProfilePhotoDelete}
-                  className="absolute top-1 right-1 p-1.5 rounded-full bg-white shadow-lg hover:bg-red-500 text-gray-600 hover:text-white transition-all duration-300 hover:scale-110 hover:rotate-12 z-20"
+                  className="absolute top-0 right-0 p-1 rounded-full bg-white shadow-lg hover:bg-red-500 text-gray-600 hover:text-white transition-all duration-300 hover:scale-110 hover:rotate-12 z-20"
                   aria-label="Delete profile photo" title="Delete Profile Photo">
-                  <Trash2 className="w-3 h-3" />
+                  <Trash2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                 </button>
               )}
 
               <button onClick={() => profilePhotoInputRef.current?.click()}
-                className="absolute bottom-1 right-1 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white p-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 hover:rotate-12 z-20"
+                className="absolute bottom-0 right-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white p-1.5 sm:p-2 rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 hover:rotate-12 z-20"
                 aria-label="Upload profile photo" title="Upload Profile Photo">
-                <Camera className="w-3.5 h-3.5" />
+                <Camera className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               </button>
               <input ref={profilePhotoInputRef} type="file" className="hidden" accept="image/*" onChange={handleProfilePhotoUpload} />
             </div>
 
             <div className="flex-1 text-center md:text-left w-full">
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-1.5">
-                <h2 className="text-2xl font-bold text-gray-800">{editForm.fullName}</h2>
-                <span className="text-xs text-[#00695C] font-medium bg-gray-100 px-3 py-1 rounded-full border border-gray-200">
-                  Owner ID: #OWN-{editForm.mobileNumber?.slice(-4) || '0000'}
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 sm:gap-2 mb-1 sm:mb-1.5">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">{editForm.fullName}</h2>
+                <span className="text-[10px] sm:text-xs text-[#00695C] font-medium bg-gray-100 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full border border-gray-200">
+                  #OWN-{editForm.mobileNumber?.slice(-4) || '0000'}
                 </span>
-                <span className="relative overflow-hidden bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white px-3 py-0.5 rounded-full text-[10px] font-bold">
+                <span className="relative overflow-hidden bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white px-2 sm:px-3 py-0.5 rounded-full text-[8px] sm:text-[10px] font-bold">
                   Verified Owner
                   <span className="absolute inset-y-0 left-[-60%] w-[40%] bg-gradient-to-r from-transparent via-white/80 to-transparent animate-shimmer" />
                 </span>
               </div>
 
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs text-gray-500 mb-3">
-                <span className="flex items-center gap-1.5 bg-[#00695C]/5 px-3 py-1.5 rounded-xl shadow-sm border border-[#00695C]/10 hover:border-[#26A69A] hover:-translate-y-0.5 transition-all duration-300 animate-rise" style={{ animationDelay: '0.05s' }}>
-                  <MapPin className="w-3.5 h-3.5 text-[#00695C]" /> {editForm.city}, {editForm.state}
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-gray-500 mb-2 sm:mb-3">
+                <span className="flex items-center gap-1 sm:gap-1.5 bg-[#00695C]/5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl shadow-sm border border-[#00695C]/10 hover:border-[#26A69A] hover:-translate-y-0.5 transition-all duration-300 animate-rise" style={{ animationDelay: '0.05s' }}>
+                  <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00695C]" /> {editForm.city}, {editForm.state}
                 </span>
-                <span className="flex items-center gap-1.5 bg-[#00695C]/5 px-3 py-1.5 rounded-xl shadow-sm border border-[#00695C]/10 hover:border-[#26A69A] hover:-translate-y-0.5 transition-all duration-300 animate-rise" style={{ animationDelay: '0.15s' }}>
-                  <Phone className="w-3.5 h-3.5 text-[#00695C]" /> {editForm.mobileNumber}
+                <span className="flex items-center gap-1 sm:gap-1.5 bg-[#00695C]/5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl shadow-sm border border-[#00695C]/10 hover:border-[#26A69A] hover:-translate-y-0.5 transition-all duration-300 animate-rise" style={{ animationDelay: '0.15s' }}>
+                  <Phone className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00695C]" /> {editForm.mobileNumber}
                 </span>
-                <span className="flex items-center gap-1.5 bg-[#00695C]/5 px-3 py-1.5 rounded-xl shadow-sm border border-[#00695C]/10 hover:border-[#26A69A] hover:-translate-y-0.5 transition-all duration-300 animate-rise" style={{ animationDelay: '0.25s' }}>
-                  <Mail className="w-3.5 h-3.5 text-[#00695C]" /> {editForm.emailAddress}
+                <span className="flex items-center gap-1 sm:gap-1.5 bg-[#00695C]/5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl shadow-sm border border-[#00695C]/10 hover:border-[#26A69A] hover:-translate-y-0.5 transition-all duration-300 animate-rise" style={{ animationDelay: '0.25s' }}>
+                  <Mail className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00695C]" /> {editForm.emailAddress}
                 </span>
               </div>
 
-              <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                <span className="flex items-center gap-1.5 bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 text-[#00695C] px-3 py-1.5 rounded-xl text-[10px] font-bold shadow-sm hover:scale-105 transition-transform duration-300 border border-[#00695C]/20 text-left animate-rise" style={{ animationDelay: '0.35s' }}>
-                  <MapPin className="w-3 h-3 flex-shrink-0" />
-                  <span className="truncate max-w-[200px]">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center md:justify-start">
+                <span className="flex items-center gap-1 sm:gap-1.5 bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 text-[#00695C] px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[8px] sm:text-[10px] font-bold shadow-sm hover:scale-105 transition-transform duration-300 border border-[#00695C]/20 text-left animate-rise" style={{ animationDelay: '0.35s' }}>
+                  <MapPin className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
+                  <span className="truncate max-w-[120px] sm:max-w-[180px] md:max-w-[200px]">
                     {[editForm.addressLine1, editForm.addressLine2, editForm.city, editForm.district, editForm.state, editForm.pinCode].filter(Boolean).join(', ')}
                   </span>
                 </span>
@@ -3411,8 +3413,8 @@ const OwnerProfile = () => {
         </div>
 
         {/* TAB NAVIGATION */}
-        <div className="bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] backdrop-blur-sm rounded-2xl shadow-xl p-2 mb-6 border border-[#00695C]/20 w-full overflow-x-auto">
-          <div className="flex gap-1.5 min-w-max">
+        <div className="bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl p-1.5 sm:p-2 mb-4 sm:mb-6 border border-[#00695C]/20 w-full overflow-x-auto">
+          <div className="flex gap-1 sm:gap-1.5 min-w-max">
             {sections.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeSection === tab.id;
@@ -3420,7 +3422,7 @@ const OwnerProfile = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveSection(tab.id)}
-                  className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-xs transition-all duration-500 whitespace-nowrap relative group ${
+                  className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 rounded-lg sm:rounded-xl font-bold text-[9px] sm:text-xs transition-all duration-500 whitespace-nowrap relative group ${
                     isActive
                       ? 'text-white shadow-lg transform scale-105'
                       : 'text-gray-600 hover:text-[#00695C]'
@@ -3432,13 +3434,14 @@ const OwnerProfile = () => {
                   }}
                 >
                   {isActive && (
-                    <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#00695C] to-[#26A69A] shadow-lg animate-pulse-slow" />
+                    <span className="absolute inset-0 rounded-lg sm:rounded-xl bg-gradient-to-r from-[#00695C] to-[#26A69A] shadow-lg animate-pulse-slow" />
                   )}
-                  <span className="relative z-10 flex items-center gap-1.5">
-                    <Icon className={`w-3.5 h-3.5 transition-all duration-300 ${isActive ? 'text-white' : 'group-hover:text-[#00695C]'}`} />
-                    {tab.title}
+                  <span className="relative z-10 flex items-center gap-1 sm:gap-1.5">
+                    <Icon className={`w-3 h-3 sm:w-3.5 sm:h-3.5 transition-all duration-300 ${isActive ? 'text-white' : 'group-hover:text-[#00695C]'}`} />
+                    <span className="hidden lg:inline">{tab.title}</span>
+                    <span className="inline lg:hidden">{tab.title.split(' ')[0]}</span>
                     {isActive && (
-                      <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-white rounded-full animate-ping" />
+                      <span className="absolute -top-0.5 -right-0.5 w-1 h-1 sm:w-1.5 sm:h-1.5 bg-white rounded-full animate-ping" />
                     )}
                   </span>
                 </button>
@@ -3448,45 +3451,45 @@ const OwnerProfile = () => {
         </div>
 
         {/* TAB CONTENT */}
-        <div className="bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] backdrop-blur-sm rounded-2xl shadow-xl p-5 mb-6 border border-[#00695C]/20 w-full relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-[#00695C]/5 to-[#26A69A]/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-br from-[#26A69A]/5 to-[#00695C]/5 rounded-full blur-3xl" />
+        <div className="bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 md:p-5 mb-4 sm:mb-6 border border-[#00695C]/20 w-full relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 sm:w-48 h-32 sm:h-48 bg-gradient-to-br from-[#00695C]/5 to-[#26A69A]/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-32 sm:w-48 h-32 sm:h-48 bg-gradient-to-br from-[#26A69A]/5 to-[#00695C]/5 rounded-full blur-3xl" />
           <div className="relative z-10">
             {renderSectionContent()}
           </div>
         </div>
 
         {/* PROPERTIES SECTION */}
-        <div className="bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] backdrop-blur-sm rounded-2xl shadow-xl p-5 mb-6 w-full border border-[#00695C]/20 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 md:p-5 mb-4 sm:mb-6 w-full border border-[#00695C]/20 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-[#00695C]/5 to-[#26A69A]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
           
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
-            <div className="flex items-center gap-2.5">
-              <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl shadow-lg">
-                <Home className="w-4 h-4 text-white" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <div className="flex items-center gap-2 sm:gap-2.5">
+              <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-1.5 sm:p-2 rounded-lg sm:rounded-xl shadow-lg">
+                <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
               </div>
               <div>
-                <h2 className="text-base font-bold text-gray-800">My Properties</h2>
-                <p className="text-[11px] text-gray-500">Manage your property listings</p>
+                <h2 className="text-sm sm:text-base font-bold text-gray-800">My Properties</h2>
+                <p className="text-[9px] sm:text-[11px] text-gray-500">Manage your property listings</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
-              <div className="relative flex-1 sm:flex-initial min-w-[120px]">
+            <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto flex-wrap">
+              <div className="relative flex-1 sm:flex-initial min-w-[100px] sm:min-w-[120px]">
                 <input
                   type="text"
                   placeholder="Search..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-3 py-1.5 pl-8 rounded-lg border-2 border-gray-200 focus:border-[#00695C] focus:ring-3 focus:ring-[#00695C]/20 outline-none transition-all duration-300 text-xs"
+                  className="w-full px-2 sm:px-3 py-1 sm:py-1.5 pl-6 sm:pl-8 rounded-lg border-2 border-gray-200 focus:border-[#00695C] focus:ring-3 focus:ring-[#00695C]/20 outline-none transition-all duration-300 text-[10px] sm:text-xs"
                 />
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                <Search className="absolute left-1.5 sm:left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400" />
                 {searchTerm && (
                   <button
                     onClick={clearSearch}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute right-1.5 sm:right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                   </button>
                 )}
               </div>
@@ -3494,7 +3497,7 @@ const OwnerProfile = () => {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-3 py-1.5 rounded-lg border-2 border-gray-200 focus:border-[#00695C] focus:ring-3 focus:ring-[#00695C]/20 outline-none transition-all duration-300 text-xs bg-white"
+                className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border-2 border-gray-200 focus:border-[#00695C] focus:ring-3 focus:ring-[#00695C]/20 outline-none transition-all duration-300 text-[10px] sm:text-xs bg-white"
               >
                 <option value="all">All</option>
                 <option value="active">Active</option>
@@ -3504,25 +3507,25 @@ const OwnerProfile = () => {
               <div className="flex rounded-lg border-2 border-gray-200 overflow-hidden">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-1.5 transition-all duration-300 ${
+                  className={`p-1 sm:p-1.5 transition-all duration-300 ${
                     viewMode === 'grid' 
                       ? 'bg-[#00695C] text-white' 
                       : 'bg-white text-gray-600 hover:bg-gray-50'
                   }`}
                   aria-label="Grid view"
                 >
-                  <GridIcon className="w-4.5 h-4.5" />
+                  <GridIcon className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-1.5 transition-all duration-300 ${
+                  className={`p-1 sm:p-1.5 transition-all duration-300 ${
                     viewMode === 'list' 
                       ? 'bg-[#00695C] text-white' 
                       : 'bg-white text-gray-600 hover:bg-gray-50'
                   }`}
                   aria-label="List view"
                 >
-                  <List className="w-4.5 h-4.5" />
+                  <List className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5" />
                 </button>
               </div>
             </div>
@@ -3531,14 +3534,14 @@ const OwnerProfile = () => {
           {filteredProperties.length > 0 ? (
             <div>
               {viewMode === 'grid' ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                   {filteredProperties.map((property, index) => (
                     <div
                       key={property.id}
-                      className="group relative bg-teal-100/30 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-[#00695C]/10 overflow-hidden hover:-translate-y-1"
+                      className="group relative bg-teal-100/30 rounded-lg sm:rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-[#00695C]/10 overflow-hidden hover:-translate-y-1"
                       style={{ animationDelay: `${index * 0.08}s` }}
                     >
-                      <div className="relative w-full h-46 bg-gray-100 overflow-hidden">
+                      <div className="relative w-full h-40 sm:h-46 bg-gray-100 overflow-hidden">
                         <img 
                           src={property.images?.[0] || 'https://via.placeholder.com/400x400/CCCCCC/666666?text=No+Image'} 
                           alt={property.name}
@@ -3547,26 +3550,26 @@ const OwnerProfile = () => {
                             e.target.src = 'https://via.placeholder.com/400x400/CCCCCC/666666?text=No+Image';
                           }}
                         />
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent p-3">
-                          <p className="text-white font-bold text-lg drop-shadow-lg">
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent p-2 sm:p-3">
+                          <p className="text-white font-bold text-base sm:text-lg drop-shadow-lg">
                             {property.price}
                           </p>
                         </div>
                         {property.images && property.images.length > 1 && (
-                          <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5">
-                            <Image className="w-3.5 h-3.5" />
+                          <div className="absolute bottom-2 sm:bottom-3 right-2 sm:right-3 bg-black/60 backdrop-blur-sm text-white text-[9px] sm:text-xs px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full flex items-center gap-1 sm:gap-1.5">
+                            <Image className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                             {property.images.length}
                           </div>
                         )}
                       </div>
 
-                      <div className="p-4 space-y-3">
-                        <div className="flex items-center justify-between gap-2">
-                          <h3 className="font-bold text-gray-800 text-base hover:text-[#00695C] transition-colors duration-300 line-clamp-1 flex-1">
+                      <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
+                        <div className="flex items-center justify-between gap-1 sm:gap-2">
+                          <h3 className="font-bold text-gray-800 text-sm sm:text-base hover:text-[#00695C] transition-colors duration-300 line-clamp-1 flex-1">
                             {property.name}
                           </h3>
-                          <div className="flex items-center gap-1.5 flex-shrink-0">
-                            <span className={`text-[10px] font-bold ${
+                          <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+                            <span className={`text-[9px] sm:text-[10px] font-bold ${
                               property.status === 'Active' ? 'text-green-600' : 'text-gray-400'
                             }`}>
                               {property.status === 'Active' ? 'Active' : 'Inactive'}
@@ -3579,18 +3582,18 @@ const OwnerProfile = () => {
                           </div>
                         </div>
 
-                        <p className="text-xs text-gray-500 font-medium flex items-center gap-2">
-                          <span className="bg-gray-100 px-2 py-0.5 rounded-full">{property.id}</span>
+                        <p className="text-[9px] sm:text-xs text-gray-500 font-medium flex items-center gap-1 sm:gap-2">
+                          <span className="bg-gray-100 px-1.5 sm:px-2 py-0.5 rounded-full">{property.id}</span>
                           <span className="w-1 h-1 rounded-full bg-gray-300" />
                           <span>{property.postedDate}</span>
                         </p>
 
-                        <div className="flex items-center gap-1.5 text-sm text-gray-600">
-                          <MapPin className="w-4 h-4 text-[#00695C] flex-shrink-0" />
+                        <div className="flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm text-gray-600">
+                          <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00695C] flex-shrink-0" />
                           <span className="font-medium truncate">{property.location}</span>
                         </div>
 
-                        <div className="flex flex-wrap gap-1.5">
+                        <div className="flex flex-wrap gap-1 sm:gap-1.5">
                           {[
                             { icon: Building, label: property.type },
                             { icon: Layers, label: property.area },
@@ -3598,34 +3601,34 @@ const OwnerProfile = () => {
                           ].map((item, idx) => (
                             <span 
                               key={idx}
-                              className="flex items-center gap-1 bg-[#00695C]/5 px-2.5 py-1 rounded-lg text-xs font-medium text-[#00695C] border border-[#00695C]/10"
+                              className="flex items-center gap-0.5 sm:gap-1 bg-[#00695C]/5 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-[9px] sm:text-xs font-medium text-[#00695C] border border-[#00695C]/10"
                             >
-                              <item.icon className="w-3.5 h-3.5" />
+                              <item.icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                               {item.label}
                             </span>
                           ))}
                         </div>
 
-                        <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
+                        <div className="flex items-center gap-1.5 sm:gap-2 pt-2 sm:pt-3 border-t border-gray-100">
                           <button
                             onClick={() => handleViewDetails(property)}
-                            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-lg text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
+                            className="flex-1 flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-lg text-[10px] sm:text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
                           >
-                            <ViewIcon className="w-4 h-4" />
+                            <ViewIcon className="w-3 h-3 sm:w-4 sm:h-4" />
                             View
                           </button>
                           <button
                             onClick={() => handleEditProperty(property)}
-                            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
+                            className="flex-1 flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg text-[10px] sm:text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
                           >
-                            <Edit2 className="w-4 h-4" />
+                            <Edit2 className="w-3 h-3 sm:w-4 sm:h-4" />
                             Edit
                           </button>
                           <button
                             onClick={() => handleDeleteProperty(property)}
-                            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
+                            className="flex-1 flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg text-[10px] sm:text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                             Delete
                           </button>
                         </div>
@@ -3634,111 +3637,192 @@ const OwnerProfile = () => {
                   ))}
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[700px] text-sm">
-                    <thead>
-                      <tr className="border-b-2 border-gray-200 bg-gray-50">
-                        <th className="text-left py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Property</th>
-                        <th className="text-left py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
-                        <th className="text-left py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Type</th>
-                        <th className="text-left py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Price</th>
-                        <th className="text-left py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Area</th>
-                        <th className="text-left py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Location</th>
-                        <th className="text-right py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {filteredProperties.map((property) => (
-                        <tr 
-                          key={property.id}
-                          className="hover:bg-[#00695C]/3 transition-colors duration-200 group"
-                        >
-                          <td className="py-3 px-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                                <img 
-                                  src={property.images?.[0] || 'https://via.placeholder.com/100x100/CCCCCC/666666?text=No+Image'} 
-                                  alt={property.name}
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    e.target.src = 'https://via.placeholder.com/100x100/CCCCCC/666666?text=No+Image';
-                                  }}
-                                />
-                              </div>
-                              <div>
-                                <div className="flex items-center gap-2">
-                                  <p className="font-bold text-sm text-gray-800 group-hover:text-[#00695C] transition-colors">
-                                    {property.name}
-                                  </p>
-                                  <div className="flex items-center gap-1">
-                                    <span className={`text-[10px] font-bold ${
-                                      property.status === 'Active' ? 'text-green-600' : 'text-gray-400'
-                                    }`}>
-                                      {property.status === 'Active' ? 'Active' : 'Inactive'}
-                                    </span>
-                                    <ToggleSwitch 
-                                      isOn={property.status === 'Active'} 
-                                      onToggle={() => handleToggleStatus(property)}
-                                      size="sm"
-                                    />
-                                  </div>
-                                </div>
-                                <p className="text-xs text-gray-500">{property.id}</p>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="py-3 px-4">
-                            <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${
-                              property.status === 'Active' ? 'bg-green-100 text-green-700' :
-                              property.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
-                              'bg-red-100 text-red-700'
-                            }`}>
-                              {property.status}
-                            </span>
-                          </td>
-                          <td className="py-3 px-4 text-sm text-gray-700">{property.type}</td>
-                          <td className="py-3 px-4 text-sm font-bold text-gray-800">{property.price}</td>
-                          <td className="py-3 px-4 text-sm text-gray-700">{property.area}</td>
-                          <td className="py-3 px-4 text-sm text-gray-700 truncate max-w-[150px]">{property.location}</td>
-                          <td className="py-3 px-4 text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              <button
-                                onClick={() => handleViewDetails(property)}
-                                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#00695C] text-white rounded-lg text-xs font-bold hover:bg-[#005A4F] transition-all duration-300"
-                              >
-                                <ViewIcon className="w-3.5 h-3.5" />
-                                View
-                              </button>
-                              <button
-                                onClick={() => handleEditProperty(property)}
-                                className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 text-white rounded-lg text-xs font-bold hover:bg-blue-600 transition-all duration-300"
-                              >
-                                <Edit2 className="w-3.5 h-3.5" />
-                                Edit
-                              </button>
-                              <button
-                                onClick={() => handleDeleteProperty(property)}
-                                className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500 text-white rounded-lg text-xs font-bold hover:bg-red-600 transition-all duration-300"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                                Delete
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+               <div className="overflow-x-auto rounded-lg sm:rounded-xl border border-gray-100">
+  <table className="w-full text-[10px] sm:text-sm table-fixed">
+    <colgroup>
+      <col className="w-[38%] lg:w-[24%]" />
+      <col className="w-[18%] lg:w-[11%]" />
+      <col className="hidden lg:table-column lg:w-[11%]" />
+      <col className="w-[20%] lg:w-[14%]" />
+      <col className="hidden lg:table-column lg:w-[9%]" />
+      <col className="hidden lg:table-column lg:w-[13%]" />
+      <col className="w-[24%] lg:w-[18%]" />
+    </colgroup>
+    <thead>
+      <tr className="border-b-2 border-gray-200 bg-gray-50">
+        <th className="text-left py-2 sm:py-3 px-2 sm:px-4 text-[9px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider">Property</th>
+        <th className="text-left py-2 sm:py-3 px-2 sm:px-4 text-[9px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
+        <th className="hidden lg:table-cell text-left py-2 sm:py-3 px-2 sm:px-4 text-[9px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider">Type</th>
+        <th className="text-left py-2 sm:py-3 px-2 sm:px-4 text-[9px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider">Price</th>
+        <th className="hidden lg:table-cell text-left py-2 sm:py-3 px-2 sm:px-4 text-[9px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider">Area</th>
+        <th className="hidden lg:table-cell text-left py-2 sm:py-3 px-2 sm:px-4 text-[9px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider">Location</th>
+        <th className="text-right py-2 sm:py-3 px-2 sm:px-4 text-[9px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
+      </tr>
+    </thead>
+    <tbody className="divide-y divide-gray-100">
+      {filteredProperties.map((property) => (
+        <tr key={property.id} className="hover:bg-[#00695C]/3 transition-colors duration-200 group">
+          {/* PROPERTY (name + id + type/location as meta on small screens) */}
+          <td className="py-2 sm:py-3 px-2 sm:px-4">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                <img
+                  src={property.images?.[0] || 'https://via.placeholder.com/100x100/CCCCCC/666666?text=No+Image'}
+                  alt={property.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => { e.target.src = 'https://via.placeholder.com/100x100/CCCCCC/666666?text=No+Image'; }}
+                />
+              </div>
+              <div className="min-w-0">
+                <p className="font-bold text-[10px] sm:text-sm text-gray-800 group-hover:text-[#00695C] transition-colors truncate">
+                  {property.name}
+                </p>
+                <p className="text-[9px] sm:text-xs text-gray-500 truncate">{property.id}</p>
+                <p className="text-[9px] sm:text-xs text-gray-400 truncate lg:hidden">
+                  {property.type} · {property.location}
+                </p>
+              </div>
+            </div>
+          </td>
+
+          {/* STATUS */}
+          <td className="py-2 sm:py-3 px-2 sm:px-4">
+            <div className="flex items-center gap-1">
+              <ToggleSwitch
+                isOn={property.status === 'Active'}
+                onToggle={() => handleToggleStatus(property)}
+                size="sm"
+              />
+              <span className={`hidden sm:inline text-[9px] sm:text-[11px] font-bold whitespace-nowrap ${
+                property.status === 'Active' ? 'text-green-600' : 'text-gray-400'
+              }`}>
+                {property.status}
+              </span>
+            </div>
+          </td>
+
+          {/* TYPE - lg+ only */}
+          <td className="hidden lg:table-cell py-2 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-sm text-gray-700 truncate">
+            {property.type}
+          </td>
+
+          {/* PRICE */}
+          <td className="py-2 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-sm font-bold text-gray-800 truncate">
+            {property.price}
+          </td>
+
+          {/* AREA - lg+ only */}
+          <td className="hidden lg:table-cell py-2 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-sm text-gray-700 truncate">
+            {property.area}
+          </td>
+
+          {/* LOCATION - lg+ only */}
+          <td className="hidden lg:table-cell py-2 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-sm text-gray-700 truncate">
+            {property.location}
+          </td>
+
+          {/* ACTIONS */}
+          {/* ACTIONS */}
+<td className="py-2 sm:py-3 px-2 sm:px-4 text-right">
+  <div className="flex items-center justify-end gap-1 sm:gap-1.5 lg:gap-2">
+
+    {/* VIEW */}
+    <button
+      onClick={() => handleViewDetails(property)}
+      className="
+        flex items-center justify-center
+        gap-1.5
+        p-1.5
+        lg:px-3 lg:py-2
+        bg-gradient-to-r from-[#00695C] to-[#26A69A]
+        text-white
+        rounded-lg
+        text-xs lg:text-sm
+        font-bold
+        hover:shadow-lg
+        transition-all duration-300
+        hover:scale-105
+      "
+      title="View"
+    >
+      <ViewIcon className="w-3.5 h-3.5 lg:w-4 lg:h-4 flex-shrink-0" />
+
+      {/* Desktop text only */}
+      <span className="hidden lg:inline">
+        View
+      </span>
+    </button>
+
+    {/* EDIT */}
+    <button
+      onClick={() => handleEditProperty(property)}
+      className="
+        flex items-center justify-center
+        gap-1.5
+        p-1.5
+        lg:px-3 lg:py-2
+        bg-gradient-to-r from-blue-500 to-blue-600
+        text-white
+        rounded-lg
+        text-xs lg:text-sm
+        font-bold
+        hover:shadow-lg
+        transition-all duration-300
+        hover:scale-105
+      "
+      title="Edit"
+    >
+      <Edit2 className="w-3.5 h-3.5 lg:w-4 lg:h-4 flex-shrink-0" />
+
+      {/* Desktop text only */}
+      <span className="hidden lg:inline">
+        Edit
+      </span>
+    </button>
+
+    {/* DELETE */}
+    <button
+      onClick={() => handleDeleteProperty(property)}
+      className="
+        flex items-center justify-center
+        gap-1.5
+        p-1.5
+        lg:px-3 lg:py-2
+        bg-gradient-to-r from-red-500 to-red-600
+        text-white
+        rounded-lg
+        text-xs lg:text-sm
+        font-bold
+        hover:shadow-lg
+        transition-all duration-300
+        hover:scale-105
+      "
+      title="Delete"
+    >
+      <Trash2 className="w-3.5 h-3.5 lg:w-4 lg:h-4 flex-shrink-0" />
+
+      {/* Desktop text only */}
+      <span className="hidden lg:inline">
+        Delete
+      </span>
+    </button>
+
+  </div>
+</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
               )}
             </div>
           ) : (
-            <div className="text-center py-8">
-              <div className="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Home className="w-8 h-8 text-gray-400" />
+            <div className="text-center py-6 sm:py-8">
+              <div className="bg-gray-100 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
+                <Home className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
               </div>
-              <p className="text-gray-500 font-medium text-sm">No properties found</p>
-              <p className="text-xs text-gray-400">
+              <p className="text-gray-500 font-medium text-xs sm:text-sm">No properties found</p>
+              <p className="text-[10px] sm:text-xs text-gray-400">
                 {searchTerm || filterStatus !== 'all' 
                   ? 'Try adjusting your search or filters' 
                   : 'You haven\'t added any properties yet'}
@@ -3749,7 +3833,7 @@ const OwnerProfile = () => {
                     setSearchTerm('');
                     setFilterStatus('all');
                   }}
-                  className="mt-2 px-3 py-1.5 bg-[#00695C] text-white rounded-lg text-xs font-bold hover:bg-[#005A4F] transition-all duration-300"
+                  className="mt-1.5 sm:mt-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-[#00695C] text-white rounded-lg text-[10px] sm:text-xs font-bold hover:bg-[#005A4F] transition-all duration-300"
                 >
                   Clear Filters
                 </button>
@@ -3757,7 +3841,7 @@ const OwnerProfile = () => {
             </div>
           )}
 
-          <div className="mt-3 pt-3 border-t-2 border-gray-100 flex justify-between text-[10px] text-gray-500">
+          <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t-2 border-gray-100 flex justify-between text-[8px] sm:text-[10px] text-gray-500">
             <span>Showing {filteredProperties.length} of {properties.length} properties</span>
             <span>Total: {properties.length}</span>
           </div>
@@ -3851,6 +3935,13 @@ const OwnerProfile = () => {
           --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
           --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color);
           box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+        }
+
+        @media (min-width: 480px) {
+          .xs\\:inline { display: inline; }
+        }
+        @media (max-width: 479px) {
+          .xs\\:inline { display: none; }
         }
       `}</style>
     </div>

@@ -73,31 +73,33 @@ const PdfViewerModal = ({ file, onClose }) => {
   const fileName = typeof file === 'string' ? file.split('/').pop() || 'document.pdf' : file.name || 'document.pdf';
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/85 backdrop-blur-md animate-fadeIn p-4">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/85 backdrop-blur-md animate-fadeIn p-2 sm:p-4 md:p-6 lg:p-8">
       <div className="relative w-full max-w-5xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
-        <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] px-6 py-4 flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center gap-3">
-            <FileText className="w-5 h-5 text-white" />
-            <h3 className="text-white font-bold text-lg truncate max-w-md">{fileName}</h3>
+        <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-3 md:py-4 lg:py-5 flex items-center justify-between flex-shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 lg:gap-4 min-w-0">
+            <FileText className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white flex-shrink-0" />
+            <h3 className="text-white font-bold text-xs sm:text-sm md:text-lg lg:text-xl truncate max-w-[100px] sm:max-w-[200px] md:max-w-md lg:max-w-lg">
+              {fileName}
+            </h3>
           </div>
           <button
             onClick={onClose}
-            className="text-white/80 hover:text-white transition-all duration-300 hover:rotate-90 hover:scale-110"
+            className="text-white/80 hover:text-white transition-all duration-300 hover:rotate-90 hover:scale-110 flex-shrink-0"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
-        <div className="flex-1 overflow-auto bg-gray-100 p-4">
-          <embed src={fileUrl} type="application/pdf" className="w-full h-full min-h-[70vh]" />
+        <div className="flex-1 overflow-auto bg-gray-100 p-2 sm:p-3 md:p-4 lg:p-6">
+          <embed src={fileUrl} type="application/pdf" className="w-full h-[50vh] sm:h-[60vh] md:h-[70vh] lg:h-[75vh] min-h-[300px] sm:min-h-[400px] md:min-h-[500px]" />
         </div>
-        <div className="px-6 py-3 bg-gray-50 border-t border-gray-200 flex justify-between items-center flex-shrink-0">
-          <span className="text-sm text-gray-500">{fileName}</span>
+        <div className="px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-3 md:py-4 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-2 flex-shrink-0">
+          <span className="text-[10px] sm:text-xs md:text-sm lg:text-base text-gray-500 truncate max-w-[120px] sm:max-w-[200px] md:max-w-[300px] lg:max-w-full">{fileName}</span>
           <button
             onClick={() => window.open(fileUrl, '_blank')}
-            className="flex items-center gap-2 px-4 py-2 bg-[#00695C] text-white rounded-xl text-sm font-bold hover:bg-[#005A4F] transition-all duration-300"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 lg:px-6 py-1.5 sm:py-2 md:py-2.5 bg-[#00695C] text-white rounded-xl text-[10px] sm:text-xs md:text-sm lg:text-base font-bold hover:bg-[#005A4F] transition-all duration-300 w-full sm:w-auto justify-center"
           >
-            <ExternalLink className="w-4 h-4" />
-            Open in New Tab
+            <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span>Open in New Tab</span>
           </button>
         </div>
       </div>
@@ -114,42 +116,42 @@ const MediaLightboxModal = ({ items, index, onClose, onNavigate, onDelete }) => 
   const goNext = () => onNavigate((index + 1) % items.length);
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 backdrop-blur-md animate-fadeIn p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 backdrop-blur-md animate-fadeIn p-2 sm:p-4 md:p-6" onClick={onClose}>
       <div className="relative max-w-4xl max-h-[85vh] w-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={onClose}
-          className="absolute -top-10 right-0 text-white/80 hover:text-white transition-all duration-300 hover:rotate-90 hover:scale-110"
+          className="absolute -top-8 sm:-top-10 right-0 text-white/80 hover:text-white transition-all duration-300 hover:rotate-90 hover:scale-110"
         >
-          <X className="w-7 h-7" />
+          <X className="w-5 h-5 sm:w-7 sm:h-7" />
         </button>
 
         {items.length > 1 && (
           <button
             onClick={goPrev}
-            className="absolute left-0 sm:-left-14 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-2.5 transition-all duration-300 z-10"
+            className="absolute left-1 sm:-left-14 md:-left-16 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-1.5 sm:p-2.5 md:p-3 transition-all duration-300 z-10"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-4 h-4 sm:w-6 sm:h-6" />
           </button>
         )}
 
-        <div className="w-full flex flex-col items-center gap-3 animate-scaleIn">
+        <div className="w-full flex flex-col items-center gap-2 sm:gap-3 md:gap-4 animate-scaleIn">
           {current.type === 'video' ? (
-            <video src={current.url} controls autoPlay className="max-w-full max-h-[75vh] rounded-2xl shadow-2xl bg-black" />
+            <video src={current.url} controls autoPlay className="max-w-full max-h-[60vh] sm:max-h-[70vh] md:max-h-[75vh] rounded-2xl shadow-2xl bg-black" />
           ) : (
-            <img src={current.url} alt={current.name || 'Preview'} className="max-w-full max-h-[75vh] rounded-2xl shadow-2xl object-contain bg-black/20" />
+            <img src={current.url} alt={current.name || 'Preview'} className="max-w-full max-h-[60vh] sm:max-h-[70vh] md:max-h-[75vh] rounded-2xl shadow-2xl object-contain bg-black/20" />
           )}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 text-white/80 text-xs font-medium">
-              <span>{current.name}</span>
+          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 md:gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-white/80 text-[10px] sm:text-xs md:text-sm font-medium">
+              <span className="truncate max-w-[100px] sm:max-w-[200px] md:max-w-full">{current.name}</span>
               {items.length > 1 && <span>· {index + 1} / {items.length}</span>}
             </div>
             {onDelete && (
               <button
                 onClick={onDelete}
                 title="Delete this file"
-                className="flex items-center gap-1 bg-red-500/90 hover:bg-red-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-lg transition-all duration-300 hover:scale-105"
+                className="flex items-center gap-0.5 sm:gap-1 bg-red-500/90 hover:bg-red-600 text-white text-[9px] sm:text-[10px] md:text-[11px] font-bold px-1.5 sm:px-2 md:px-2.5 py-0.5 sm:py-1 rounded-lg shadow-lg transition-all duration-300 hover:scale-105"
               >
-                <Trash2 className="w-3 h-3" />
+                <Trash2 className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3" />
                 Delete
               </button>
             )}
@@ -159,11 +161,71 @@ const MediaLightboxModal = ({ items, index, onClose, onNavigate, onDelete }) => 
         {items.length > 1 && (
           <button
             onClick={goNext}
-            className="absolute right-0 sm:-right-14 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-2.5 transition-all duration-300 z-10"
+            className="absolute right-1 sm:-right-14 md:-right-16 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-1.5 sm:p-2.5 md:p-3 transition-all duration-300 z-10"
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6" />
           </button>
         )}
+      </div>
+    </div>
+  );
+};
+
+// ============ PDF FILE CARD COMPONENT ============
+const PdfFileCard = ({ file, onDelete, onView }) => {
+  const fileName = file.name || 'document.pdf';
+  const fileSize = file.size ? (file.size / 1024 / 1024).toFixed(1) + ' MB' : 'Unknown size';
+  
+  const getPdfIcon = () => {
+    const ext = fileName.split('.').pop().toLowerCase();
+    switch(ext) {
+      case 'pdf': return <FileText className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-red-500" />;
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+      case 'webp': return <FileImage className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-500" />;
+      case 'xls':
+      case 'xlsx':
+      case 'csv': return <FileSpreadsheet className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-green-500" />;
+      case 'zip':
+      case 'rar':
+      case '7z': return <FileArchive className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-yellow-500" />;
+      default: return <File className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-gray-500" />;
+    }
+  };
+
+  return (
+    <div className="group flex items-center gap-2 sm:gap-2.5 md:gap-3 bg-white rounded-xl p-2 sm:p-2.5 md:p-3 border border-gray-200 hover:border-[#00695C]/40 hover:shadow-md transition-all duration-300">
+      <div className="flex-shrink-0 p-1 sm:p-1.5 md:p-2 bg-gray-50 rounded-lg group-hover:bg-[#00695C]/5 transition-colors duration-300">
+        {getPdfIcon()}
+      </div>
+      
+      <div className="flex-1 min-w-0">
+        <button
+          onClick={onView}
+          className="text-xs sm:text-sm font-medium text-gray-800 hover:text-[#00695C] transition-colors duration-300 truncate block w-full text-left hover:underline"
+        >
+          {fileName}
+        </button>
+        <span className="text-[9px] sm:text-[10px] md:text-xs text-gray-400">{fileSize}</span>
+      </div>
+
+      <div className="flex items-center gap-0.5 sm:gap-1 md:gap-1.5">
+        <button
+          onClick={onView}
+          className="p-1 sm:p-1.5 text-[#00695C] hover:bg-[#00695C]/10 rounded-lg transition-colors duration-300"
+          title="View PDF"
+        >
+          <Eye className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
+        </button>
+        <button
+          onClick={onDelete}
+          className="p-1 sm:p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-300"
+          title="Delete file"
+        >
+          <Trash2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
+        </button>
       </div>
     </div>
   );
@@ -206,14 +268,14 @@ const PropertyDetailsModal = ({ property, onClose, onAddImages, onRemoveImage, o
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn p-2 sm:p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col animate-scaleIn">
-        <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] px-4 py-3 flex items-center justify-between rounded-t-2xl flex-shrink-0">
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="bg-white/20 p-1.5 rounded-lg">
-              <Home className="w-4 h-4 text-white" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn p-2 sm:p-4 md:p-6">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-[90%] sm:max-w-[95%] lg:max-w-2xl h-[80vh] flex flex-col animate-scaleIn">
+        <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] px-3 sm:px-4 md:px-5 py-2 sm:py-3 flex items-center justify-between rounded-t-2xl flex-shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <div className="bg-white/20 p-1 sm:p-1.5 rounded-lg">
+              <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
             </div>
-            <h2 className="text-white text-lg sm:text-xl font-bold truncate">
+            <h2 className="text-white text-base sm:text-lg md:text-xl font-bold truncate">
               {property.name}
             </h2>
           </div>
@@ -221,12 +283,12 @@ const PropertyDetailsModal = ({ property, onClose, onAddImages, onRemoveImage, o
             onClick={onClose}
             className="text-white/80 hover:text-white transition-all duration-300 hover:rotate-90 hover:scale-110 flex-shrink-0"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 
-        <div className="p-4 overflow-y-auto flex-1 space-y-4">
-          <div className="relative rounded-xl overflow-hidden bg-gray-100 h-56 sm:h-64">
+        <div className="p-3 sm:p-4 overflow-y-auto flex-1 space-y-3 sm:space-y-4">
+          <div className="relative rounded-xl overflow-hidden bg-gray-100 h-48 sm:h-56 md:h-64">
             <img 
               src={images[currentImageIndex]} 
               alt={property.name}
@@ -240,17 +302,17 @@ const PropertyDetailsModal = ({ property, onClose, onAddImages, onRemoveImage, o
               <>
                 <button
                   onClick={prevImage}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-all duration-300"
+                  className="absolute left-1.5 sm:left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 sm:p-2 transition-all duration-300"
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
                 <button
                   onClick={nextImage}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-all duration-300"
+                  className="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 sm:p-2 transition-all duration-300"
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
-                <div className="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] px-2.5 py-0.5 rounded-full">
+                <div className="absolute bottom-1.5 sm:bottom-2 right-1.5 sm:right-2 bg-black/60 text-white text-[9px] sm:text-[10px] px-2 sm:px-2.5 py-0.5 rounded-full">
                   {currentImageIndex + 1} / {images.length}
                 </div>
               </>
@@ -260,34 +322,23 @@ const PropertyDetailsModal = ({ property, onClose, onAddImages, onRemoveImage, o
               <button
                 onClick={() => handleDeleteImage(currentImageIndex)}
                 title="Delete this image"
-                className="absolute bottom-2 left-2 flex items-center gap-1 bg-red-500/90 hover:bg-red-600 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg shadow-lg transition-all duration-300 hover:scale-105"
+                className="absolute bottom-1.5 sm:bottom-2 left-1.5 sm:left-2 flex items-center gap-1 bg-red-500/90 hover:bg-red-600 text-white text-[9px] sm:text-[10px] font-bold px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg shadow-lg transition-all duration-300 hover:scale-105"
               >
-                <Trash2 className="w-3 h-3" />
+                <Trash2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                 Delete
               </button>
             )}
-
-            <div className="absolute top-2 right-2 flex items-center gap-2 bg-black/50 backdrop-blur-sm px-2.5 py-1.5 rounded-xl">
-              <span className="text-white text-[10px] font-bold">
-                {property.status === 'Active' ? 'ON' : 'OFF'}
-              </span>
-              <ToggleSwitch 
-                isOn={property.status === 'Active'} 
-                onToggle={() => onToggleStatus(property)}
-                size="sm"
-              />
-            </div>
           </div>
 
           <div className="flex items-center justify-between">
-            <p className="text-[10px] text-gray-500 font-medium">
+            <p className="text-[9px] sm:text-[10px] text-gray-500 font-medium">
               {hasImages ? `${images.length} image${images.length > 1 ? 's' : ''}` : 'No images uploaded yet'}
             </p>
             <button
               onClick={() => detailImageInputRef.current?.click()}
-              className="flex items-center gap-1.5 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+              className="flex items-center gap-1 sm:gap-1.5 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white text-[9px] sm:text-[10px] font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
             >
-              <Upload className="w-3 h-3" />
+              <Upload className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
               Add Image
             </button>
             <input
@@ -301,12 +352,12 @@ const PropertyDetailsModal = ({ property, onClose, onAddImages, onRemoveImage, o
           </div>
 
           {images.length > 1 && (
-            <div className="flex gap-1.5 overflow-x-auto pb-1.5">
+            <div className="flex gap-1 sm:gap-1.5 overflow-x-auto pb-1 sm:pb-1.5">
               {images.map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setCurrentImageIndex(idx)}
-                  className={`flex-shrink-0 w-16 h-12 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
+                  className={`flex-shrink-0 w-12 sm:w-14 md:w-16 h-9 sm:h-10 md:h-12 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
                     currentImageIndex === idx ? 'border-[#00695C] shadow-md' : 'border-gray-200 hover:border-gray-400'
                   }`}
                 >
@@ -323,76 +374,76 @@ const PropertyDetailsModal = ({ property, onClose, onAddImages, onRemoveImage, o
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-              <div className="p-1.5 bg-[#00695C]/10 rounded-lg">
-                <Building className="w-3.5 h-3.5 text-[#00695C]" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-gray-50 rounded-lg">
+              <div className="p-1 sm:p-1.5 bg-[#00695C]/10 rounded-lg">
+                <Building className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00695C]" />
               </div>
               <div>
-                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Property ID</p>
-                <p className="text-xs font-bold text-gray-800">{property.id}</p>
+                <p className="text-[9px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-wider">Property ID</p>
+                <p className="text-[10px] sm:text-xs font-bold text-gray-800">{property.id}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-              <div className="p-1.5 bg-[#00695C]/10 rounded-lg">
-                <CreditCard className="w-3.5 h-3.5 text-[#00695C]" />
+            <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-gray-50 rounded-lg">
+              <div className="p-1 sm:p-1.5 bg-[#00695C]/10 rounded-lg">
+                <CreditCard className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00695C]" />
               </div>
               <div>
-                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Price</p>
-                <p className="text-xs font-bold text-gray-800">{property.price}</p>
+                <p className="text-[9px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-wider">Price</p>
+                <p className="text-[10px] sm:text-xs font-bold text-gray-800">{property.price}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-              <div className="p-1.5 bg-[#00695C]/10 rounded-lg">
-                <Bed className="w-3.5 h-3.5 text-[#00695C]" />
+            <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-gray-50 rounded-lg">
+              <div className="p-1 sm:p-1.5 bg-[#00695C]/10 rounded-lg">
+                <Bed className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00695C]" />
               </div>
               <div>
-                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Bedrooms</p>
-                <p className="text-xs font-bold text-gray-800">{property.bedrooms || 'N/A'}</p>
+                <p className="text-[9px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-wider">Bedrooms</p>
+                <p className="text-[10px] sm:text-xs font-bold text-gray-800">{property.bedrooms || 'N/A'}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-              <div className="p-1.5 bg-[#00695C]/10 rounded-lg">
-                <Bath className="w-3.5 h-3.5 text-[#00695C]" />
+            <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-gray-50 rounded-lg">
+              <div className="p-1 sm:p-1.5 bg-[#00695C]/10 rounded-lg">
+                <Bath className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00695C]" />
               </div>
               <div>
-                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Bathrooms</p>
-                <p className="text-xs font-bold text-gray-800">{property.bathrooms || 'N/A'}</p>
+                <p className="text-[9px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-wider">Bathrooms</p>
+                <p className="text-[10px] sm:text-xs font-bold text-gray-800">{property.bathrooms || 'N/A'}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-              <div className="p-1.5 bg-[#00695C]/10 rounded-lg">
-                <MapPin className="w-3.5 h-3.5 text-[#00695C]" />
+            <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-gray-50 rounded-lg">
+              <div className="p-1 sm:p-1.5 bg-[#00695C]/10 rounded-lg">
+                <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00695C]" />
               </div>
               <div>
-                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Location</p>
-                <p className="text-xs font-bold text-gray-800 truncate">{property.location}</p>
+                <p className="text-[9px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-wider">Location</p>
+                <p className="text-[10px] sm:text-xs font-bold text-gray-800 truncate">{property.location}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-              <div className="p-1.5 bg-[#00695C]/10 rounded-lg">
-                <Calendar className="w-3.5 h-3.5 text-[#00695C]" />
+            <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-gray-50 rounded-lg">
+              <div className="p-1 sm:p-1.5 bg-[#00695C]/10 rounded-lg">
+                <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00695C]" />
               </div>
               <div>
-                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Posted</p>
-                <p className="text-xs font-bold text-gray-800">{property.postedDate}</p>
+                <p className="text-[9px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-wider">Posted</p>
+                <p className="text-[10px] sm:text-xs font-bold text-gray-800">{property.postedDate}</p>
               </div>
             </div>
           </div>
 
           {property.description && (
-            <div className="bg-gray-50 rounded-lg p-3">
-              <h3 className="text-[11px] font-bold text-gray-700 mb-1">Description</h3>
-              <p className="text-xs text-gray-600 leading-relaxed">{property.description}</p>
+            <div className="bg-gray-50 rounded-lg p-2 sm:p-3">
+              <h3 className="text-[10px] sm:text-[11px] font-bold text-gray-700 mb-0.5 sm:mb-1">Description</h3>
+              <p className="text-[10px] sm:text-xs text-gray-600 leading-relaxed">{property.description}</p>
             </div>
           )}
 
           {property.features && property.features.length > 0 && (
             <div>
-              <h3 className="text-[11px] font-bold text-gray-700 mb-1.5">Features</h3>
-              <div className="flex flex-wrap gap-1.5">
+              <h3 className="text-[10px] sm:text-[11px] font-bold text-gray-700 mb-1 sm:mb-1.5">Features</h3>
+              <div className="flex flex-wrap gap-1 sm:gap-1.5">
                 {property.features.map((feature, index) => (
-                  <span key={index} className="px-2.5 py-1 bg-[#00695C]/10 text-[#00695C] rounded-lg text-[10px] font-bold">
+                  <span key={index} className="px-2 sm:px-2.5 py-0.5 sm:py-1 bg-[#00695C]/10 text-[#00695C] rounded-lg text-[9px] sm:text-[10px] font-bold">
                     {feature}
                   </span>
                 ))}
@@ -402,10 +453,10 @@ const PropertyDetailsModal = ({ property, onClose, onAddImages, onRemoveImage, o
 
           {property.selectedAmenities && property.selectedAmenities.length > 0 && (
             <div>
-              <h3 className="text-[11px] font-bold text-gray-700 mb-1.5">Amenities</h3>
-              <div className="flex flex-wrap gap-1.5">
+              <h3 className="text-[10px] sm:text-[11px] font-bold text-gray-700 mb-1 sm:mb-1.5">Amenities</h3>
+              <div className="flex flex-wrap gap-1 sm:gap-1.5">
                 {property.selectedAmenities.map((amenity, index) => (
-                  <span key={index} className="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-bold">
+                  <span key={index} className="px-2 sm:px-2.5 py-0.5 sm:py-1 bg-blue-50 text-blue-600 rounded-lg text-[9px] sm:text-[10px] font-bold">
                     {amenity}
                   </span>
                 ))}
@@ -414,15 +465,15 @@ const PropertyDetailsModal = ({ property, onClose, onAddImages, onRemoveImage, o
           )}
         </div>
 
-        <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 rounded-b-2xl flex flex-wrap gap-2.5 flex-shrink-0">
+        <div className="px-3 sm:px-4 py-2 sm:py-3 bg-gray-50 border-t border-gray-100 rounded-b-2xl flex flex-wrap gap-2 sm:gap-2.5 flex-shrink-0">
           <button 
             onClick={() => {
               onClose();
               onEdit(property);
             }}
-            className="flex-1 min-w-[100px] px-4 py-2.5 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-xl text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+            className="flex-1 min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-xl text-xs sm:text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-1 sm:gap-2"
           >
-            <Edit2 className="w-4 h-4" />
+            <Edit2 className="w-3 h-3 sm:w-4 sm:h-4" />
             Edit Property
           </button>
           <button 
@@ -430,9 +481,9 @@ const PropertyDetailsModal = ({ property, onClose, onAddImages, onRemoveImage, o
               onClose();
               onDelete(property);
             }}
-            className="flex-1 min-w-[100px] px-4 py-2.5 bg-red-500 text-white rounded-xl text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+            className="flex-1 min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-2 sm:py-2.5 bg-red-500 text-white rounded-xl text-xs sm:text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-1 sm:gap-2"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
             Delete
           </button>
         </div>
@@ -446,28 +497,28 @@ const DeletePropertyConfirmModal = ({ property, onConfirm, onCancel }) => {
   if (!property) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn p-4">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full animate-scaleIn p-6">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="bg-red-100 p-3 rounded-2xl">
-            <AlertTriangle className="w-8 h-8 text-red-500 animate-pulse" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn p-3 sm:p-4 md:p-6">
+      <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full animate-scaleIn p-4 sm:p-6 md:p-8">
+        <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+          <div className="bg-red-100 p-2 sm:p-3 rounded-2xl">
+            <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 text-red-500 animate-pulse" />
           </div>
-          <h3 className="text-xl font-bold text-gray-800">Delete Property</h3>
+          <h3 className="text-lg sm:text-xl font-bold text-gray-800">Delete Property</h3>
         </div>
-        <p className="text-gray-600 mb-2">
+        <p className="text-sm sm:text-base text-gray-600 mb-2">
           Are you sure you want to delete <span className="font-bold text-[#00695C]">{property.name}</span>?
         </p>
-        <p className="text-sm text-red-500 mb-6">This action cannot be undone.</p>
-        <div className="flex justify-end gap-3">
+        <p className="text-xs sm:text-sm text-red-500 mb-4 sm:mb-6">This action cannot be undone.</p>
+        <div className="flex justify-end gap-2 sm:gap-3">
           <button
             onClick={onCancel}
-            className="px-6 py-3 rounded-2xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105"
+            className="px-4 sm:px-6 py-2 sm:py-3 rounded-2xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105 text-sm sm:text-base"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="px-6 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold hover:from-red-600 hover:to-rose-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+            className="px-4 sm:px-6 py-2 sm:py-3 rounded-2xl bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold hover:from-red-600 hover:to-rose-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-sm sm:text-base"
           >
             Delete
           </button>
@@ -830,7 +881,17 @@ const EditPropertyModal = ({ property, onSave, onCancel }) => {
         <div className="space-y-3">
           <div>
             <label className="block text-xs font-bold text-gray-700 mb-0.5">Listing Purpose</label>
-            <div className="flex gap-4">
+            <div className="flex gap-4 flex-wrap">
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input
+                  type="radio"
+                  name="listingPurpose"
+                  className="accent-[#00695C] w-4 h-4 cursor-pointer"
+                  checked={localProperty.listingPurpose === 'sale' || localProperty.listingPurpose === 'For Sale'}
+                  onChange={() => handleLocalChange('listingPurpose', 'sale')}
+                />
+                For Sale
+              </label>
               <label className="flex items-center gap-2 text-sm cursor-pointer">
                 <input
                   type="radio"
@@ -841,11 +902,27 @@ const EditPropertyModal = ({ property, onSave, onCancel }) => {
                 />
                 For Rent
               </label>
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input
+                  type="radio"
+                  name="listingPurpose"
+                  className="accent-[#00695C] w-4 h-4 cursor-pointer"
+                  checked={localProperty.listingPurpose === 'lease' || localProperty.listingPurpose === 'For Lease'}
+                  onChange={() => handleLocalChange('listingPurpose', 'lease')}
+                />
+                For Lease
+              </label>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-0.5">Expected Rent (₹/month)</label>
+            <label className="block text-xs font-bold text-gray-700 mb-0.5">
+              {localProperty.listingPurpose === 'sale' || localProperty.listingPurpose === 'For Sale'
+                ? 'Expected Price (₹)'
+                : localProperty.listingPurpose === 'lease' || localProperty.listingPurpose === 'For Lease'
+                ? 'Expected Lease Amount (₹/month)'
+                : 'Expected Rent (₹/month)'}
+            </label>
             <input
               type="text"
               value={localProperty.expectedPrice || localProperty.price?.replace(/[^0-9]/g, '') || ''}
@@ -856,7 +933,11 @@ const EditPropertyModal = ({ property, onSave, onCancel }) => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-0.5">Budget Range (₹/month)</label>
+            <label className="block text-xs font-bold text-gray-700 mb-0.5">
+              {localProperty.listingPurpose === 'sale' || localProperty.listingPurpose === 'For Sale'
+                ? 'Budget Range (₹)'
+                : 'Budget Range (₹/month)'}
+            </label>
             <div className="grid grid-cols-2 gap-2">
               <input
                 type="number"
@@ -1055,27 +1136,27 @@ const EditPropertyModal = ({ property, onSave, onCancel }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col animate-scaleIn">
-        <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] px-6 py-4 flex items-center justify-between rounded-t-3xl flex-shrink-0">
-          <div className="flex items-center gap-3">
-            <Edit2 className="w-5 h-5 text-white" />
-            <h2 className="text-white text-xl font-bold">Edit Property</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn p-2 sm:p-4 md:p-6">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-[90%] sm:max-w-[95%] lg:max-w-3xl max-h-[80vh] flex flex-col animate-scaleIn">
+        <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 flex items-center justify-between rounded-t-3xl flex-shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Edit2 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+            <h2 className="text-white text-lg sm:text-xl font-bold">Edit Property</h2>
           </div>
           <button 
             onClick={onCancel}
             className="text-white/80 hover:text-white transition-all duration-300 hover:rotate-90 hover:scale-110"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
 
-        <div className="flex border-b border-gray-100 flex-shrink-0 px-4 pt-2">
+        <div className="flex border-b border-gray-100 flex-shrink-0 px-3 sm:px-4 pt-2 overflow-x-auto">
           {editSteps.map((stepName, idx) => (
             <button
               key={idx}
               onClick={() => setLocalStep(idx)}
-              className={`px-4 py-2.5 text-sm font-bold border-b-2 transition-all ${
+              className={`px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap ${
                 localStep === idx
                   ? 'border-[#00695C] text-[#00695C]'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -1086,41 +1167,41 @@ const EditPropertyModal = ({ property, onSave, onCancel }) => {
           ))}
         </div>
 
-        <div className="p-6 overflow-y-auto flex-1">
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1">
           {renderStepContent()}
         </div>
 
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 rounded-b-3xl flex justify-between items-center flex-shrink-0">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 border-t border-gray-100 rounded-b-3xl flex flex-wrap justify-between items-center gap-3 flex-shrink-0">
           <div className="flex gap-2">
             {localStep > 0 && (
               <button
                 onClick={handleLocalBack}
-                className="px-4 py-2 text-sm font-bold text-[#00695C] bg-teal-50 rounded-xl hover:bg-teal-100 transition-all"
+                className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-[#00695C] bg-teal-50 rounded-xl hover:bg-teal-100 transition-all"
               >
                 ← Back
               </button>
             )}
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-2 sm:gap-3">
             <button
               onClick={onCancel}
-              className="px-6 py-2.5 rounded-xl border-2 border-gray-300 text-gray-700 text-sm font-bold hover:bg-gray-100 transition-all duration-300"
+              className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl border-2 border-gray-300 text-gray-700 text-xs sm:text-sm font-bold hover:bg-gray-100 transition-all duration-300"
             >
               Cancel
             </button>
             {localStep < editSteps.length - 1 ? (
               <button
                 onClick={handleLocalNext}
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white text-sm font-bold hover:shadow-lg transition-all duration-300 flex items-center gap-2"
+                className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white text-xs sm:text-sm font-bold hover:shadow-lg transition-all duration-300 flex items-center gap-1 sm:gap-2"
               >
                 Next →
               </button>
             ) : (
               <button
                 onClick={handleLocalSave}
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white text-sm font-bold hover:shadow-lg transition-all duration-300 flex items-center gap-2"
+                className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white text-xs sm:text-sm font-bold hover:shadow-lg transition-all duration-300 flex items-center gap-1 sm:gap-2"
               >
-                <Save className="w-4 h-4" />
+                <Save className="w-3 h-3 sm:w-4 sm:h-4" />
                 Save Changes
               </button>
             )}
@@ -1187,7 +1268,7 @@ const AgentProfile = () => {
       parking: '3+ Cars',
       propertyCategory: 'residential',
       listedBy: 'agent',
-      listingPurpose: 'For Sale',
+      listingPurpose: 'sale',
       expectedPrice: '12000000',
       maintenance: '5000',
       availableFrom: '2025-07-01',
@@ -1219,7 +1300,7 @@ const AgentProfile = () => {
       parking: '2 Cars',
       propertyCategory: 'residential',
       listedBy: 'agent',
-      listingPurpose: 'For Sale',
+      listingPurpose: 'sale',
       expectedPrice: '4500000',
       maintenance: '2000',
       availableFrom: '2025-08-15',
@@ -1251,7 +1332,7 @@ const AgentProfile = () => {
       parking: '2 Cars',
       propertyCategory: 'commercial',
       listedBy: 'agent',
-      listingPurpose: 'For Rent',
+      listingPurpose: 'rent',
       expectedPrice: '200000',
       maintenance: '10000',
       availableFrom: '2025-05-01',
@@ -1283,7 +1364,7 @@ const AgentProfile = () => {
       parking: '2 Cars',
       propertyCategory: 'residential',
       listedBy: 'agent',
-      listingPurpose: 'For Sale',
+      listingPurpose: 'sale',
       expectedPrice: '7500000',
       maintenance: '3000',
       availableFrom: '2025-07-15',
@@ -1315,7 +1396,7 @@ const AgentProfile = () => {
       parking: '1 Car',
       propertyCategory: 'residential',
       listedBy: 'agent',
-      listingPurpose: 'For Rent',
+      listingPurpose: 'rent',
       expectedPrice: '30000',
       maintenance: '1500',
       availableFrom: '2025-08-01',
@@ -1616,16 +1697,15 @@ const AgentProfile = () => {
   };
 
   // ============ SECTION DEFINITIONS ============
-const sections = [
-  { id: 'personal', title: 'Personal Details', icon: User },
-  { id: 'business', title: 'Business Information', icon: Briefcase },
-  { id: 'identity', title: 'Identity Verification', icon: Shield },
-  { id: 'documents', title: 'Upload Documents', icon: FileText },
-  { id: 'bank', title: 'Bank Details', icon: Banknote },
-  { id: 'social', title: 'Social Media', icon: Share2 },
-  { id: 'login', title: 'Login Credentials', icon: Settings },
-  { id: 'contact', title: 'Contact Information', icon: MapPin },
-];
+  const sections = [
+    { id: 'personal', title: 'Personal Details', icon: User },
+    { id: 'business', title: 'Business Information', icon: Briefcase },
+    { id: 'identity', title: 'Identity Verification', icon: Shield },
+    { id: 'documents', title: 'Upload Documents', icon: FileText },
+    { id: 'bank', title: 'Bank Details', icon: Banknote },
+    { id: 'social', title: 'Social Media', icon: Share2 },
+    { id: 'contact', title: 'Contact Information', icon: MapPin },
+  ];
 
   // ============ FORMAT HELPERS ============
   const formatDateForDisplay = (dateStr) => {
@@ -1650,6 +1730,15 @@ const sections = [
   const getFileStatusLabel = (field) => {
     const file = documents[field];
     return file !== null && file !== undefined ? 'Uploaded' : null;
+  };
+
+  const getListingPurposeLabel = (purpose) => {
+    if (!purpose) return 'Not specified';
+    const normalized = purpose.toLowerCase();
+    if (normalized === 'sale' || normalized === 'for sale') return 'For Sale';
+    if (normalized === 'rent' || normalized === 'for rent') return 'For Rent';
+    if (normalized === 'lease' || normalized === 'for lease') return 'For Lease';
+    return purpose;
   };
 
   // ============ PROPERTY HANDLERS ============
@@ -1792,14 +1881,14 @@ const sections = [
   const SectionHeader = ({ title, subtitle, filled, total }) => {
     const pct = total ? Math.round((filled / total) * 100) : null;
     return (
-      <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-5 gap-2 sm:gap-3">
         <div className="flex items-center">
-          <div className="w-1 h-8 bg-gradient-to-b from-[#00695C] to-[#26A69A] mr-3 rounded-full animate-pulse-slow"></div>
+          <div className="w-1 h-6 sm:h-8 bg-gradient-to-b from-[#00695C] to-[#26A69A] mr-2 sm:mr-3 rounded-full animate-pulse-slow"></div>
           <div>
-            <h2 className="text-lg font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
+            <h2 className="text-base sm:text-lg font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
               {title}
             </h2>
-            <p className="text-xs text-gray-500">{subtitle}</p>
+            <p className="text-[10px] sm:text-xs text-gray-500">{subtitle}</p>
           </div>
         </div>
         {pct !== null && (
@@ -1823,27 +1912,27 @@ const sections = [
       <div className="absolute -inset-px rounded-2xl bg-gradient-to-r from-[#00695C]/0 via-[#26A69A]/40 to-[#00695C]/0 opacity-0 group-hover/acard:opacity-100 blur-sm transition-opacity duration-500 -z-10" />
       <div className="absolute top-0 left-[-100%] w-full h-[1px] bg-gradient-to-r from-transparent via-[#26A69A]/60 to-transparent group-hover/acard:left-full transition-all duration-[1100ms] ease-out" />
       <div className="absolute -top-8 -right-8 w-20 h-20 bg-gradient-to-br from-[#26A69A]/10 to-[#00695C]/10 rounded-full blur-2xl opacity-0 group-hover/acard:opacity-100 group-hover/acard:scale-125 transition-all duration-500" />
-      <div className="relative p-3.5 flex items-start gap-3">
+      <div className="relative p-2.5 sm:p-3.5 flex items-start gap-2 sm:gap-3">
         <div className="relative flex-shrink-0">
           <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#00695C] to-[#26A69A] blur-md opacity-0 group-hover/acard:opacity-60 transition-opacity duration-500" />
-          <div className="relative p-2.5 rounded-xl bg-gradient-to-br from-[#00695C] to-[#26A69A] shadow-lg transform group-hover/acard:scale-110 group-hover/acard:rotate-6 transition-all duration-300">
+          <div className="relative p-2 sm:p-2.5 rounded-xl bg-gradient-to-br from-[#00695C] to-[#26A69A] shadow-lg transform group-hover/acard:scale-110 group-hover/acard:rotate-6 transition-all duration-300">
             <div className="text-white">{icon}</div>
           </div>
         </div>
         <div className="flex-1 min-w-0">
-          <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase tracking-wider group-hover/acard:text-[#00695C] transition-colors duration-300">
+          <label className="block text-[9px] sm:text-[10px] font-bold text-gray-500 mb-0.5 sm:mb-1 uppercase tracking-wider group-hover/acard:text-[#00695C] transition-colors duration-300">
             {label}
           </label>
           {children ? (
             children
           ) : (
-            <div className="text-[13px] text-gray-800 font-semibold break-words">
+            <div className="text-xs sm:text-[13px] text-gray-800 font-semibold break-words">
               {value || <span className="text-gray-400 font-medium italic">Not specified</span>}
             </div>
           )}
         </div>
         {value && !children && (
-          <CheckCircle className="w-4 h-4 text-[#00695C]/30 group-hover/acard:text-[#00695C] flex-shrink-0 transition-colors duration-300" />
+          <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00695C]/30 group-hover/acard:text-[#00695C] flex-shrink-0 transition-colors duration-300" />
         )}
       </div>
       <div className="h-[2px] w-full bg-gray-100 overflow-hidden">
@@ -1874,24 +1963,24 @@ const sections = [
               filled={filledCount}
               total={personalFields.length}
             />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
               <div className="space-y-3 w-full">
-                <AnimatedCard label="Full Name" value={editForm.fullName} icon={<User className="w-4 h-4" />} delay={0.05} />
-                <AnimatedCard label="Mobile Number" value={editForm.mobileNumber} icon={<Phone className="w-4 h-4" />} delay={0.12} />
-                <AnimatedCard label="Email Address" value={editForm.emailAddress} icon={<Mail className="w-4 h-4" />} delay={0.19} />
+                <AnimatedCard label="Full Name" value={editForm.fullName} icon={<User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.05} />
+                <AnimatedCard label="Mobile Number" value={editForm.mobileNumber} icon={<Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.12} />
+                <AnimatedCard label="Email Address" value={editForm.emailAddress} icon={<Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.19} />
               </div>
               <div className="space-y-3 w-full">
-                <AnimatedCard label="Date of Birth" value={formatDateForDisplay(editForm.dateOfBirth)} icon={<Calendar className="w-4 h-4" />} delay={0.26} />
-                <AnimatedCard label="Gender" value={editForm.gender} icon={<User className="w-4 h-4" />} delay={0.33} />
-                <AnimatedCard label="Profile Photo" icon={<Camera className="w-4 h-4" />} delay={0.4}>
+                <AnimatedCard label="Date of Birth" value={formatDateForDisplay(editForm.dateOfBirth)} icon={<Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.26} />
+                <AnimatedCard label="Gender" value={editForm.gender} icon={<User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.33} />
+                <AnimatedCard label="Profile Photo" icon={<Camera className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.4}>
                   <div className="flex items-center gap-2">
                     {documents.profilePhoto ? (
-                      <span className="inline-flex items-center gap-1.5 text-xs text-[#00695C] font-bold bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 px-3 py-1.5 rounded-lg border border-[#00695C]/20 animate-fadeIn">
-                        <Check className="w-3.5 h-3.5" />
+                      <span className="inline-flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs text-[#00695C] font-bold bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-[#00695C]/20 animate-fadeIn">
+                        <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                         Uploaded
                       </span>
                     ) : (
-                      <span className="text-xs text-gray-400 font-medium italic">No photo uploaded</span>
+                      <span className="text-[10px] sm:text-xs text-gray-400 font-medium italic">No photo uploaded</span>
                     )}
                   </div>
                 </AnimatedCard>
@@ -1922,26 +2011,26 @@ const sections = [
               filled={filledCount}
               total={businessFields.length}
             />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
               <div className="space-y-3 w-full">
-                <AnimatedCard label="Agency Name" value={editForm.agencyName} icon={<Building className="w-4 h-4" />} delay={0.05} />
-                <AnimatedCard label="RERA Registration Number" value={editForm.reraRegistrationNumber} icon={<BadgeCheck className="w-4 h-4" />} delay={0.12} />
-                <AnimatedCard label="GST Number" value={editForm.gstNumber || 'Not provided'} icon={<Hash className="w-4 h-4" />} delay={0.19} />
-                <AnimatedCard label="Years of Experience" value={editForm.yearsOfExperience} icon={<Award className="w-4 h-4" />} delay={0.26} />
+                <AnimatedCard label="Agency Name" value={editForm.agencyName} icon={<Building className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.05} />
+                <AnimatedCard label="RERA Registration Number" value={editForm.reraRegistrationNumber} icon={<BadgeCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.12} />
+                <AnimatedCard label="GST Number" value={editForm.gstNumber || 'Not provided'} icon={<Hash className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.19} />
+                <AnimatedCard label="Years of Experience" value={editForm.yearsOfExperience} icon={<Award className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.26} />
               </div>
               <div className="space-y-3 w-full">
-                <AnimatedCard label="Number of Active Listings" value={editForm.numberOfActiveListings} icon={<TrendingUp className="w-4 h-4" />} delay={0.33} />
-                <AnimatedCard label="Service Areas" value={editForm.serviceAreas} icon={<Globe className="w-4 h-4" />} delay={0.4} />
-                <AnimatedCard label="Office Address" value={editForm.officeAddress} icon={<MapPin className="w-4 h-4" />} delay={0.47} />
-                <AnimatedCard label="Agency Logo" icon={<Image className="w-4 h-4" />} delay={0.54}>
+                <AnimatedCard label="Number of Active Listings" value={editForm.numberOfActiveListings} icon={<TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.33} />
+                <AnimatedCard label="Service Areas" value={editForm.serviceAreas} icon={<Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.4} />
+                <AnimatedCard label="Office Address" value={editForm.officeAddress} icon={<MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.47} />
+                <AnimatedCard label="Agency Logo" icon={<Image className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.54}>
                   <div className="flex items-center gap-2">
                     {documents.agencyLogo ? (
-                      <span className="inline-flex items-center gap-1.5 text-xs text-[#00695C] font-bold bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 px-3 py-1.5 rounded-lg border border-[#00695C]/20 animate-fadeIn">
-                        <Check className="w-3.5 h-3.5" />
+                      <span className="inline-flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs text-[#00695C] font-bold bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-[#00695C]/20 animate-fadeIn">
+                        <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                         Uploaded
                       </span>
                     ) : (
-                      <span className="text-xs text-gray-400 font-medium italic">No logo uploaded</span>
+                      <span className="text-[10px] sm:text-xs text-gray-400 font-medium italic">No logo uploaded</span>
                     )}
                   </div>
                 </AnimatedCard>
@@ -1970,94 +2059,94 @@ const sections = [
               filled={filledCount}
               total={identityFields.length}
             />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
               <div className="space-y-3 w-full">
-                <AnimatedCard label="Aadhaar Number" value={editForm.aadhaarNumber} icon={<IdCard className="w-4 h-4" />} delay={0.05} />
-                <AnimatedCard label="PAN Number" value={editForm.panNumber} icon={<CreditCard className="w-4 h-4" />} delay={0.12} />
+                <AnimatedCard label="Aadhaar Number" value={editForm.aadhaarNumber} icon={<IdCard className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.05} />
+                <AnimatedCard label="PAN Number" value={editForm.panNumber} icon={<CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.12} />
               </div>
               <div className="space-y-3 w-full">
-                <AnimatedCard label="Upload Aadhaar Card" icon={<FileCheck className="w-4 h-4" />} delay={0.19}>
+                <AnimatedCard label="Upload Aadhaar Card" icon={<FileCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.19}>
                   {documents.aadhaarCard ? (
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handlePdfView('aadhaarCard')}
-                        className="text-xs text-[#00695C] font-bold hover:underline flex items-center gap-1"
+                        className="text-[10px] sm:text-xs text-[#00695C] font-bold hover:underline flex items-center gap-1"
                       >
-                        <FileText className="w-3 h-3" />
+                        <FileText className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         View Document
                       </button>
                       <button
                         onClick={() => handlePdfDelete('aadhaarCard')}
                         className="text-red-400 hover:text-red-600 transition-colors"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Trash2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                       </button>
                     </div>
                   ) : (
-                    <span className="text-xs text-gray-400 font-medium italic">Not uploaded</span>
+                    <span className="text-[10px] sm:text-xs text-gray-400 font-medium italic">Not uploaded</span>
                   )}
                 </AnimatedCard>
-                <AnimatedCard label="Upload PAN Card" icon={<FileCheck className="w-4 h-4" />} delay={0.26}>
+                <AnimatedCard label="Upload PAN Card" icon={<FileCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.26}>
                   {documents.panCard ? (
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handlePdfView('panCard')}
-                        className="text-xs text-[#00695C] font-bold hover:underline flex items-center gap-1"
+                        className="text-[10px] sm:text-xs text-[#00695C] font-bold hover:underline flex items-center gap-1"
                       >
-                        <FileText className="w-3 h-3" />
+                        <FileText className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         View Document
                       </button>
                       <button
                         onClick={() => handlePdfDelete('panCard')}
                         className="text-red-400 hover:text-red-600 transition-colors"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Trash2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                       </button>
                     </div>
                   ) : (
-                    <span className="text-xs text-gray-400 font-medium italic">Not uploaded</span>
+                    <span className="text-[10px] sm:text-xs text-gray-400 font-medium italic">Not uploaded</span>
                   )}
                 </AnimatedCard>
-                <AnimatedCard label="Business Registration Certificate" icon={<FileCheck className="w-4 h-4" />} delay={0.33}>
+                <AnimatedCard label="Business Registration Certificate" icon={<FileCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.33}>
                   {documents.businessRegistrationCertificate ? (
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handlePdfView('businessRegistrationCertificate')}
-                        className="text-xs text-[#00695C] font-bold hover:underline flex items-center gap-1"
+                        className="text-[10px] sm:text-xs text-[#00695C] font-bold hover:underline flex items-center gap-1"
                       >
-                        <FileText className="w-3 h-3" />
+                        <FileText className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         View Document
                       </button>
                       <button
                         onClick={() => handlePdfDelete('businessRegistrationCertificate')}
                         className="text-red-400 hover:text-red-600 transition-colors"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Trash2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                       </button>
                     </div>
                   ) : (
-                    <span className="text-xs text-gray-400 font-medium italic">Not uploaded</span>
+                    <span className="text-[10px] sm:text-xs text-gray-400 font-medium italic">Not uploaded</span>
                   )}
                 </AnimatedCard>
-                <AnimatedCard label="RERA Certificate" icon={<FileCheck className="w-4 h-4" />} delay={0.4}>
+                <AnimatedCard label="RERA Certificate" icon={<FileCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.4}>
                   {documents.reraCertificate ? (
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handlePdfView('reraCertificate')}
-                        className="text-xs text-[#00695C] font-bold hover:underline flex items-center gap-1"
+                        className="text-[10px] sm:text-xs text-[#00695C] font-bold hover:underline flex items-center gap-1"
                       >
-                        <FileText className="w-3 h-3" />
+                        <FileText className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         View Document
                       </button>
                       <button
                         onClick={() => handlePdfDelete('reraCertificate')}
                         className="text-red-400 hover:text-red-600 transition-colors"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Trash2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                       </button>
                     </div>
                   ) : (
-                    <span className="text-xs text-gray-400 font-medium italic">Not uploaded</span>
+                    <span className="text-[10px] sm:text-xs text-gray-400 font-medium italic">Not uploaded</span>
                   )}
                 </AnimatedCard>
               </div>
@@ -2065,8 +2154,8 @@ const sections = [
           </div>
         );
       }
-        
-       case 'documents': {
+
+      case 'documents': {
         const docFields = [
           'profilePhoto',
           'agencyLogo',
@@ -2090,15 +2179,15 @@ const sections = [
               total={docFields.length}
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 w-full">
               {[
-                { field: 'profilePhoto', label: 'Profile Photo', icon: <Camera className="w-4 h-4" /> },
-                { field: 'agencyLogo', label: 'Agency Logo', icon: <Image className="w-4 h-4" /> },
-                { field: 'aadhaarCard', label: 'Aadhaar Card', icon: <IdCard className="w-4 h-4" /> },
-                { field: 'panCard', label: 'PAN Card', icon: <CreditCard className="w-4 h-4" /> },
-                { field: 'reraCertificate', label: 'RERA Certificate', icon: <BadgeCheck className="w-4 h-4" /> },
-                { field: 'gstCertificate', label: 'GST Certificate', icon: <Hash className="w-4 h-4" /> },
-                { field: 'businessRegistrationCertificate', label: 'Business Registration', icon: <FileCheck className="w-4 h-4" /> },
+                { field: 'profilePhoto', label: 'Profile Photo', icon: <Camera className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> },
+                { field: 'agencyLogo', label: 'Agency Logo', icon: <Image className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> },
+                { field: 'aadhaarCard', label: 'Aadhaar Card', icon: <IdCard className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> },
+                { field: 'panCard', label: 'PAN Card', icon: <CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> },
+                { field: 'reraCertificate', label: 'RERA Certificate', icon: <BadgeCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> },
+                { field: 'gstCertificate', label: 'GST Certificate', icon: <Hash className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> },
+                { field: 'businessRegistrationCertificate', label: 'Business Registration', icon: <FileCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> },
               ].map((doc) => {
                 const file = documents[doc.field];
                 const hasFile = file !== null && file !== undefined;
@@ -2109,25 +2198,25 @@ const sections = [
                     className="group relative overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-lg transition-all duration-300 w-full border border-[#00695C]/10 hover:border-[#00695C]/30"
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-[#00695C]/5 to-[#26A69A]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="relative p-3">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <div className="p-1.5 rounded-lg bg-gradient-to-br from-[#00695C] to-[#26A69A] shadow-lg transform group-hover:scale-110 transition-all duration-300">
+                    <div className="relative p-2.5 sm:p-3">
+                      <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                        <div className="flex items-center gap-1.5 sm:gap-2">
+                          <div className="p-1 sm:p-1.5 rounded-lg bg-gradient-to-br from-[#00695C] to-[#26A69A] shadow-lg transform group-hover:scale-110 transition-all duration-300">
                             <div className="text-white">
                               {doc.icon}
                             </div>
                           </div>
-                          <span className="text-xs font-bold text-gray-700">{doc.label}</span>
+                          <span className="text-[10px] sm:text-xs font-bold text-gray-700">{doc.label}</span>
                         </div>
                         {hasFile && (
-                          <span className="text-[10px] text-[#00695C] font-bold bg-[#00695C]/10 px-2 py-0.5 rounded-full animate-fadeIn">
+                          <span className="text-[9px] sm:text-[10px] text-[#00695C] font-bold bg-[#00695C]/10 px-1.5 sm:px-2 py-0.5 rounded-full animate-fadeIn">
                             ✓
                           </span>
                         )}
                       </div>
 
                       {hasFile ? (
-                        <div className="flex items-center gap-2 bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 rounded-lg p-1.5 border border-[#00695C]/20 group-hover:border-[#00695C]/40 transition-all duration-300">
+                        <div className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-[#00695C]/5 to-[#26A69A]/5 rounded-lg p-1 sm:p-1.5 border border-[#00695C]/20 group-hover:border-[#00695C]/40 transition-all duration-300">
                           {doc.field === 'profilePhoto' || doc.field === 'agencyLogo' ? (
                             <button
                               onClick={() => {
@@ -2140,36 +2229,36 @@ const sections = [
                                 setLightboxIndex(0);
                                 setShowMediaLightbox(true);
                               }}
-                              className="flex-1 text-[10px] text-[#00695C] font-medium hover:underline truncate text-left flex items-center gap-1"
+                              className="flex-1 text-[9px] sm:text-[10px] text-[#00695C] font-medium hover:underline truncate text-left flex items-center gap-0.5 sm:gap-1"
                             >
-                              <Image className="w-3 h-3 flex-shrink-0" />
+                              <Image className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
                               <span className="truncate">{file.name || 'Image'}</span>
                             </button>
                           ) : (
                             <button
                               onClick={() => handlePdfView(doc.field)}
-                              className="flex-1 text-[10px] text-[#00695C] font-medium hover:underline truncate text-left flex items-center gap-1"
+                              className="flex-1 text-[9px] sm:text-[10px] text-[#00695C] font-medium hover:underline truncate text-left flex items-center gap-0.5 sm:gap-1"
                             >
-                              <FileText className="w-3 h-3 flex-shrink-0" />
+                              <FileText className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
                               <span className="truncate">{file.name || 'Document'}</span>
                             </button>
                           )}
                           <button
                             onClick={() => removeFile(doc.field)}
-                            className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors duration-300 flex-shrink-0"
+                            className="p-0.5 sm:p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors duration-300 flex-shrink-0"
                             title="Delete"
                           >
-                            <Trash2 className="w-3 h-3" />
+                            <Trash2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                           </button>
                         </div>
                       ) : (
-                        <div className="border-2 border-dashed border-gray-200 rounded-lg p-2 text-center hover:border-[#00695C] hover:bg-[#00695C]/5 transition-all duration-300 group/upload">
+                        <div className="border-2 border-dashed border-gray-200 rounded-lg p-1.5 sm:p-2 text-center hover:border-[#00695C] hover:bg-[#00695C]/5 transition-all duration-300 group/upload">
                           <label className="block cursor-pointer">
-                            <div className="flex items-center justify-center gap-2">
-                              <div className="p-1 bg-gray-100 rounded-lg group-hover/upload:bg-[#00695C]/10 transition-colors duration-300">
-                                <Upload className="w-3.5 h-3.5 text-gray-400 group-hover/upload:text-[#00695C] transition-colors duration-300" />
+                            <div className="flex items-center justify-center gap-1.5 sm:gap-2">
+                              <div className="p-0.5 sm:p-1 bg-gray-100 rounded-lg group-hover/upload:bg-[#00695C]/10 transition-colors duration-300">
+                                <Upload className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400 group-hover/upload:text-[#00695C] transition-colors duration-300" />
                               </div>
-                              <span className="text-[10px] font-medium text-gray-500 group-hover/upload:text-[#00695C] transition-colors duration-300">
+                              <span className="text-[9px] sm:text-[10px] font-medium text-gray-500 group-hover/upload:text-[#00695C] transition-colors duration-300">
                                 Upload
                               </span>
                             </div>
@@ -2203,7 +2292,6 @@ const sections = [
           </div>
         );
       }
-     
 
       case 'bank': {
         const bankFields = [
@@ -2223,190 +2311,145 @@ const sections = [
               filled={filledCount}
               total={bankFields.length}
             />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
               <div className="space-y-3 w-full">
-                <AnimatedCard label="Account Holder Name" value={editForm.accountHolderName} icon={<User className="w-4 h-4" />} delay={0.05} />
-                <AnimatedCard label="Bank Name" value={editForm.bankName} icon={<Building className="w-4 h-4" />} delay={0.12} />
-                <AnimatedCard label="Account Number" value={editForm.accountNumber} icon={<CreditCard className="w-4 h-4" />} delay={0.19} />
+                <AnimatedCard label="Account Holder Name" value={editForm.accountHolderName} icon={<User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.05} />
+                <AnimatedCard label="Bank Name" value={editForm.bankName} icon={<Building className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.12} />
+                <AnimatedCard label="Account Number" value={editForm.accountNumber} icon={<CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.19} />
               </div>
               <div className="space-y-3 w-full">
-                <AnimatedCard label="IFSC Code" value={editForm.ifscCode} icon={<Banknote className="w-4 h-4" />} delay={0.26} />
-                <AnimatedCard label="UPI ID" value={editForm.upiId || 'Not provided'} icon={<Globe className="w-4 h-4" />} delay={0.33} />
+                <AnimatedCard label="IFSC Code" value={editForm.ifscCode} icon={<Banknote className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.26} />
+                <AnimatedCard label="UPI ID" value={editForm.upiId || 'Not provided'} icon={<Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.33} />
               </div>
             </div>
           </div>
         );
       }
 
-     case 'social': {
-  const socialFields = [
-    editForm.website,
-    editForm.facebookPage,
-    editForm.instagram,
-    editForm.linkedIn,
-    editForm.youtubeChannel
-  ];
-  const filledCount = socialFields.filter(Boolean).length;
-
-  // Helper function to get social media URL
-  const getSocialUrl = (platform, value) => {
-    if (!value) return '#';
-    // If it already has http:// or https://, return as is
-    if (value.startsWith('http://') || value.startsWith('https://')) {
-      return value;
-    }
-    // Add protocol and platform specific base URL
-    const cleanValue = value.replace(/^https?:\/\//, '').replace(/^www\./, '');
-    switch(platform) {
-      case 'website':
-        return `https://${cleanValue}`;
-      case 'facebook':
-        return `https://www.facebook.com/${cleanValue}`;
-      case 'instagram':
-        return `https://www.instagram.com/${cleanValue}`;
-      case 'linkedin':
-        return `https://www.linkedin.com/${cleanValue}`;
-      case 'youtube':
-        return `https://www.youtube.com/${cleanValue}`;
-      default:
-        return `https://${cleanValue}`;
-    }
-  };
-
-  return (
-    <div className="w-full animate-slideUp">
-      <SectionHeader
-        title="Social Media & Website"
-        subtitle="Your online presence and social media links"
-        filled={filledCount}
-        total={socialFields.length}
-      />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 w-full">
-        <div className="space-y-3 w-full">
-          <AnimatedCard label="Website" icon={<Globe2 className="w-4 h-4" />} delay={0.05}>
-            {editForm.website ? (
-              <a 
-                href={getSocialUrl('website', editForm.website)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[13px] font-semibold text-[#00695C] hover:text-[#004D40] hover:underline flex items-center gap-2 transition-all duration-300"
-                onClick={(e) => {
-                  if (!editForm.website) e.preventDefault();
-                }}
-              >
-                {editForm.website}
-                <ExternalLink className="w-3.5 h-3.5 inline" />
-              </a>
-            ) : (
-              <span className="text-[13px] text-gray-400 font-medium italic">Not provided</span>
-            )}
-          </AnimatedCard>
-
-          <AnimatedCard label="Facebook Page" icon={<Share2 className="w-4 h-4" />} delay={0.12}>
-            {editForm.facebookPage ? (
-              <a 
-                href={getSocialUrl('facebook', editForm.facebookPage)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[13px] font-semibold text-[#00695C] hover:text-[#004D40] hover:underline flex items-center gap-2 transition-all duration-300"
-              >
-                {editForm.facebookPage}
-                <ExternalLink className="w-3.5 h-3.5 inline" />
-              </a>
-            ) : (
-              <span className="text-[13px] text-gray-400 font-medium italic">Not provided</span>
-            )}
-          </AnimatedCard>
-
-          <AnimatedCard label="Instagram" icon={<Camera className="w-4 h-4" />} delay={0.19}>
-            {editForm.instagram ? (
-              <a 
-                href={getSocialUrl('instagram', editForm.instagram)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[13px] font-semibold text-[#00695C] hover:text-[#004D40] hover:underline flex items-center gap-2 transition-all duration-300"
-              >
-                {editForm.instagram}
-                <ExternalLink className="w-3.5 h-3.5 inline" />
-              </a>
-            ) : (
-              <span className="text-[13px] text-gray-400 font-medium italic">Not provided</span>
-            )}
-          </AnimatedCard>
-        </div>
-
-        <div className="space-y-3 w-full">
-          <AnimatedCard label="LinkedIn" icon={<Briefcase className="w-4 h-4" />} delay={0.26}>
-            {editForm.linkedIn ? (
-              <a 
-                href={getSocialUrl('linkedin', editForm.linkedIn)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[13px] font-semibold text-[#00695C] hover:text-[#004D40] hover:underline flex items-center gap-2 transition-all duration-300"
-              >
-                {editForm.linkedIn}
-                <ExternalLink className="w-3.5 h-3.5 inline" />
-              </a>
-            ) : (
-              <span className="text-[13px] text-gray-400 font-medium italic">Not provided</span>
-            )}
-          </AnimatedCard>
-
-          <AnimatedCard label="YouTube Channel" icon={<Video className="w-4 h-4" />} delay={0.33}>
-            {editForm.youtubeChannel ? (
-              <a 
-                href={getSocialUrl('youtube', editForm.youtubeChannel)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[13px] font-semibold text-[#00695C] hover:text-[#004D40] hover:underline flex items-center gap-2 transition-all duration-300"
-              >
-                {editForm.youtubeChannel}
-                <ExternalLink className="w-3.5 h-3.5 inline" />
-              </a>
-            ) : (
-              <span className="text-[13px] text-gray-400 font-medium italic">Not provided</span>
-            )}
-          </AnimatedCard>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-      case 'login': {
-        const loginFields = [
-          editForm.username,
-          editForm.emailAddressLogin,
-          editForm.mobileNumberLogin,
-          editForm.password
+      case 'social': {
+        const socialFields = [
+          editForm.website,
+          editForm.facebookPage,
+          editForm.instagram,
+          editForm.linkedIn,
+          editForm.youtubeChannel
         ];
-        const filledCount = loginFields.filter(Boolean).length;
+        const filledCount = socialFields.filter(Boolean).length;
+
+        const getSocialUrl = (platform, value) => {
+          if (!value) return '#';
+          if (value.startsWith('http://') || value.startsWith('https://')) {
+            return value;
+          }
+          const cleanValue = value.replace(/^https?:\/\//, '').replace(/^www\./, '');
+          switch(platform) {
+            case 'website': return `https://${cleanValue}`;
+            case 'facebook': return `https://www.facebook.com/${cleanValue}`;
+            case 'instagram': return `https://www.instagram.com/${cleanValue}`;
+            case 'linkedin': return `https://www.linkedin.com/${cleanValue}`;
+            case 'youtube': return `https://www.youtube.com/${cleanValue}`;
+            default: return `https://${cleanValue}`;
+          }
+        };
 
         return (
           <div className="w-full animate-slideUp">
             <SectionHeader
-              title="Login Credentials"
-              subtitle="Your account access information"
+              title="Social Media & Website"
+              subtitle="Your online presence and social media links"
               filled={filledCount}
-              total={loginFields.length}
+              total={socialFields.length}
             />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
               <div className="space-y-3 w-full">
-                <AnimatedCard label="Username" value={editForm.username} icon={<User className="w-4 h-4" />} delay={0.05} />
-                <AnimatedCard label="Email Address" value={editForm.emailAddressLogin} icon={<Mail className="w-4 h-4" />} delay={0.12} />
+                <AnimatedCard label="Website" icon={<Globe2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.05}>
+                  {editForm.website ? (
+                    <a 
+                      href={getSocialUrl('website', editForm.website)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs sm:text-[13px] font-semibold text-[#00695C] hover:text-[#004D40] hover:underline flex items-center gap-1.5 sm:gap-2 transition-all duration-300"
+                    >
+                      {editForm.website}
+                      <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5 inline" />
+                    </a>
+                  ) : (
+                    <span className="text-xs sm:text-[13px] text-gray-400 font-medium italic">Not provided</span>
+                  )}
+                </AnimatedCard>
+
+                <AnimatedCard label="Facebook Page" icon={<Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.12}>
+                  {editForm.facebookPage ? (
+                    <a 
+                      href={getSocialUrl('facebook', editForm.facebookPage)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs sm:text-[13px] font-semibold text-[#00695C] hover:text-[#004D40] hover:underline flex items-center gap-1.5 sm:gap-2 transition-all duration-300"
+                    >
+                      {editForm.facebookPage}
+                      <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5 inline" />
+                    </a>
+                  ) : (
+                    <span className="text-xs sm:text-[13px] text-gray-400 font-medium italic">Not provided</span>
+                  )}
+                </AnimatedCard>
+
+                <AnimatedCard label="Instagram" icon={<Camera className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.19}>
+                  {editForm.instagram ? (
+                    <a 
+                      href={getSocialUrl('instagram', editForm.instagram)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs sm:text-[13px] font-semibold text-[#00695C] hover:text-[#004D40] hover:underline flex items-center gap-1.5 sm:gap-2 transition-all duration-300"
+                    >
+                      {editForm.instagram}
+                      <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5 inline" />
+                    </a>
+                  ) : (
+                    <span className="text-xs sm:text-[13px] text-gray-400 font-medium italic">Not provided</span>
+                  )}
+                </AnimatedCard>
               </div>
+
               <div className="space-y-3 w-full">
-                <AnimatedCard label="Mobile Number" value={editForm.mobileNumberLogin} icon={<Phone className="w-4 h-4" />} delay={0.19} />
-                <AnimatedCard label="Password" icon={<Lock className="w-4 h-4" />} delay={0.26}>
-                  <div className="text-[13px] text-gray-800 font-semibold">••••••••</div>
+                <AnimatedCard label="LinkedIn" icon={<Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.26}>
+                  {editForm.linkedIn ? (
+                    <a 
+                      href={getSocialUrl('linkedin', editForm.linkedIn)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs sm:text-[13px] font-semibold text-[#00695C] hover:text-[#004D40] hover:underline flex items-center gap-1.5 sm:gap-2 transition-all duration-300"
+                    >
+                      {editForm.linkedIn}
+                      <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5 inline" />
+                    </a>
+                  ) : (
+                    <span className="text-xs sm:text-[13px] text-gray-400 font-medium italic">Not provided</span>
+                  )}
+                </AnimatedCard>
+
+                <AnimatedCard label="YouTube Channel" icon={<Video className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.33}>
+                  {editForm.youtubeChannel ? (
+                    <a 
+                      href={getSocialUrl('youtube', editForm.youtubeChannel)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs sm:text-[13px] font-semibold text-[#00695C] hover:text-[#004D40] hover:underline flex items-center gap-1.5 sm:gap-2 transition-all duration-300"
+                    >
+                      {editForm.youtubeChannel}
+                      <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5 inline" />
+                    </a>
+                  ) : (
+                    <span className="text-xs sm:text-[13px] text-gray-400 font-medium italic">Not provided</span>
+                  )}
                 </AnimatedCard>
               </div>
             </div>
           </div>
         );
       }
-       
-       case 'contact': {
+
+      case 'contact': {
         const contactFields = [
           editForm.officeAddress,
           editForm.city,
@@ -2426,23 +2469,22 @@ const sections = [
               filled={filledCount}
               total={contactFields.length}
             />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
               <div className="space-y-3 w-full">
-                <AnimatedCard label="Office Address" value={editForm.officeAddress} icon={<MapPin className="w-4 h-4" />} delay={0.05} />
-                <AnimatedCard label="City" value={editForm.city} icon={<Building className="w-4 h-4" />} delay={0.12} />
-                <AnimatedCard label="District" value={editForm.district} icon={<Landmark className="w-4 h-4" />} delay={0.19} />
-                <AnimatedCard label="State" value={editForm.state} icon={<Globe className="w-4 h-4" />} delay={0.26} />
+                <AnimatedCard label="Office Address" value={editForm.officeAddress} icon={<MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.05} />
+                <AnimatedCard label="City" value={editForm.city} icon={<Building className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.12} />
+                <AnimatedCard label="District" value={editForm.district} icon={<Landmark className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.19} />
+                <AnimatedCard label="State" value={editForm.state} icon={<Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.26} />
               </div>
               <div className="space-y-3 w-full">
-                <AnimatedCard label="PIN Code" value={editForm.pinCode} icon={<MapPin className="w-4 h-4" />} delay={0.33} />
-                <AnimatedCard label="Website" value={editForm.website || 'Not provided'} icon={<Globe2 className="w-4 h-4" />} delay={0.4} />
-                <AnimatedCard label="WhatsApp Number" value={editForm.whatsappNumber || 'Not provided'} icon={<Smartphone className="w-4 h-4" />} delay={0.47} />
+                <AnimatedCard label="PIN Code" value={editForm.pinCode} icon={<MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.33} />
+                <AnimatedCard label="Website" value={editForm.website || 'Not provided'} icon={<Globe2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.4} />
+                <AnimatedCard label="WhatsApp Number" value={editForm.whatsappNumber || 'Not provided'} icon={<Smartphone className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} delay={0.47} />
               </div>
             </div>
           </div>
         );
       }
-     
 
       default:
         return null;
@@ -2452,36 +2494,36 @@ const sections = [
   // ============ RENDER PROPERTIES SECTION ============
   const renderPropertiesSection = () => {
     return (
-      <div className="bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] backdrop-blur-sm rounded-2xl shadow-xl p-5 mb-6 w-full border border-[#00695C]/20 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] backdrop-blur-sm rounded-2xl shadow-xl p-3 sm:p-4 md:p-5 mb-6 w-full border border-[#00695C]/20 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#00695C]/5 to-[#26A69A]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
         
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
-          <div className="flex items-center gap-2.5">
-            <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl shadow-lg">
-              <Home className="w-4 h-4 text-white" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 mb-3 sm:mb-4">
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-1.5 sm:p-2 rounded-lg sm:rounded-xl shadow-lg">
+              <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-gray-800">My Properties</h2>
-              <p className="text-[11px] text-gray-500">Manage your property listings</p>
+              <h2 className="text-sm sm:text-base font-bold text-gray-800">My Properties</h2>
+              <p className="text-[9px] sm:text-[11px] text-gray-500">Manage your property listings</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
-            <div className="relative flex-1 sm:flex-initial min-w-[120px]">
+          <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto flex-wrap">
+            <div className="relative flex-1 sm:flex-initial min-w-[100px] sm:min-w-[120px]">
               <input
                 type="text"
                 placeholder="Search..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-3 py-1.5 pl-8 rounded-lg border-2 border-gray-200 focus:border-[#00695C] focus:ring-3 focus:ring-[#00695C]/20 outline-none transition-all duration-300 text-xs"
+                className="w-full px-2 sm:px-3 py-1 sm:py-1.5 pl-6 sm:pl-8 rounded-lg border-2 border-gray-200 focus:border-[#00695C] focus:ring-3 focus:ring-[#00695C]/20 outline-none transition-all duration-300 text-[10px] sm:text-xs"
               />
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+              <Search className="absolute left-1.5 sm:left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400" />
               {searchTerm && (
                 <button
                   onClick={clearSearch}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-1.5 sm:right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <X className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 </button>
               )}
             </div>
@@ -2489,7 +2531,7 @@ const sections = [
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-3 py-1.5 rounded-lg border-2 border-gray-200 focus:border-[#00695C] focus:ring-3 focus:ring-[#00695C]/20 outline-none transition-all duration-300 text-xs bg-white"
+              className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border-2 border-gray-200 focus:border-[#00695C] focus:ring-3 focus:ring-[#00695C]/20 outline-none transition-all duration-300 text-[10px] sm:text-xs bg-white"
             >
               <option value="all">All</option>
               <option value="active">Active</option>
@@ -2499,25 +2541,25 @@ const sections = [
             <div className="flex rounded-lg border-2 border-gray-200 overflow-hidden">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-1.5 transition-all duration-300 ${
+                className={`p-1 sm:p-1.5 transition-all duration-300 ${
                   viewMode === 'grid' 
                     ? 'bg-[#00695C] text-white' 
                     : 'bg-white text-gray-600 hover:bg-gray-50'
                 }`}
                 aria-label="Grid view"
               >
-                <GridIcon className="w-4.5 h-4.5" />
+                <GridIcon className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5" />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-1.5 transition-all duration-300 ${
+                className={`p-1 sm:p-1.5 transition-all duration-300 ${
                   viewMode === 'list' 
                     ? 'bg-[#00695C] text-white' 
                     : 'bg-white text-gray-600 hover:bg-gray-50'
                 }`}
                 aria-label="List view"
               >
-                <List className="w-4.5 h-4.5" />
+                <List className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5" />
               </button>
             </div>
           </div>
@@ -2526,14 +2568,14 @@ const sections = [
         {filteredProperties.length > 0 ? (
           <div>
             {viewMode === 'grid' ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                 {filteredProperties.map((property, index) => (
                   <div
                     key={property.id}
-                    className="group relative bg-teal-100/30 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-[#00695C]/10 overflow-hidden hover:-translate-y-1"
+                    className="group relative bg-teal-100/30 rounded-lg sm:rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-[#00695C]/10 overflow-hidden hover:-translate-y-1"
                     style={{ animationDelay: `${index * 0.08}s` }}
                   >
-                    <div className="relative w-full h-46 bg-gray-100 overflow-hidden">
+                    <div className="relative w-full h-40 sm:h-46 bg-gray-100 overflow-hidden">
                       <img 
                         src={property.images?.[0] || 'https://via.placeholder.com/400x400/CCCCCC/666666?text=No+Image'} 
                         alt={property.name}
@@ -2542,26 +2584,31 @@ const sections = [
                           e.target.src = 'https://via.placeholder.com/400x400/CCCCCC/666666?text=No+Image';
                         }}
                       />
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent p-3">
-                        <p className="text-white font-bold text-lg drop-shadow-lg">
+                      <div className="absolute top-2 sm:top-3 left-2 sm:left-3">
+                        <span className="bg-white/90 backdrop-blur-sm text-[#00695C] text-[9px] sm:text-[10px] font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full shadow-md">
+                          {getListingPurposeLabel(property.listingPurpose)}
+                        </span>
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent p-2 sm:p-3">
+                        <p className="text-white font-bold text-base sm:text-lg drop-shadow-lg">
                           {property.price}
                         </p>
                       </div>
                       {property.images && property.images.length > 1 && (
-                        <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5">
-                          <Image className="w-3.5 h-3.5" />
+                        <div className="absolute bottom-2 sm:bottom-3 right-2 sm:right-3 bg-black/60 backdrop-blur-sm text-white text-[9px] sm:text-xs px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full flex items-center gap-1 sm:gap-1.5">
+                          <Image className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                           {property.images.length}
                         </div>
                       )}
                     </div>
 
-                    <div className="p-4 space-y-3">
-                      <div className="flex items-center justify-between gap-2">
-                        <h3 className="font-bold text-gray-800 text-base hover:text-[#00695C] transition-colors duration-300 line-clamp-1 flex-1">
+                    <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
+                      <div className="flex items-center justify-between gap-1 sm:gap-2">
+                        <h3 className="font-bold text-gray-800 text-sm sm:text-base hover:text-[#00695C] transition-colors duration-300 line-clamp-1 flex-1">
                           {property.name}
                         </h3>
-                        <div className="flex items-center gap-1.5 flex-shrink-0">
-                          <span className={`text-[10px] font-bold ${
+                        <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+                          <span className={`text-[9px] sm:text-[10px] font-bold ${
                             property.status === 'Active' ? 'text-green-600' : 'text-gray-400'
                           }`}>
                             {property.status === 'Active' ? 'Active' : 'Inactive'}
@@ -2574,18 +2621,18 @@ const sections = [
                         </div>
                       </div>
 
-                      <p className="text-xs text-gray-500 font-medium flex items-center gap-2">
-                        <span className="bg-gray-100 px-2 py-0.5 rounded-full">{property.id}</span>
+                      <p className="text-[9px] sm:text-xs text-gray-500 font-medium flex items-center gap-1 sm:gap-2">
+                        <span className="bg-gray-100 px-1.5 sm:px-2 py-0.5 rounded-full">{property.id}</span>
                         <span className="w-1 h-1 rounded-full bg-gray-300" />
                         <span>{property.postedDate}</span>
                       </p>
 
-                      <div className="flex items-center gap-1.5 text-sm text-gray-600">
-                        <MapPin className="w-4 h-4 text-[#00695C] flex-shrink-0" />
+                      <div className="flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm text-gray-600">
+                        <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00695C] flex-shrink-0" />
                         <span className="font-medium truncate">{property.location}</span>
                       </div>
 
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1 sm:gap-1.5">
                         {[
                           { icon: Building, label: property.type },
                           { icon: Layers, label: property.area },
@@ -2593,34 +2640,34 @@ const sections = [
                         ].map((item, idx) => (
                           <span 
                             key={idx}
-                            className="flex items-center gap-1 bg-[#00695C]/5 px-2.5 py-1 rounded-lg text-xs font-medium text-[#00695C] border border-[#00695C]/10"
+                            className="flex items-center gap-0.5 sm:gap-1 bg-[#00695C]/5 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-[9px] sm:text-xs font-medium text-[#00695C] border border-[#00695C]/10"
                           >
-                            <item.icon className="w-3.5 h-3.5" />
+                            <item.icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                             {item.label}
                           </span>
                         ))}
                       </div>
 
-                      <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
+                      <div className="flex items-center gap-1.5 sm:gap-2 pt-2 sm:pt-3 border-t border-gray-100">
                         <button
                           onClick={() => handleViewDetails(property)}
-                          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-lg text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
+                          className="flex-1 flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-lg text-[10px] sm:text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
                         >
-                          <ViewIcon className="w-4 h-4" />
+                          <ViewIcon className="w-3 h-3 sm:w-4 sm:h-4" />
                           View
                         </button>
                         <button
                           onClick={() => handleEditProperty(property)}
-                          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
+                          className="flex-1 flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg text-[10px] sm:text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
                         >
-                          <Edit2 className="w-4 h-4" />
+                          <Edit2 className="w-3 h-3 sm:w-4 sm:h-4" />
                           Edit
                         </button>
                         <button
                           onClick={() => handleDeleteProperty(property)}
-                          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
+                          className="flex-1 flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg text-[10px] sm:text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                           Delete
                         </button>
                       </div>
@@ -2629,94 +2676,105 @@ const sections = [
                 ))}
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[700px] text-sm">
+              <div className="overflow-x-auto rounded-lg sm:rounded-xl border border-gray-100">
+                <table className="w-full text-[10px] sm:text-sm table-fixed">
+                  <colgroup>
+                    <col className="w-[38%] lg:w-[24%]" />
+                    <col className="w-[18%] lg:w-[11%]" />
+                    <col className="hidden lg:table-column lg:w-[11%]" />
+                    <col className="w-[20%] lg:w-[14%]" />
+                    <col className="hidden lg:table-column lg:w-[9%]" />
+                    <col className="hidden lg:table-column lg:w-[13%]" />
+                    <col className="w-[24%] lg:w-[18%]" />
+                  </colgroup>
                   <thead>
                     <tr className="border-b-2 border-gray-200 bg-gray-50">
-                      <th className="text-left py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Property</th>
-                      <th className="text-left py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
-                      <th className="text-left py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Type</th>
-                      <th className="text-left py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Price</th>
-                      <th className="text-left py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Area</th>
-                      <th className="text-left py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Location</th>
-                      <th className="text-right py-3 px-4 text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
+                      <th className="text-left py-2 sm:py-3 px-2 sm:px-4 text-[9px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider">Property</th>
+                      <th className="text-left py-2 sm:py-3 px-2 sm:px-4 text-[9px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
+                      <th className="hidden lg:table-cell text-left py-2 sm:py-3 px-2 sm:px-4 text-[9px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider">Purpose</th>
+                      <th className="text-left py-2 sm:py-3 px-2 sm:px-4 text-[9px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider">Price</th>
+                      <th className="hidden lg:table-cell text-left py-2 sm:py-3 px-2 sm:px-4 text-[9px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider">Area</th>
+                      <th className="hidden lg:table-cell text-left py-2 sm:py-3 px-2 sm:px-4 text-[9px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider">Location</th>
+                      <th className="text-right py-2 sm:py-3 px-2 sm:px-4 text-[9px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {filteredProperties.map((property) => (
-                      <tr 
-                        key={property.id}
-                        className="hover:bg-[#00695C]/3 transition-colors duration-200 group"
-                      >
-                        <td className="py-3 px-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                              <img 
-                                src={property.images?.[0] || 'https://via.placeholder.com/100x100/CCCCCC/666666?text=No+Image'} 
+                      <tr key={property.id} className="hover:bg-[#00695C]/3 transition-colors duration-200 group">
+                        <td className="py-2 sm:py-3 px-2 sm:px-4">
+                          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                              <img
+                                src={property.images?.[0] || 'https://via.placeholder.com/100x100/CCCCCC/666666?text=No+Image'}
                                 alt={property.name}
                                 className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  e.target.src = 'https://via.placeholder.com/100x100/CCCCCC/666666?text=No+Image';
-                                }}
+                                onError={(e) => { e.target.src = 'https://via.placeholder.com/100x100/CCCCCC/666666?text=No+Image'; }}
                               />
                             </div>
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <p className="font-bold text-sm text-gray-800 group-hover:text-[#00695C] transition-colors">
-                                  {property.name}
-                                </p>
-                                <div className="flex items-center gap-1">
-                                  <span className={`text-[10px] font-bold ${
-                                    property.status === 'Active' ? 'text-green-600' : 'text-gray-400'
-                                  }`}>
-                                    {property.status === 'Active' ? 'Active' : 'Inactive'}
-                                  </span>
-                                  <ToggleSwitch 
-                                    isOn={property.status === 'Active'} 
-                                    onToggle={() => handleToggleStatus(property)}
-                                    size="sm"
-                                  />
-                                </div>
-                              </div>
-                              <p className="text-xs text-gray-500">{property.id}</p>
+                            <div className="min-w-0">
+                              <p className="font-bold text-[10px] sm:text-sm text-gray-800 group-hover:text-[#00695C] transition-colors truncate">
+                                {property.name}
+                              </p>
+                              <p className="text-[9px] sm:text-xs text-gray-500 truncate">{property.id}</p>
+                              <p className="text-[9px] sm:text-xs text-gray-400 truncate lg:hidden">
+                                {property.type} · {property.location}
+                              </p>
                             </div>
                           </div>
                         </td>
-                        <td className="py-3 px-4">
-                          <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${
-                            property.status === 'Active' ? 'bg-green-100 text-green-700' :
-                            property.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
-                            'bg-red-100 text-red-700'
-                          }`}>
-                            {property.status}
+                        <td className="py-2 sm:py-3 px-2 sm:px-4">
+                          <div className="flex items-center gap-1">
+                            <ToggleSwitch
+                              isOn={property.status === 'Active'}
+                              onToggle={() => handleToggleStatus(property)}
+                              size="sm"
+                            />
+                            <span className={`hidden sm:inline text-[9px] sm:text-[11px] font-bold whitespace-nowrap ${
+                              property.status === 'Active' ? 'text-green-600' : 'text-gray-400'
+                            }`}>
+                              {property.status}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="hidden lg:table-cell py-2 sm:py-3 px-2 sm:px-4">
+                          <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-[9px] sm:text-[10px] font-bold bg-[#00695C]/10 text-[#00695C] whitespace-nowrap">
+                            {getListingPurposeLabel(property.listingPurpose)}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-sm text-gray-700">{property.type}</td>
-                        <td className="py-3 px-4 text-sm font-bold text-gray-800">{property.price}</td>
-                        <td className="py-3 px-4 text-sm text-gray-700">{property.area}</td>
-                        <td className="py-3 px-4 text-sm text-gray-700 truncate max-w-[150px]">{property.location}</td>
-                        <td className="py-3 px-4 text-right">
-                          <div className="flex items-center justify-end gap-2">
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-sm font-bold text-gray-800 truncate">
+                          {property.price}
+                        </td>
+                        <td className="hidden lg:table-cell py-2 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-sm text-gray-700 truncate">
+                          {property.area}
+                        </td>
+                        <td className="hidden lg:table-cell py-2 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-sm text-gray-700 truncate">
+                          {property.location}
+                        </td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 text-right">
+                          <div className="flex items-center justify-end gap-1 sm:gap-1.5 lg:gap-2">
                             <button
                               onClick={() => handleViewDetails(property)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#00695C] text-white rounded-lg text-xs font-bold hover:bg-[#005A4F] transition-all duration-300"
+                              className="flex items-center justify-center gap-1.5 p-1.5 lg:px-3 lg:py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-lg text-xs lg:text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
+                              title="View"
                             >
-                              <ViewIcon className="w-3.5 h-3.5" />
-                              View
+                              <ViewIcon className="w-3.5 h-3.5 lg:w-4 lg:h-4 flex-shrink-0" />
+                              <span className="hidden lg:inline">View</span>
                             </button>
                             <button
                               onClick={() => handleEditProperty(property)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 text-white rounded-lg text-xs font-bold hover:bg-blue-600 transition-all duration-300"
+                              className="flex items-center justify-center gap-1.5 p-1.5 lg:px-3 lg:py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg text-xs lg:text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
+                              title="Edit"
                             >
-                              <Edit2 className="w-3.5 h-3.5" />
-                              Edit
+                              <Edit2 className="w-3.5 h-3.5 lg:w-4 lg:h-4 flex-shrink-0" />
+                              <span className="hidden lg:inline">Edit</span>
                             </button>
                             <button
                               onClick={() => handleDeleteProperty(property)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500 text-white rounded-lg text-xs font-bold hover:bg-red-600 transition-all duration-300"
+                              className="flex items-center justify-center gap-1.5 p-1.5 lg:px-3 lg:py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg text-xs lg:text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
+                              title="Delete"
                             >
-                              <Trash2 className="w-3.5 h-3.5" />
-                              Delete
+                              <Trash2 className="w-3.5 h-3.5 lg:w-4 lg:h-4 flex-shrink-0" />
+                              <span className="hidden lg:inline">Delete</span>
                             </button>
                           </div>
                         </td>
@@ -2728,12 +2786,12 @@ const sections = [
             )}
           </div>
         ) : (
-          <div className="text-center py-8">
-            <div className="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
-              <Home className="w-8 h-8 text-gray-400" />
+          <div className="text-center py-6 sm:py-8">
+            <div className="bg-gray-100 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
+              <Home className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
             </div>
-            <p className="text-gray-500 font-medium text-sm">No properties found</p>
-            <p className="text-xs text-gray-400">
+            <p className="text-gray-500 font-medium text-xs sm:text-sm">No properties found</p>
+            <p className="text-[10px] sm:text-xs text-gray-400">
               {searchTerm || filterStatus !== 'all' 
                 ? 'Try adjusting your search or filters' 
                 : 'You haven\'t added any properties yet'}
@@ -2744,7 +2802,7 @@ const sections = [
                   setSearchTerm('');
                   setFilterStatus('all');
                 }}
-                className="mt-2 px-3 py-1.5 bg-[#00695C] text-white rounded-lg text-xs font-bold hover:bg-[#005A4F] transition-all duration-300"
+                className="mt-1.5 sm:mt-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-[#00695C] text-white rounded-lg text-[10px] sm:text-xs font-bold hover:bg-[#005A4F] transition-all duration-300"
               >
                 Clear Filters
               </button>
@@ -2752,7 +2810,7 @@ const sections = [
           </div>
         )}
 
-        <div className="mt-3 pt-3 border-t-2 border-gray-100 flex justify-between text-[10px] text-gray-500">
+        <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t-2 border-gray-100 flex justify-between text-[8px] sm:text-[10px] text-gray-500">
           <span>Showing {filteredProperties.length} of {properties.length} properties</span>
           <span>Total: {properties.length}</span>
         </div>
@@ -2762,7 +2820,7 @@ const sections = [
 
   // ============ MAIN RENDER ============
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#00695C]/5 via-teal-50/50 to-[#26A69A]/5 pt-20 pb-12 w-full relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#00695C]/5 via-teal-50/50 to-[#26A69A]/5 pt-16 sm:pt-20 pb-8 sm:pb-12 w-full relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-[#00695C]/10 to-[#26A69A]/10 rounded-full blur-3xl animate-float" />
@@ -2807,28 +2865,28 @@ const sections = [
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full mx-4 p-8 transform transition-all duration-300 scale-100 animate-scaleIn">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="bg-red-100 p-3 rounded-2xl">
-                <AlertTriangle className="w-8 h-8 text-red-500 animate-pulse" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn p-3 sm:p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full mx-2 sm:mx-4 p-5 sm:p-8 transform transition-all duration-300 scale-100 animate-scaleIn">
+            <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+              <div className="bg-red-100 p-2 sm:p-3 rounded-2xl">
+                <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 text-red-500 animate-pulse" />
               </div>
-              <h3 className="text-xl font-bold text-gray-800">Confirm Delete</h3>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-800">Confirm Delete</h3>
             </div>
-            <p className="text-gray-600 mb-6">Are you sure you want to delete this file? This action cannot be undone.</p>
-            <div className="flex justify-end gap-3">
+            <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Are you sure you want to delete this file? This action cannot be undone.</p>
+            <div className="flex justify-end gap-2 sm:gap-3">
               <button
                 onClick={() => {
                   setShowDeleteConfirm(false);
                   setDeleteItem(null);
                 }}
-                className="px-6 py-3 rounded-2xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105"
+                className="px-4 sm:px-6 py-2 sm:py-3 rounded-2xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105 text-sm sm:text-base"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDelete}
-                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold hover:from-red-600 hover:to-rose-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+                className="px-4 sm:px-6 py-2 sm:py-3 rounded-2xl bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold hover:from-red-600 hover:to-rose-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-sm sm:text-base"
               >
                 Delete
               </button>
@@ -2839,25 +2897,25 @@ const sections = [
 
       {/* Profile Photo Delete Confirmation */}
       {showProfilePhotoDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full mx-4 p-8 transform transition-all duration-300 scale-100 animate-scaleIn">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="bg-red-100 p-3 rounded-2xl">
-                <AlertTriangle className="w-8 h-8 text-red-500 animate-pulse" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn p-3 sm:p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full mx-2 sm:mx-4 p-5 sm:p-8 transform transition-all duration-300 scale-100 animate-scaleIn">
+            <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+              <div className="bg-red-100 p-2 sm:p-3 rounded-2xl">
+                <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 text-red-500 animate-pulse" />
               </div>
-              <h3 className="text-xl font-bold text-gray-800">Delete Profile Photo</h3>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-800">Delete Profile Photo</h3>
             </div>
-            <p className="text-gray-600 mb-6">Are you sure you want to delete your profile photo? This action cannot be undone.</p>
-            <div className="flex justify-end gap-3">
+            <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Are you sure you want to delete your profile photo? This action cannot be undone.</p>
+            <div className="flex justify-end gap-2 sm:gap-3">
               <button
                 onClick={() => setShowProfilePhotoDeleteConfirm(false)}
-                className="px-6 py-3 rounded-2xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105"
+                className="px-4 sm:px-6 py-2 sm:py-3 rounded-2xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105 text-sm sm:text-base"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmProfilePhotoDelete}
-                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold hover:from-red-600 hover:to-rose-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+                className="px-4 sm:px-6 py-2 sm:py-3 rounded-2xl bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold hover:from-red-600 hover:to-rose-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-sm sm:text-base"
               >
                 Delete
               </button>
@@ -2866,958 +2924,514 @@ const sections = [
         </div>
       )}
 
-{/* Edit Modal */}
-{showEditModal && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn w-full">
-    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-[90%] sm:max-w-[95%] lg:max-w-2xl mx-4 overflow-hidden max-h-[85vh] flex flex-col animate-scaleIn">
-      <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] px-8 py-5 flex items-center justify-between flex-shrink-0">
-        <h2 className="text-white text-xl font-bold flex items-center gap-3">
-          <div className="bg-white/20 p-2 rounded-xl">
-            <Edit2 className="w-5 h-5" />
-          </div>
-          Edit Agent Profile
-        </h2>
-        <button
-          onClick={() => setShowEditModal(false)}
-          className="text-white/80 hover:text-white transition-all duration-300 hover:rotate-90 hover:scale-110"
-        >
-          <X className="w-6 h-6" />
-        </button>
-      </div>
-      <div className="px-8 py-6 space-y-6 overflow-y-auto flex-1 w-full bg-gray-50">
-        
-        {/* 1. Personal Details */}
-        <div className="space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-6 shadow-sm border border-[#00695C]/10">
-          <h3 className="text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-3">
-            <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl">
-              <User className="w-4 h-4 text-white" />
-            </div>
-            Personal Details
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>👤</span> Full Name *
-              </label>
-              <input
-                type="text"
-                name="fullName"
-                value={editForm.fullName}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📱</span> Mobile Number *
-              </label>
-              <input
-                type="text"
-                name="mobileNumber"
-                value={editForm.mobileNumber}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>✉️</span> Email Address *
-              </label>
-              <input
-                type="email"
-                name="emailAddress"
-                value={editForm.emailAddress}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>🎂</span> Date of Birth
-              </label>
-              <input
-                type="date"
-                name="dateOfBirth"
-                value={formatDateForInput(editForm.dateOfBirth)}
-                onChange={handleDateChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>⚥</span> Gender
-              </label>
-              <select
-                name="gender"
-                value={editForm.gender}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
+      {/* Edit Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn w-full p-2 sm:p-4">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-[95%] sm:max-w-[90%] md:max-w-2xl  mx-auto overflow-hidden max-h-[80vh] flex flex-col animate-scaleIn">
+            <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 flex items-center justify-between flex-shrink-0">
+              <h2 className="text-white text-lg sm:text-xl font-bold flex items-center gap-2 sm:gap-3">
+                <div className="bg-white/20 p-1.5 sm:p-2 rounded-xl">
+                  <Edit2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                </div>
+                Edit Agent Profile
+              </h2>
+              <button 
+                onClick={() => setShowEditModal(false)} 
+                className="text-white/80 hover:text-white transition-all duration-300 hover:rotate-90 hover:scale-110"
               >
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </select>
+                <X className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
             </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📸</span> Profile Photo *
-              </label>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => profilePhotoInputRef.current?.click()}
-                  className="px-4 py-2 bg-[#00695C] text-white rounded-xl text-sm font-bold hover:bg-[#005A4F] transition-all duration-300"
-                >
-                  Upload
-                </button>
-                {documents.profilePhoto && (
-                  <button
-                    onClick={handleProfilePhotoDelete}
-                    className="px-4 py-2 bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-red-600 transition-all duration-300"
-                  >
-                    Delete
-                  </button>
-                )}
-                <input ref={profilePhotoInputRef} type="file" className="hidden" accept="image/*" onChange={handleProfilePhotoUpload} />
+            <div className="px-4 sm:px-6 md:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6 overflow-y-auto flex-1 w-full bg-gray-50">
+              {/* Personal Details */}
+              <div className="space-y-3 sm:space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-4 sm:p-5 md:p-6 shadow-sm border border-[#00695C]/10">
+                <h3 className="text-xs sm:text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-2 sm:gap-3">
+                  <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-1.5 sm:p-2 rounded-xl">
+                    <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+                  </div>
+                  Personal Details
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full">
+                  {[
+                    { name: 'fullName', label: 'Full Name *', emoji: '👤' },
+                    { name: 'mobileNumber', label: 'Mobile Number *', emoji: '📱' },
+                    { name: 'emailAddress', label: 'Email Address *', emoji: '✉️' },
+                    { name: 'dateOfBirth', label: 'Date of Birth', type: 'date', emoji: '🎂' },
+                    { name: 'gender', label: 'Gender', emoji: '⚥' },
+                  ].map((field) => (
+                    <div key={field.name} className="space-y-1 sm:space-y-1.5 w-full">
+                      <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                        <span className="text-sm sm:text-base">{field.emoji}</span> {field.label}
+                      </label>
+                      {field.name === 'dateOfBirth' ? (
+                        <input
+                          type="date"
+                          name={field.name}
+                          value={formatDateForInput(editForm.dateOfBirth)}
+                          onChange={handleDateChange}
+                          className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-800 outline-none transition-all duration-300"
+                        />
+                      ) : field.name === 'gender' ? (
+                        <select
+                          name={field.name}
+                          value={editForm.gender}
+                          onChange={handleEditChange}
+                          className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-800 outline-none transition-all duration-300"
+                        >
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      ) : (
+                        <input
+                          type={field.type || 'text'}
+                          name={field.name}
+                          value={editForm[field.name]}
+                          onChange={handleEditChange}
+                          className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-800 outline-none transition-all duration-300"
+                        />
+                      )}
+                    </div>
+                  ))}
+                  <div className="space-y-1 sm:space-y-1.5 w-full">
+                    <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                      <span className="text-sm sm:text-base">📸</span> Profile Photo *
+                    </label>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <button
+                        onClick={() => profilePhotoInputRef.current?.click()}
+                        className="px-2 sm:px-3 py-1 sm:py-1.5 bg-[#00695C] text-white rounded-lg text-[10px] sm:text-xs font-bold hover:bg-[#005A4F] transition-all duration-300"
+                      >
+                        Upload
+                      </button>
+                      {documents.profilePhoto && (
+                        <button
+                          onClick={handleProfilePhotoDelete}
+                          className="px-2 sm:px-3 py-1 sm:py-1.5 bg-red-500 text-white rounded-lg text-[10px] sm:text-xs font-bold hover:bg-red-600 transition-all duration-300"
+                        >
+                          Delete
+                        </button>
+                      )}
+                      <input ref={profilePhotoInputRef} type="file" className="hidden" accept="image/*" onChange={handleProfilePhotoUpload} />
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              {/* Business Information */}
+              <div className="space-y-3 sm:space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-4 sm:p-5 md:p-6 shadow-sm border border-[#00695C]/10">
+                <h3 className="text-xs sm:text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-2 sm:gap-3">
+                  <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-1.5 sm:p-2 rounded-xl">
+                    <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+                  </div>
+                  Business Information
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full">
+                  {[
+                    { name: 'agencyName', label: 'Agency Name *', emoji: '🏢' },
+                    { name: 'reraRegistrationNumber', label: 'RERA Registration Number', emoji: '📋' },
+                    { name: 'gstNumber', label: 'GST Number', emoji: '#️⃣' },
+                    { name: 'yearsOfExperience', label: 'Years of Experience *', emoji: '⭐' },
+                    { name: 'numberOfActiveListings', label: 'Number of Active Listings', emoji: '📊' },
+                  ].map((field) => (
+                    <div key={field.name} className="space-y-1 sm:space-y-1.5 w-full">
+                      <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                        <span className="text-sm sm:text-base">{field.emoji}</span> {field.label}
+                      </label>
+                      <input
+                        type={field.name === 'yearsOfExperience' || field.name === 'numberOfActiveListings' ? 'number' : 'text'}
+                        name={field.name}
+                        value={editForm[field.name]}
+                        onChange={handleEditChange}
+                        className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-800 outline-none transition-all duration-300"
+                      />
+                    </div>
+                  ))}
+                  <div className="space-y-1 sm:space-y-1.5 w-full sm:col-span-2">
+                    <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                      <span className="text-sm sm:text-base">🌍</span> Service Areas (City/Locality)
+                    </label>
+                    <input
+                      type="text"
+                      name="serviceAreas"
+                      value={editForm.serviceAreas}
+                      onChange={handleEditChange}
+                      className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-800 outline-none transition-all duration-300"
+                      placeholder="e.g. Mumbai, Pune, Navi Mumbai"
+                    />
+                  </div>
+                  <div className="space-y-1 sm:space-y-1.5 w-full sm:col-span-2">
+                    <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                      <span className="text-sm sm:text-base">📍</span> Office Address *
+                    </label>
+                    <textarea
+                      name="officeAddress"
+                      value={editForm.officeAddress}
+                      onChange={handleEditChange}
+                      rows="2"
+                      className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-800 outline-none transition-all duration-300 resize-y"
+                      placeholder="Enter complete office address"
+                    />
+                  </div>
+                  <div className="space-y-1 sm:space-y-1.5 w-full">
+                    <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                      <span className="text-sm sm:text-base">🏢</span> Agency Logo
+                    </label>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <button
+                        onClick={() => agencyLogoInputRef.current?.click()}
+                        className="px-2 sm:px-3 py-1 sm:py-1.5 bg-[#00695C] text-white rounded-lg text-[10px] sm:text-xs font-bold hover:bg-[#005A4F] transition-all duration-300"
+                      >
+                        Upload
+                      </button>
+                      {documents.agencyLogo && (
+                        <button
+                          onClick={() => removeFile('agencyLogo')}
+                          className="px-2 sm:px-3 py-1 sm:py-1.5 bg-red-500 text-white rounded-lg text-[10px] sm:text-xs font-bold hover:bg-red-600 transition-all duration-300"
+                        >
+                          Delete
+                        </button>
+                      )}
+                      <input ref={agencyLogoInputRef} type="file" className="hidden" accept="image/*" onChange={handleAgencyLogoUpload} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Identity Verification */}
+              <div className="space-y-3 sm:space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-4 sm:p-5 md:p-6 shadow-sm border border-[#00695C]/10">
+                <h3 className="text-xs sm:text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-2 sm:gap-3">
+                  <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-1.5 sm:p-2 rounded-xl">
+                    <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+                  </div>
+                  Identity Verification
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full">
+                  {[
+                    { name: 'aadhaarNumber', label: 'Aadhaar Number *', emoji: '🆔' },
+                    { name: 'panNumber', label: 'PAN Number *', emoji: '📄' },
+                  ].map((field) => (
+                    <div key={field.name} className="space-y-1 sm:space-y-1.5 w-full">
+                      <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                        <span className="text-sm sm:text-base">{field.emoji}</span> {field.label}
+                      </label>
+                      <input
+                        type="text"
+                        name={field.name}
+                        value={editForm[field.name]}
+                        onChange={handleEditChange}
+                        className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-800 outline-none transition-all duration-300"
+                      />
+                    </div>
+                  ))}
+                  <div className="space-y-1 sm:space-y-1.5 w-full">
+                    <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                      <span className="text-sm sm:text-base">📎</span> Upload Aadhaar Card *
+                    </label>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <button
+                        onClick={() => fileInputRefs.current['aadhaarCard']?.click()}
+                        className="px-2 sm:px-3 py-1 sm:py-1.5 bg-[#00695C] text-white rounded-lg text-[10px] sm:text-xs font-bold hover:bg-[#005A4F] transition-all duration-300"
+                      >
+                        Upload
+                      </button>
+                      {documents.aadhaarCard && (
+                        <button
+                          onClick={() => handlePdfDelete('aadhaarCard')}
+                          className="px-2 sm:px-3 py-1 sm:py-1.5 bg-red-500 text-white rounded-lg text-[10px] sm:text-xs font-bold hover:bg-red-600 transition-all duration-300"
+                        >
+                          Delete
+                        </button>
+                      )}
+                      <input
+                        ref={el => fileInputRefs.current['aadhaarCard'] = el}
+                        type="file"
+                        className="hidden"
+                        accept=".pdf"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) handlePdfUpload('aadhaarCard', file);
+                          e.target.value = '';
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1 sm:space-y-1.5 w-full">
+                    <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                      <span className="text-sm sm:text-base">📎</span> Upload PAN Card *
+                    </label>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <button
+                        onClick={() => fileInputRefs.current['panCard']?.click()}
+                        className="px-2 sm:px-3 py-1 sm:py-1.5 bg-[#00695C] text-white rounded-lg text-[10px] sm:text-xs font-bold hover:bg-[#005A4F] transition-all duration-300"
+                      >
+                        Upload
+                      </button>
+                      {documents.panCard && (
+                        <button
+                          onClick={() => handlePdfDelete('panCard')}
+                          className="px-2 sm:px-3 py-1 sm:py-1.5 bg-red-500 text-white rounded-lg text-[10px] sm:text-xs font-bold hover:bg-red-600 transition-all duration-300"
+                        >
+                          Delete
+                        </button>
+                      )}
+                      <input
+                        ref={el => fileInputRefs.current['panCard'] = el}
+                        type="file"
+                        className="hidden"
+                        accept=".pdf"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) handlePdfUpload('panCard', file);
+                          e.target.value = '';
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1 sm:space-y-1.5 w-full">
+                    <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                      <span className="text-sm sm:text-base">📎</span> Upload Business Registration Certificate
+                    </label>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <button
+                        onClick={() => fileInputRefs.current['businessRegistrationCertificate']?.click()}
+                        className="px-2 sm:px-3 py-1 sm:py-1.5 bg-[#00695C] text-white rounded-lg text-[10px] sm:text-xs font-bold hover:bg-[#005A4F] transition-all duration-300"
+                      >
+                        Upload
+                      </button>
+                      {documents.businessRegistrationCertificate && (
+                        <button
+                          onClick={() => handlePdfDelete('businessRegistrationCertificate')}
+                          className="px-2 sm:px-3 py-1 sm:py-1.5 bg-red-500 text-white rounded-lg text-[10px] sm:text-xs font-bold hover:bg-red-600 transition-all duration-300"
+                        >
+                          Delete
+                        </button>
+                      )}
+                      <input
+                        ref={el => fileInputRefs.current['businessRegistrationCertificate'] = el}
+                        type="file"
+                        className="hidden"
+                        accept=".pdf"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) handlePdfUpload('businessRegistrationCertificate', file);
+                          e.target.value = '';
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1 sm:space-y-1.5 w-full">
+                    <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                      <span className="text-sm sm:text-base">📎</span> Upload RERA Certificate
+                    </label>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <button
+                        onClick={() => fileInputRefs.current['reraCertificate']?.click()}
+                        className="px-2 sm:px-3 py-1 sm:py-1.5 bg-[#00695C] text-white rounded-lg text-[10px] sm:text-xs font-bold hover:bg-[#005A4F] transition-all duration-300"
+                      >
+                        Upload
+                      </button>
+                      {documents.reraCertificate && (
+                        <button
+                          onClick={() => handlePdfDelete('reraCertificate')}
+                          className="px-2 sm:px-3 py-1 sm:py-1.5 bg-red-500 text-white rounded-lg text-[10px] sm:text-xs font-bold hover:bg-red-600 transition-all duration-300"
+                        >
+                          Delete
+                        </button>
+                      )}
+                      <input
+                        ref={el => fileInputRefs.current['reraCertificate'] = el}
+                        type="file"
+                        className="hidden"
+                        accept=".pdf"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) handlePdfUpload('reraCertificate', file);
+                          e.target.value = '';
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bank Details */}
+              <div className="space-y-3 sm:space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-4 sm:p-5 md:p-6 shadow-sm border border-[#00695C]/10">
+                <h3 className="text-xs sm:text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-2 sm:gap-3">
+                  <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-1.5 sm:p-2 rounded-xl">
+                    <Banknote className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+                  </div>
+                  Bank Details
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full">
+                  {[
+                    { name: 'accountHolderName', label: 'Account Holder Name', emoji: '👤' },
+                    { name: 'bankName', label: 'Bank Name', emoji: '🏦' },
+                    { name: 'accountNumber', label: 'Account Number', emoji: '💳' },
+                    { name: 'ifscCode', label: 'IFSC Code', emoji: '🔢' },
+                    { name: 'upiId', label: 'UPI ID', emoji: '📱' },
+                  ].map((field) => (
+                    <div key={field.name} className="space-y-1 sm:space-y-1.5 w-full">
+                      <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                        <span className="text-sm sm:text-base">{field.emoji}</span> {field.label}
+                      </label>
+                      <input
+                        type="text"
+                        name={field.name}
+                        value={editForm[field.name]}
+                        onChange={handleEditChange}
+                        className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-800 outline-none transition-all duration-300"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Social Media */}
+              <div className="space-y-3 sm:space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-4 sm:p-5 md:p-6 shadow-sm border border-[#00695C]/10">
+                <h3 className="text-xs sm:text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-2 sm:gap-3">
+                  <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-1.5 sm:p-2 rounded-xl">
+                    <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+                  </div>
+                  Social Media & Website
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full">
+                  {[
+                    { name: 'website', label: 'Website', emoji: '🌐' },
+                    { name: 'facebookPage', label: 'Facebook Page', emoji: '📘' },
+                    { name: 'instagram', label: 'Instagram', emoji: '📸' },
+                    { name: 'linkedIn', label: 'LinkedIn', emoji: '💼' },
+                    { name: 'youtubeChannel', label: 'YouTube Channel', emoji: '▶️' },
+                  ].map((field) => (
+                    <div key={field.name} className="space-y-1 sm:space-y-1.5 w-full">
+                      <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                        <span className="text-sm sm:text-base">{field.emoji}</span> {field.label}
+                      </label>
+                      <input
+                        type="text"
+                        name={field.name}
+                        value={editForm[field.name]}
+                        onChange={handleEditChange}
+                        className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-800 outline-none transition-all duration-300"
+                        placeholder={field.name === 'website' ? 'www.example.com' : `${field.name}.com/yourhandle`}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Contact Information */}
+              <div className="space-y-3 sm:space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-4 sm:p-5 md:p-6 shadow-sm border border-[#00695C]/10">
+                <h3 className="text-xs sm:text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-2 sm:gap-3">
+                  <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-1.5 sm:p-2 rounded-xl">
+                    <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+                  </div>
+                  Contact Information
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full">
+                  {[
+                    { name: 'officeAddress', label: 'Office Address *', emoji: '📍', textarea: true },
+                    { name: 'city', label: 'City *', emoji: '🏙️' },
+                    { name: 'district', label: 'District *', emoji: '🗺️' },
+                    { name: 'state', label: 'State *', emoji: '🌍' },
+                    { name: 'pinCode', label: 'PIN Code *', emoji: '📍' },
+                    { name: 'whatsappNumber', label: 'WhatsApp Number', emoji: '📱' },
+                  ].map((field) => (
+                    <div key={field.name} className={`space-y-1 sm:space-y-1.5 w-full ${field.textarea ? 'sm:col-span-2' : ''}`}>
+                      <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                        <span className="text-sm sm:text-base">{field.emoji}</span> {field.label}
+                      </label>
+                      {field.textarea ? (
+                        <textarea
+                          name={field.name}
+                          value={editForm[field.name]}
+                          onChange={handleEditChange}
+                          rows="2"
+                          className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-800 outline-none transition-all duration-300 resize-y"
+                          placeholder="Enter complete office address"
+                        />
+                      ) : (
+                        <input
+                          type="text"
+                          name={field.name}
+                          value={editForm[field.name]}
+                          onChange={handleEditChange}
+                          className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-800 outline-none transition-all duration-300"
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Login Credentials */}
+              <div className="space-y-3 sm:space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-4 sm:p-5 md:p-6 shadow-sm border border-[#00695C]/10">
+                <h3 className="text-xs sm:text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-2 sm:gap-3">
+                  <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-1.5 sm:p-2 rounded-xl">
+                    <Settings className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+                  </div>
+                  Login Credentials
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full">
+                  {[
+                    { name: 'username', label: 'Username *', emoji: '👤' },
+                    { name: 'emailAddressLogin', label: 'Email Address *', emoji: '✉️' },
+                    { name: 'mobileNumberLogin', label: 'Mobile Number *', emoji: '📱' },
+                    { name: 'password', label: 'Password *', emoji: '🔒', type: 'password' },
+                    { name: 'confirmPassword', label: 'Confirm Password *', emoji: '🔒', type: 'password' },
+                  ].map((field) => (
+                    <div key={field.name} className={`space-y-1 sm:space-y-1.5 w-full ${field.name === 'confirmPassword' ? 'sm:col-span-2' : ''}`}>
+                      <label className="block text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                        <span className="text-sm sm:text-base">{field.emoji}</span> {field.label}
+                      </label>
+                      <input
+                        type={field.type || 'text'}
+                        name={field.name}
+                        value={editForm[field.name]}
+                        onChange={handleEditChange}
+                        className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-800 outline-none transition-all duration-300"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 bg-white border-t-2 border-gray-100 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 flex-shrink-0">
+              <button 
+                onClick={() => setShowEditModal(false)} 
+                className="px-4 sm:px-6 md:px-8 py-2 sm:py-3 rounded-2xl border-2 border-gray-300 text-gray-700 text-xs sm:text-sm font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105 w-full sm:w-auto"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleSave} 
+                disabled={isLoading}
+                className="px-4 sm:px-6 md:px-8 py-2 sm:py-3 rounded-2xl bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white text-xs sm:text-sm font-bold hover:from-[#005A4F] hover:to-[#1B9E8E] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-1.5 sm:gap-2 justify-center w-full sm:w-auto hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 border-3 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                )}
+                {isLoading ? 'Saving...' : 'Save Changes'}
+              </button>
             </div>
           </div>
         </div>
-
-        {/* 2. Business Information */}
-        <div className="space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-6 shadow-sm border border-[#00695C]/10">
-          <h3 className="text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-3">
-            <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl">
-              <Briefcase className="w-4 h-4 text-white" />
-            </div>
-            Business Information
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>🏢</span> Agency Name *
-              </label>
-              <input
-                type="text"
-                name="agencyName"
-                value={editForm.agencyName}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📋</span> RERA Registration Number
-              </label>
-              <input
-                type="text"
-                name="reraRegistrationNumber"
-                value={editForm.reraRegistrationNumber}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>#️⃣</span> GST Number
-              </label>
-              <input
-                type="text"
-                name="gstNumber"
-                value={editForm.gstNumber}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>⭐</span> Years of Experience *
-              </label>
-              <input
-                type="number"
-                name="yearsOfExperience"
-                value={editForm.yearsOfExperience}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📊</span> Number of Active Listings
-              </label>
-              <input
-                type="number"
-                name="numberOfActiveListings"
-                value={editForm.numberOfActiveListings}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full md:col-span-2">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>🌍</span> Service Areas (City/Locality)
-              </label>
-              <input
-                type="text"
-                name="serviceAreas"
-                value={editForm.serviceAreas}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-                placeholder="e.g. Mumbai, Pune, Navi Mumbai"
-              />
-            </div>
-            <div className="space-y-1.5 w-full md:col-span-2">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📍</span> Office Address *
-              </label>
-              <textarea
-                name="officeAddress"
-                value={editForm.officeAddress}
-                onChange={handleEditChange}
-                rows="2"
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300 resize-y"
-                placeholder="Enter complete office address"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* 3. Identity Verification */}
-        <div className="space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-6 shadow-sm border border-[#00695C]/10">
-          <h3 className="text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-3">
-            <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl">
-              <Shield className="w-4 h-4 text-white" />
-            </div>
-            Identity Verification
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>🆔</span> Aadhaar Number *
-              </label>
-              <input
-                type="text"
-                name="aadhaarNumber"
-                value={editForm.aadhaarNumber}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📄</span> PAN Number *
-              </label>
-              <input
-                type="text"
-                name="panNumber"
-                value={editForm.panNumber}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📎</span> Upload Aadhaar Card *
-              </label>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => fileInputRefs.current['aadhaarCard']?.click()}
-                  className="px-4 py-2 bg-[#00695C] text-white rounded-xl text-sm font-bold hover:bg-[#005A4F] transition-all duration-300"
-                >
-                  Upload
-                </button>
-                {documents.aadhaarCard && (
-                  <button
-                    onClick={() => handlePdfDelete('aadhaarCard')}
-                    className="px-4 py-2 bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-red-600 transition-all duration-300"
-                  >
-                    Delete
-                  </button>
-                )}
-                <input
-                  ref={el => fileInputRefs.current['aadhaarCard'] = el}
-                  type="file"
-                  className="hidden"
-                  accept=".pdf"
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (file) handlePdfUpload('aadhaarCard', file);
-                    e.target.value = '';
-                  }}
-                />
-              </div>
-              {documents.aadhaarCard && (
-                <p className="text-xs text-[#00695C] font-bold mt-1 flex items-center gap-1">
-                  <Check className="w-3 h-3" /> {documents.aadhaarCard.name}
-                </p>
-              )}
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📎</span> Upload PAN Card *
-              </label>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => fileInputRefs.current['panCard']?.click()}
-                  className="px-4 py-2 bg-[#00695C] text-white rounded-xl text-sm font-bold hover:bg-[#005A4F] transition-all duration-300"
-                >
-                  Upload
-                </button>
-                {documents.panCard && (
-                  <button
-                    onClick={() => handlePdfDelete('panCard')}
-                    className="px-4 py-2 bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-red-600 transition-all duration-300"
-                  >
-                    Delete
-                  </button>
-                )}
-                <input
-                  ref={el => fileInputRefs.current['panCard'] = el}
-                  type="file"
-                  className="hidden"
-                  accept=".pdf"
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (file) handlePdfUpload('panCard', file);
-                    e.target.value = '';
-                  }}
-                />
-              </div>
-              {documents.panCard && (
-                <p className="text-xs text-[#00695C] font-bold mt-1 flex items-center gap-1">
-                  <Check className="w-3 h-3" /> {documents.panCard.name}
-                </p>
-              )}
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📎</span> Upload Business Registration Certificate
-              </label>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => fileInputRefs.current['businessRegistrationCertificate']?.click()}
-                  className="px-4 py-2 bg-[#00695C] text-white rounded-xl text-sm font-bold hover:bg-[#005A4F] transition-all duration-300"
-                >
-                  Upload
-                </button>
-                {documents.businessRegistrationCertificate && (
-                  <button
-                    onClick={() => handlePdfDelete('businessRegistrationCertificate')}
-                    className="px-4 py-2 bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-red-600 transition-all duration-300"
-                  >
-                    Delete
-                  </button>
-                )}
-                <input
-                  ref={el => fileInputRefs.current['businessRegistrationCertificate'] = el}
-                  type="file"
-                  className="hidden"
-                  accept=".pdf"
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (file) handlePdfUpload('businessRegistrationCertificate', file);
-                    e.target.value = '';
-                  }}
-                />
-              </div>
-              {documents.businessRegistrationCertificate && (
-                <p className="text-xs text-[#00695C] font-bold mt-1 flex items-center gap-1">
-                  <Check className="w-3 h-3" /> {documents.businessRegistrationCertificate.name}
-                </p>
-              )}
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📎</span> Upload RERA Certificate
-              </label>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => fileInputRefs.current['reraCertificate']?.click()}
-                  className="px-4 py-2 bg-[#00695C] text-white rounded-xl text-sm font-bold hover:bg-[#005A4F] transition-all duration-300"
-                >
-                  Upload
-                </button>
-                {documents.reraCertificate && (
-                  <button
-                    onClick={() => handlePdfDelete('reraCertificate')}
-                    className="px-4 py-2 bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-red-600 transition-all duration-300"
-                  >
-                    Delete
-                  </button>
-                )}
-                <input
-                  ref={el => fileInputRefs.current['reraCertificate'] = el}
-                  type="file"
-                  className="hidden"
-                  accept=".pdf"
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (file) handlePdfUpload('reraCertificate', file);
-                    e.target.value = '';
-                  }}
-                />
-              </div>
-              {documents.reraCertificate && (
-                <p className="text-xs text-[#00695C] font-bold mt-1 flex items-center gap-1">
-                  <Check className="w-3 h-3" /> {documents.reraCertificate.name}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* 4. Upload Documents */}
-        <div className="space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-6 shadow-sm border border-[#00695C]/10">
-          <h3 className="text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-3">
-            <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl">
-              <FileText className="w-4 h-4 text-white" />
-            </div>
-            Upload Documents
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📸</span> Profile Photo *
-              </label>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => profilePhotoInputRef.current?.click()}
-                  className="px-4 py-2 bg-[#00695C] text-white rounded-xl text-sm font-bold hover:bg-[#005A4F] transition-all duration-300"
-                >
-                  Upload
-                </button>
-                {documents.profilePhoto && (
-                  <button
-                    onClick={handleProfilePhotoDelete}
-                    className="px-4 py-2 bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-red-600 transition-all duration-300"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-              {documents.profilePhoto && (
-                <p className="text-xs text-[#00695C] font-bold mt-1 flex items-center gap-1">
-                  <Check className="w-3 h-3" /> {documents.profilePhoto.name}
-                </p>
-              )}
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>🏢</span> Agency Logo
-              </label>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => agencyLogoInputRef.current?.click()}
-                  className="px-4 py-2 bg-[#00695C] text-white rounded-xl text-sm font-bold hover:bg-[#005A4F] transition-all duration-300"
-                >
-                  Upload
-                </button>
-                {documents.agencyLogo && (
-                  <button
-                    onClick={() => removeFile('agencyLogo')}
-                    className="px-4 py-2 bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-red-600 transition-all duration-300"
-                  >
-                    Delete
-                  </button>
-                )}
-                <input ref={agencyLogoInputRef} type="file" className="hidden" accept="image/*" onChange={handleAgencyLogoUpload} />
-              </div>
-              {documents.agencyLogo && (
-                <p className="text-xs text-[#00695C] font-bold mt-1 flex items-center gap-1">
-                  <Check className="w-3 h-3" /> {documents.agencyLogo.name}
-                </p>
-              )}
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📎</span> Aadhaar Card *
-              </label>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => fileInputRefs.current['aadhaarCard']?.click()}
-                  className="px-4 py-2 bg-[#00695C] text-white rounded-xl text-sm font-bold hover:bg-[#005A4F] transition-all duration-300"
-                >
-                  Upload
-                </button>
-                {documents.aadhaarCard && (
-                  <button
-                    onClick={() => handlePdfDelete('aadhaarCard')}
-                    className="px-4 py-2 bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-red-600 transition-all duration-300"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-              {documents.aadhaarCard && (
-                <p className="text-xs text-[#00695C] font-bold mt-1 flex items-center gap-1">
-                  <Check className="w-3 h-3" /> {documents.aadhaarCard.name}
-                </p>
-              )}
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📎</span> PAN Card *
-              </label>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => fileInputRefs.current['panCard']?.click()}
-                  className="px-4 py-2 bg-[#00695C] text-white rounded-xl text-sm font-bold hover:bg-[#005A4F] transition-all duration-300"
-                >
-                  Upload
-                </button>
-                {documents.panCard && (
-                  <button
-                    onClick={() => handlePdfDelete('panCard')}
-                    className="px-4 py-2 bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-red-600 transition-all duration-300"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-              {documents.panCard && (
-                <p className="text-xs text-[#00695C] font-bold mt-1 flex items-center gap-1">
-                  <Check className="w-3 h-3" /> {documents.panCard.name}
-                </p>
-              )}
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📎</span> RERA Certificate
-              </label>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => fileInputRefs.current['reraCertificate']?.click()}
-                  className="px-4 py-2 bg-[#00695C] text-white rounded-xl text-sm font-bold hover:bg-[#005A4F] transition-all duration-300"
-                >
-                  Upload
-                </button>
-                {documents.reraCertificate && (
-                  <button
-                    onClick={() => handlePdfDelete('reraCertificate')}
-                    className="px-4 py-2 bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-red-600 transition-all duration-300"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-              {documents.reraCertificate && (
-                <p className="text-xs text-[#00695C] font-bold mt-1 flex items-center gap-1">
-                  <Check className="w-3 h-3" /> {documents.reraCertificate.name}
-                </p>
-              )}
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📎</span> GST Certificate
-              </label>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => fileInputRefs.current['gstCertificate']?.click()}
-                  className="px-4 py-2 bg-[#00695C] text-white rounded-xl text-sm font-bold hover:bg-[#005A4F] transition-all duration-300"
-                >
-                  Upload
-                </button>
-                {documents.gstCertificate && (
-                  <button
-                    onClick={() => handlePdfDelete('gstCertificate')}
-                    className="px-4 py-2 bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-red-600 transition-all duration-300"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-              {documents.gstCertificate && (
-                <p className="text-xs text-[#00695C] font-bold mt-1 flex items-center gap-1">
-                  <Check className="w-3 h-3" /> {documents.gstCertificate.name}
-                </p>
-              )}
-            </div>
-            <div className="space-y-1.5 w-full md:col-span-2">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📎</span> Business Registration Certificate
-              </label>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => fileInputRefs.current['businessRegistrationCertificate']?.click()}
-                  className="px-4 py-2 bg-[#00695C] text-white rounded-xl text-sm font-bold hover:bg-[#005A4F] transition-all duration-300"
-                >
-                  Upload
-                </button>
-                {documents.businessRegistrationCertificate && (
-                  <button
-                    onClick={() => handlePdfDelete('businessRegistrationCertificate')}
-                    className="px-4 py-2 bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-red-600 transition-all duration-300"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-              {documents.businessRegistrationCertificate && (
-                <p className="text-xs text-[#00695C] font-bold mt-1 flex items-center gap-1">
-                  <Check className="w-3 h-3" /> {documents.businessRegistrationCertificate.name}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* 5. Bank Details */}
-        <div className="space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-6 shadow-sm border border-[#00695C]/10">
-          <h3 className="text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-3">
-            <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl">
-              <Banknote className="w-4 h-4 text-white" />
-            </div>
-            Bank Details
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>👤</span> Account Holder Name
-              </label>
-              <input
-                type="text"
-                name="accountHolderName"
-                value={editForm.accountHolderName}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>🏦</span> Bank Name
-              </label>
-              <input
-                type="text"
-                name="bankName"
-                value={editForm.bankName}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>💳</span> Account Number
-              </label>
-              <input
-                type="text"
-                name="accountNumber"
-                value={editForm.accountNumber}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>🔢</span> IFSC Code
-              </label>
-              <input
-                type="text"
-                name="ifscCode"
-                value={editForm.ifscCode}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📱</span> UPI ID
-              </label>
-              <input
-                type="text"
-                name="upiId"
-                value={editForm.upiId}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-                placeholder="example@upi"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* 6. Social Media */}
-        <div className="space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-6 shadow-sm border border-[#00695C]/10">
-          <h3 className="text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-3">
-            <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl">
-              <Share2 className="w-4 h-4 text-white" />
-            </div>
-            Social Media & Website
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>🌐</span> Website
-              </label>
-              <input
-                type="text"
-                name="website"
-                value={editForm.website}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-                placeholder="www.example.com"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📘</span> Facebook Page
-              </label>
-              <input
-                type="text"
-                name="facebookPage"
-                value={editForm.facebookPage}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-                placeholder="facebook.com/yourpage"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📸</span> Instagram
-              </label>
-              <input
-                type="text"
-                name="instagram"
-                value={editForm.instagram}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-                placeholder="instagram.com/yourpage"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>💼</span> LinkedIn
-              </label>
-              <input
-                type="text"
-                name="linkedIn"
-                value={editForm.linkedIn}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-                placeholder="linkedin.com/in/yourprofile"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>▶️</span> YouTube Channel
-              </label>
-              <input
-                type="text"
-                name="youtubeChannel"
-                value={editForm.youtubeChannel}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-                placeholder="youtube.com/yourchannel"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* 7. Login Credentials */}
-        <div className="space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-6 shadow-sm border border-[#00695C]/10">
-          <h3 className="text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-3">
-            <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl">
-              <Settings className="w-4 h-4 text-white" />
-            </div>
-            Login Credentials
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>👤</span> Username *
-              </label>
-              <input
-                type="text"
-                name="username"
-                value={editForm.username}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>✉️</span> Email Address *
-              </label>
-              <input
-                type="email"
-                name="emailAddressLogin"
-                value={editForm.emailAddressLogin}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📱</span> Mobile Number *
-              </label>
-              <input
-                type="text"
-                name="mobileNumberLogin"
-                value={editForm.mobileNumberLogin}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>🔒</span> Password *
-              </label>
-              <input
-                type="password"
-                name="password"
-                value={editForm.password}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full md:col-span-2">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>🔒</span> Confirm Password *
-              </label>
-              <input
-                type="password"
-                name="confirmPassword"
-                value={editForm.confirmPassword}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* 8. Contact Information */}
-        <div className="space-y-4 w-full bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] rounded-2xl p-6 shadow-sm border border-[#00695C]/10">
-          <h3 className="text-sm font-bold text-[#00695C] uppercase tracking-wider flex items-center gap-3">
-            <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl">
-              <MapPin className="w-4 h-4 text-white" />
-            </div>
-            Contact Information
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-            <div className="space-y-1.5 w-full md:col-span-2">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📍</span> Office Address *
-              </label>
-              <textarea
-                name="officeAddress"
-                value={editForm.officeAddress}
-                onChange={handleEditChange}
-                rows="2"
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300 resize-y"
-                placeholder="Enter complete office address"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>🏙️</span> City *
-              </label>
-              <input
-                type="text"
-                name="city"
-                value={editForm.city}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>🗺️</span> District *
-              </label>
-              <input
-                type="text"
-                name="district"
-                value={editForm.district}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>🌍</span> State *
-              </label>
-              <input
-                type="text"
-                name="state"
-                value={editForm.state}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📍</span> PIN Code *
-              </label>
-              <input
-                type="text"
-                name="pinCode"
-                value={editForm.pinCode}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>🌐</span> Website
-              </label>
-              <input
-                type="text"
-                name="website"
-                value={editForm.website}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-                placeholder="www.example.com"
-              />
-            </div>
-            <div className="space-y-1.5 w-full">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                <span>📱</span> WhatsApp Number
-              </label>
-              <input
-                type="text"
-                name="whatsappNumber"
-                value={editForm.whatsappNumber}
-                onChange={handleEditChange}
-                className="w-full border-2 border-gray-200 focus:border-[#00695C] focus:ring-4 focus:ring-[#00695C]/20 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none transition-all duration-300"
-                placeholder="+91 98765 43210"
-              />
-            </div>
-          </div>
-        </div>
-
-      </div>
-      <div className="px-8 py-5 bg-white border-t-2 border-gray-100 flex flex-col sm:flex-row justify-end gap-3 flex-shrink-0">
-        <button
-          onClick={() => setShowEditModal(false)}
-          className="px-8 py-3 rounded-2xl border-2 border-gray-300 text-gray-700 text-sm font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105 w-full sm:w-auto"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleSave}
-          disabled={isLoading}
-          className="px-8 py-3 rounded-2xl bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white text-sm font-bold hover:from-[#005A4F] hover:to-[#1B9E8E] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2 justify-center w-full sm:w-auto hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isLoading ? (
-            <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin" />
-          ) : (
-            <Save className="w-4 h-4" />
-          )}
-          {isLoading ? 'Saving...' : 'Save Changes'}
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+      )}
 
       {/* Success Toast */}
       {showSuccess && (
-        <div className="fixed top-20 right-4 z-50 bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 border-2 border-[#00695C]/30 rounded-2xl p-4 flex items-center gap-4 shadow-xl animate-slideDown max-w-md backdrop-blur-sm">
-          <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-3 rounded-2xl animate-bounce-in">
-            <CheckCircle className="w-6 h-6 text-white" />
+        <div className="fixed top-20 sm:top-24 md:top-28 right-2 sm:right-4 z-50 bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 border-2 border-[#00695C]/30 rounded-2xl p-2 sm:p-3 flex items-center gap-3 sm:gap-4 shadow-xl animate-slideDown max-w-xs sm:max-w-md backdrop-blur-sm">
+          <div className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 sm:p-3 rounded-2xl animate-bounce-in">
+            <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
           <div>
-            <p className="text-[#00695C] font-bold text-lg">Success!</p>
-            <p className="text-[#00695C]/80 text-sm">Operation completed successfully!</p>
+            <p className="text-[#00695C] font-bold text-base sm:text-lg">Success!</p>
+            <p className="text-[#00695C]/80 text-[10px] sm:text-sm">Operation completed successfully!</p>
           </div>
           <button onClick={() => setShowSuccess(false)} className="text-[#00695C] hover:text-[#004D40] ml-auto hover:rotate-90 transition-transform duration-300 hover:scale-110">
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
       )}
@@ -3863,63 +3477,64 @@ const sections = [
       )}
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 max-w-full w-full relative z-10 -mt-15">
+      <div className="container mx-auto px-2 sm:px-4 md:px-6 max-w-full w-full relative z-10 -mt-12 sm:-mt-15">
         {/* Header */}
-        <div className="relative overflow-hidden rounded-3xl mb-6 w-full animate-fade-up">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#00695C]/[0.04] via-[#26A69A]/[0.06] to-[#00695C]/[0.04] rounded-3xl" />
+        <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl mb-4 sm:mb-6 w-full animate-fade-up">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#00695C]/[0.04] via-[#26A69A]/[0.06] to-[#00695C]/[0.04] rounded-2xl sm:rounded-3xl" />
           <div className="absolute -top-16 -left-10 w-40 h-40 bg-gradient-to-br from-[#00695C]/10 to-[#26A69A]/10 rounded-full blur-3xl animate-pulse-slow pointer-events-none" />
           <div className="absolute -bottom-16 -right-10 w-40 h-40 bg-gradient-to-br from-[#26A69A]/10 to-[#00695C]/10 rounded-full blur-3xl animate-pulse-slow pointer-events-none" style={{ animationDelay: '1.2s' }} />
           <div className="absolute top-0 left-[-100%] w-full h-[1px] bg-gradient-to-r from-transparent via-[#26A69A]/50 to-transparent animate-shimmer pointer-events-none" />
 
-          <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full p-4 sm:p-5">
-            <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 w-full p-3 sm:p-4 md:p-5">
+            <div className="flex items-center gap-2 sm:gap-3 md:gap-4 w-full sm:w-auto">
               <button
                 onClick={handleNavigateBack}
-                className="relative p-3 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-110 hover:-rotate-12 group border border-[#00695C]/10 overflow-hidden"
+                className="relative p-2 sm:p-3 bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-110 hover:-rotate-12 group border border-[#00695C]/10 overflow-hidden"
                 aria-label="Go back"
               >
-                <span className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#00695C]/0 to-[#26A69A]/0 group-hover:from-[#00695C]/10 group-hover:to-[#26A69A]/10 transition-all duration-300" />
-                <ArrowLeft className="relative w-5 h-5 text-gray-600 group-hover:text-[#00695C] group-hover:-translate-x-0.5 transition-all duration-300" />
+                <span className="absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#00695C]/0 to-[#26A69A]/0 group-hover:from-[#00695C]/10 group-hover:to-[#26A69A]/10 transition-all duration-300" />
+                <ArrowLeft className="relative w-4 h-4 sm:w-5 sm:h-5 text-gray-600 group-hover:text-[#00695C] group-hover:-translate-x-0.5 transition-all duration-300" />
               </button>
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent flex items-center gap-3 relative">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent flex items-center gap-2 sm:gap-3 relative">
                   <div className="relative flex-shrink-0">
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#00695C] to-[#26A69A] blur-lg opacity-40 animate-pulse-slow" />
-                    <div className="absolute -inset-1 rounded-2xl border-2 border-[#26A69A]/30 animate-spin-slow" />
-                    <div className="relative bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2.5 rounded-2xl shadow-lg">
-                      <User className="w-6 h-6 text-white" />
+                    <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-r from-[#00695C] to-[#26A69A] blur-lg opacity-40 animate-pulse-slow" />
+                    <div className="absolute -inset-0.5 sm:-inset-1 rounded-xl sm:rounded-2xl border-2 border-[#26A69A]/30 animate-spin-slow" />
+                    <div className="relative bg-gradient-to-r from-[#00695C] to-[#26A69A] p-1.5 sm:p-2 md:p-2.5 rounded-xl sm:rounded-2xl shadow-lg">
+                      <User className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
                     </div>
                   </div>
-                  <span className="relative">
+                  <span className="relative text-base sm:text-xl md:text-2xl lg:text-3xl">
                     Agent Profile
-                    <span className="absolute -bottom-1 left-0 h-[3px] w-full bg-gradient-to-r from-[#00695C] to-[#26A69A] rounded-full scale-x-0 origin-left animate-underline-grow" />
+                    <span className="absolute -bottom-0.5 sm:-bottom-1 left-0 h-[2px] sm:h-[3px] w-full bg-gradient-to-r from-[#00695C] to-[#26A69A] rounded-full scale-x-0 origin-left animate-underline-grow" />
                   </span>
                 </h1>
-                <p className="text-xs text-gray-500 mt-1.5 ml-1 flex items-center gap-1.5">
-                  <Sparkles className="w-3 h-3 text-[#26A69A] animate-pulse" />
-                  Manage your agent profile and property listings
+                <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1.5 ml-0.5 sm:ml-1 flex items-center gap-1 sm:gap-1.5">
+                  <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#26A69A] animate-pulse" />
+                  <span className="hidden lg:inline">Manage your agent profile and property listings</span>
+                  <span className="inline lg:hidden">Manage your profile</span>
                 </p>
               </div>
             </div>
             <button
               onClick={() => setShowEditModal(true)}
-              className="relative flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#00695C] to-[#26A69A] hover:from-[#005A4F] hover:to-[#1B9E8E] text-white rounded-2xl font-bold transition-all duration-300 shadow-lg hover:shadow-2xl w-full sm:w-auto justify-center transform hover:scale-105 hover:-translate-y-1 group text-sm overflow-hidden"
+              className="relative flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 bg-gradient-to-r from-[#00695C] to-[#26A69A] hover:from-[#005A4F] hover:to-[#1B9E8E] text-white rounded-xl sm:rounded-2xl font-bold transition-all duration-300 shadow-lg hover:shadow-2xl w-full sm:w-auto justify-center transform hover:scale-105 hover:-translate-y-1 group text-xs sm:text-sm overflow-hidden"
             >
               <span className="absolute top-0 left-[-100%] w-full h-full bg-gradient-to-r from-transparent via-white/25 to-transparent group-hover:left-full transition-all duration-700 ease-out" />
-              <Edit2 className="relative w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
+              <Edit2 className="relative w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:rotate-12 transition-transform duration-300" />
               <span className="relative">Edit Profile</span>
             </button>
           </div>
         </div>
 
         {/* Profile Card */}
-        <div className="relative bg-[#00695C]/5 backdrop-blur-sm rounded-2xl shadow-xl p-6 mb-6 w-full hover:shadow-2xl transition-all duration-500 border border-[#00695C]/20 overflow-hidden group">
+        <div className="relative bg-[#00695C]/5 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-5 md:p-6 mb-4 sm:mb-6 w-full hover:shadow-2xl transition-all duration-500 border border-[#00695C]/20 overflow-hidden group">
           <div className="absolute top-0 left-[-100%] w-full h-[2px] bg-gradient-to-r from-transparent via-[#26A69A] to-transparent group-hover:left-full transition-all duration-[900ms] ease-out" />
 
           <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-[#00695C]/10 to-[#26A69A]/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
           <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-br from-[#26A69A]/10 to-[#00695C]/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
 
-          <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-2xl">
+          <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-xl sm:rounded-2xl">
             {Array.from({ length: 10 }).map((_, i) => (
               <span
                 key={i}
@@ -3939,21 +3554,21 @@ const sections = [
           <button
             onClick={handleDownloadInvoice}
             title="Download Invoice PDF"
-            className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg hover:from-[#005A4F] hover:to-[#1B9E8E] hover:scale-105 transition-all duration-300"
+            className="absolute top-2 sm:top-3 md:top-4 right-2 sm:right-3 md:right-4 z-20 flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 md:px-3.5 py-1.5 sm:py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold shadow-md hover:shadow-lg hover:from-[#005A4F] hover:to-[#1B9E8E] hover:scale-105 transition-all duration-300"
           >
-            <Download className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Download Invoice</span>
+            <Download className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+            <span className="hidden lg:inline">Download Invoice</span>
           </button>
 
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6 w-full relative z-10">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-4 sm:gap-5 md:gap-6 w-full relative z-10">
             <div className="relative flex-shrink-0">
-              <div className="absolute -inset-1 rounded-[24px] animate-spin-slow"
+              <div className="absolute -inset-0.5 sm:-inset-1 rounded-[20px] sm:rounded-[24px] animate-spin-slow"
                 style={{ background: 'conic-gradient(from 0deg, #00695C, #26A69A, #7fd6c9, #26A69A, #00695C)' }} />
-              <div className="relative w-28 h-28 rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-[#00695C]/20 to-[#26A69A]/20 flex items-center justify-center ring-4 ring-white/60">
+              <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-[#00695C]/20 to-[#26A69A]/20 flex items-center justify-center ring-3 sm:ring-4 ring-white/60">
                 {documents.profilePhoto ? (
                   <img src={URL.createObjectURL(documents.profilePhoto)} alt={editForm.fullName} className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-5xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
+                  <span className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
                     {editForm.fullName.charAt(0)}
                   </span>
                 )}
@@ -3961,55 +3576,55 @@ const sections = [
 
               {documents.profilePhoto && (
                 <button onClick={handleProfilePhotoDelete}
-                  className="absolute top-1 right-1 p-1.5 rounded-full bg-white shadow-lg hover:bg-red-500 text-gray-600 hover:text-white transition-all duration-300 hover:scale-110 hover:rotate-12 z-20"
+                  className="absolute top-0 right-0 p-1 rounded-full bg-white shadow-lg hover:bg-red-500 text-gray-600 hover:text-white transition-all duration-300 hover:scale-110 hover:rotate-12 z-20"
                   aria-label="Delete profile photo" title="Delete Profile Photo">
-                  <Trash2 className="w-3 h-3" />
+                  <Trash2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                 </button>
               )}
 
               <button onClick={() => profilePhotoInputRef.current?.click()}
-                className="absolute bottom-1 right-1 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white p-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 hover:rotate-12 z-20"
+                className="absolute bottom-0 right-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white p-1.5 sm:p-2 rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 hover:rotate-12 z-20"
                 aria-label="Upload profile photo" title="Upload Profile Photo">
-                <Camera className="w-3.5 h-3.5" />
+                <Camera className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               </button>
               <input ref={profilePhotoInputRef} type="file" className="hidden" accept="image/*" onChange={handleProfilePhotoUpload} />
             </div>
 
             <div className="flex-1 text-center md:text-left w-full">
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-1.5">
-                <h2 className="text-2xl font-bold text-gray-800">{editForm.fullName}</h2>
-                <span className="text-xs text-[#00695C] font-medium bg-gray-100 px-3 py-1 rounded-full border border-gray-200">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 sm:gap-2 mb-1 sm:mb-1.5">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">{editForm.fullName}</h2>
+                <span className="text-[10px] sm:text-xs text-[#00695C] font-medium bg-gray-100 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full border border-gray-200">
                   Agent ID: #AGT-{editForm.mobileNumber?.slice(-4) || '0000'}
                 </span>
-                <span className="relative overflow-hidden bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white px-3 py-0.5 rounded-full text-[10px] font-bold">
+                <span className="relative overflow-hidden bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white px-2 sm:px-3 py-0.5 rounded-full text-[8px] sm:text-[10px] font-bold">
                   Verified Agent
                   <span className="absolute inset-y-0 left-[-60%] w-[40%] bg-gradient-to-r from-transparent via-white/80 to-transparent animate-shimmer" />
                 </span>
               </div>
 
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs text-gray-500 mb-3">
-                <span className="flex items-center gap-1.5 bg-[#00695C]/5 px-3 py-1.5 rounded-xl shadow-sm border border-[#00695C]/10 hover:border-[#26A69A] hover:-translate-y-0.5 transition-all duration-300 animate-rise" style={{ animationDelay: '0.05s' }}>
-                  <Building className="w-3.5 h-3.5 text-[#00695C]" /> {editForm.agencyName}
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-gray-500 mb-2 sm:mb-3">
+                <span className="flex items-center gap-1 sm:gap-1.5 bg-[#00695C]/5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl shadow-sm border border-[#00695C]/10 hover:border-[#26A69A] hover:-translate-y-0.5 transition-all duration-300 animate-rise" style={{ animationDelay: '0.05s' }}>
+                  <Building className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00695C]" /> {editForm.agencyName}
                 </span>
-                <span className="flex items-center gap-1.5 bg-[#00695C]/5 px-3 py-1.5 rounded-xl shadow-sm border border-[#00695C]/10 hover:border-[#26A69A] hover:-translate-y-0.5 transition-all duration-300 animate-rise" style={{ animationDelay: '0.15s' }}>
-                  <MapPin className="w-3.5 h-3.5 text-[#00695C]" /> {editForm.city}, {editForm.state}
+                <span className="flex items-center gap-1 sm:gap-1.5 bg-[#00695C]/5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl shadow-sm border border-[#00695C]/10 hover:border-[#26A69A] hover:-translate-y-0.5 transition-all duration-300 animate-rise" style={{ animationDelay: '0.15s' }}>
+                  <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00695C]" /> {editForm.city}, {editForm.state}
                 </span>
-                <span className="flex items-center gap-1.5 bg-[#00695C]/5 px-3 py-1.5 rounded-xl shadow-sm border border-[#00695C]/10 hover:border-[#26A69A] hover:-translate-y-0.5 transition-all duration-300 animate-rise" style={{ animationDelay: '0.25s' }}>
-                  <Phone className="w-3.5 h-3.5 text-[#00695C]" /> {editForm.mobileNumber}
+                <span className="flex items-center gap-1 sm:gap-1.5 bg-[#00695C]/5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl shadow-sm border border-[#00695C]/10 hover:border-[#26A69A] hover:-translate-y-0.5 transition-all duration-300 animate-rise" style={{ animationDelay: '0.25s' }}>
+                  <Phone className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00695C]" /> {editForm.mobileNumber}
                 </span>
-                <span className="flex items-center gap-1.5 bg-[#00695C]/5 px-3 py-1.5 rounded-xl shadow-sm border border-[#00695C]/10 hover:border-[#26A69A] hover:-translate-y-0.5 transition-all duration-300 animate-rise" style={{ animationDelay: '0.35s' }}>
-                  <Award className="w-3.5 h-3.5 text-[#00695C]" /> {editForm.yearsOfExperience} Years Exp.
+                <span className="flex items-center gap-1 sm:gap-1.5 bg-[#00695C]/5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl shadow-sm border border-[#00695C]/10 hover:border-[#26A69A] hover:-translate-y-0.5 transition-all duration-300 animate-rise" style={{ animationDelay: '0.35s' }}>
+                  <Award className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00695C]" /> {editForm.yearsOfExperience} Years Exp.
                 </span>
               </div>
 
-              <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                <span className="flex items-center gap-1.5 bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 text-[#00695C] px-3 py-1.5 rounded-xl text-[10px] font-bold shadow-sm hover:scale-105 transition-transform duration-300 border border-[#00695C]/20 text-left animate-rise" style={{ animationDelay: '0.45s' }}>
-                  <TrendingUp className="w-3 h-3 flex-shrink-0" />
+              <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center md:justify-start">
+                <span className="flex items-center gap-1 sm:gap-1.5 bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 text-[#00695C] px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[8px] sm:text-[10px] font-bold shadow-sm hover:scale-105 transition-transform duration-300 border border-[#00695C]/20 text-left animate-rise" style={{ animationDelay: '0.45s' }}>
+                  <TrendingUp className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
                   <span>{editForm.numberOfActiveListings} Active Listings</span>
                 </span>
-                <span className="flex items-center gap-1.5 bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 text-[#00695C] px-3 py-1.5 rounded-xl text-[10px] font-bold shadow-sm hover:scale-105 transition-transform duration-300 border border-[#00695C]/20 text-left animate-rise" style={{ animationDelay: '0.55s' }}>
-                  <Globe className="w-3 h-3 flex-shrink-0" />
-                  <span className="truncate max-w-[200px]">{editForm.serviceAreas}</span>
+                <span className="flex items-center gap-1 sm:gap-1.5 bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 text-[#00695C] px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[8px] sm:text-[10px] font-bold shadow-sm hover:scale-105 transition-transform duration-300 border border-[#00695C]/20 text-left animate-rise" style={{ animationDelay: '0.55s' }}>
+                  <Globe className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
+                  <span className="truncate max-w-[120px] sm:max-w-[180px] md:max-w-[200px]">{editForm.serviceAreas}</span>
                 </span>
               </div>
             </div>
@@ -4017,8 +3632,8 @@ const sections = [
         </div>
 
         {/* Navigation Tabs */}
-        <div className="bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] backdrop-blur-sm rounded-2xl shadow-xl p-2 mb-6 border border-[#00695C]/20 w-full overflow-x-auto">
-          <div className="flex gap-1.5 min-w-max">
+        <div className="bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl p-1.5 sm:p-2 mb-4 sm:mb-6 border border-[#00695C]/20 w-full overflow-x-auto">
+          <div className="flex gap-1 sm:gap-1.5 min-w-max">
             {sections.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeSection === tab.id;
@@ -4026,7 +3641,7 @@ const sections = [
                 <button
                   key={tab.id}
                   onClick={() => setActiveSection(tab.id)}
-                  className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-xs transition-all duration-500 whitespace-nowrap relative group ${
+                  className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 rounded-lg sm:rounded-xl font-bold text-[9px] sm:text-xs transition-all duration-500 whitespace-nowrap relative group ${
                     isActive
                       ? 'text-white shadow-lg transform scale-105'
                       : 'text-gray-600 hover:text-[#00695C]'
@@ -4038,13 +3653,14 @@ const sections = [
                   }}
                 >
                   {isActive && (
-                    <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#00695C] to-[#26A69A] shadow-lg animate-pulse-slow" />
+                    <span className="absolute inset-0 rounded-lg sm:rounded-xl bg-gradient-to-r from-[#00695C] to-[#26A69A] shadow-lg animate-pulse-slow" />
                   )}
-                  <span className="relative z-10 flex items-center gap-1.5">
-                    <Icon className={`w-3.5 h-3.5 transition-all duration-300 ${isActive ? 'text-white' : 'group-hover:text-[#00695C]'}`} />
-                    {tab.title}
+                  <span className="relative z-10 flex items-center gap-1 sm:gap-1.5">
+                    <Icon className={`w-3 h-3 sm:w-3.5 sm:h-3.5 transition-all duration-300 ${isActive ? 'text-white' : 'group-hover:text-[#00695C]'}`} />
+                    <span className="hidden lg:inline">{tab.title}</span>
+                    <span className="inline lg:hidden">{tab.title.split(' ')[0]}</span>
                     {isActive && (
-                      <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-white rounded-full animate-ping" />
+                      <span className="absolute -top-0.5 -right-0.5 w-1 h-1 sm:w-1.5 sm:h-1.5 bg-white rounded-full animate-ping" />
                     )}
                   </span>
                 </button>
@@ -4054,15 +3670,15 @@ const sections = [
         </div>
 
         {/* Tab Content */}
-        <div className="bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] backdrop-blur-sm rounded-2xl shadow-xl p-5 mb-6 border border-[#00695C]/20 w-full relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-[#00695C]/5 to-[#26A69A]/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-br from-[#26A69A]/5 to-[#00695C]/5 rounded-full blur-3xl" />
+        <div className="bg-gradient-to-br from-[#00695C]/[0.05] to-[#26A69A]/[0.05] backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 md:p-5 mb-4 sm:mb-6 border border-[#00695C]/20 w-full relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 sm:w-48 h-32 sm:h-48 bg-gradient-to-br from-[#00695C]/5 to-[#26A69A]/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-32 sm:w-48 h-32 sm:h-48 bg-gradient-to-br from-[#26A69A]/5 to-[#00695C]/5 rounded-full blur-3xl" />
           <div className="relative z-10">
             {renderSectionContent()}
           </div>
         </div>
 
-        {/* Properties Section - Separately at the bottom */}
+        {/* Properties Section */}
         {renderPropertiesSection()}
       </div>
 
@@ -4139,6 +3755,13 @@ const sections = [
           --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
           --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color);
           box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+        }
+
+        @media (min-width: 480px) {
+          .xs\\:inline { display: inline; }
+        }
+        @media (max-width: 479px) {
+          .xs\\:inline { display: none; }
         }
       `}</style>
     </div>

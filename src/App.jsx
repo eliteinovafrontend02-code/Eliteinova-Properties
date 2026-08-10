@@ -105,6 +105,9 @@ import PropertyManagementFormModal from "./components/Forms/PropertyManagementFo
 //import all profiles
 import OwnerProfile from "./components/profiles/OwnerProfile";
 import AgentProfile from "./components/profiles/AgentProfile";
+import BuilderProfile from "./components/profiles/BuilderProfile";
+import PropertyManagementProfile from "./components/profiles/PropertyManagementProfile";
+import AdminDashboard from "./components/dashboard/AdminDashboard";
 
 
 function AppLayout() {
@@ -182,9 +185,14 @@ function AppLayout() {
           {/* My Profile  Routes */}
            <Route path="/profile/owner" element={<OwnerProfile/>} />
            <Route path="/profile/agent" element={<AgentProfile/>} />
+           <Route path="/profile/builder" element={<BuilderProfile/>} />
+          <Route path="/profile/property-management" element={<PropertyManagementProfile/>} />
+
+
 
           <Route path="/" element={<HomePage />} />
           <Route path="/customer-portal" element={<CustomerPortalPage />} />
+           <Route path="/admin" element={<AdminDashboard/>} />
           
           {/* Customer Portal Routes */}
           <Route path="/individual" element={<IndividualPage />} />
