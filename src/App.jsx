@@ -192,7 +192,7 @@ function AppLayout() {
 
           <Route path="/" element={<HomePage />} />
           <Route path="/customer-portal" element={<CustomerPortalPage />} />
-           <Route path="/admin" element={<AdminDashboard/>} />
+           <Route path="/admin/*" element={<AdminDashboard/>} />
           
           {/* Customer Portal Routes */}
           <Route path="/individual" element={<IndividualPage />} />

@@ -14,7 +14,7 @@ import {
 } from 'react-icons/fi';
 
 import { 
-  FaBuilding, FaBuilding as FaApartment, FaShoppingBag, 
+  FaBuilding, FaShoppingBag, 
   FaDollarSign, FaFileAlt, FaUserTie, FaUserCheck, FaUserCog,
   FaProjectDiagram, FaTools, FaShieldAlt, FaImage, FaBell,
   FaChartLine, FaWallet, FaBars, FaSun, FaMoon, FaClock,
@@ -29,32 +29,47 @@ import { BsBuilding, BsTools } from 'react-icons/bs';
 import { HiOutlineBuildingOffice, HiOutlineUserGroup } from 'react-icons/hi2';
 
 // ============ IMPORT ALL COMPONENTS ============
-// import AdminOverview from './admin/AdminOverview';
-// import UserManagement from './admin/UserManagement';
+import AdminOverview from './admin/AdminOverview';
+import UserManagement from './admin/UserManagement'; 
+
+// Owners
 // import Owners from './admin/Owners/Owners';
-// import OwnersOverview from './admin/Owners/OwnersOverview';
-// import OwnersRegistration from './admin/Owners/OwnersRegistration';
+import OwnersOverview from './admin/Owners/OwnersOverview';
+import OwnersRegistration from './admin/Owners/OwnersRegistration';
 // import OwnersPropertyControl from './admin/Owners/OwnersPropertyControl';
 // import OwnersSubscription from './admin/Owners/OwnersSubscription';
+
+// Agents
 // import Agents from './admin/Agents/Agents';
 // import AgentsOverview from './admin/Agents/AgentsOverview';
 // import AgentsVerification from './admin/Agents/AgentsVerification';
 // import AgentsProperties from './admin/Agents/AgentsProperties';
+
+// Builders
 // import Builders from './admin/Builders/Builders';
 // import BuildersOverview from './admin/Builders/BuildersOverview';
 // import BuildersVerification from './admin/Builders/BuildersVerification';
 // import BuildersProjects from './admin/Builders/BuildersProjects';
+
+// Property Managers
 // import PropertyManagers from './admin/PropertyManagers/PropertyManagers';
 // import PropertyManagersOverview from './admin/PropertyManagers/PropertyManagersOverview';
 // import PropertyManagersCompanies from './admin/PropertyManagers/PropertyManagersCompanies';
 // import PropertyManagersMaintenance from './admin/PropertyManagers/PropertyManagersMaintenance';
+
+// Buyers & Tenants
 // import BuyersTenants from './admin/BuyersTenants';
+
+// Properties - All property types
 // import Properties from './admin/Properties/Properties';
 // import PropertiesOverview from './admin/Properties/PropertiesOverview';
-// import Residential from './admin/Properties/Residential';
+// import Individual from './admin/Properties/Individual';
 // import Commercial from './admin/Properties/Commercial';
+// import Apartment from './admin/Properties/Apartment';
 // import LandAndPlots from './admin/Properties/LandAndPlots';
 // import HostelAndPg from './admin/Properties/HostelAndPg';
+
+// Other modules
 // import LeadManagement from './admin/LeadManagement';
 // import Subscriptions from './admin/Subscriptions';
 // import Payments from './admin/Payments';
@@ -160,8 +175,9 @@ const AdminDashboard = () => {
       label: 'Properties',
       children: [
         { key: '/admin/properties/overview', icon: <FiGrid />, label: 'Properties Overview' },
-        { key: '/admin/properties/residential', icon: <FiHome />, label: 'Residential' },
+        { key: '/admin/properties/individual', icon: <FiHome />, label: 'Individual' },
         { key: '/admin/properties/commercial', icon: <FaShoppingBag />, label: 'Commercial' },
+        { key: '/admin/properties/apartment', icon: <MdOutlineApartment />, label: 'Apartment' },
         { key: '/admin/properties/land-plots', icon: <FiMapPin />, label: 'Land & Plots' },
         { key: '/admin/properties/hostel-pg', icon: <MdOutlineApartment />, label: 'Hostel & PG' },
       ],
@@ -296,15 +312,14 @@ const AdminDashboard = () => {
           )}
         </div>
 
-        {/* Menu - Scrollable area */}
+        {/* Menu - Scrollable area with proper bottom padding */}
         <div 
           className="flex-1 overflow-y-auto sidebar-scroll" 
           style={{ minHeight: 0 }}
         >
-          <div className="py-3 px-2">
+          <div className="py-3 px-2 pb-20">
             {menuItems.map(renderMenuItem)}
           </div>
-          <div className="h-4" />
         </div>
 
         {/* Bottom - Fixed at bottom */}
@@ -435,40 +450,58 @@ const AdminDashboard = () => {
             <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-[#26A69A]/5 rounded-full blur-3xl animate-float-delayed" />
             
             <Routes>
-              {/* <Route path="/" element={<AdminOverview />} />
-              <Route path="/overview" element={<AdminOverview />} />
-              <Route path="/user-management" element={<UserManagement />} />
-              <Route path="/owners" element={<Owners />} />
-              <Route path="/owners/overview" element={<OwnersOverview />} />
-              <Route path="/owners/registration" element={<OwnersRegistration />} />
-              <Route path="/owners/property-control" element={<OwnersPropertyControl />} />
-              <Route path="/owners/subscription" element={<OwnersSubscription />} />
-              <Route path="/agents" element={<Agents />} />
-              <Route path="/agents/overview" element={<AgentsOverview />} />
-              <Route path="/agents/verification" element={<AgentsVerification />} />
-              <Route path="/agents/properties" element={<AgentsProperties />} />
-              <Route path="/builders" element={<Builders />} />
-              <Route path="/builders/overview" element={<BuildersOverview />} />
-              <Route path="/builders/verification" element={<BuildersVerification />} />
-              <Route path="/builders/projects" element={<BuildersProjects />} />
-              <Route path="/property-managers" element={<PropertyManagers />} />
-              <Route path="/property-managers/overview" element={<PropertyManagersOverview />} />
-              <Route path="/property-managers/companies" element={<PropertyManagersCompanies />} />
-              <Route path="/property-managers/maintenance" element={<PropertyManagersMaintenance />} />
-              <Route path="/buyers-tenants" element={<BuyersTenants />} />
-              <Route path="/properties" element={<Properties />} />
-              <Route path="/properties/overview" element={<PropertiesOverview />} />
-              <Route path="/properties/residential" element={<Residential />} />
-              <Route path="/properties/commercial" element={<Commercial />} />
-              <Route path="/properties/land-plots" element={<LandAndPlots />} />
-              <Route path="/properties/hostel-pg" element={<HostelAndPg />} />
-              <Route path="/leads" element={<LeadManagement />} />
-              <Route path="/subscriptions" element={<Subscriptions />} />
-              <Route path="/payments" element={<Payments />} />
-              <Route path="/reports" element={<ReportsAnalytics />} />
-              <Route path="/content" element={<ContentManagement />} />
-              <Route path="/notifications" element={<Notifications />} />
-              <Route path="/settings" element={<Settings />} /> */}
+              {/* Main overview routes */}
+              <Route index element={<AdminOverview />} />
+              <Route path="overview" element={<AdminOverview />} />
+
+              {/* User Management */}
+              <Route path="user-management" element={<UserManagement />} />
+
+              {/* Owners */}
+              {/* <Route path="owners" element={<Owners />} /> */}
+              <Route path="owners/overview" element={<OwnersOverview />} />
+              <Route path="owners/registration" element={<OwnersRegistration />} />
+              {/* <Route path="owners/property-control" element={<OwnersPropertyControl />} /> */}
+              {/* <Route path="owners/subscription" element={<OwnersSubscription />} /> */}
+
+              {/* Agents */}
+              {/* <Route path="agents" element={<Agents />} />
+              <Route path="agents/overview" element={<AgentsOverview />} />
+              <Route path="agents/verification" element={<AgentsVerification />} />
+              <Route path="agents/properties" element={<AgentsProperties />} /> */}
+
+              {/* Builders */}
+              {/* <Route path="builders" element={<Builders />} />
+              <Route path="builders/overview" element={<BuildersOverview />} />
+              <Route path="builders/verification" element={<BuildersVerification />} />
+              <Route path="builders/projects" element={<BuildersProjects />} /> */}
+
+              {/* Property Managers */}
+              {/* <Route path="property-managers" element={<PropertyManagers />} />
+              <Route path="property-managers/overview" element={<PropertyManagersOverview />} />
+              <Route path="property-managers/companies" element={<PropertyManagersCompanies />} />
+              <Route path="property-managers/maintenance" element={<PropertyManagersMaintenance />} /> */}
+
+              {/* Buyers & Tenants */}
+              {/* <Route path="buyers-tenants" element={<BuyersTenants />} /> */}
+
+              {/* Properties - All property types */}
+              {/* <Route path="properties" element={<Properties />} />
+              <Route path="properties/overview" element={<PropertiesOverview />} />
+              <Route path="properties/individual" element={<Individual />} />
+              <Route path="properties/commercial" element={<Commercial />} />
+              <Route path="properties/apartment" element={<Apartment />} />
+              <Route path="properties/land-plots" element={<LandAndPlots />} />
+              <Route path="properties/hostel-pg" element={<HostelAndPg />} /> */}
+
+              {/* Other routes */}
+              {/* <Route path="leads" element={<LeadManagement />} />
+              <Route path="subscriptions" element={<Subscriptions />} />
+              <Route path="payments" element={<Payments />} />
+              <Route path="reports" element={<ReportsAnalytics />} />
+              <Route path="content" element={<ContentManagement />} />
+              <Route path="notifications" element={<Notifications />} />
+              <Route path="settings" element={<Settings />} /> */}
             </Routes>
           </div>
         </div>
