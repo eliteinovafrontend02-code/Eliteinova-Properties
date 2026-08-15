@@ -37,7 +37,7 @@ import UserManagement from './admin/UserManagement';
 import OwnersOverview from './admin/Owners/OwnersOverview';
 import OwnersRegistration from './admin/Owners/OwnersRegistration';
 import OwnersPropertyControl from './admin/Owners/OwnersPropertyControl';
-// import OwnersSubscription from './admin/Owners/OwnersSubscription';
+import OwnersSubscription from './admin/Owners/OwnersSubscription';
 
 // Agents
 // import AgentsOverview from './admin/Agents/AgentsOverview';
@@ -471,7 +471,7 @@ const AdminDashboard = () => {
               <Route path="owners/overview" element={<OwnersOverview />} />
               <Route path="owners/registration" element={<OwnersRegistration />} />
               <Route path="owners/property-control" element={<OwnersPropertyControl />} />
-              {/* <Route path="owners/subscription" element={<OwnersSubscription />} /> */}
+              <Route path="owners/subscription" element={<OwnersSubscription />} />
 
               {/* Agents */}
               {/* <Route path="agents/overview" element={<AgentsOverview />} />
