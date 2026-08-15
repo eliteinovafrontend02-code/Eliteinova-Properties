@@ -10,7 +10,8 @@ import {
   FiStar, FiShield, FiActivity, FiRefreshCw,
   FiArrowRight, FiMoreVertical, FiDownload, FiUpload,
   FiInfo, FiAlertTriangle, FiPlus, FiExternalLink, FiGrid, FiList, FiX,
-  FiPrinter, FiCopy, FiShare, FiSettings, FiAward, FiBriefcase, FiHome
+  FiPrinter, FiCopy, FiShare, FiSettings, FiAward, FiBriefcase, FiHome, FiDollarSign,
+  FiMaximize, FiMinimize, FiTag, FiSquare
 } from 'react-icons/fi';
 import {
   FaBuilding, FaUserTie, FaUserCog, FaUsers,
@@ -114,13 +115,274 @@ const ApprovalConfirmModal = ({ show, action, actionLoading, ownerName, onCancel
   );
 };
 
+// ============ OWNER PROPERTIES MODAL ============
+const OwnerPropertiesModal = ({ owner, show, onClose, onViewProperty }) => {
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (show && owner) {
+      setLoading(true);
+      // Generate mock properties for this owner
+      setTimeout(() => {
+        const mockProperties = generateOwnerProperties(owner);
+        setProperties(mockProperties);
+        setLoading(false);
+      }, 500);
+    }
+  }, [show, owner]);
+
+  if (!show || !owner) return null;
+
+  const statusColors = {
+    pending: 'bg-amber-100 text-amber-700',
+    approved: 'bg-emerald-100 text-emerald-700',
+    rejected: 'bg-red-100 text-red-700',
+    suspended: 'bg-gray-100 text-gray-700'
+  };
+
+  const typeIcons = {
+    'Individual': <FiUser className="text-[#00695C]" />,
+    'Apartment': <MdApartment className="text-[#00695C]" />,
+    'Commercial': <MdOutlineBusiness className="text-[#00695C]" />,
+    'Land & Plots': <FiSquare className="text-[#00695C]" />,
+    'Hostel': <FaBuilding className="text-[#00695C]" />
+  };
+
+  const handleViewProperty = (property) => {
+    if (onViewProperty) {
+      onViewProperty(property);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[85vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
+        {/* Header */}
+        <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] px-6 py-4 rounded-t-3xl z-10 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white">
+              <FiHome className="text-lg" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white">{owner.name}'s Properties</h2>
+              <p className="text-white/70 text-xs">{properties.length} properties listed</p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110"
+          >
+            <FiX className="text-lg" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6 bg-[#F8FAF9]">
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="w-10 h-10 border-4 border-[#00695C]/20 border-t-[#00695C] rounded-full animate-spin" />
+            </div>
+          ) : properties.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="w-20 h-20 rounded-full bg-[#F5F9F8] flex items-center justify-center mb-4">
+                <FiHome className="text-3xl text-[#B5C9C5]" />
+              </div>
+              <h3 className="text-lg font-semibold text-[#1A2E2A]">No Properties Found</h3>
+              <p className="text-sm text-[#5A7D78] mt-1">This owner hasn't listed any properties yet.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {properties.map((property, index) => (
+                <div
+                  key={property.id}
+                  className="bg-white rounded-2xl border border-[#E8F0EE] p-4 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-[#1A2E2A] text-sm truncate">{property.title}</h4>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F5F9F8] text-[#5A7D78] flex items-center gap-1">
+                          {typeIcons[property.type] || <FiTag className="text-[#00695C]" />}
+                          {property.type}
+                        </span>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColors[property.status] || 'bg-gray-100 text-gray-700'}`}>
+                          {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
+                        </span>
+                        {property.isFeatured && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
+                            <FaStarSolid className="inline mr-0.5 text-[8px]" /> Featured
+                          </span>
+                        )}
+                        {property.isVerified && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                            <FiShield className="inline mr-0.5 text-[8px]" /> Verified
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="shrink-0">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white font-bold text-sm">
+                        ₹{Math.floor(property.price / 100000)}L
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 space-y-1">
+                    <div className="flex items-center gap-2 text-xs text-[#5A7D78]">
+                      <FiMapPin className="text-[#00695C] shrink-0" />
+                      <span className="truncate">{property.location}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-[#5A7D78]">
+                      <FiDollarSign className="text-[#00695C] shrink-0" />
+                      <span className="font-semibold text-[#1A2E2A]">₹{property.price.toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-[#5A7D78]">
+                      <FiUser className="text-[#00695C] shrink-0" />
+                      <span className="truncate">{property.ownerName || owner.name}</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-[#E8F0EE]">
+                    <div className="text-center">
+                      <p className="text-sm font-bold text-[#1A2E2A]">{property.bedrooms}</p>
+                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Beds</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm font-bold text-[#1A2E2A]">{property.bathrooms}</p>
+                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Baths</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm font-bold text-[#1A2E2A]">{property.area}</p>
+                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">{property.areaUnit}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 pt-3 border-t border-[#E8F0EE] flex items-center justify-between text-xs text-[#5A7D78]">
+                    <span>Listed: {new Date(property.listedDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                    <div className="flex items-center gap-3">
+                      <span><FiEye className="inline mr-0.5 text-[#00695C]" /> {property.views}</span>
+                      <span><FiMail className="inline mr-0.5 text-[#00695C]" /> {property.inquiries}</span>
+                    </div>
+                  </div>
+
+                  {/* View Property Button */}
+                  <div className="mt-3 pt-3 border-t border-[#E8F0EE]">
+                    <button
+                      onClick={() => handleViewProperty(property)}
+                      className="w-full py-2 rounded-xl text-xs font-medium bg-[#00695C] text-white hover:bg-[#004D40] transition-all duration-300 flex items-center justify-center gap-2 hover:scale-[1.02] shadow-md"
+                    >
+                      <FiEye className="text-xs" />
+                      View Property Details
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="sticky bottom-0 px-6 py-3 border-t border-[#E8F0EE] bg-white rounded-b-3xl flex items-center justify-between shrink-0">
+          <span className="text-xs text-[#5A7D78]">
+            Total: <span className="font-semibold text-[#1A2E2A]">{properties.length}</span> properties
+          </span>
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-sm font-medium shadow-md hover:scale-105"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Helper function to generate mock properties for an owner
+const generateOwnerProperties = (owner) => {
+  const propertyTypes = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
+  const statuses = ['pending', 'approved', 'rejected', 'suspended'];
+  const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur', 'Lucknow', 'Nagpur'];
+  const titles = [
+    'Luxury Apartment', 'Modern Family Home', 'Spacious Villa', 'Penthouse Suite',
+    'Cozy Studio', 'Commercial Office Space', 'Garden House', 'Lake View Apartment',
+    'City Center Condo', 'Suburban Family Home', 'Beachfront Villa', 'Sky Lounge Penthouse',
+    'Premium Individual House', 'Luxury Individual Villa', 'Corporate Commercial Space',
+    'Retail Commercial Space', 'Residential Land Plot', 'Commercial Land Plot',
+    'Premium Hostel', 'Student Hostel', 'Working Professional Hostel'
+  ];
+
+  // Use the actual propertiesCount from the owner, or a random number if not available
+  const count = owner.propertiesCount || Math.floor(Math.random() * 8) + 1;
+  
+  const properties = [];
+
+  // Owner names for properties
+  const ownerNames = [
+    'Rajesh Kumar', 'Priya Sharma', 'Amit Singh', 'Sneha Patel', 'Vikram Reddy',
+    'Deepak Verma', 'Meera Joshi', 'Arjun Nair', 'Kavya Rao', 'Suresh Gupta'
+  ];
+
+  for (let i = 1; i <= count; i++) {
+    const date = new Date();
+    date.setDate(date.getDate() - Math.floor(Math.random() * 120));
+
+    const type = propertyTypes[Math.floor(Math.random() * propertyTypes.length)];
+    const status = statuses[Math.floor(Math.random() * statuses.length)];
+    const city = cities[Math.floor(Math.random() * cities.length)];
+    const ownerName = ownerNames[Math.floor(Math.random() * ownerNames.length)];
+
+    // Generate amenities based on property type
+    let amenities = [];
+    if (type === 'Individual') {
+      amenities = ['WiFi', 'Parking', 'Garden', 'Security', 'Balcony'];
+    } else if (type === 'Apartment') {
+      amenities = ['WiFi', 'Swimming Pool', 'AC', 'Parking', 'Gym', 'Elevator'];
+    } else if (type === 'Commercial') {
+      amenities = ['WiFi', 'Parking', 'Security', 'AC', 'Elevator'];
+    } else if (type === 'Land & Plots') {
+      amenities = ['Water Connection', 'Electricity', 'Road Access', 'Fencing'];
+    } else if (type === 'Hostel') {
+      amenities = ['WiFi', 'AC', 'Security', 'Mess', 'Laundry'];
+    }
+
+    properties.push({
+      id: `prop_${owner.id}_${i}`,
+      title: titles[Math.floor(Math.random() * titles.length)] + ` ${i}`,
+      type: type,
+      location: `${city}, ${['Maharashtra', 'Delhi', 'Karnataka', 'Tamil Nadu', 'Telangana', 'Gujarat', 'Rajasthan'][Math.floor(Math.random() * 7)]}`,
+      price: Math.floor(Math.random() * 50000000 + 5000000),
+      bedrooms: Math.floor(Math.random() * 4) + 1,
+      bathrooms: Math.floor(Math.random() * 3) + 1,
+      area: Math.floor(Math.random() * 2000 + 500),
+      areaUnit: 'sq ft',
+      status: status,
+      isFeatured: Math.random() > 0.8,
+      isVerified: Math.random() > 0.7,
+      listedDate: date.toISOString(),
+      views: Math.floor(Math.random() * 500),
+      inquiries: Math.floor(Math.random() * 50),
+      description: `Beautiful ${type.toLowerCase()} located in ${city}. Features ${Math.floor(Math.random() * 3) + 2} bedrooms and modern amenities. Perfect for families and professionals.`,
+      amenities: amenities,
+      parking: Math.random() > 0.5 ? `${Math.floor(Math.random() * 2) + 1} spots` : 'None',
+      ownerName: owner.name || ownerName,
+      ownerEmail: owner.email || `${ownerName.toLowerCase().replace(' ', '.')}@email.com`,
+      ownerPhone: owner.phone || `+91 ${Math.floor(Math.random() * 9000000000 + 1000000000)}`,
+    });
+  }
+
+  return properties;
+};
+
 /* ============================================================
    VIEW OWNER MODAL — redesigned, theme-token based
    Signature element: a completion ring around the avatar that
    visualizes how many of the 4 KYC documents are verified.
 ============================================================ */
 
-const ViewOwnerModal = ({ owner, show, actionLoading, onClose, onApprove, onReject, onEdit, onToggleBlock }) => {
+const ViewOwnerModal = ({ owner, show, actionLoading, onClose, onApprove, onReject, onEdit, onToggleBlock, onViewProperties }) => {
   const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
@@ -212,6 +474,22 @@ const ViewOwnerModal = ({ owner, show, actionLoading, onClose, onApprove, onReje
         <p className="text-center text-[10px] font-medium mt-1 shrink-0" style={{ color: 'var(--ovm-muted)' }}>
           {kycVerifiedCount}/{kycItems.length} documents verified · {kycPercent}%
         </p>
+
+        {/* View Properties Button */}
+        <div className="px-6 mt-3 shrink-0">
+          <button
+            onClick={() => onViewProperties && onViewProperties(owner)}
+            className="w-full py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.02]"
+            style={{ 
+              background: 'var(--ovm-accent)', 
+              color: 'var(--ovm-on-accent)',
+              boxShadow: '0 4px 12px rgba(15, 107, 92, 0.3)'
+            }}
+          >
+            <FiHome className="text-sm" />
+            View All Properties ({owner.propertiesCount})
+          </button>
+        </div>
 
         {/* Tabs */}
         <div className="flex items-center justify-center gap-1 px-6 mt-4 shrink-0">
@@ -631,6 +909,10 @@ const OwnersRegistration = () => {
   const [actionLoading, setActionLoading] = useState(null);
   const [filterCount, setFilterCount] = useState(0);
   const [activeFilter, setActiveFilter] = useState('all');
+  
+  // ============ PROPERTIES MODAL STATE ============
+  const [showPropertiesModal, setShowPropertiesModal] = useState(false);
+  const [selectedOwnerForProperties, setSelectedOwnerForProperties] = useState(null);
 
   // ============ TOAST FUNCTION ============
   const showToast = useCallback((message, type = 'success', duration = 3000) => {
@@ -908,6 +1190,19 @@ const OwnersRegistration = () => {
     setShowViewModal(true);
   }, []);
 
+  // ============ VIEW OWNER PROPERTIES ============
+  const handleViewOwnerProperties = useCallback((owner) => {
+    setSelectedOwnerForProperties(owner);
+    setShowPropertiesModal(true);
+  }, []);
+
+  // ============ VIEW INDIVIDUAL PROPERTY DETAIL ============
+  const handleViewPropertyDetail = useCallback((property) => {
+    // Navigate to property detail page
+    navigate(`/properties/${property.id}`);
+    showToast(`Opening ${property.title}...`, 'info');
+  }, [navigate, showToast]);
+
   // ============ EDIT OWNER ============
   const handleEditOwner = useCallback((owner) => {
     setEditingOwner(owner);
@@ -1036,6 +1331,11 @@ const OwnersRegistration = () => {
     handleToggleBlock(viewingOwner.id);
   }, [viewingOwner, handleToggleBlock]);
 
+  const handleViewModalViewProperties = useCallback((owner) => {
+    setShowViewModal(false);
+    handleViewOwnerProperties(owner);
+  }, [handleViewOwnerProperties]);
+
   // ============ BULK ACTIONS ============
   const handleBulkAction = useCallback((action) => {
     if (selectedOwners.length === 0) {
@@ -1107,6 +1407,14 @@ const OwnersRegistration = () => {
         onConfirm={confirmApproval}
       />
 
+      {/* Owner Properties Modal */}
+      <OwnerPropertiesModal
+        owner={selectedOwnerForProperties}
+        show={showPropertiesModal}
+        onClose={() => { setShowPropertiesModal(false); setSelectedOwnerForProperties(null); }}
+        onViewProperty={handleViewPropertyDetail}
+      />
+
       {/* Edit Modal */}
       <EditOwnerModal
         owner={editingOwner}
@@ -1125,6 +1433,7 @@ const OwnersRegistration = () => {
         onReject={handleViewModalReject}
         onEdit={handleViewModalEdit}
         onToggleBlock={handleViewModalToggleBlock}
+        onViewProperties={handleViewModalViewProperties}
       />
 
       {/* Header */}
@@ -1510,7 +1819,7 @@ const OwnersRegistration = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 mt-2.5 pt-2.5 border-t border-[#E8F0EE]">
+                  <div className="flex flex-wrap gap-1 mt-2.5 pt-2.5 border-t border-[#E8F0EE]">
                     {isPending ? (
                       <>
                         <button
@@ -1547,6 +1856,13 @@ const OwnersRegistration = () => {
                           className="flex-1 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                         >
                           <FiEdit className="text-[10px]" /> Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleViewOwnerProperties(owner)}
+                          className="flex-1 py-1.5 text-xs font-medium text-purple-600 bg-purple-50 rounded-xl hover:bg-purple-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
+                        >
+                          <FiHome className="text-[10px]" /> Properties
                         </button>
                         <button
                           type="button"
@@ -1739,6 +2055,14 @@ const OwnersRegistration = () => {
                           title="Edit"
                         >
                           <FiEdit className="text-xs" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleViewOwnerProperties(owner)}
+                          className="w-7 h-7 rounded-lg hover:bg-purple-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-purple-600 hover:scale-110"
+                          title="View Properties"
+                        >
+                          <FiHome className="text-xs" />
                         </button>
                         <button
                           type="button"
