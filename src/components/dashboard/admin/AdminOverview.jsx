@@ -599,7 +599,7 @@ const AdminOverview = () => {
   // Stat Card Component - memoized to prevent re-renders
   const StatCard = useCallback(({ icon, title, value, trend, trendValue, subtitle, color, clickable = true, delay = 0 }) => (
     <div 
-      className={`bg-white rounded-2xl p-5 shadow-sm hover:shadow-xl transition-all duration-500 border border-gray-100 group hover:border-[#00695C]/30 cursor-pointer transform hover:-translate-y-1 ${statsAnimating ? 'animate-pulse-once' : ''}`}
+      className={`bg-white rounded-2xl p-2 shadow-sm hover:shadow-xl transition-all duration-500 border border-gray-100 group hover:border-[#00695C]/30 cursor-pointer transform hover:-translate-y-1 ${statsAnimating ? 'animate-pulse-once' : ''}`}
       style={{ animationDelay: `${delay}ms` }}
       onClick={() => clickable && handleStatClick(title)}
       onMouseEnter={() => setHoveredCard(title)}
@@ -907,7 +907,7 @@ const AdminOverview = () => {
       </div>
 
       {/* Overall Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 relative">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 relative">
         <StatCard
           icon={<BsPeople className="text-lg text-white" />}
           title="Total Vendors"
@@ -966,6 +966,7 @@ const AdminOverview = () => {
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
+
             { key: 'Owners', count: stats.totalOwners, icon: <FiUser className="text-[#00695C] text-lg" />, color: 'from-[#00695C]/10 to-[#26A69A]/10', border: 'border-[#00695C]/10', textColor: 'text-[#00695C]' },
             { key: 'Agents', count: stats.totalAgents, icon: <MdOutlineRealEstateAgent className="text-blue-600 text-lg" />, color: 'from-blue-600/10 to-blue-400/10', border: 'border-blue-600/10', textColor: 'text-blue-600' },
             { key: 'Builders', count: stats.totalBuilders, icon: <FaBuilding className="text-purple-600 text-lg" />, color: 'from-purple-600/10 to-purple-400/10', border: 'border-purple-600/10', textColor: 'text-purple-600' },

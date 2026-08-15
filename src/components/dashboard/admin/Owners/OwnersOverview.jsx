@@ -38,17 +38,17 @@ const StatCard = ({ icon, title, value, subtitle, color, gradient, borderColor, 
     <div className="relative flex items-start justify-between">
       <div className="flex-1">
         <div className="flex items-center gap-2 mb-1">
-          <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">{title}</p>
+          <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider">{title}</p>
           {trend && (
-            <span className={`text-[8px] font-bold px-2 py-0.5 rounded-full ${trend === 'up' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+            <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${trend === 'up' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
               {trend === 'up' ? '↑' : '↓'} {trendValue}%
             </span>
           )}
         </div>
-        <h3 className="text-2xl font-bold text-gray-800 group-hover:text-[#00695C] transition-colors duration-300">
+        <h3 className="text-2xl font-bold text-gray-900 group-hover:text-[#00695C] transition-colors duration-300">
           {typeof value === 'string' ? value : value.toLocaleString()}
         </h3>
-        {subtitle && <p className="text-[10px] text-gray-400 mt-0.5">{subtitle}</p>}
+        {subtitle && <p className="text-[11px] text-gray-500 mt-0.5">{subtitle}</p>}
       </div>
       <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${color} ${gradient} transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-12 shadow-lg group-hover:shadow-xl relative`}>
         <div className="absolute inset-0 rounded-2xl bg-white/20 animate-pulse-glow" />
@@ -62,8 +62,8 @@ const StatCard = ({ icon, title, value, subtitle, color, gradient, borderColor, 
     </div>
     
     <div className="mt-3 flex items-center justify-between">
-      <span className="text-[10px] text-gray-400 flex items-center gap-1">
-        <FiArrowRight className="text-[8px]" />
+      <span className="text-[11px] text-gray-500 flex items-center gap-1">
+        <FiArrowRight className="text-[9px]" />
         Click to view details
       </span>
       <FiArrowRight className="text-[#00695C] text-sm opacity-0 group-hover:opacity-100 transform group-hover:translate-x-2 transition-all duration-300" />
@@ -102,26 +102,26 @@ const NavCard = ({ icon, title, description, stats, color, gradient, borderColor
           )}
         </div>
         {badge && (
-          <span className={`px-3 py-1 ${badgeColor} text-white text-[10px] font-bold rounded-full shadow-lg animate-pulse-glow`}>
+          <span className={`px-3 py-1 ${badgeColor} text-white text-[11px] font-bold rounded-full shadow-lg animate-pulse-glow`}>
             {badge}
           </span>
         )}
       </div>
       
-      <h3 className="text-lg font-bold text-gray-800 group-hover:text-[#00695C] transition-colors duration-300 flex items-center gap-2">
+      <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#00695C] transition-colors duration-300 flex items-center gap-2">
         {title}
         {featured && <MdVerified className="text-[#00695C] text-sm" />}
       </h3>
-      <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">{description}</p>
+      <p className="text-xs text-gray-600 mt-1.5 leading-relaxed">{description}</p>
 
       {stats && stats.length > 0 && (
         <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-gray-100">
           {stats.map((s, i) => (
             <div key={i} className="text-center group/stat">
-              <p className="text-sm font-bold text-gray-800 group-hover/stat:text-[#00695C] transition-colors">
+              <p className="text-sm font-bold text-gray-900 group-hover/stat:text-[#00695C] transition-colors">
                 {typeof s.value === 'string' ? s.value : s.value.toLocaleString()}
               </p>
-              <p className="text-[8px] text-gray-400 uppercase tracking-wider">{s.label}</p>
+              <p className="text-[9px] text-gray-500 uppercase tracking-wider">{s.label}</p>
             </div>
           ))}
         </div>
@@ -154,14 +154,14 @@ const ActivityItem = ({ icon, title, time, description, color, gradient, index, 
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-sm font-semibold text-gray-800 group-hover:text-[#00695C] transition-colors truncate">
+          <p className="text-sm font-semibold text-gray-900 group-hover:text-[#00695C] transition-colors truncate">
             {title}
           </p>
-          <span className="text-[10px] text-gray-400 group-hover:text-[#00695C] transition-colors whitespace-nowrap">
+          <span className="text-[11px] text-gray-500 group-hover:text-[#00695C] transition-colors whitespace-nowrap">
             {time}
           </span>
         </div>
-        <p className="text-xs text-gray-500 group-hover:text-gray-700 transition-colors line-clamp-1">
+        <p className="text-xs text-gray-600 group-hover:text-gray-800 transition-colors line-clamp-1">
           {description}
         </p>
       </div>
@@ -182,8 +182,8 @@ const SectionHeader = ({ icon, title, subtitle, action, actionLabel, onAction })
         {icon}
       </div>
       <div>
-        <h2 className="text-sm font-bold text-gray-800">{title}</h2>
-        {subtitle && <p className="text-[10px] text-gray-400">{subtitle}</p>}
+        <h2 className="text-sm font-bold text-gray-900">{title}</h2>
+        {subtitle && <p className="text-[11px] text-gray-500">{subtitle}</p>}
       </div>
     </div>
     {action && (
@@ -206,8 +206,8 @@ const SectionHeader = ({ icon, title, subtitle, action, actionLabel, onAction })
 const QuickStat = ({ icon, label, value, color }) => (
   <div className="flex items-center gap-2 bg-white/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer hover:border-[#00695C]/30">
     <span className={color}>{icon}</span>
-    <span className="text-[10px] text-gray-500 group-hover:text-gray-700 transition-colors">{label}</span>
-    <span className="text-[10px] font-bold text-gray-800 group-hover:text-[#00695C] transition-colors">{value}</span>
+    <span className="text-[11px] text-gray-600 group-hover:text-gray-800 transition-colors">{label}</span>
+    <span className="text-[11px] font-bold text-gray-900 group-hover:text-[#00695C] transition-colors">{value}</span>
   </div>
 );
 
@@ -334,61 +334,65 @@ const OwnersOverview = () => {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-amber-500/3 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }} />
       </div>
 
-      {/* ===== HEADER ===== */}
-      <div className="relative animate-fade-in">
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-1 flex-wrap">
-              <div className="p-2.5 bg-gradient-to-br from-[#00695C] to-[#26A69A] rounded-2xl shadow-lg animate-pulse-glow relative">
-                <div className="absolute inset-0 rounded-2xl bg-white/20 animate-pulse" />
-                <FaUserTie className="text-white text-xl relative z-10" />
-              </div>
-              <div>
-                <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
-                  Owners Overview
-                </h1>
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <span>Complete control over all property owners</span>
-                  <span className="w-1 h-1 bg-gray-300 rounded-full" />
-                  <span className="text-[#00695C] font-medium">
-                    {time.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3 w-full lg:w-auto flex-wrap">
-            {/* Quick Stats Bar */}
-            <div className="flex items-center gap-2 flex-wrap">
-              {quickStats.map((stat, idx) => (
-                <QuickStat key={idx} {...stat} />
-              ))}
-            </div>
-            
-            {/* Live Status */}
-            <div className="flex items-center gap-2 text-xs bg-white/80 backdrop-blur-sm px-3 py-2 rounded-xl shadow-sm border border-[#00695C]/20 hover:border-[#00695C]/40 transition-all duration-300">
-              <FiActivity className="text-[#00695C] animate-pulse text-sm" />
-              <span className="font-medium text-[#00695C]">Live</span>
-              <span className="w-1 h-1 bg-gray-300 rounded-full" />
-              <span className="text-gray-400">
-                {time.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
-              </span>
-            </div>
-            
-            {/* Refresh Button */}
-            <button
-              onClick={handleRefresh}
-              disabled={loading}
-              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-xl hover:shadow-xl transition-all duration-300 text-sm font-medium shadow-md disabled:opacity-50 group relative overflow-hidden hover:scale-105"
-            >
-              <span className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-              <FiRefreshCw className={`text-sm ${loading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
-              {loading ? 'Refreshing...' : 'Refresh Data'}
-            </button>
-          </div>
+     {/* ===== HEADER ===== */}
+<div className="relative animate-fade-in">
+  <div className="flex flex-col gap-4">
+    {/* Title row */}
+    <div className="flex items-center gap-3 flex-wrap">
+      <div className="p-2.5 bg-gradient-to-br from-[#00695C] to-[#26A69A] rounded-2xl shadow-lg animate-pulse-glow relative">
+        <div className="absolute inset-0 rounded-2xl bg-white/20 animate-pulse" />
+        <FaUserTie className="text-white text-xl relative z-10" />
+      </div>
+      <div>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
+          Owners Overview
+        </h1>
+        <div className="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
+          <span>Complete control over all property owners</span>
+          <span className="w-1 h-1 bg-gray-400 rounded-full hidden sm:block" />
+          <span className="text-[#00695C] font-medium">
+            {time.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          </span>
         </div>
       </div>
+    </div>
+
+    {/* Actions row */}
+    <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
+      {/* Quick Stats — scrolls horizontally instead of wrapping */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        {quickStats.map((stat, idx) => (
+          <div key={idx} className="flex-shrink-0">
+            <QuickStat {...stat} />
+          </div>
+        ))}
+      </div>
+
+      <div className="flex items-center gap-3 flex-shrink-0">
+        {/* Live Status */}
+        <div className="flex items-center gap-2 text-xs bg-white/80 backdrop-blur-sm px-3 py-2 rounded-xl shadow-sm border border-[#00695C]/20 hover:border-[#00695C]/40 transition-all duration-300 whitespace-nowrap">
+          <FiActivity className="text-[#00695C] animate-pulse text-sm" />
+          <span className="font-medium text-[#00695C]">Live</span>
+          <span className="w-1 h-1 bg-gray-400 rounded-full" />
+          <span className="text-gray-500">
+            {time.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+          </span>
+        </div>
+
+        {/* Refresh Button */}
+        <button
+          onClick={handleRefresh}
+          disabled={loading}
+          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-xl hover:shadow-xl transition-all duration-300 text-sm font-medium shadow-md disabled:opacity-50 group relative overflow-hidden hover:scale-105 whitespace-nowrap"
+        >
+          <span className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+          <FiRefreshCw className={`text-sm ${loading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
+          {loading ? 'Refreshing...' : 'Refresh Data'}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
       {/* ===== STATS GRID ===== */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 relative">
@@ -548,10 +552,10 @@ const OwnersOverview = () => {
 
       {/* ===== FOOTER ===== */}
       <div className="text-center pt-4">
-        <p className="text-[10px] text-gray-400 flex items-center justify-center gap-2">
-          <span className="w-4 h-0.5 bg-gray-200 rounded-full" />
+        <p className="text-[11px] text-gray-500 flex items-center justify-center gap-2">
+          <span className="w-4 h-0.5 bg-gray-300 rounded-full" />
           <span>© 2026 Owners Overview • All rights reserved</span>
-          <span className="w-4 h-0.5 bg-gray-200 rounded-full" />
+          <span className="w-4 h-0.5 bg-gray-300 rounded-full" />
         </p>
       </div>
 

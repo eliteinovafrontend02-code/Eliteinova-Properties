@@ -36,26 +36,29 @@ import UserManagement from './admin/UserManagement';
 // import Owners from './admin/Owners/Owners';
 import OwnersOverview from './admin/Owners/OwnersOverview';
 import OwnersRegistration from './admin/Owners/OwnersRegistration';
-// import OwnersPropertyControl from './admin/Owners/OwnersPropertyControl';
+import OwnersPropertyControl from './admin/Owners/OwnersPropertyControl';
 // import OwnersSubscription from './admin/Owners/OwnersSubscription';
 
 // Agents
-// import Agents from './admin/Agents/Agents';
 // import AgentsOverview from './admin/Agents/AgentsOverview';
+// import AgentsRegistration from './admin/Agents/AgentsRegistration';
 // import AgentsVerification from './admin/Agents/AgentsVerification';
-// import AgentsProperties from './admin/Agents/AgentsProperties';
+// import AgentsPropertyManagement from './admin/Agents/AgentsPropertyManagement';
+// import AgentsPropertyControl from './admin/Agents/AgentsPropertyControl';
 
 // Builders
-// import Builders from './admin/Builders/Builders';
 // import BuildersOverview from './admin/Builders/BuildersOverview';
+// import BuildersRegistration from './admin/Builders/BuildersRegistration';
 // import BuildersVerification from './admin/Builders/BuildersVerification';
 // import BuildersProjects from './admin/Builders/BuildersProjects';
+// import BuildersPropertyControl from './admin/Builders/BuildersPropertyControl';
 
 // Property Managers
-// import PropertyManagers from './admin/PropertyManagers/PropertyManagers';
 // import PropertyManagersOverview from './admin/PropertyManagers/PropertyManagersOverview';
-// import PropertyManagersCompanies from './admin/PropertyManagers/PropertyManagersCompanies';
+// import PropertyManagersRegistration from './admin/PropertyManagers/PropertyManagersRegistration';
+// import PropertyManagersCompanyManagement from './admin/PropertyManagers/PropertyManagersCompanyManagement';
 // import PropertyManagersMaintenance from './admin/PropertyManagers/PropertyManagersMaintenance';
+// import PropertyManagersPropertyControl from './admin/PropertyManagers/PropertyManagersPropertyControl';
 
 // Buyers & Tenants
 // import BuyersTenants from './admin/BuyersTenants';
@@ -144,8 +147,10 @@ const AdminDashboard = () => {
       label: 'Agents',
       children: [
         { key: '/admin/agents/overview', icon: <FiGrid />, label: 'Agents Dashboard' },
-        { key: '/admin/agents/verification', icon: <FiCheckCircle />, label: 'Verification' },
-        { key: '/admin/agents/properties', icon: <FiHome />, label: 'Properties' },
+        { key: '/admin/agents/registration', icon: <FiCheckCircle />, label: 'Registration Approval' },
+        { key: '/admin/agents/verification', icon: <FaShieldAlt />, label: 'Agent Verification' },
+        { key: '/admin/agents/property-management', icon: <FiHome />, label: 'Property Management' },
+        { key: '/admin/agents/property-control', icon: <FiSettings />, label: 'Property Control' },
       ],
     },
     {
@@ -154,8 +159,10 @@ const AdminDashboard = () => {
       label: 'Builders',
       children: [
         { key: '/admin/builders/overview', icon: <FiGrid />, label: 'Builders Dashboard' },
-        { key: '/admin/builders/verification', icon: <FiCheckCircle />, label: 'Verification' },
-        { key: '/admin/builders/projects', icon: <FaProjectDiagram />, label: 'Projects' },
+        { key: '/admin/builders/registration', icon: <FiCheckCircle />, label: 'Registration Approval' },
+        { key: '/admin/builders/verification', icon: <FaShieldAlt />, label: 'Builder Verification' },
+        { key: '/admin/builders/projects', icon: <FaProjectDiagram />, label: 'Project Management' },
+        { key: '/admin/builders/property-control', icon: <FiSettings />, label: 'Property Control' },
       ],
     },
     {
@@ -164,8 +171,10 @@ const AdminDashboard = () => {
       label: 'Property Managers',
       children: [
         { key: '/admin/property-managers/overview', icon: <FiGrid />, label: 'PM Dashboard' },
-        { key: '/admin/property-managers/companies', icon: <FaBuilding />, label: 'Companies' },
+        { key: '/admin/property-managers/registration', icon: <FiCheckCircle />, label: 'Registration Approval' },
+        { key: '/admin/property-managers/companies', icon: <FaBuilding />, label: 'Company Management' },
         { key: '/admin/property-managers/maintenance', icon: <BsTools />, label: 'Maintenance' },
+        { key: '/admin/property-managers/property-control', icon: <FiSettings />, label: 'Property Control' },
       ],
     },
     { key: '/admin/buyers-tenants', icon: <HiOutlineUserGroup />, label: 'Buyers & Tenants' },
@@ -461,26 +470,29 @@ const AdminDashboard = () => {
               {/* <Route path="owners" element={<Owners />} /> */}
               <Route path="owners/overview" element={<OwnersOverview />} />
               <Route path="owners/registration" element={<OwnersRegistration />} />
-              {/* <Route path="owners/property-control" element={<OwnersPropertyControl />} /> */}
+              <Route path="owners/property-control" element={<OwnersPropertyControl />} />
               {/* <Route path="owners/subscription" element={<OwnersSubscription />} /> */}
 
               {/* Agents */}
-              {/* <Route path="agents" element={<Agents />} />
-              <Route path="agents/overview" element={<AgentsOverview />} />
+              {/* <Route path="agents/overview" element={<AgentsOverview />} />
+              <Route path="agents/registration" element={<AgentsRegistration />} />
               <Route path="agents/verification" element={<AgentsVerification />} />
-              <Route path="agents/properties" element={<AgentsProperties />} /> */}
+              <Route path="agents/property-management" element={<AgentsPropertyManagement />} />
+              <Route path="agents/property-control" element={<AgentsPropertyControl />} /> */}
 
               {/* Builders */}
-              {/* <Route path="builders" element={<Builders />} />
-              <Route path="builders/overview" element={<BuildersOverview />} />
+              {/* <Route path="builders/overview" element={<BuildersOverview />} />
+              <Route path="builders/registration" element={<BuildersRegistration />} />
               <Route path="builders/verification" element={<BuildersVerification />} />
-              <Route path="builders/projects" element={<BuildersProjects />} /> */}
+              <Route path="builders/projects" element={<BuildersProjects />} />
+              <Route path="builders/property-control" element={<BuildersPropertyControl />} /> */}
 
               {/* Property Managers */}
-              {/* <Route path="property-managers" element={<PropertyManagers />} />
-              <Route path="property-managers/overview" element={<PropertyManagersOverview />} />
-              <Route path="property-managers/companies" element={<PropertyManagersCompanies />} />
-              <Route path="property-managers/maintenance" element={<PropertyManagersMaintenance />} /> */}
+              {/* <Route path="property-managers/overview" element={<PropertyManagersOverview />} />
+              <Route path="property-managers/registration" element={<PropertyManagersRegistration />} />
+              <Route path="property-managers/companies" element={<PropertyManagersCompanyManagement />} />
+              <Route path="property-managers/maintenance" element={<PropertyManagersMaintenance />} />
+              <Route path="property-managers/property-control" element={<PropertyManagersPropertyControl />} /> */}
 
               {/* Buyers & Tenants */}
               {/* <Route path="buyers-tenants" element={<BuyersTenants />} /> */}
