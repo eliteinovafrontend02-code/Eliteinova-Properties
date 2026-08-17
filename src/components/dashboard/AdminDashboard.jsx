@@ -40,11 +40,11 @@ import OwnersPropertyControl from './admin/Owners/OwnersPropertyControl';
 import OwnersSubscription from './admin/Owners/OwnersSubscription';
 
 // Agents
-// import AgentsOverview from './admin/Agents/AgentsOverview';
-// import AgentsRegistration from './admin/Agents/AgentsRegistration';
-// import AgentsVerification from './admin/Agents/AgentsVerification';
-// import AgentsPropertyManagement from './admin/Agents/AgentsPropertyManagement';
-// import AgentsPropertyControl from './admin/Agents/AgentsPropertyControl';
+import AgentsOverview from './admin/Agents/AgentsOverview';
+import AgentsRegistration from './admin/Agents/AgentsRegistration';
+import AgentsVerification from './admin/Agents/AgentsVerification';
+import AgentsPropertyManagement from './admin/Agents/AgentsPropertyManagement';
+import AgentsPropertyControl from './admin/Agents/AgentsPropertyControl';
 
 // Builders
 // import BuildersOverview from './admin/Builders/BuildersOverview';
@@ -474,11 +474,11 @@ const AdminDashboard = () => {
               <Route path="owners/subscription" element={<OwnersSubscription />} />
 
               {/* Agents */}
-              {/* <Route path="agents/overview" element={<AgentsOverview />} />
+              <Route path="agents/overview" element={<AgentsOverview />} />
               <Route path="agents/registration" element={<AgentsRegistration />} />
               <Route path="agents/verification" element={<AgentsVerification />} />
               <Route path="agents/property-management" element={<AgentsPropertyManagement />} />
-              <Route path="agents/property-control" element={<AgentsPropertyControl />} /> */}
+              <Route path="agents/property-control" element={<AgentsPropertyControl />} />
 
               {/* Builders */}
               {/* <Route path="builders/overview" element={<BuildersOverview />} />

@@ -1,4 +1,4 @@
-// src/components/dashboard/admin/Owners/OwnersOverview.jsx
+// src/components/dashboard/admin/Agents/AgentsOverview.jsx
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +9,8 @@ import {
   FiPlus, FiFilter, FiDownload, FiEye, FiEdit, FiTrash2,
   FiLock, FiUnlock, FiXCircle, FiAlertCircle, FiInfo, FiSearch,
   FiTrendingDown, FiUserPlus, FiBriefcase, FiAward as FiAwardIcon,
-  FiBell, FiSettings, FiHelpCircle, FiShare2, FiMoreHorizontal
+  FiBell, FiSettings, FiHelpCircle, FiShare2, FiMoreHorizontal,
+  FiFileText, FiCheckSquare, FiClipboard, FiTrendingUp as FiTrendingUpIcon
 } from 'react-icons/fi';
 import {
   FaCrown, FaGem, FaMedal, FaUser, FaBuilding,
@@ -17,30 +18,28 @@ import {
   FaTimes, FaStar as FaStarSolid, FaRegStar, FaArrowUp, FaArrowDown,
   FaUserTie, FaUserCheck as FaUserCheckSolid,
   FaUserPlus, FaUsers, FaTrophy, FaRegBuilding,
-  FaClipboardList, FaWallet, FaHome,
-  FaRegSmile, FaRegHeart, FaRegCalendarAlt
+  FaClipboardList, FaWallet, FaHome as FaHomeIcon,
+  FaRegSmile, FaRegHeart, FaRegCalendarAlt,
+  FaHandshake, FaFileSignature, FaIdCard, FaPhoneAlt,
+  FaEnvelope, FaAddressCard, FaRegFileAlt, FaRegBuilding as FaRegBuildingIcon
 } from 'react-icons/fa';
-import { MdOutlineRealEstateAgent, MdApartment, MdVerified, MdOutlineVerified } from 'react-icons/md';
+import { MdOutlineRealEstateAgent, MdApartment, MdVerified, MdOutlineVerified, MdAssignment, MdAttachMoney } from 'react-icons/md';
 
 // ============================================================
-// CHILD COMPONENT
-// ============================================================
-// ============================================================
-// STAT CARD - Enhanced with Glassmorphism & Elegant Design
+// STAT CARD - Enhanced with Glassmorphism & Elegant Design (compact)
 // ============================================================
 const StatCard = ({ icon, title, value, subtitle, color, gradient, borderColor, delay = 0, statsAnimating, onClick, trend, trendValue }) => (
   <div
-    className={`relative bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 border ${borderColor} group cursor-pointer transform hover:-translate-y-2 hover:scale-[1.02] ${statsAnimating ? 'animate-pulse-once' : ''} overflow-hidden`}
+    className={`relative bg-white/80 backdrop-blur-xl rounded-2xl p-2 shadow-lg hover:shadow-2xl transition-all duration-500 border ${borderColor} group cursor-pointer transform hover:-translate-y-2 hover:scale-[1.02] ${statsAnimating ? 'animate-pulse-once' : ''} overflow-hidden`}
     style={{ animationDelay: `${delay}ms` }}
     onClick={onClick}
   >
-    {/* Animated Gradient Background */}
     <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-[#00695C]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
     <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#00695C]/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
     
     <div className="relative flex items-start justify-between">
       <div className="flex-1">
-        <div className="flex items-center gap-2 mb-1">
+        <div className="flex items-center gap-2 mb-0.5">
           <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider">{title}</p>
           {trend && (
             <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${trend === 'up' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
@@ -48,24 +47,23 @@ const StatCard = ({ icon, title, value, subtitle, color, gradient, borderColor, 
             </span>
           )}
         </div>
-        <h3 className="text-2xl font-bold text-gray-900 group-hover:text-[#00695C] transition-colors duration-300">
+        <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#00695C] transition-colors duration-300">
           {typeof value === 'string' ? value : value.toLocaleString()}
         </h3>
         {subtitle && <p className="text-[11px] text-gray-500 mt-0.5">{subtitle}</p>}
       </div>
-      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${color} ${gradient} transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-12 shadow-lg group-hover:shadow-xl relative`}>
-        <div className="absolute inset-0 rounded-2xl bg-white/20 animate-pulse-glow" />
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color} ${gradient} transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-12 shadow-lg group-hover:shadow-xl relative`}>
+        <div className="absolute inset-0 rounded-xl bg-white/20 animate-pulse-glow" />
         {icon}
       </div>
     </div>
     
-    {/* Progress Bar */}
-    <div className="mt-4 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+    <div className="mt-2 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
       <div className="h-full bg-gradient-to-r from-[#00695C] to-[#26A69A] rounded-full transition-all duration-1000 group-hover:opacity-80" style={{ width: `${Math.min(100, 60 + Math.random() * 30)}%` }} />
     </div>
     
-    <div className="mt-3 flex items-center justify-between">
-      <span className="text-[11px] text-gray-500 flex items-center gap-1">
+    <div className="mt-2 flex items-center justify-between">
+      <span className="text-[10px] text-gray-500 flex items-center gap-1">
         <FiArrowRight className="text-[9px]" />
         Click to view details
       </span>
@@ -75,26 +73,23 @@ const StatCard = ({ icon, title, value, subtitle, color, gradient, borderColor, 
 );
 
 // ============================================================
-// NAV CARD - Elegant Glassmorphism with Hover Effects
+// NAV CARD - Elegant Glassmorphism with Hover Effects (compact)
 // ============================================================
 const NavCard = ({ icon, title, description, stats, color, gradient, borderColor, delay = 0, onClick, badge, badgeColor, featured }) => (
   <button
     onClick={onClick}
-    className={`relative text-left bg-white/90 backdrop-blur-xl rounded-2xl border ${borderColor} p-6 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group overflow-hidden w-full ${featured ? 'ring-2 ring-[#00695C]/30 ring-offset-2' : ''}`}
+    className={`relative text-left bg-white/90 backdrop-blur-xl rounded-2xl border ${borderColor} p-5 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group overflow-hidden w-full ${featured ? 'ring-2 ring-[#00695C]/30 ring-offset-2' : ''}`}
     style={{ animationDelay: `${delay}ms` }}
   >
-    {/* Animated Background Elements */}
     <div className="absolute inset-0 bg-gradient-to-br from-[#00695C]/5 via-transparent to-[#26A69A]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
     <div className="absolute -top-32 -right-32 w-64 h-64 bg-[#00695C]/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000" />
     <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-[#26A69A]/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000 delay-200" />
-    
-    {/* Shimmer Effect */}
     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
     
     <div className="relative">
       <div className="flex items-start justify-between">
-        <div className={`w-14 h-14 rounded-2xl ${color} ${gradient} flex items-center justify-center shadow-lg mb-4 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 relative`}>
-          <div className="absolute inset-0 rounded-2xl bg-white/20 animate-pulse-glow" />
+        <div className={`w-10 h-10 rounded-xl ${color} ${gradient} flex items-center justify-center shadow-lg mb-2 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 relative`}>
+          <div className="absolute inset-0 rounded-xl bg-white/20 animate-pulse-glow" />
           {icon}
           {featured && (
             <div className="absolute -top-1 -right-1">
@@ -111,14 +106,14 @@ const NavCard = ({ icon, title, description, stats, color, gradient, borderColor
         )}
       </div>
       
-      <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#00695C] transition-colors duration-300 flex items-center gap-2">
+      <h3 className="text-base font-bold text-gray-900 group-hover:text-[#00695C] transition-colors duration-300 flex items-center gap-2">
         {title}
         {featured && <MdVerified className="text-[#00695C] text-sm" />}
       </h3>
-      <p className="text-xs text-gray-600 mt-1.5 leading-relaxed">{description}</p>
+      <p className="text-xs text-gray-600 mt-1 leading-snug line-clamp-2">{description}</p>
 
       {stats && stats.length > 0 && (
-        <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-gray-100">
+        <div className="grid grid-cols-3 gap-2 mt-2 pt-2 border-t border-gray-100">
           {stats.map((s, i) => (
             <div key={i} className="text-center group/stat">
               <p className="text-sm font-bold text-gray-900 group-hover/stat:text-[#00695C] transition-colors">
@@ -130,7 +125,7 @@ const NavCard = ({ icon, title, description, stats, color, gradient, borderColor
         </div>
       )}
 
-      <div className="flex items-center gap-2 mt-4 text-xs font-semibold text-[#00695C] group-hover:gap-3 transition-all duration-300">
+      <div className="flex items-center gap-2 mt-2 text-xs font-semibold text-[#00695C] group-hover:gap-3 transition-all duration-300">
         <span className="bg-[#00695C]/10 px-3 py-1 rounded-full group-hover:bg-[#00695C]/20 transition-colors group-hover:scale-105">
           Open Module →
         </span>
@@ -217,7 +212,7 @@ const QuickStat = ({ icon, label, value, color }) => (
 // ============================================================
 // MAIN COMPONENT
 // ============================================================
-const OwnersOverview = () => {
+const AgentsOverview = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [statsAnimating, setStatsAnimating] = useState(false);
@@ -226,71 +221,77 @@ const OwnersOverview = () => {
 
   // ---- Stats ----
   const [stats, setStats] = useState({
-    totalOwners: 523,
-    pendingApprovals: 47,
-    totalProperties: 1847,
-    totalRevenue: 1245000,
-    approvedOwners: 438,
-    rejectedOwners: 38,
-    pendingProperties: 62,
-    activeSubscriptions: 291,
-    premiumOwners: 96,
-    growthRate: 12.5,
-    monthlyGrowth: 8.3,
-    newThisWeek: 28,
-    verificationRate: 94,
-    avgPropertiesPerOwner: 3.5
+    totalAgents: 342,
+    registrationApproval: 28,
+    agentVerification: 156,
+    propertyManagement: 823,
+    propertyControl: 95,
+    pendingApprovals: 28,
+    verifiedAgents: 156,
+    unverifiedAgents: 58,
+    totalListings: 823,
+    pendingListings: 95,
+    featuredProperties: 67,
+    verifiedProperties: 312,
+    totalLeads: 245,
+    totalCommission: 875000,
+    growthRate: 18.5,
+    monthlyGrowth: 9.2,
+    newThisWeek: 16,
+    reraVerified: 89,
+    agencyVerified: 112,
+    avgListingsPerAgent: 2.4
   });
 
   // ---- Recent Activities ----
   const activities = useMemo(() => [
     {
       icon: <FaUserPlus className="text-white text-sm" />,
-      title: 'New Owner Registration',
-      time: '2 min ago',
-      description: 'Rajesh Kumar registered as a property owner',
+      title: 'New Agent Registration',
+      time: '5 min ago',
+      description: 'Amit Kumar registered as a real estate agent',
       color: 'bg-gradient-to-br',
       gradient: 'from-[#00695C] to-[#26A69A]'
     },
     {
       icon: <FiCheckCircle className="text-white text-sm" />,
-      title: 'KYC Approved',
-      time: '15 min ago',
-      description: 'Priya Sharma\'s Aadhaar & PAN verified successfully',
+      title: 'RERA Verification Approved',
+      time: '18 min ago',
+      description: 'Priya Singh\'s RERA certificate verified successfully',
       color: 'bg-gradient-to-br',
       gradient: 'from-emerald-500 to-emerald-400'
     },
     {
       icon: <FiHome className="text-white text-sm" />,
       title: 'New Property Listed',
-      time: '32 min ago',
-      description: 'Amit Singh listed a Luxury Apartment in Bangalore',
+      time: '45 min ago',
+      description: 'Rajesh Sharma listed a Luxury Villa in Mumbai',
       color: 'bg-gradient-to-br',
       gradient: 'from-blue-500 to-blue-400'
     },
     {
-      icon: <FiDollarSign className="text-white text-sm" />,
-      title: 'Subscription Upgraded',
+      icon: <MdAssignment className="text-white text-sm" />,
+      title: 'Lead Assigned',
       time: '1 hour ago',
-      description: 'Sneha Reddy upgraded to Gold Plan',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-amber-500 to-amber-400'
-    },
-    {
-      icon: <FiUserCheck className="text-white text-sm" />,
-      title: 'Owner Verified',
-      time: '2 hours ago',
-      description: 'Vikram Patel\'s account was verified',
+      description: 'Sneha Reddy assigned 5 new leads to agents',
       color: 'bg-gradient-to-br',
       gradient: 'from-purple-500 to-purple-400'
+    },
+    {
+      icon: <FiDollarSign className="text-white text-sm" />,
+      title: 'Commission Recorded',
+      time: '2 hours ago',
+      description: 'Commission of ₹1,25,000 credited to Vikram Patel',
+      color: 'bg-gradient-to-br',
+      gradient: 'from-amber-500 to-amber-400'
     }
   ], []);
 
   // ---- Quick Stats ----
   const quickStats = useMemo(() => [
     { icon: <FiUserPlus className="text-[#00695C]" />, label: 'New This Week', value: stats.newThisWeek },
-    { icon: <FiCheckCircle className="text-emerald-500" />, label: 'Verification Rate', value: `${stats.verificationRate}%` },
-    { icon: <FiHome className="text-blue-500" />, label: 'Avg Properties', value: stats.avgPropertiesPerOwner },
+    { icon: <FiCheckCircle className="text-emerald-500" />, label: 'Verified Agents', value: stats.verifiedAgents },
+    { icon: <FiHome className="text-blue-500" />, label: 'Avg Listings', value: stats.avgListingsPerAgent },
     { icon: <FiTrendingUp className="text-amber-500" />, label: 'Growth', value: `${stats.monthlyGrowth}%` },
   ], [stats]);
 
@@ -310,12 +311,12 @@ const OwnersOverview = () => {
     setTimeout(() => {
       setStats(prev => ({
         ...prev,
-        totalOwners: prev.totalOwners + Math.floor(Math.random() * 5),
-        pendingApprovals: Math.max(0, prev.pendingApprovals + Math.floor(Math.random() * 7) - 3),
-        totalProperties: prev.totalProperties + Math.floor(Math.random() * 10),
-        totalRevenue: prev.totalRevenue + Math.floor(Math.random() * 50000),
-        monthlyGrowth: prev.monthlyGrowth + (Math.random() * 2 - 1),
-        newThisWeek: prev.newThisWeek + Math.floor(Math.random() * 3),
+        totalAgents: prev.totalAgents + Math.floor(Math.random() * 3),
+        registrationApproval: Math.max(0, prev.registrationApproval + Math.floor(Math.random() * 5) - 2),
+        agentVerification: prev.agentVerification + Math.floor(Math.random() * 4),
+        propertyManagement: prev.propertyManagement + Math.floor(Math.random() * 8),
+        propertyControl: Math.max(0, prev.propertyControl + Math.floor(Math.random() * 6) - 3),
+        newThisWeek: prev.newThisWeek + Math.floor(Math.random() * 2),
       }));
       setLoading(false);
       setStatsAnimating(false);
@@ -337,123 +338,132 @@ const OwnersOverview = () => {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-amber-500/3 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }} />
       </div>
 
-     {/* ===== HEADER ===== */}
-<div className="relative animate-fade-in">
-  <div className="flex flex-col gap-4">
-    {/* Title row */}
-    <div className="flex items-center gap-3 flex-wrap">
-      <div className="p-2.5 bg-gradient-to-br from-[#00695C] to-[#26A69A] rounded-2xl shadow-lg animate-pulse-glow relative">
-        <div className="absolute inset-0 rounded-2xl bg-white/20 animate-pulse" />
-        <FaUserTie className="text-white text-xl relative z-10" />
-      </div>
-      <div>
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
-          Owners Overview
-        </h1>
-        <div className="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
-          <span>Complete control over all property owners</span>
-          <span className="w-1 h-1 bg-gray-400 rounded-full hidden sm:block" />
-          <span className="text-[#00695C] font-medium">
-            {time.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-          </span>
-        </div>
-      </div>
-    </div>
-
-    {/* Actions row */}
-    <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
-      {/* Quick Stats — scrolls horizontally instead of wrapping */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-        {quickStats.map((stat, idx) => (
-          <div key={idx} className="flex-shrink-0">
-            <QuickStat {...stat} />
+      {/* ===== HEADER ===== */}
+      <div className="relative animate-fade-in">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="p-2.5 bg-gradient-to-br from-[#00695C] to-[#26A69A] rounded-2xl shadow-lg animate-pulse-glow relative">
+              <div className="absolute inset-0 rounded-2xl bg-white/20 animate-pulse" />
+              <MdOutlineRealEstateAgent className="text-white text-xl relative z-10" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
+                Agents Overview
+              </h1>
+              <div className="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
+                <span>Complete control over all real estate agents</span>
+                <span className="w-1 h-1 bg-gray-400 rounded-full hidden sm:block" />
+                <span className="text-[#00695C] font-medium">
+                  {time.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                </span>
+              </div>
+            </div>
           </div>
-        ))}
-      </div>
 
-      <div className="flex items-center gap-3 flex-shrink-0">
-        {/* Live Status */}
-        <div className="flex items-center gap-2 text-xs bg-white/80 backdrop-blur-sm px-3 py-2 rounded-xl shadow-sm border border-[#00695C]/20 hover:border-[#00695C]/40 transition-all duration-300 whitespace-nowrap">
-          <FiActivity className="text-[#00695C] animate-pulse text-sm" />
-          <span className="font-medium text-[#00695C]">Live</span>
-          <span className="w-1 h-1 bg-gray-400 rounded-full" />
-          <span className="text-gray-500">
-            {time.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
-          </span>
+          <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+              {quickStats.map((stat, idx) => (
+                <div key={idx} className="flex-shrink-0">
+                  <QuickStat {...stat} />
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <div className="flex items-center gap-2 text-xs bg-white/80 backdrop-blur-sm px-3 py-2 rounded-xl shadow-sm border border-[#00695C]/20 hover:border-[#00695C]/40 transition-all duration-300 whitespace-nowrap">
+                <FiActivity className="text-[#00695C] animate-pulse text-sm" />
+                <span className="font-medium text-[#00695C]">Live</span>
+                <span className="w-1 h-1 bg-gray-400 rounded-full" />
+                <span className="text-gray-500">
+                  {time.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+
+              <button
+                onClick={handleRefresh}
+                disabled={loading}
+                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-xl hover:shadow-xl transition-all duration-300 text-sm font-medium shadow-md disabled:opacity-50 group relative overflow-hidden hover:scale-105 whitespace-nowrap"
+              >
+                <span className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <FiRefreshCw className={`text-sm ${loading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
+                {loading ? 'Refreshing...' : 'Refresh Data'}
+              </button>
+            </div>
+          </div>
         </div>
-
-        {/* Refresh Button */}
-        <button
-          onClick={handleRefresh}
-          disabled={loading}
-          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-xl hover:shadow-xl transition-all duration-300 text-sm font-medium shadow-md disabled:opacity-50 group relative overflow-hidden hover:scale-105 whitespace-nowrap"
-        >
-          <span className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-          <FiRefreshCw className={`text-sm ${loading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
-          {loading ? 'Refreshing...' : 'Refresh Data'}
-        </button>
       </div>
-    </div>
-  </div>
-</div>
 
       {/* ===== STATS GRID ===== */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 relative">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 relative">
         <StatCard
           icon={<FaUsers className="text-lg text-white" />}
-          title="Total Owners"
-          value={stats.totalOwners}
+          title="Total Agents"
+          value={stats.totalAgents}
           subtitle={`${stats.newThisWeek} new this week`}
           color="bg-gradient-to-br"
           gradient="from-[#00695C] to-[#26A69A]"
           borderColor="border-[#00695C]/30"
           delay={0}
           statsAnimating={statsAnimating}
-          onClick={() => navigateTo('/admin/owners/overview')}
+          onClick={() => navigateTo('/admin/agents/overview')}
           trend="up"
-          trendValue="12.5"
+          trendValue="18.5"
         />
         <StatCard
           icon={<FiClock className="text-lg text-white" />}
-          title="Pending Approvals"
-          value={stats.pendingApprovals}
-          subtitle="Awaiting KYC review"
+          title="Registration Approval"
+          value={stats.registrationApproval}
+          subtitle="Pending KYC review"
           color="bg-gradient-to-br"
           gradient="from-amber-500 to-amber-400"
           borderColor="border-amber-500/30"
           delay={100}
           statsAnimating={statsAnimating}
-          onClick={() => navigateTo('/admin/owners/registration')}
+          onClick={() => navigateTo('/admin/agents/registration')}
           trend="down"
-          trendValue="8.3"
+          trendValue="6.2"
+        />
+        <StatCard
+          icon={<FiShield className="text-lg text-white" />}
+          title="Agent Verification"
+          value={stats.verifiedAgents}
+          subtitle={`${stats.reraVerified} RERA verified`}
+          color="bg-gradient-to-br"
+          gradient="from-purple-600 to-purple-400"
+          borderColor="border-purple-600/30"
+          delay={200}
+          statsAnimating={statsAnimating}
+          onClick={() => navigateTo('/admin/agents/verification')}
+          trend="up"
+          trendValue="12.8"
         />
         <StatCard
           icon={<FiHome className="text-lg text-white" />}
-          title="Total Properties"
-          value={stats.totalProperties}
-          subtitle={`${stats.avgPropertiesPerOwner} avg per owner`}
+          title="Property Management"
+          value={stats.propertyManagement}
+          subtitle={`${stats.totalLeads} leads assigned`}
           color="bg-gradient-to-br"
           gradient="from-blue-600 to-blue-400"
           borderColor="border-blue-600/30"
-          delay={200}
+          delay={300}
           statsAnimating={statsAnimating}
-          onClick={() => navigateTo('/admin/owners/property-control')}
+          onClick={() => navigateTo('/admin/agents/property-management')}
           trend="up"
-          trendValue="15.2"
+          trendValue="22.3"
         />
         <StatCard
-          icon={<FiDollarSign className="text-lg text-white" />}
-          title="Total Revenue"
-          value={`₹${(stats.totalRevenue / 100000).toFixed(1)}L`}
-          subtitle={`+${stats.growthRate}% growth`}
+          icon={<FiEdit className="text-lg text-white" />}
+          title="Property Control"
+          value={stats.propertyControl}
+          subtitle={`${stats.featuredProperties} featured`}
           color="bg-gradient-to-br"
           gradient="from-emerald-600 to-emerald-400"
           borderColor="border-emerald-600/30"
-          delay={300}
+          delay={400}
           statsAnimating={statsAnimating}
-          onClick={() => navigateTo('/admin/owners/subscription')}
+          onClick={() => navigateTo('/admin/agents/property-control')}
           trend="up"
-          trendValue="22.7"
+          trendValue="9.4"
         />
       </div>
 
@@ -462,64 +472,84 @@ const OwnersOverview = () => {
         <SectionHeader
           icon={<FiShield className="text-white text-sm" />}
           title="Quick Access Modules"
-          subtitle="Manage owners, properties, and subscriptions"
-        
+          subtitle="Manage agents, registrations, and properties"
         />
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {/* Registration Card */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {/* Registration Approval Card */}
           <NavCard
             icon={<FiUserCheck className="text-white text-xl" />}
-            title="Registration & KYC"
-            description="Review new owner sign-ups, verify mobile, email, Aadhaar, PAN, and approve or reject registrations."
+            title="Registration Approval"
+            description="Approve or reject agent registrations. Verify mobile, email, Aadhaar, PAN, and KYC documents."
             color="bg-gradient-to-br"
             gradient="from-[#00695C] to-[#26A69A]"
             borderColor="border-[#00695C]/30"
             delay={0}
-            onClick={() => navigateTo('/admin/owners/registration')}
-            badge={`${stats.pendingApprovals} Pending`}
+            onClick={() => navigateTo('/admin/agents/registration')}
+            badge={`${stats.registrationApproval} Pending`}
             badgeColor="bg-gradient-to-r from-amber-500 to-amber-400"
             featured={true}
             stats={[
-              { label: 'Pending', value: stats.pendingApprovals },
-              { label: 'Approved', value: stats.approvedOwners },
-              { label: 'Rejected', value: stats.rejectedOwners },
+              { label: 'Pending', value: stats.registrationApproval },
+              { label: 'Verified', value: stats.verifiedAgents },
+              { label: 'Total', value: stats.totalAgents },
+            ]}
+          />
+
+          {/* Agent Verification Card */}
+          <NavCard
+            icon={<FiShield className="text-white text-xl" />}
+            title="Agent Verification"
+            description="Verify RERA certificates, agency documents, and approve professional credentials."
+            color="bg-gradient-to-br"
+            gradient="from-purple-600 to-purple-400"
+            borderColor="border-purple-600/30"
+            delay={100}
+            onClick={() => navigateTo('/admin/agents/verification')}
+            badge={`${stats.reraVerified} RERA`}
+            badgeColor="bg-gradient-to-r from-purple-500 to-purple-400"
+            stats={[
+              { label: 'RERA', value: stats.reraVerified },
+              { label: 'Agency', value: stats.agencyVerified },
+              { label: 'Unverified', value: stats.unverifiedAgents },
+            ]}
+          />
+
+          {/* Property Management Card */}
+          <NavCard
+            icon={<FiHome className="text-white text-xl" />}
+            title="Property Management"
+            description="Manage agent listings, assign leads, track performance, and monitor commission."
+            color="bg-gradient-to-br"
+            gradient="from-blue-600 to-blue-400"
+            borderColor="border-blue-600/30"
+            delay={200}
+            onClick={() => navigateTo('/admin/agents/property-management')}
+            badge={`${stats.totalLeads} Leads`}
+            badgeColor="bg-gradient-to-r from-blue-500 to-blue-400"
+            stats={[
+              { label: 'Listings', value: stats.totalListings },
+              { label: 'Leads', value: stats.totalLeads },
+              { label: 'Commission', value: '₹8.75L' },
             ]}
           />
 
           {/* Property Control Card */}
           <NavCard
-            icon={<FiHome className="text-white text-xl" />}
+            icon={<FiEdit className="text-white text-xl" />}
             title="Property Control"
-            description="View, edit, approve, reject, suspend, delete listings. Manage featured & verified properties."
+            description="View, edit, approve, reject, suspend, delete listings. Feature & verify properties."
             color="bg-gradient-to-br"
-            gradient="from-blue-600 to-blue-400"
-            borderColor="border-blue-600/30"
-            delay={100}
-            onClick={() => navigateTo('/admin/owners/property-control')}
-            badge={`${stats.pendingProperties} Pending`}
-            badgeColor="bg-gradient-to-r from-blue-500 to-blue-400"
+            gradient="from-emerald-600 to-emerald-400"
+            borderColor="border-emerald-600/30"
+            delay={300}
+            onClick={() => navigateTo('/admin/agents/property-control')}
+            badge={`${stats.featuredProperties} Featured`}
+            badgeColor="bg-gradient-to-r from-emerald-500 to-emerald-400"
             stats={[
-              { label: 'Total', value: stats.totalProperties },
-              { label: 'Pending', value: stats.pendingProperties },
-            ]}
-          />
-
-          {/* Subscription Card */}
-          <NavCard
-            icon={<FiDollarSign className="text-white text-xl" />}
-            title="Subscription Plans"
-            description="Manage Free, Silver, Gold, and Platinum plans. Upgrade or downgrade owner subscriptions."
-            color="bg-gradient-to-br"
-            gradient="from-amber-600 to-amber-400"
-            borderColor="border-amber-600/30"
-            delay={200}
-            onClick={() => navigateTo('/admin/owners/subscription')}
-            badge={`${stats.premiumOwners} Premium`}
-            badgeColor="bg-gradient-to-r from-purple-500 to-purple-400"
-            stats={[
-              { label: 'Active', value: stats.activeSubscriptions },
-              { label: 'Premium', value: stats.premiumOwners },
+              { label: 'Total', value: stats.totalListings },
+              { label: 'Pending', value: stats.propertyControl },
+              { label: 'Featured', value: stats.featuredProperties },
             ]}
           />
         </div>
@@ -530,7 +560,7 @@ const OwnersOverview = () => {
         <SectionHeader
           icon={<FiActivity className="text-white text-sm" />}
           title="Recent Activities"
-          subtitle="Live updates from owners and properties"
+          subtitle="Live updates from agents and properties"
           action={true}
           actionLabel="View All"
           onAction={() => navigateTo('/admin/notifications')}
@@ -557,7 +587,7 @@ const OwnersOverview = () => {
       <div className="text-center pt-4">
         <p className="text-[11px] text-gray-500 flex items-center justify-center gap-2">
           <span className="w-4 h-0.5 bg-gray-300 rounded-full" />
-          <span>© 2026 Owners Overview • All rights reserved</span>
+          <span>© 2026 Agents Overview • All rights reserved</span>
           <span className="w-4 h-0.5 bg-gray-300 rounded-full" />
         </p>
       </div>
@@ -606,17 +636,15 @@ const OwnersOverview = () => {
         .animate-shimmer { animation: shimmer 3s ease-in-out infinite; }
         .animate-breathe { animation: breathe 3s ease-in-out infinite; }
         
-        /* Scrollbar Styling */
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #00695C, #26A69A); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #00695C; }
         
-        /* Selection Color */
         ::selection { background: #00695C; color: white; }
       `}</style>
     </div>
   );
 };
 
-export default OwnersOverview;
+export default AgentsOverview;
