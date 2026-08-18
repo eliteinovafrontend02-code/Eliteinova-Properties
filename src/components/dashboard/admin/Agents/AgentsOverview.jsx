@@ -224,7 +224,7 @@ const AgentsOverview = () => {
     totalAgents: 342,
     registrationApproval: 28,
     agentVerification: 156,
-    propertyManagement: 823,
+    propertiesAndLeads: 823, // Changed from propertyManagement
     propertyControl: 95,
     pendingApprovals: 28,
     verifiedAgents: 156,
@@ -314,7 +314,7 @@ const AgentsOverview = () => {
         totalAgents: prev.totalAgents + Math.floor(Math.random() * 3),
         registrationApproval: Math.max(0, prev.registrationApproval + Math.floor(Math.random() * 5) - 2),
         agentVerification: prev.agentVerification + Math.floor(Math.random() * 4),
-        propertyManagement: prev.propertyManagement + Math.floor(Math.random() * 8),
+        propertiesAndLeads: prev.propertiesAndLeads + Math.floor(Math.random() * 8), // Changed
         propertyControl: Math.max(0, prev.propertyControl + Math.floor(Math.random() * 6) - 3),
         newThisWeek: prev.newThisWeek + Math.floor(Math.random() * 2),
       }));
@@ -439,15 +439,15 @@ const AgentsOverview = () => {
         />
         <StatCard
           icon={<FiHome className="text-lg text-white" />}
-          title="Property Management"
-          value={stats.propertyManagement}
+          title="Properties & Leads" // Changed from "Property Management"
+          value={stats.propertiesAndLeads} // Changed from stats.propertyManagement
           subtitle={`${stats.totalLeads} leads assigned`}
           color="bg-gradient-to-br"
           gradient="from-blue-600 to-blue-400"
           borderColor="border-blue-600/30"
           delay={300}
           statsAnimating={statsAnimating}
-          onClick={() => navigateTo('/admin/agents/property-management')}
+          onClick={() => navigateTo('/admin/agents/leads')} // Updated route
           trend="up"
           trendValue="22.3"
         />
@@ -515,16 +515,16 @@ const AgentsOverview = () => {
             ]}
           />
 
-          {/* Property Management Card */}
+          {/* Properties & Leads Card - Changed from Property Management */}
           <NavCard
             icon={<FiHome className="text-white text-xl" />}
-            title="Property Management"
-            description="Manage agent listings, assign leads, track performance, and monitor commission."
+            title="Properties & Leads" // Changed from "Property Management"
+            description="Manage property listings, leads, and agent performance with commission tracking." // Updated description
             color="bg-gradient-to-br"
             gradient="from-blue-600 to-blue-400"
             borderColor="border-blue-600/30"
             delay={200}
-            onClick={() => navigateTo('/admin/agents/property-management')}
+            onClick={() => navigateTo('/admin/agents/leads')} // Updated route
             badge={`${stats.totalLeads} Leads`}
             badgeColor="bg-gradient-to-r from-blue-500 to-blue-400"
             stats={[

@@ -38,20 +38,21 @@ import OwnersOverview from './admin/Owners/OwnersOverview';
 import OwnersRegistration from './admin/Owners/OwnersRegistration';
 import OwnersPropertyControl from './admin/Owners/OwnersPropertyControl';
 import OwnersSubscription from './admin/Owners/OwnersSubscription';
+import OwnersPropertiesLeads from './admin/Owners/OwnersPropertiesLeads';
 
 // Agents
 import AgentsOverview from './admin/Agents/AgentsOverview';
 import AgentsRegistration from './admin/Agents/AgentsRegistration';
 import AgentsVerification from './admin/Agents/AgentsVerification';
-import AgentsPropertyManagement from './admin/Agents/AgentsPropertyManagement';
+import AgentsPropertiesLeads from './admin/Agents/AgentsPropertiesLeads';
 import AgentsPropertyControl from './admin/Agents/AgentsPropertyControl';
 
 // Builders
-// import BuildersOverview from './admin/Builders/BuildersOverview';
-// import BuildersRegistration from './admin/Builders/BuildersRegistration';
-// import BuildersVerification from './admin/Builders/BuildersVerification';
-// import BuildersProjects from './admin/Builders/BuildersProjects';
-// import BuildersPropertyControl from './admin/Builders/BuildersPropertyControl';
+import BuildersOverview from './admin/Builders/BuildersOverview';
+import BuildersRegistration from './admin/Builders/BuildersRegistration';
+import BuildersVerification from './admin/Builders/BuildersVerification';
+import BuildersProjects from './admin/Builders/BuildersProjects';
+import BuildersPropertyControl from './admin/Builders/BuildersPropertyControl';
 
 // Property Managers
 // import PropertyManagersOverview from './admin/PropertyManagers/PropertyManagersOverview';
@@ -139,6 +140,7 @@ const AdminDashboard = () => {
         { key: '/admin/owners/registration', icon: <FiCheckCircle />, label: 'Registration & KYC' },
         { key: '/admin/owners/property-control', icon: <FiSettings />, label: 'Property Control' },
         { key: '/admin/owners/subscription', icon: <FaDollarSign />, label: 'Subscription' },
+        { key: '/admin/owners/leads', icon: <FiMessageCircle />, label: 'Properties Leads' },
       ],
     },
     {
@@ -149,7 +151,7 @@ const AdminDashboard = () => {
         { key: '/admin/agents/overview', icon: <FiGrid />, label: 'Agents Dashboard' },
         { key: '/admin/agents/registration', icon: <FiCheckCircle />, label: 'Registration Approval' },
         { key: '/admin/agents/verification', icon: <FaShieldAlt />, label: 'Agent Verification' },
-        { key: '/admin/agents/property-management', icon: <FiHome />, label: 'Property Management' },
+        { key: '/admin/agents/leads', icon: <FiHome />, label: 'Properties Leads' },
         { key: '/admin/agents/property-control', icon: <FiSettings />, label: 'Property Control' },
       ],
     },
@@ -472,20 +474,21 @@ const AdminDashboard = () => {
               <Route path="owners/registration" element={<OwnersRegistration />} />
               <Route path="owners/property-control" element={<OwnersPropertyControl />} />
               <Route path="owners/subscription" element={<OwnersSubscription />} />
+              <Route path="owners/leads" element={<OwnersPropertiesLeads />} />
 
               {/* Agents */}
               <Route path="agents/overview" element={<AgentsOverview />} />
               <Route path="agents/registration" element={<AgentsRegistration />} />
               <Route path="agents/verification" element={<AgentsVerification />} />
-              <Route path="agents/property-management" element={<AgentsPropertyManagement />} />
+              <Route path="agents/leads" element={<AgentsPropertiesLeads />} />
               <Route path="agents/property-control" element={<AgentsPropertyControl />} />
 
               {/* Builders */}
-              {/* <Route path="builders/overview" element={<BuildersOverview />} />
+              <Route path="builders/overview" element={<BuildersOverview />} />
               <Route path="builders/registration" element={<BuildersRegistration />} />
               <Route path="builders/verification" element={<BuildersVerification />} />
               <Route path="builders/projects" element={<BuildersProjects />} />
-              <Route path="builders/property-control" element={<BuildersPropertyControl />} /> */}
+              <Route path="builders/property-control" element={<BuildersPropertyControl />} />
 
               {/* Property Managers */}
               {/* <Route path="property-managers/overview" element={<PropertyManagersOverview />} />

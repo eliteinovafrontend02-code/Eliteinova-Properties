@@ -1,4 +1,4 @@
-// src/components/dashboard/admin/Agents/AgentsPropertyManagement.jsx
+// src/components/dashboard/admin/Owners/OwnersPropertiesLeads.jsx
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -125,7 +125,7 @@ const StatCard = ({ icon, title, value, color, delay = 0, isActive, onClick }) =
   );
 };
 
-// Status -> left border color, matching OwnersPropertyControl's property cards
+// Status -> left border color
 const STATUS_BORDER = {
   pending: 'border-l-amber-500',
   approved: 'border-l-emerald-500',
@@ -139,8 +139,7 @@ const STATUS_BADGE = {
   suspended: 'bg-gray-100 text-gray-700',
 };
 
-// Tiny deterministic PRNG so the same agent always shows the same set of
-// properties (instead of a random/shared mock list for every agent).
+// Tiny deterministic PRNG
 const seededRandom = (seed) => {
   let s = seed % 2147483647;
   if (s <= 0) s += 2147483646;
@@ -164,44 +163,53 @@ const ViewPropertyModal = ({ property, show, onClose }) => {
   const amenities = property.amenities || ['WiFi', 'Swimming Pool', 'AC', 'Parking', 'Gym'];
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
         {/* Header */}
-        <div className="relative bg-gradient-to-r from-[#00695C] to-[#26A69A] p-5 shrink-0">
+        <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] px-5 py-3 rounded-t-2xl z-10 shrink-0 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white">
+              <FiEye className="text-sm" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-white">Property Details</h2>
+              <p className="text-white/70 text-[10px]">View property information</p>
+            </div>
+          </div>
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110"
+            className="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110"
           >
-            <FiX className="text-lg" />
+            <FiX className="text-sm" />
           </button>
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center text-white text-3xl">
-              <FaHome />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-lg font-bold text-white">{property.title}</h2>
-              <p className="text-white/80 text-sm">{property.type} · {property.location}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 mt-2 flex-wrap">
-            <span className={`text-[10px] px-2.5 py-1 rounded-full font-semibold ${STATUS_BADGE[property.status] || 'bg-gray-100 text-gray-700'}`}>
-              {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
-            </span>
-            {property.isVerified && (
-              <span className="text-[10px] px-2.5 py-1 rounded-full font-semibold bg-blue-100 text-blue-700">
-                <FiShield className="inline mr-1 text-xs" /> Verified
-              </span>
-            )}
-            {property.isFeatured && (
-              <span className="text-[10px] px-2.5 py-1 rounded-full font-semibold bg-purple-100 text-purple-700">
-                <FaStarSolid className="inline mr-1 text-xs" /> Featured
-              </span>
-            )}
-          </div>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-white">
+          {/* Title and Status */}
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="text-lg font-bold text-[#1A2E2A]">{property.title}</h3>
+              <p className="text-sm text-[#5A7D78]">{property.type} · {property.location}</p>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className={`text-[10px] px-2.5 py-1 rounded-full font-semibold ${STATUS_BADGE[property.status] || 'bg-gray-100 text-gray-700'}`}>
+                {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
+              </span>
+              {property.isVerified && (
+                <span className="text-[10px] px-2.5 py-1 rounded-full font-semibold bg-blue-100 text-blue-700">
+                  <FiShield className="inline mr-1 text-xs" /> Verified
+                </span>
+              )}
+              {property.isFeatured && (
+                <span className="text-[10px] px-2.5 py-1 rounded-full font-semibold bg-purple-100 text-purple-700">
+                  <FaStarSolid className="inline mr-1 text-xs" /> Featured
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Quick Stats */}
           <div className="grid grid-cols-3 gap-3">
             <div className="text-center p-3 bg-[#F5F9F8] rounded-xl">
               <p className="text-lg font-bold text-[#1A2E2A]">₹{property.price.toLocaleString()}</p>
@@ -217,9 +225,10 @@ const ViewPropertyModal = ({ property, show, onClose }) => {
             </div>
           </div>
 
+          {/* Details */}
           <div>
             <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-2">Details</h4>
-            <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="grid grid-cols-2 gap-2 text-sm bg-[#F5F9F8] rounded-xl p-3">
               <div className="flex items-center gap-2 text-[#5A7D78]">
                 <FiMapPin className="text-[#00695C]" /> {property.location}
               </div>
@@ -235,6 +244,7 @@ const ViewPropertyModal = ({ property, show, onClose }) => {
             </div>
           </div>
 
+          {/* Amenities */}
           <div>
             <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-2">Amenities</h4>
             <div className="flex flex-wrap gap-2">
@@ -244,17 +254,20 @@ const ViewPropertyModal = ({ property, show, onClose }) => {
             </div>
           </div>
 
+          {/* Description */}
           <div>
             <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-2">Description</h4>
-            <p className="text-sm text-[#5A7D78] leading-relaxed">{property.description || 'No description available.'}</p>
+            <p className="text-sm text-[#5A7D78] leading-relaxed bg-[#F5F9F8] rounded-xl p-3">
+              {property.description || 'No description available.'}
+            </p>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 px-5 py-3 border-t border-[#E8F0EE] flex justify-end bg-white">
+        <div className="sticky bottom-0 bg-white pt-3 px-4 pb-4 border-t border-[#E8F0EE] flex items-center justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-sm font-medium shadow-md shadow-[#00695C]/30 hover:scale-105"
+            className="px-6 py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-lg hover:shadow-xl transition-all duration-300 text-sm font-medium shadow-md shadow-[#00695C]/30 hover:scale-[1.02]"
           >
             Close
           </button>
@@ -476,9 +489,9 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
   );
 };
 
-// ============ ASSIGN LEADS MODAL (simplified: just pick & assign, no per-lead detail view) ============
+// ============ ASSIGN LEADS MODAL - UPDATED with Download option ============
 const AssignLeadsModal = ({
-  agent,
+  owner,
   show,
   onClose,
   onAssign,
@@ -491,7 +504,7 @@ const AssignLeadsModal = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (show && agent) {
+    if (show && owner) {
       const mockLeads = [];
       const leadNames = ['Rahul Sharma', 'Priya Patel', 'Amit Singh', 'Sneha Reddy', 'Vikram Kumar', 'Meera Iyer', 'Deepak Jain', 'Kavya Nair', 'Arjun Menon', 'Neha Kapoor'];
       const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Pune'];
@@ -508,7 +521,7 @@ const AssignLeadsModal = ({
       setSelectedLeads([]);
       setSearchQuery('');
     }
-  }, [show, agent]);
+  }, [show, owner]);
 
   const filteredLeads = useMemo(() => {
     if (!searchQuery) return availableLeads;
@@ -533,17 +546,44 @@ const AssignLeadsModal = ({
     }
   };
 
+  // Download all available leads as Excel/CSV
+  const handleDownloadLeads = () => {
+    if (availableLeads.length === 0) {
+      return;
+    }
+
+    const data = availableLeads.map(lead => ({
+      'Name': lead.name,
+      'Phone': lead.phone,
+      'City': lead.city,
+      'ID': lead.id,
+    }));
+
+    const csv = [
+      Object.keys(data[0]).join(','),
+      ...data.map(row => Object.values(row).map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `leads_${(owner?.name || 'owner').replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  };
+
   const handleSubmit = () => {
     if (selectedLeads.length === 0) return;
     setIsSubmitting(true);
     const leadObjects = availableLeads.filter(l => selectedLeads.includes(l.id));
     setTimeout(() => {
-      onAssign(agent.id, leadObjects);
+      onAssign(owner.id, leadObjects);
       setIsSubmitting(false);
     }, 500);
   };
 
-  if (!show || !agent) return null;
+  if (!show || !owner) return null;
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
@@ -555,7 +595,7 @@ const AssignLeadsModal = ({
             </div>
             <div>
               <h2 className="text-base font-bold text-white">Assign Leads</h2>
-              <p className="text-white/70 text-[10px]">Assign leads to {agent.name}</p>
+              <p className="text-white/70 text-[10px]">Assign leads to {owner.name}</p>
             </div>
           </div>
           <button onClick={onClose} className="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110">
@@ -564,18 +604,30 @@ const AssignLeadsModal = ({
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          <div className="relative">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm" />
-            <input type="text" placeholder="Search leads by name or city..."
-              value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" />
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm" />
+              <input type="text" placeholder="Search leads by name or city..."
+                value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" />
+            </div>
+            <button
+              onClick={handleDownloadLeads}
+              className="px-3 py-2 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 shadow-md shadow-[#00695C]/30"
+              title="Download all leads as CSV"
+            >
+              <FiDownload className="text-sm" />
+              Download
+            </button>
           </div>
 
           <div className="flex items-center justify-between">
             <span className="text-xs text-[#5A7D78]">{filteredLeads.length} available lead(s)</span>
-            <button onClick={handleSelectAll} className="text-xs text-[#00695C] font-medium hover:underline">
-              {selectedLeads.length === filteredLeads.length ? 'Deselect All' : 'Select All'}
-            </button>
+            <div className="flex items-center gap-2">
+              <button onClick={handleSelectAll} className="text-xs text-[#00695C] font-medium hover:underline">
+                {selectedLeads.length === filteredLeads.length ? 'Deselect All' : 'Select All'}
+              </button>
+            </div>
           </div>
 
           {filteredLeads.length === 0 ? (
@@ -626,8 +678,8 @@ const AssignLeadsModal = ({
 };
 
 // ============ VIEW ASSIGNED LEADS MODAL ============
-const ViewAssignedLeadsModal = ({ agent, leads, show, onClose, onViewLeadProfile }) => {
-  if (!show || !agent) return null;
+const ViewAssignedLeadsModal = ({ owner, leads, show, onClose, onViewLeadProfile }) => {
+  if (!show || !owner) return null;
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
@@ -639,7 +691,7 @@ const ViewAssignedLeadsModal = ({ agent, leads, show, onClose, onViewLeadProfile
             </div>
             <div>
               <h2 className="text-base font-bold text-white">Assigned Leads</h2>
-              <p className="text-white/70 text-[10px]">Leads assigned to {agent.name}</p>
+              <p className="text-white/70 text-[10px]">Leads assigned to {owner.name}</p>
             </div>
           </div>
           <button onClick={onClose} className="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110">
@@ -698,12 +750,12 @@ const ViewAssignedLeadsModal = ({ agent, leads, show, onClose, onViewLeadProfile
 };
 
 // ============ COMMISSION TRACKING MODAL ============
-const CommissionTrackingModal = ({ agent, show, onClose }) => {
+const CommissionTrackingModal = ({ owner, show, onClose }) => {
   const [commissionData, setCommissionData] = useState([]);
   const [stats, setStats] = useState({ total: 0, paid: 0, pending: 0 });
 
   useEffect(() => {
-    if (show && agent) {
+    if (show && owner) {
       const mockCommissions = [
         { id: 1, property: 'Luxury Villa in Mumbai', price: 45000000, commission: 450000, date: '2026-01-15', status: 'paid' },
         { id: 2, property: 'Modern Apartment in Delhi', price: 12000000, commission: 120000, date: '2026-01-10', status: 'pending' },
@@ -721,7 +773,7 @@ const CommissionTrackingModal = ({ agent, show, onClose }) => {
         pending: mockCommissions.filter(c => c.status === 'pending').reduce((sum, c) => sum + c.commission, 0),
       });
     }
-  }, [show, agent]);
+  }, [show, owner]);
 
   const handleExportCommission = useCallback(() => {
     if (!commissionData.length) return;
@@ -741,12 +793,12 @@ const CommissionTrackingModal = ({ agent, show, onClose }) => {
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `commission_${(agent?.name || 'agent').replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `commission_${(owner?.name || 'owner').replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
     window.URL.revokeObjectURL(url);
-  }, [commissionData, agent]);
+  }, [commissionData, owner]);
 
-  if (!show || !agent) return null;
+  if (!show || !owner) return null;
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
@@ -758,7 +810,7 @@ const CommissionTrackingModal = ({ agent, show, onClose }) => {
             </div>
             <div>
               <h2 className="text-base font-bold text-white">Commission Tracking</h2>
-              <p className="text-white/70 text-[10px]">Commission details for {agent.name}</p>
+              <p className="text-white/70 text-[10px]">Commission details for {owner.name}</p>
             </div>
           </div>
           <button onClick={onClose} className="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110">
@@ -818,23 +870,23 @@ const CommissionTrackingModal = ({ agent, show, onClose }) => {
   );
 };
 
-// ============ PERFORMANCE REPORT MODAL ============
-const PerformanceReportModal = ({ agent, show, onClose }) => {
-  if (!show || !agent) return null;
+// ============ PERFORMANCE REPORT MODAL - UPDATED (removed all amount/commission) ============
+const PerformanceReportModal = ({ owner, show, onClose }) => {
+  if (!show || !owner) return null;
 
   const performanceData = {
-    totalProperties: agent.propertiesCount || 12,
-    totalLeads: agent.leadsCount || 45,
+    totalProperties: owner.propertiesCount || 12,
+    totalLeads: owner.leadsCount || 45,
     conversionRate: 68,
     avgResponseTime: '2.4 hrs',
     totalCommission: 1875000,
     monthlyPerformance: [
-      { month: 'Aug', properties: 3, leads: 8, commission: 320000 },
-      { month: 'Sep', properties: 2, leads: 7, commission: 280000 },
-      { month: 'Oct', properties: 4, leads: 10, commission: 450000 },
-      { month: 'Nov', properties: 2, leads: 6, commission: 220000 },
-      { month: 'Dec', properties: 5, leads: 12, commission: 580000 },
-      { month: 'Jan', properties: 3, leads: 9, commission: 350000 },
+      { month: 'Aug', properties: 3, leads: 8 },
+      { month: 'Sep', properties: 2, leads: 7 },
+      { month: 'Oct', properties: 4, leads: 10 },
+      { month: 'Nov', properties: 2, leads: 6 },
+      { month: 'Dec', properties: 5, leads: 12 },
+      { month: 'Jan', properties: 3, leads: 9 },
     ]
   };
 
@@ -845,7 +897,6 @@ const PerformanceReportModal = ({ agent, show, onClose }) => {
       Month: item.month,
       Properties: item.properties,
       Leads: item.leads,
-      Commission: item.commission,
     }));
     const csv = [
       Object.keys(data[0]).join(','),
@@ -856,7 +907,7 @@ const PerformanceReportModal = ({ agent, show, onClose }) => {
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `performance_${(agent?.name || 'agent').replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `performance_${(owner?.name || 'owner').replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
     window.URL.revokeObjectURL(url);
   };
@@ -871,7 +922,7 @@ const PerformanceReportModal = ({ agent, show, onClose }) => {
             </div>
             <div>
               <h2 className="text-base font-bold text-white">Performance Report</h2>
-              <p className="text-white/70 text-[10px]">Performance metrics for {agent.name}</p>
+              <p className="text-white/70 text-[10px]">Performance metrics for {owner.name}</p>
             </div>
           </div>
           <button onClick={onClose} className="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110">
@@ -926,24 +977,9 @@ const PerformanceReportModal = ({ agent, show, onClose }) => {
                   <div className="flex items-center gap-4">
                     <span className="text-[#5A7D78]">{item.properties} props</span>
                     <span className="text-[#5A7D78]">{item.leads} leads</span>
-                    <span className="font-semibold text-[#00695C]">₹{item.commission.toLocaleString()}</span>
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between p-3 bg-gradient-to-r from-[#00695C]/10 to-[#26A69A]/10 rounded-xl border-l-4 border-l-[#00695C]">
-            <div>
-              <p className="text-xs text-[#5A7D78]">Total Commission</p>
-              <p className="text-xl font-bold text-[#00695C]">₹{performanceData.totalCommission.toLocaleString()}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-[#5A7D78]">Rank</p>
-              <div className="flex items-center gap-1">
-                <FaMedal className="text-amber-500" />
-                <span className="text-lg font-bold text-[#1A2E2A]">#1</span>
-              </div>
             </div>
           </div>
         </div>
@@ -951,7 +987,7 @@ const PerformanceReportModal = ({ agent, show, onClose }) => {
         <div className="sticky bottom-0 bg-white pt-3 px-4 pb-4 border-t border-[#E8F0EE] flex items-center justify-end gap-3">
           <button onClick={onClose} className="px-6 py-2 bg-[#F5F9F8] text-[#1A2E2A] rounded-lg hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium">Close</button>
           <button onClick={handleExportPerformance} className="px-6 py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-lg hover:shadow-xl transition-all duration-300 text-sm font-medium shadow-md shadow-[#00695C]/30 hover:scale-[1.02]">
-            <FiDownload className="inline mr-2 text-sm" /> Full Report
+            <FiDownload className="inline mr-2 text-sm" /> Export Report
           </button>
         </div>
       </div>
@@ -959,9 +995,9 @@ const PerformanceReportModal = ({ agent, show, onClose }) => {
   );
 };
 
-// ============ VIEW AGENT PROPERTIES MODAL ============
-const ViewAgentPropertiesModal = ({
-  agent,
+// ============ VIEW OWNER PROPERTIES MODAL ============
+const ViewOwnerPropertiesModal = ({
+  owner,
   show,
   onClose,
   showToast,
@@ -983,11 +1019,8 @@ const ViewAgentPropertiesModal = ({
     onConfirm: null,
   });
 
-  // Build a deterministic, agent-specific property list — same agent
-  // always shows the same set, sized to that agent's propertiesCount,
-  // instead of one shared static list for every agent.
   useEffect(() => {
-    if (show && agent) {
+    if (show && owner) {
       const propertyTypes = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
       const statuses = ['pending', 'approved', 'rejected', 'suspended'];
       const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur'];
@@ -998,8 +1031,8 @@ const ViewAgentPropertiesModal = ({
       ];
       const amenityList = ['WiFi', 'Swimming Pool', 'AC', 'Parking', 'Gym', 'Security', 'CCTV', 'Garden'];
 
-      const rand = seededRandom(seedFromString(agent.id));
-      const count = Math.min(Math.max(agent.propertiesCount || 4, 1), 12);
+      const rand = seededRandom(seedFromString(owner.id));
+      const count = Math.min(Math.max(owner.propertiesCount || 4, 1), 12);
 
       const generated = Array.from({ length: count }, (_, idx) => {
         const type = propertyTypes[Math.floor(rand() * propertyTypes.length)];
@@ -1010,7 +1043,7 @@ const ViewAgentPropertiesModal = ({
         const amenities = amenityList.filter(() => rand() > 0.5).slice(0, 5);
 
         return {
-          id: `${agent.id}_p${idx + 1}`,
+          id: `${owner.id}_p${idx + 1}`,
           title: `${titles[Math.floor(rand() * titles.length)]} ${idx + 1}`,
           type,
           location: `${city}, India`,
@@ -1024,15 +1057,15 @@ const ViewAgentPropertiesModal = ({
           isVerified: rand() > 0.6,
           views: Math.floor(rand() * 400),
           inquiries: Math.floor(rand() * 30),
-          ownerName: agent.name,
-          description: `${type} managed by ${agent.name} in ${city}. Well-maintained with modern amenities.`,
+          ownerName: owner.name,
+          description: `${type} owned by ${owner.name} in ${city}. Well-maintained with modern amenities.`,
           amenities,
         };
       });
 
       setProperties(generated);
     }
-  }, [show, agent]);
+  }, [show, owner]);
 
   const showConfirmation = useCallback(({ title, message, confirmText, confirmColor, icon, onConfirm }) => {
     setConfirmationModal({
@@ -1057,13 +1090,11 @@ const ViewAgentPropertiesModal = ({
     closeConfirmation();
   }, [confirmationModal, closeConfirmation]);
 
-  // Opens the READ-ONLY view modal (eye icon)
   const handleViewProperty = (property) => {
     setViewingProperty(property);
     setShowViewModal(true);
   };
 
-  // Opens the EDIT form modal (pencil icon) — kept separate from View
   const handleEditProperty = (property) => {
     setEditingProperty(property);
     setShowEditModal(true);
@@ -1149,7 +1180,7 @@ const ViewAgentPropertiesModal = ({
     });
   };
 
-  if (!show || !agent) return null;
+  if (!show || !owner) return null;
 
   return (
     <>
@@ -1187,8 +1218,8 @@ const ViewAgentPropertiesModal = ({
                 <FiHome className="text-sm" />
               </div>
               <div>
-                <h2 className="text-base font-bold text-white">Agent Properties</h2>
-                <p className="text-white/70 text-[10px]">Properties managed by {agent.name}</p>
+                <h2 className="text-base font-bold text-white">Owner Properties</h2>
+                <p className="text-white/70 text-[10px]">Properties owned by {owner.name}</p>
               </div>
             </div>
             <button onClick={onClose} className="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110">
@@ -1197,15 +1228,14 @@ const ViewAgentPropertiesModal = ({
           </div>
 
           <div className="flex-1 overflow-y-auto p-4">
-            {/* Agent info + View Profile (like AgentsVerification's View Profile button) */}
             <div className="flex items-center justify-between p-3 bg-[#F5F9F8] rounded-xl border-l-4 border-l-[#00695C] mb-4">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-12 h-12 rounded-full bg-[#00695C] flex items-center justify-center text-white text-lg font-bold shrink-0">
-                  {agent.name?.charAt(0) || 'A'}
+                  {owner.name?.charAt(0) || 'O'}
                 </div>
                 <div className="min-w-0">
-                  <p className="font-semibold text-[#1A2E2A] truncate">{agent.name}</p>
-                  <p className="text-xs text-[#5A7D78] truncate">{agent.email} · {agent.phone}</p>
+                  <p className="font-semibold text-[#1A2E2A] truncate">{owner.name}</p>
+                  <p className="text-xs text-[#5A7D78] truncate">{owner.email} · {owner.phone}</p>
                   <div className="flex items-center gap-3 mt-0.5">
                     <span className="text-[10px] font-medium text-[#00695C] bg-[#E8F4F2] px-2 py-0.5 rounded-full">
                       {properties.length} Properties
@@ -1217,7 +1247,7 @@ const ViewAgentPropertiesModal = ({
                 </div>
               </div>
               <button
-                onClick={() => onViewProfile && onViewProfile(agent.id)}
+                onClick={() => onViewProfile && onViewProfile(owner.id)}
                 className="px-4 py-2 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-xs font-medium flex items-center gap-2 hover:scale-105 shrink-0"
               >
                 <FiExternalLink className="text-xs" />
@@ -1230,7 +1260,7 @@ const ViewAgentPropertiesModal = ({
                 <div className="w-16 h-16 rounded-full bg-[#F5F9F8] flex items-center justify-center mx-auto mb-3">
                   <FiHome className="text-2xl text-[#B5C9C5]" />
                 </div>
-                <p className="text-sm text-[#5A7D78]">No properties managed by this agent</p>
+                <p className="text-sm text-[#5A7D78]">No properties owned by this owner</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -1299,12 +1329,12 @@ const ViewAgentPropertiesModal = ({
 };
 
 // ============ MAIN COMPONENT ============
-const AgentsPropertyManagement = () => {
+const OwnersPropertiesLeads = () => {
   const navigate = useNavigate();
 
   // ============ STATE ============
-  const [agents, setAgents] = useState([]);
-  const [filteredAgents, setFilteredAgents] = useState([]);
+  const [owners, setOwners] = useState([]);
+  const [filteredOwners, setFilteredOwners] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -1314,7 +1344,7 @@ const AgentsPropertyManagement = () => {
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState('asc');
   const [viewMode, setViewMode] = useState('grid');
-  const [selectedAgents, setSelectedAgents] = useState([]);
+  const [selectedOwners, setSelectedOwners] = useState([]);
   const [showStats, setShowStats] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
   const [filterCount, setFilterCount] = useState(0);
@@ -1322,18 +1352,18 @@ const AgentsPropertyManagement = () => {
   const [actionLoading, setActionLoading] = useState(null);
 
   // Modal states
-  const [assignLeadAgent, setAssignLeadAgent] = useState(null);
+  const [assignLeadOwner, setAssignLeadOwner] = useState(null);
   const [showAssignLeadModal, setShowAssignLeadModal] = useState(false);
-  const [commissionAgent, setCommissionAgent] = useState(null);
+  const [commissionOwner, setCommissionOwner] = useState(null);
   const [showCommissionModal, setShowCommissionModal] = useState(false);
-  const [performanceAgent, setPerformanceAgent] = useState(null);
+  const [performanceOwner, setPerformanceOwner] = useState(null);
   const [showPerformanceModal, setShowPerformanceModal] = useState(false);
-  const [viewPropertiesAgent, setViewPropertiesAgent] = useState(null);
+  const [viewPropertiesOwner, setViewPropertiesOwner] = useState(null);
   const [showViewPropertiesModal, setShowViewPropertiesModal] = useState(false);
 
-  // Assigned leads tracking: { [agentId]: [{ id, name, phone, city, assignedDate }] }
+  // Assigned leads tracking
   const [assignedLeadsMap, setAssignedLeadsMap] = useState({});
-  const [assignedLeadsAgent, setAssignedLeadsAgent] = useState(null);
+  const [assignedLeadsOwner, setAssignedLeadsOwner] = useState(null);
   const [showAssignedLeadsModal, setShowAssignedLeadsModal] = useState(false);
 
   const searchInputRef = useRef(null);
@@ -1348,7 +1378,7 @@ const AgentsPropertyManagement = () => {
     confirmColor: 'bg-red-500',
     icon: <FiAlertTriangle className="text-4xl text-red-500" />,
     onConfirm: null,
-    agentId: null,
+    ownerId: null,
     action: null,
   });
 
@@ -1370,27 +1400,26 @@ const AgentsPropertyManagement = () => {
     setTimeout(() => setToast(null), duration);
   }, []);
 
-  // ============ GENERATE MOCK AGENTS ============
-  const generateMockAgents = useCallback(() => {
-    const agentNames = [
+  // ============ GENERATE MOCK OWNERS ============
+  const generateMockOwners = useCallback(() => {
+    const ownerNames = [
       'Rajesh Kumar', 'Priya Sharma', 'Amit Singh', 'Sneha Patel',
       'Vikram Reddy', 'Deepak Verma', 'Meera Joshi', 'Arjun Nair',
       'Kavya Rao', 'Suresh Gupta', 'Ananya Menon', 'Ravi Desai',
       'Pooja Iyer', 'Sanjay Chopra', 'Neha Kapoor'
     ];
 
-    // Match the real property type categories used across the app
     const specialties = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
     const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur'];
     const statuses = ['active', 'inactive', 'pending'];
 
-    return agentNames.map((name, i) => {
+    return ownerNames.map((name, i) => {
       const status = statuses[Math.floor(Math.random() * statuses.length)];
       const specialty = specialties[Math.floor(Math.random() * specialties.length)];
       const city = cities[Math.floor(Math.random() * cities.length)];
 
       return {
-        id: `agent_${i + 1}`,
+        id: `owner_${i + 1}`,
         name: name,
         email: `${name.toLowerCase().replace(' ', '.')}@realestate.com`,
         phone: `+91 98765${String(43210 + i).padStart(5, '0')}`,
@@ -1409,33 +1438,33 @@ const AgentsPropertyManagement = () => {
 
   // ============ INITIALIZE DATA ============
   useEffect(() => {
-    const mockAgents = generateMockAgents();
-    setAgents(mockAgents);
-    setFilteredAgents(mockAgents);
-    updateStats(mockAgents);
-  }, [generateMockAgents]);
+    const mockOwners = generateMockOwners();
+    setOwners(mockOwners);
+    setFilteredOwners(mockOwners);
+    updateStats(mockOwners);
+  }, [generateMockOwners]);
 
   // ============ UPDATE STATS ============
-  const updateStats = useCallback((agentsList) => {
-    const totalProperties = agentsList.reduce((sum, a) => sum + (a.propertiesCount || 0), 0);
-    const totalLeads = agentsList.reduce((sum, a) => sum + (a.leadsCount || 0), 0);
-    const totalCommission = agentsList.reduce((sum, a) => sum + (a.commission || 0), 0);
+  const updateStats = useCallback((ownersList) => {
+    const totalProperties = ownersList.reduce((sum, a) => sum + (a.propertiesCount || 0), 0);
+    const totalLeads = ownersList.reduce((sum, a) => sum + (a.leadsCount || 0), 0);
+    const totalCommission = ownersList.reduce((sum, a) => sum + (a.commission || 0), 0);
 
     setStats({
-      total: agentsList.length,
-      active: agentsList.filter(a => a.status === 'active').length,
-      inactive: agentsList.filter(a => a.status === 'inactive').length,
-      pending: agentsList.filter(a => a.status === 'pending').length,
-      topPerformers: agentsList.filter(a => (a.rating || 0) >= 4.5).length,
+      total: ownersList.length,
+      active: ownersList.filter(a => a.status === 'active').length,
+      inactive: ownersList.filter(a => a.status === 'inactive').length,
+      pending: ownersList.filter(a => a.status === 'pending').length,
+      topPerformers: ownersList.filter(a => (a.rating || 0) >= 4.5).length,
       totalProperties,
       totalLeads,
       totalCommission,
     });
   }, []);
 
-  // ============ FILTER AGENTS ============
-  const filterAgents = useCallback(() => {
-    let filtered = [...agents];
+  // ============ FILTER OWNERS ============
+  const filterOwners = useCallback(() => {
+    let filtered = [...owners];
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -1478,22 +1507,22 @@ const AgentsPropertyManagement = () => {
       return 0;
     });
 
-    setFilteredAgents(filtered);
+    setFilteredOwners(filtered);
     setCurrentPage(1);
-  }, [agents, searchQuery, selectedStatus, selectedSpecialty, sortField, sortDirection, activeFilter]);
+  }, [owners, searchQuery, selectedStatus, selectedSpecialty, sortField, sortDirection, activeFilter]);
 
   useEffect(() => {
-    filterAgents();
-  }, [filterAgents]);
+    filterOwners();
+  }, [filterOwners]);
 
   // ============ PAGINATION ============
-  const totalPages = Math.ceil(filteredAgents.length / pageSize);
-  const paginatedAgents = useMemo(() =>
-    filteredAgents.slice(
+  const totalPages = Math.ceil(filteredOwners.length / pageSize);
+  const paginatedOwners = useMemo(() =>
+    filteredOwners.slice(
       (currentPage - 1) * pageSize,
       currentPage * pageSize
     )
-  , [filteredAgents, currentPage, pageSize]);
+  , [filteredOwners, currentPage, pageSize]);
 
   // ============ HANDLE SORT ============
   const handleSort = useCallback((field) => {
@@ -1507,17 +1536,17 @@ const AgentsPropertyManagement = () => {
 
   // ============ HANDLE SELECT ALL ============
   const handleSelectAll = useCallback(() => {
-    if (selectedAgents.length === paginatedAgents.length) {
-      setSelectedAgents([]);
+    if (selectedOwners.length === paginatedOwners.length) {
+      setSelectedOwners([]);
     } else {
-      setSelectedAgents(paginatedAgents.map(a => a.id));
+      setSelectedOwners(paginatedOwners.map(a => a.id));
     }
-  }, [selectedAgents, paginatedAgents]);
+  }, [selectedOwners, paginatedOwners]);
 
-  // ============ HANDLE SELECT AGENT ============
-  const handleSelectAgent = useCallback((agentId) => {
-    setSelectedAgents(prev =>
-      prev.includes(agentId) ? prev.filter(id => id !== agentId) : [...prev, agentId]
+  // ============ HANDLE SELECT OWNER ============
+  const handleSelectOwner = useCallback((ownerId) => {
+    setSelectedOwners(prev =>
+      prev.includes(ownerId) ? prev.filter(id => id !== ownerId) : [...prev, ownerId]
     );
   }, []);
 
@@ -1565,7 +1594,7 @@ const AgentsPropertyManagement = () => {
     confirmColor = 'bg-red-500',
     icon = <FiAlertTriangle className="text-4xl text-red-500" />,
     onConfirm,
-    agentId,
+    ownerId,
     action,
   }) => {
     setConfirmationModal({
@@ -1577,7 +1606,7 @@ const AgentsPropertyManagement = () => {
       confirmColor,
       icon,
       onConfirm,
-      agentId,
+      ownerId,
       action,
     });
   }, []);
@@ -1589,104 +1618,104 @@ const AgentsPropertyManagement = () => {
 
   // ============ HANDLE CONFIRM ACTION ============
   const handleConfirmAction = useCallback(async () => {
-    const { onConfirm, agentId, action } = confirmationModal;
+    const { onConfirm, ownerId, action } = confirmationModal;
     if (onConfirm) {
-      setActionLoading(`${action}_${agentId}`);
-      await onConfirm(agentId);
+      setActionLoading(`${action}_${ownerId}`);
+      await onConfirm(ownerId);
       setActionLoading(null);
     }
     closeConfirmation();
   }, [confirmationModal, closeConfirmation]);
 
-  // ============ VIEW AGENT PROPERTIES ============
-  const handleViewAgentProperties = useCallback((agent) => {
-    setViewPropertiesAgent(agent);
+  // ============ VIEW OWNER PROPERTIES ============
+  const handleViewOwnerProperties = useCallback((owner) => {
+    setViewPropertiesOwner(owner);
     setShowViewPropertiesModal(true);
   }, []);
 
-  // ============ VIEW AGENT PROFILE (same pattern as AgentsVerification) ============
-  const handleViewAgentProfile = useCallback((agentId) => {
-    navigate('/profile/agent');
-    showToast('Opening Agent Profile...', 'info');
+  // ============ VIEW OWNER PROFILE ============
+  const handleViewOwnerProfile = useCallback((ownerId) => {
+    navigate('/profile/owner');
+    showToast('Opening Owner Profile...', 'info');
   }, [navigate, showToast]);
 
   // ============ VIEW LEAD PROFILE ============
   const handleViewLeadProfile = useCallback((lead) => {
-    navigate('/profile/agent', { state: { lead } });
+    navigate('/profile/owner', { state: { lead } });
     showToast(`Opening ${lead.name}'s Profile...`, 'info');
   }, [navigate, showToast]);
 
   // ============ ASSIGN LEADS ============
-  const handleAssignLeads = useCallback((agent) => {
-    setAssignLeadAgent(agent);
+  const handleAssignLeads = useCallback((owner) => {
+    setAssignLeadOwner(owner);
     setShowAssignLeadModal(true);
   }, []);
 
-  const handleAssignLeadsSubmit = useCallback((agentId, leadObjects) => {
-    setActionLoading(`assign_${agentId}`);
+  const handleAssignLeadsSubmit = useCallback((ownerId, leadObjects) => {
+    setActionLoading(`assign_${ownerId}`);
     setTimeout(() => {
-      setAgents(prev => {
-        const updated = prev.map(agent => {
-          if (agent.id === agentId) {
-            const newLeadsCount = (agent.leadsCount || 0) + leadObjects.length;
-            showToast(`${leadObjects.length} lead(s) assigned to ${agent.name} successfully`, 'success');
-            return { ...agent, leadsCount: newLeadsCount };
+      setOwners(prev => {
+        const updated = prev.map(owner => {
+          if (owner.id === ownerId) {
+            const newLeadsCount = (owner.leadsCount || 0) + leadObjects.length;
+            showToast(`${leadObjects.length} lead(s) assigned to ${owner.name} successfully`, 'success');
+            return { ...owner, leadsCount: newLeadsCount };
           }
-          return agent;
+          return owner;
         });
         updateStats(updated);
         return updated;
       });
 
       setAssignedLeadsMap(prev => {
-        const existing = prev[agentId] || [];
+        const existing = prev[ownerId] || [];
         const withDate = leadObjects.map(l => ({ ...l, assignedDate: new Date().toISOString() }));
-        return { ...prev, [agentId]: [...existing, ...withDate] };
+        return { ...prev, [ownerId]: [...existing, ...withDate] };
       });
 
       setActionLoading(null);
       setShowAssignLeadModal(false);
-      setAssignLeadAgent(null);
+      setAssignLeadOwner(null);
     }, 800);
   }, [showToast, updateStats]);
 
   // ============ VIEW ASSIGNED LEADS ============
-  const handleViewAssignedLeads = useCallback((agent) => {
-    setAssignedLeadsAgent(agent);
+  const handleViewAssignedLeads = useCallback((owner) => {
+    setAssignedLeadsOwner(owner);
     setShowAssignedLeadsModal(true);
   }, []);
 
   // ============ VIEW COMMISSION ============
-  const handleViewCommission = useCallback((agent) => {
-    setCommissionAgent(agent);
+  const handleViewCommission = useCallback((owner) => {
+    setCommissionOwner(owner);
     setShowCommissionModal(true);
   }, []);
 
   // ============ VIEW PERFORMANCE ============
-  const handleViewPerformance = useCallback((agent) => {
-    setPerformanceAgent(agent);
+  const handleViewPerformance = useCallback((owner) => {
+    setPerformanceOwner(owner);
     setShowPerformanceModal(true);
   }, []);
 
-  // ============ TOGGLE AGENT STATUS ============
-  const handleToggleStatus = useCallback((agentId) => {
-    const agent = agents.find(a => a.id === agentId);
-    if (!agent) return;
+  // ============ TOGGLE OWNER STATUS ============
+  const handleToggleStatus = useCallback((ownerId) => {
+    const owner = owners.find(a => a.id === ownerId);
+    if (!owner) return;
 
-    const isActive = agent.status === 'active';
+    const isActive = owner.status === 'active';
 
     showConfirmation({
-      title: isActive ? 'Deactivate Agent' : 'Activate Agent',
+      title: isActive ? 'Deactivate Owner' : 'Activate Owner',
       message: isActive
-        ? `Are you sure you want to deactivate ${agent.name}? They will no longer be able to manage properties.`
-        : `Are you sure you want to activate ${agent.name}? They will be able to manage properties again.`,
+        ? `Are you sure you want to deactivate ${owner.name}? They will no longer be able to manage properties.`
+        : `Are you sure you want to activate ${owner.name}? They will be able to manage properties again.`,
       confirmText: isActive ? 'Yes, Deactivate' : 'Yes, Activate',
       confirmColor: isActive ? 'bg-red-500' : 'bg-emerald-500',
       icon: isActive ? <FiUserX className="text-4xl text-red-500" /> : <FiUserCheck className="text-4xl text-emerald-500" />,
       onConfirm: (id) => {
         return new Promise((resolve) => {
           setTimeout(() => {
-            setAgents(prev => {
+            setOwners(prev => {
               const updated = prev.map(a => {
                 if (a.id === id) {
                   const newStatus = a.status === 'active' ? 'inactive' : 'active';
@@ -1702,65 +1731,65 @@ const AgentsPropertyManagement = () => {
           }, 600);
         });
       },
-      agentId,
+      ownerId,
       action: 'toggle_status',
     });
-  }, [agents, showConfirmation, showToast, updateStats]);
+  }, [owners, showConfirmation, showToast, updateStats]);
 
-  // ============ DELETE AGENT ============
-  const handleDeleteAgent = useCallback((agentId) => {
-    const agent = agents.find(a => a.id === agentId);
-    if (!agent) return;
+  // ============ DELETE OWNER ============
+  const handleDeleteOwner = useCallback((ownerId) => {
+    const owner = owners.find(a => a.id === ownerId);
+    if (!owner) return;
 
     showConfirmation({
-      title: 'Delete Agent',
-      message: `Are you sure you want to delete ${agent.name}? This action cannot be undone.`,
+      title: 'Delete Owner',
+      message: `Are you sure you want to delete ${owner.name}? This action cannot be undone.`,
       confirmText: 'Yes, Delete',
       confirmColor: 'bg-red-500',
       icon: <FiTrash2 className="text-4xl text-red-500" />,
       onConfirm: (id) => {
         return new Promise((resolve) => {
           setTimeout(() => {
-            setAgents(prev => {
+            setOwners(prev => {
               const updated = prev.filter(a => a.id !== id);
               updateStats(updated);
-              showToast(`Agent deleted successfully`, 'error');
+              showToast(`Owner deleted successfully`, 'error');
               return updated;
             });
             resolve();
           }, 600);
         });
       },
-      agentId,
+      ownerId,
       action: 'delete',
     });
-  }, [agents, showConfirmation, showToast, updateStats]);
+  }, [owners, showConfirmation, showToast, updateStats]);
 
   // ============ BULK ACTIONS ============
   const handleBulkAction = useCallback((action) => {
-    if (selectedAgents.length === 0) {
-      showToast('Please select agents first', 'warning');
+    if (selectedOwners.length === 0) {
+      showToast('Please select owners first', 'warning');
       return;
     }
 
     const actionMap = {
       activate: {
-        title: 'Activate Agents',
-        message: `Are you sure you want to activate ${selectedAgents.length} selected agent(s)?`,
+        title: 'Activate Owners',
+        message: `Are you sure you want to activate ${selectedOwners.length} selected owner(s)?`,
         confirmText: 'Yes, Activate All',
         confirmColor: 'bg-emerald-500',
         icon: <FiUserCheck className="text-4xl text-emerald-500" />,
       },
       deactivate: {
-        title: 'Deactivate Agents',
-        message: `Are you sure you want to deactivate ${selectedAgents.length} selected agent(s)?`,
+        title: 'Deactivate Owners',
+        message: `Are you sure you want to deactivate ${selectedOwners.length} selected owner(s)?`,
         confirmText: 'Yes, Deactivate All',
         confirmColor: 'bg-red-500',
         icon: <FiUserX className="text-4xl text-red-500" />,
       },
       delete: {
-        title: 'Delete Agents',
-        message: `Are you sure you want to delete ${selectedAgents.length} selected agent(s)? This action cannot be undone.`,
+        title: 'Delete Owners',
+        message: `Are you sure you want to delete ${selectedOwners.length} selected owner(s)? This action cannot be undone.`,
         confirmText: 'Yes, Delete All',
         confirmColor: 'bg-red-500',
         icon: <FiTrash2 className="text-4xl text-red-500" />,
@@ -1776,10 +1805,10 @@ const AgentsPropertyManagement = () => {
         return new Promise((resolve) => {
           setActionLoading(action);
           setTimeout(() => {
-            const selectedIds = new Set(selectedAgents);
-            let updatedAgents = [...agents];
+            const selectedIds = new Set(selectedOwners);
+            let updatedOwners = [...owners];
 
-            updatedAgents = updatedAgents.map(a => {
+            updatedOwners = updatedOwners.map(a => {
               if (selectedIds.has(a.id)) {
                 if (action === 'activate') {
                   return { ...a, status: 'active' };
@@ -1792,36 +1821,36 @@ const AgentsPropertyManagement = () => {
               return a;
             }).filter(Boolean);
 
-            setAgents(updatedAgents);
-            updateStats(updatedAgents);
-            setSelectedAgents([]);
+            setOwners(updatedOwners);
+            updateStats(updatedOwners);
+            setSelectedOwners([]);
             setActionLoading(null);
-            showToast(`${selectedAgents.length} agent(s) ${action === 'activate' ? 'activated' : action === 'deactivate' ? 'deactivated' : 'deleted'}`, 'success');
+            showToast(`${selectedOwners.length} owner(s) ${action === 'activate' ? 'activated' : action === 'deactivate' ? 'deactivated' : 'deleted'}`, 'success');
             resolve();
           }, 800);
         });
       },
-      agentId: 'bulk',
+      ownerId: 'bulk',
       action: action,
     });
-  }, [selectedAgents, agents, showConfirmation, showToast, updateStats]);
+  }, [selectedOwners, owners, showConfirmation, showToast, updateStats]);
 
   // ============ REFRESH DATA ============
   const handleRefresh = useCallback(() => {
     setLoading(true);
     setTimeout(() => {
-      const mockAgents = generateMockAgents();
-      setAgents(mockAgents);
-      setFilteredAgents(mockAgents);
-      updateStats(mockAgents);
+      const mockOwners = generateMockOwners();
+      setOwners(mockOwners);
+      setFilteredOwners(mockOwners);
+      updateStats(mockOwners);
       setLoading(false);
       showToast('Data refreshed successfully', 'success');
     }, 1000);
-  }, [generateMockAgents, showToast, updateStats]);
+  }, [generateMockOwners, showToast, updateStats]);
 
-  // ============ EXPORT AGENTS ============
-  const handleExportAgents = useCallback(() => {
-    const data = filteredAgents.map(a => ({
+  // ============ EXPORT OWNERS ============
+  const handleExportOwners = useCallback(() => {
+    const data = filteredOwners.map(a => ({
       Name: a.name,
       Email: a.email,
       Phone: a.phone,
@@ -1845,11 +1874,11 @@ const AgentsPropertyManagement = () => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `agents_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `owners_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
-    showToast(`${filteredAgents.length} agents exported successfully`, 'success');
-  }, [filteredAgents, showToast]);
+    showToast(`${filteredOwners.length} owners exported successfully`, 'success');
+  }, [filteredOwners, showToast]);
 
   // ============ RENDER ============
   return (
@@ -1879,9 +1908,9 @@ const AgentsPropertyManagement = () => {
 
       {/* Assign Leads Modal */}
       <AssignLeadsModal
-        agent={assignLeadAgent}
+        owner={assignLeadOwner}
         show={showAssignLeadModal}
-        onClose={() => { setShowAssignLeadModal(false); setAssignLeadAgent(null); }}
+        onClose={() => { setShowAssignLeadModal(false); setAssignLeadOwner(null); }}
         onAssign={handleAssignLeadsSubmit}
         onViewLeadProfile={handleViewLeadProfile}
         loading={actionLoading !== null}
@@ -1889,34 +1918,34 @@ const AgentsPropertyManagement = () => {
 
       {/* View Assigned Leads Modal */}
       <ViewAssignedLeadsModal
-        agent={assignedLeadsAgent}
-        leads={assignedLeadsAgent ? (assignedLeadsMap[assignedLeadsAgent.id] || []) : []}
+        owner={assignedLeadsOwner}
+        leads={assignedLeadsOwner ? (assignedLeadsMap[assignedLeadsOwner.id] || []) : []}
         show={showAssignedLeadsModal}
-        onClose={() => { setShowAssignedLeadsModal(false); setAssignedLeadsAgent(null); }}
+        onClose={() => { setShowAssignedLeadsModal(false); setAssignedLeadsOwner(null); }}
         onViewLeadProfile={handleViewLeadProfile}
       />
 
       {/* Commission Tracking Modal */}
       <CommissionTrackingModal
-        agent={commissionAgent}
+        owner={commissionOwner}
         show={showCommissionModal}
-        onClose={() => { setShowCommissionModal(false); setCommissionAgent(null); }}
+        onClose={() => { setShowCommissionModal(false); setCommissionOwner(null); }}
       />
 
       {/* Performance Report Modal */}
       <PerformanceReportModal
-        agent={performanceAgent}
+        owner={performanceOwner}
         show={showPerformanceModal}
-        onClose={() => { setShowPerformanceModal(false); setPerformanceAgent(null); }}
+        onClose={() => { setShowPerformanceModal(false); setPerformanceOwner(null); }}
       />
 
-      {/* View Agent Properties Modal */}
-      <ViewAgentPropertiesModal
-        agent={viewPropertiesAgent}
+      {/* View Owner Properties Modal */}
+      <ViewOwnerPropertiesModal
+        owner={viewPropertiesOwner}
         show={showViewPropertiesModal}
-        onClose={() => { setShowViewPropertiesModal(false); setViewPropertiesAgent(null); }}
+        onClose={() => { setShowViewPropertiesModal(false); setViewPropertiesOwner(null); }}
         showToast={showToast}
-        onViewProfile={handleViewAgentProfile}
+        onViewProfile={handleViewOwnerProfile}
       />
 
       {/* Header */}
@@ -1925,10 +1954,10 @@ const AgentsPropertyManagement = () => {
           <div>
             <div className="flex items-center gap-3 mb-1 flex-wrap">
               <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
-                Agent Management
+                Properties & Leads
               </h1>
               <span className="px-3 py-1 bg-[#E8F4F2] text-[#00695C] text-xs font-semibold rounded-full animate-pulse">
-                {filteredAgents.length} Agents
+                {filteredOwners.length} Owners
               </span>
               {filterCount > 0 && (
                 <span className="px-3 py-1 bg-[#FEF3E2] text-amber-700 text-xs font-semibold rounded-full">
@@ -1937,7 +1966,7 @@ const AgentsPropertyManagement = () => {
               )}
             </div>
             <p className="text-sm text-[#5A7D78] flex items-center gap-2 flex-wrap">
-              <span>Manage agent listings, assign leads, track performance & commissions</span>
+              <span>Manage owner listings, assign leads, track performance & commissions</span>
               <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
               <span className="text-[#00695C] font-medium">{new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
             </p>
@@ -1960,7 +1989,7 @@ const AgentsPropertyManagement = () => {
               <span className="hidden sm:inline">{loading ? 'Refreshing...' : 'Refresh'}</span>
             </button>
             <button
-              onClick={handleExportAgents}
+              onClick={handleExportOwners}
               className="flex items-center gap-2 px-4 py-2 bg-white border border-[#E8F0EE] rounded-xl hover:border-[#00695C]/30 hover:shadow-md transition-all duration-300 text-sm font-medium text-[#1A2E2A] hover:scale-105"
             >
               <FiDownload className="text-sm" />
@@ -1974,10 +2003,10 @@ const AgentsPropertyManagement = () => {
       {showStats && (
         <div className="relative animate-slide-in">
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               <StatCard
                 icon={<MdOutlineRealEstateAgent className="text-white text-sm" />}
-                title="Total Agents"
+                title="Total Owners"
                 value={stats.total}
                 color="bg-gradient-to-br from-[#00695C] to-[#26A69A]"
                 delay={0}
@@ -2038,15 +2067,6 @@ const AgentsPropertyManagement = () => {
                 isActive={false}
                 onClick={() => {}}
               />
-              <StatCard
-                icon={<FiDollarSign className="text-white text-sm" />}
-                title="Total Commission"
-                value={`₹${(stats.totalCommission / 1000000).toFixed(1)}M`}
-                color="bg-gradient-to-br from-rose-600 to-rose-400"
-                delay={500}
-                isActive={false}
-                onClick={() => {}}
-              />
             </div>
           </div>
         </div>
@@ -2060,7 +2080,7 @@ const AgentsPropertyManagement = () => {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search agents by name, email, city, or specialty..."
+              placeholder="Search owners by name, email, city, or specialty..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none placeholder:text-[#B5C9C5]"
@@ -2135,10 +2155,10 @@ const AgentsPropertyManagement = () => {
         </div>
 
         {/* Bulk Actions */}
-        {selectedAgents.length > 0 && (
+        {selectedOwners.length > 0 && (
           <div className="mt-4 pt-4 border-t border-[#E8F0EE] flex flex-wrap items-center justify-between gap-3 animate-slide-in">
             <span className="text-sm text-[#5A7D78]">
-              <span className="font-semibold text-[#00695C]">{selectedAgents.length}</span> agent(s) selected
+              <span className="font-semibold text-[#00695C]">{selectedOwners.length}</span> owner(s) selected
             </span>
             <div className="flex flex-wrap items-center gap-2">
               <button
@@ -2166,7 +2186,7 @@ const AgentsPropertyManagement = () => {
                 Delete
               </button>
               <button
-                onClick={() => setSelectedAgents([])}
+                onClick={() => setSelectedOwners([])}
                 className="px-4 py-1.5 bg-[#F5F9F8] text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] transition-all duration-300 text-xs font-medium hover:scale-105"
               >
                 Clear
@@ -2176,7 +2196,7 @@ const AgentsPropertyManagement = () => {
         )}
       </div>
 
-      {/* Agents Grid */}
+      {/* Owners Grid */}
       <div className="relative">
         {loading ? (
           <div className="flex items-center justify-center py-20">
@@ -2184,24 +2204,24 @@ const AgentsPropertyManagement = () => {
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-            {paginatedAgents.map((agent, index) => {
-              const isSelected = selectedAgents.includes(agent.id);
+            {paginatedOwners.map((owner, index) => {
+              const isSelected = selectedOwners.includes(owner.id);
               const statusColors = {
                 active: 'bg-emerald-100 text-emerald-700 border-emerald-200',
                 inactive: 'bg-gray-100 text-gray-700 border-gray-200',
                 pending: 'bg-amber-100 text-amber-700 border-amber-200'
               };
-              const agentBorder = {
+              const ownerBorder = {
                 active: 'border-l-emerald-500',
                 inactive: 'border-l-gray-400',
                 pending: 'border-l-amber-500',
               };
-              const assignedCount = (assignedLeadsMap[agent.id] || []).length;
+              const assignedCount = (assignedLeadsMap[owner.id] || []).length;
 
               return (
                 <div
-                  key={agent.id}
-                  className={`relative bg-white rounded-2xl border border-[#E8F0EE] border-l-4 ${agentBorder[agent.status] || 'border-l-[#00695C]'} p-4 hover:shadow-xl hover:-translate-y-1 group animate-slide-in transition-all duration-500 ${isSelected ? 'ring-2 ring-[#00695C] shadow-lg' : ''}`}
+                  key={owner.id}
+                  className={`relative bg-white rounded-2xl border border-[#E8F0EE] border-l-4 ${ownerBorder[owner.status] || 'border-l-[#00695C]'} p-4 hover:shadow-xl hover:-translate-y-1 group animate-slide-in transition-all duration-500 ${isSelected ? 'ring-2 ring-[#00695C] shadow-lg' : ''}`}
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <div className="flex items-start justify-between mb-3">
@@ -2209,32 +2229,32 @@ const AgentsPropertyManagement = () => {
                       <input
                         type="checkbox"
                         checked={isSelected}
-                        onChange={() => handleSelectAgent(agent.id)}
+                        onChange={() => handleSelectOwner(owner.id)}
                         className="w-4 h-4 shrink-0 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                       />
                       <div className="relative">
                         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white text-xl font-bold shadow-lg">
-                          {agent.name.charAt(0)}
+                          {owner.name.charAt(0)}
                         </div>
-                        {agent.status === 'active' && (
+                        {owner.status === 'active' && (
                           <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white animate-pulse" />
                         )}
                       </div>
                       <div>
-                        <h3 className="font-semibold text-[#1A2E2A] text-sm">{agent.name}</h3>
+                        <h3 className="font-semibold text-[#1A2E2A] text-sm">{owner.name}</h3>
                         <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${statusColors[agent.status] || 'bg-gray-100 text-gray-700'}`}>
-                            {agent.status.charAt(0).toUpperCase() + agent.status.slice(1)}
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${statusColors[owner.status] || 'bg-gray-100 text-gray-700'}`}>
+                            {owner.status.charAt(0).toUpperCase() + owner.status.slice(1)}
                           </span>
                           <div className="flex items-center gap-0.5">
                             <FaStarSolid className="text-amber-400 text-[10px]" />
-                            <span className="text-xs font-medium text-[#1A2E2A]">{agent.rating}</span>
+                            <span className="text-xs font-medium text-[#1A2E2A]">{owner.rating}</span>
                           </div>
                         </div>
                       </div>
                     </div>
                     <button
-                      onClick={() => handleViewAgentProperties(agent)}
+                      onClick={() => handleViewOwnerProperties(owner)}
                       className="w-7 h-7 rounded-xl hover:bg-[#F5F9F8] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
                       title="View Properties"
                     >
@@ -2245,50 +2265,50 @@ const AgentsPropertyManagement = () => {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiMail className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate">{agent.email}</span>
+                      <span className="truncate">{owner.email}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiPhone className="text-[#00695C] flex-shrink-0" />
-                      <span>{agent.phone}</span>
+                      <span>{owner.phone}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiMapPin className="text-[#00695C] flex-shrink-0" />
-                      <span>{agent.city}</span>
+                      <span>{owner.city}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiTag className="text-[#00695C] flex-shrink-0" />
-                      <span>{agent.specialty}</span>
+                      <span>{owner.specialty}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiCalendar className="text-[#00695C] flex-shrink-0" />
-                      <span>Joined: {new Date(agent.joinedDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                      <span>Joined: {new Date(owner.joinedDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-[#E8F0EE]">
                     <div className="text-center">
-                      <p className="text-sm font-bold text-[#1A2E2A]">{agent.propertiesCount}</p>
+                      <p className="text-sm font-bold text-[#1A2E2A]">{owner.propertiesCount}</p>
                       <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Properties</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm font-bold text-[#1A2E2A]">{agent.leadsCount}</p>
+                      <p className="text-sm font-bold text-[#1A2E2A]">{owner.leadsCount}</p>
                       <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Leads</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm font-bold text-[#00695C]">₹{(agent.commission / 100000).toFixed(1)}L</p>
+                      <p className="text-sm font-bold text-[#00695C]">₹{(owner.commission / 100000).toFixed(1)}L</p>
                       <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Commission</p>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap gap-1 mt-3 pt-3 border-t border-[#E8F0EE]">
                     <button
-                      onClick={() => handleAssignLeads(agent)}
+                      onClick={() => handleAssignLeads(owner)}
                       className="flex-1 py-1.5 text-[10px] font-medium text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                     >
                       <FiUserCheck className="text-[10px]" /> Assign Leads
                     </button>
                     <button
-                      onClick={() => handleViewAssignedLeads(agent)}
+                      onClick={() => handleViewAssignedLeads(owner)}
                       className="flex-1 py-1.5 text-[10px] font-medium text-indigo-600 bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 relative"
                     >
                       <FiEye className="text-[10px]" /> Assigned
@@ -2299,19 +2319,19 @@ const AgentsPropertyManagement = () => {
                       )}
                     </button>
                     <button
-                      onClick={() => handleViewCommission(agent)}
+                      onClick={() => handleViewCommission(owner)}
                       className="flex-1 py-1.5 text-[10px] font-medium text-amber-600 bg-amber-50 rounded-xl hover:bg-amber-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                     >
                       <FiDollarSign className="text-[10px]" /> Commission
                     </button>
                     <button
-                      onClick={() => handleViewPerformance(agent)}
+                      onClick={() => handleViewPerformance(owner)}
                       className="flex-1 py-1.5 text-[10px] font-medium text-purple-600 bg-purple-50 rounded-xl hover:bg-purple-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                     >
                       <FiBarChart2 className="text-[10px]" /> Performance
                     </button>
                     <button
-                      onClick={() => handleViewAgentProperties(agent)}
+                      onClick={() => handleViewOwnerProperties(owner)}
                       className="flex-1 py-1.5 text-[10px] font-medium text-[#00695C] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                     >
                       <FiHome className="text-[10px]" /> Properties
@@ -2320,37 +2340,37 @@ const AgentsPropertyManagement = () => {
 
                   <div className="flex flex-wrap gap-1 mt-2">
                     <button
-                      onClick={() => handleViewAgentProfile(agent.id)}
+                      onClick={() => handleViewOwnerProfile(owner.id)}
                       className="flex-1 py-1.5 text-[10px] font-medium text-[#00695C] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                     >
                       <FiExternalLink className="text-[10px]" /> View Profile
                     </button>
                     <button
-                      onClick={() => handleToggleStatus(agent.id)}
-                      disabled={actionLoading === `toggle_status_${agent.id}`}
+                      onClick={() => handleToggleStatus(owner.id)}
+                      disabled={actionLoading === `toggle_status_${owner.id}`}
                       className={`flex-1 py-1.5 text-[10px] font-medium rounded-xl transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 disabled:opacity-50 ${
-                        agent.status === 'active'
+                        owner.status === 'active'
                           ? 'text-red-600 bg-red-50 hover:bg-red-100'
-                          : agent.status === 'inactive'
+                          : owner.status === 'inactive'
                           ? 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100'
                           : 'text-amber-600 bg-amber-50 hover:bg-amber-100'
                       }`}
                     >
-                      {actionLoading === `toggle_status_${agent.id}` ? (
+                      {actionLoading === `toggle_status_${owner.id}` ? (
                         <FiRefreshCw className="text-[10px] animate-spin" />
-                      ) : agent.status === 'active' ? (
+                      ) : owner.status === 'active' ? (
                         <FiUserX className="text-[10px]" />
                       ) : (
                         <FiUserCheck className="text-[10px]" />
                       )}
-                      {agent.status === 'active' ? 'Deactivate' : agent.status === 'inactive' ? 'Activate' : 'Review'}
+                      {owner.status === 'active' ? 'Deactivate' : owner.status === 'inactive' ? 'Activate' : 'Review'}
                     </button>
                     <button
-                      onClick={() => handleDeleteAgent(agent.id)}
-                      disabled={actionLoading === `delete_${agent.id}`}
+                      onClick={() => handleDeleteOwner(owner.id)}
+                      disabled={actionLoading === `delete_${owner.id}`}
                       className="flex-1 py-1.5 text-[10px] font-medium text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 disabled:opacity-50"
                     >
-                      {actionLoading === `delete_${agent.id}` ? (
+                      {actionLoading === `delete_${owner.id}` ? (
                         <FiRefreshCw className="text-[10px] animate-spin" />
                       ) : (
                         <FiTrash2 className="text-[10px]" />
@@ -2363,13 +2383,13 @@ const AgentsPropertyManagement = () => {
             })}
           </div>
         ) : (
-          /* List View */
+          /* List View - Same structure as Agents but with Owners */
           <div className="bg-white rounded-2xl border border-[#E8F0EE] shadow-sm overflow-hidden">
             <div className="grid grid-cols-12 gap-2 items-center px-4 py-3 bg-[#F5F9F8] border-b border-[#E8F0EE] text-xs font-medium text-[#5A7D78] uppercase tracking-wider">
               <div className="col-span-1 flex items-center gap-2">
                 <input
                   type="checkbox"
-                  checked={selectedAgents.length === paginatedAgents.length && paginatedAgents.length > 0}
+                  checked={selectedOwners.length === paginatedOwners.length && paginatedOwners.length > 0}
                   onChange={handleSelectAll}
                   className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                 />
@@ -2398,14 +2418,14 @@ const AgentsPropertyManagement = () => {
               <div className="col-span-2 text-right">Actions</div>
             </div>
 
-            {paginatedAgents.map((agent, index) => {
-              const isSelected = selectedAgents.includes(agent.id);
+            {paginatedOwners.map((owner, index) => {
+              const isSelected = selectedOwners.includes(owner.id);
               const statusColors = {
                 active: 'bg-emerald-100 text-emerald-700',
                 inactive: 'bg-gray-100 text-gray-700',
                 pending: 'bg-amber-100 text-amber-700'
               };
-              const agentBorder = {
+              const ownerBorder = {
                 active: 'border-l-emerald-500',
                 inactive: 'border-l-gray-400',
                 pending: 'border-l-amber-500',
@@ -2413,14 +2433,14 @@ const AgentsPropertyManagement = () => {
 
               return (
                 <div
-                  key={agent.id}
-                  className={`grid grid-cols-12 gap-2 items-center py-3 px-4 border-b border-[#E8F0EE] border-l-4 ${agentBorder[agent.status] || 'border-l-[#00695C]'} hover:bg-[#F5F9F8] transition-all duration-300 group relative ${isSelected ? 'bg-[#E8F4F2]' : ''}`}
+                  key={owner.id}
+                  className={`grid grid-cols-12 gap-2 items-center py-3 px-4 border-b border-[#E8F0EE] border-l-4 ${ownerBorder[owner.status] || 'border-l-[#00695C]'} hover:bg-[#F5F9F8] transition-all duration-300 group relative ${isSelected ? 'bg-[#E8F4F2]' : ''}`}
                 >
                   <div className="col-span-1 flex items-center gap-2">
                     <input
                       type="checkbox"
                       checked={isSelected}
-                      onChange={() => handleSelectAgent(agent.id)}
+                      onChange={() => handleSelectOwner(owner.id)}
                       className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                     />
                     <span className="text-xs text-[#5A7D78]">{index + 1}</span>
@@ -2429,111 +2449,111 @@ const AgentsPropertyManagement = () => {
                   <div className="col-span-2">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white text-xs font-bold">
-                        {agent.name.charAt(0)}
+                        {owner.name.charAt(0)}
                       </div>
                       <div>
-                        <p className="font-semibold text-sm text-[#1A2E2A] truncate">{agent.name}</p>
-                        <p className="text-[10px] text-[#5A7D78] truncate">{agent.email}</p>
+                        <p className="font-semibold text-sm text-[#1A2E2A] truncate">{owner.name}</p>
+                        <p className="text-[10px] text-[#5A7D78] truncate">{owner.email}</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="col-span-1">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColors[agent.status] || 'bg-gray-100 text-gray-700'}`}>
-                      {agent.status.charAt(0).toUpperCase() + agent.status.slice(1)}
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColors[owner.status] || 'bg-gray-100 text-gray-700'}`}>
+                      {owner.status.charAt(0).toUpperCase() + owner.status.slice(1)}
                     </span>
                   </div>
 
-                  <div className="col-span-1 text-xs text-[#5A7D78]">{agent.specialty}</div>
+                  <div className="col-span-1 text-xs text-[#5A7D78]">{owner.specialty}</div>
 
-                  <div className="col-span-1 text-xs text-[#5A7D78]">{agent.city}</div>
+                  <div className="col-span-1 text-xs text-[#5A7D78]">{owner.city}</div>
 
-                  <div className="col-span-1 text-center text-sm font-medium text-[#1A2E2A]">{agent.propertiesCount}</div>
+                  <div className="col-span-1 text-center text-sm font-medium text-[#1A2E2A]">{owner.propertiesCount}</div>
 
-                  <div className="col-span-1 text-center text-sm font-medium text-[#1A2E2A]">{agent.leadsCount}</div>
+                  <div className="col-span-1 text-center text-sm font-medium text-[#1A2E2A]">{owner.leadsCount}</div>
 
-                  <div className="col-span-1 text-center text-sm font-semibold text-[#00695C]">₹{(agent.commission / 100000).toFixed(1)}L</div>
+                  <div className="col-span-1 text-center text-sm font-semibold text-[#00695C]">₹{(owner.commission / 100000).toFixed(1)}L</div>
 
                   <div className="col-span-1 text-center flex items-center justify-center gap-0.5">
                     <FaStarSolid className="text-amber-400 text-xs" />
-                    <span className="text-sm font-medium text-[#1A2E2A]">{agent.rating}</span>
+                    <span className="text-sm font-medium text-[#1A2E2A]">{owner.rating}</span>
                   </div>
 
                   <div className="col-span-2 flex items-center justify-end gap-1 flex-wrap">
                     <button
-                      onClick={() => handleAssignLeads(agent)}
+                      onClick={() => handleAssignLeads(owner)}
                       className="p-1.5 rounded-lg hover:bg-blue-50 transition-all duration-300 text-blue-600 hover:scale-110"
                       title="Assign Leads"
                     >
                       <FiUserCheck className="text-sm" />
                     </button>
                     <button
-                      onClick={() => handleViewAssignedLeads(agent)}
+                      onClick={() => handleViewAssignedLeads(owner)}
                       className="p-1.5 rounded-lg hover:bg-indigo-50 transition-all duration-300 text-indigo-600 hover:scale-110 relative"
                       title="View Assigned Leads"
                     >
                       <FiEye className="text-sm" />
-                      {(assignedLeadsMap[agent.id] || []).length > 0 && (
+                      {(assignedLeadsMap[owner.id] || []).length > 0 && (
                         <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-indigo-600 text-white text-[7px] flex items-center justify-center font-semibold">
-                          {(assignedLeadsMap[agent.id] || []).length}
+                          {(assignedLeadsMap[owner.id] || []).length}
                         </span>
                       )}
                     </button>
                     <button
-                      onClick={() => handleViewCommission(agent)}
+                      onClick={() => handleViewCommission(owner)}
                       className="p-1.5 rounded-lg hover:bg-amber-50 transition-all duration-300 text-amber-600 hover:scale-110"
                       title="Commission"
                     >
                       <FiDollarSign className="text-sm" />
                     </button>
                     <button
-                      onClick={() => handleViewPerformance(agent)}
+                      onClick={() => handleViewPerformance(owner)}
                       className="p-1.5 rounded-lg hover:bg-purple-50 transition-all duration-300 text-purple-600 hover:scale-110"
                       title="Performance"
                     >
                       <FiBarChart2 className="text-sm" />
                     </button>
                     <button
-                      onClick={() => handleViewAgentProperties(agent)}
+                      onClick={() => handleViewOwnerProperties(owner)}
                       className="p-1.5 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 text-[#00695C] hover:scale-110"
                       title="Properties"
                     >
                       <FiHome className="text-sm" />
                     </button>
                     <button
-                      onClick={() => handleViewAgentProfile(agent.id)}
+                      onClick={() => handleViewOwnerProfile(owner.id)}
                       className="p-1.5 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 text-[#00695C] hover:scale-110"
                       title="View Profile"
                     >
                       <FiExternalLink className="text-sm" />
                     </button>
                     <button
-                      onClick={() => handleToggleStatus(agent.id)}
-                      disabled={actionLoading === `toggle_status_${agent.id}`}
+                      onClick={() => handleToggleStatus(owner.id)}
+                      disabled={actionLoading === `toggle_status_${owner.id}`}
                       className={`p-1.5 rounded-lg transition-all duration-300 hover:scale-110 disabled:opacity-50 ${
-                        agent.status === 'active'
+                        owner.status === 'active'
                           ? 'text-red-600 hover:bg-red-50'
-                          : agent.status === 'inactive'
+                          : owner.status === 'inactive'
                           ? 'text-emerald-600 hover:bg-emerald-50'
                           : 'text-amber-600 hover:bg-amber-50'
                       }`}
-                      title={agent.status === 'active' ? 'Deactivate' : agent.status === 'inactive' ? 'Activate' : 'Review'}
+                      title={owner.status === 'active' ? 'Deactivate' : owner.status === 'inactive' ? 'Activate' : 'Review'}
                     >
-                      {actionLoading === `toggle_status_${agent.id}` ? (
+                      {actionLoading === `toggle_status_${owner.id}` ? (
                         <FiRefreshCw className="text-sm animate-spin" />
-                      ) : agent.status === 'active' ? (
+                      ) : owner.status === 'active' ? (
                         <FiUserX className="text-sm" />
                       ) : (
                         <FiUserCheck className="text-sm" />
                       )}
                     </button>
                     <button
-                      onClick={() => handleDeleteAgent(agent.id)}
-                      disabled={actionLoading === `delete_${agent.id}`}
+                      onClick={() => handleDeleteOwner(owner.id)}
+                      disabled={actionLoading === `delete_${owner.id}`}
                       className="p-1.5 rounded-lg hover:bg-red-50 transition-all duration-300 text-red-500 hover:scale-110 disabled:opacity-50"
                       title="Delete"
                     >
-                      {actionLoading === `delete_${agent.id}` ? (
+                      {actionLoading === `delete_${owner.id}` ? (
                         <FiRefreshCw className="text-sm animate-spin" />
                       ) : (
                         <FiTrash2 className="text-sm" />
@@ -2546,14 +2566,14 @@ const AgentsPropertyManagement = () => {
           </div>
         )}
 
-        {paginatedAgents.length === 0 && !loading && (
+        {paginatedOwners.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-[#E8F0EE]">
             <div className="w-24 h-24 rounded-full bg-[#F5F9F8] flex items-center justify-center mb-4 animate-float">
               <MdOutlineRealEstateAgent className="text-4xl text-[#B5C9C5]" />
             </div>
-            <h3 className="text-xl font-semibold text-[#1A2E2A]">No agents found</h3>
+            <h3 className="text-xl font-semibold text-[#1A2E2A]">No owners found</h3>
             <p className="text-sm text-[#5A7D78] mt-1">
-              {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No agents match your current view'}
+              {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No owners match your current view'}
             </p>
             {filterCount > 0 && (
               <button
@@ -2573,8 +2593,8 @@ const AgentsPropertyManagement = () => {
           <div className="flex items-center gap-2 text-sm text-[#5A7D78] flex-wrap">
             <span>
               Showing {(currentPage - 1) * pageSize + 1} to{' '}
-              {Math.min(currentPage * pageSize, filteredAgents.length)} of{' '}
-              {filteredAgents.length} agents
+              {Math.min(currentPage * pageSize, filteredOwners.length)} of{' '}
+              {filteredOwners.length} owners
             </span>
             <select
               value={pageSize}
@@ -2671,4 +2691,4 @@ const AgentsPropertyManagement = () => {
   );
 };
 
-export default AgentsPropertyManagement;
+export default OwnersPropertiesLeads;

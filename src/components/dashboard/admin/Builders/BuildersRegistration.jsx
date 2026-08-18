@@ -1,4 +1,4 @@
-// src/components/dashboard/admin/Agents/AgentsRegistration.jsx
+// src/components/dashboard/admin/Builders/BuildersRegistration.jsx
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -25,9 +25,8 @@ import { MdOutlineRealEstateAgent, MdApartment, MdOutlineBusiness, MdOutlinePers
 import { HiOutlineBuildingOffice, HiOutlineUserGroup } from 'react-icons/hi2';
 
 /* ============================================================
-   STANDALONE COMPONENTS
+   TOAST COMPONENT
 ============================================================ */
-
 const Toast = ({ toast }) => {
   if (!toast) return null;
   const colors = {
@@ -47,6 +46,9 @@ const Toast = ({ toast }) => {
   );
 };
 
+/* ============================================================
+   STAT CARD COMPONENT
+============================================================ */
 const StatCard = ({ icon, title, value, color, delay = 0, isActive, statsAnimating, onClick }) => {
   return (
     <div
@@ -74,16 +76,19 @@ const StatCard = ({ icon, title, value, color, delay = 0, isActive, statsAnimati
   );
 };
 
-const ApprovalConfirmModal = ({ show, action, actionLoading, agentName, onCancel, onConfirm }) => {
+/* ============================================================
+   APPROVAL CONFIRM MODAL
+============================================================ */
+const ApprovalConfirmModal = ({ show, action, actionLoading, builderName, onCancel, onConfirm }) => {
   if (!show) return null;
 
   const isApprove = action === 'approve';
   const color = isApprove ? 'emerald' : 'red';
   const Icon = isApprove ? FiCheckCircle : FiXCircle;
-  const title = isApprove ? 'Approve Agent Registration' : 'Reject Agent Registration';
+  const title = isApprove ? 'Approve Builder Registration' : 'Reject Builder Registration';
   const message = isApprove 
-    ? `Are you sure you want to approve ${agentName}'s registration? They will gain full access to the platform as an agent.`
-    : `Are you sure you want to reject ${agentName}'s registration? This action cannot be undone.`;
+    ? `Are you sure you want to approve ${builderName}'s registration? They will gain full access to the platform as a builder.`
+    : `Are you sure you want to reject ${builderName}'s registration? This action cannot be undone.`;
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[#1A2E2A]/50 backdrop-blur-sm animate-fade-in">
@@ -115,23 +120,25 @@ const ApprovalConfirmModal = ({ show, action, actionLoading, agentName, onCancel
   );
 };
 
-// ============ AGENT PROPERTIES MODAL ============
-const AgentPropertiesModal = ({ agent, show, onClose, onViewProperty, onViewOwnerProfile }) => {
+/* ============================================================
+   BUILDER PROPERTIES MODAL
+============================================================ */
+const BuilderPropertiesModal = ({ builder, show, onClose, onViewProperty, onViewOwnerProfile }) => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (show && agent) {
+    if (show && builder) {
       setLoading(true);
       setTimeout(() => {
-        const mockProperties = generateAgentProperties(agent);
+        const mockProperties = generateBuilderProperties(builder);
         setProperties(mockProperties);
         setLoading(false);
       }, 500);
     }
-  }, [show, agent]);
+  }, [show, builder]);
 
-  if (!show || !agent) return null;
+  if (!show || !builder) return null;
 
   const statusColors = {
     pending: 'bg-amber-100 text-amber-700',
@@ -148,29 +155,16 @@ const AgentPropertiesModal = ({ agent, show, onClose, onViewProperty, onViewOwne
     'Hostel': <FaBuilding className="text-[#00695C]" />
   };
 
-  const handleViewProperty = (property) => {
-    if (onViewProperty) {
-      onViewProperty(property);
-    }
-  };
-
-  const handleViewOwnerProfile = (property) => {
-    if (onViewOwnerProfile) {
-      onViewOwnerProfile(agent, property);
-    }
-  };
-
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[85vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
-        {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] px-6 py-4 rounded-t-3xl z-10 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white">
               <FiHome className="text-lg" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">{agent.name}'s Listed Properties</h2>
+              <h2 className="text-lg font-bold text-white">{builder.name}'s Listed Properties</h2>
               <p className="text-white/70 text-xs">{properties.length} properties listed</p>
             </div>
           </div>
@@ -182,7 +176,6 @@ const AgentPropertiesModal = ({ agent, show, onClose, onViewProperty, onViewOwne
           </button>
         </div>
 
-        {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-[#F8FAF9]">
           {loading ? (
             <div className="flex items-center justify-center py-12">
@@ -194,7 +187,7 @@ const AgentPropertiesModal = ({ agent, show, onClose, onViewProperty, onViewOwne
                 <FiHome className="text-3xl text-[#B5C9C5]" />
               </div>
               <h3 className="text-lg font-semibold text-[#1A2E2A]">No Properties Found</h3>
-              <p className="text-sm text-[#5A7D78] mt-1">This agent hasn't listed any properties yet.</p>
+              <p className="text-sm text-[#5A7D78] mt-1">This builder hasn't listed any properties yet.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -245,7 +238,7 @@ const AgentPropertiesModal = ({ agent, show, onClose, onViewProperty, onViewOwne
                     </div>
                     <div className="flex items-center gap-2 text-xs text-[#5A7D78]">
                       <FiUser className="text-[#00695C] shrink-0" />
-                      <span className="truncate">{property.agentName || agent.name}</span>
+                      <span className="truncate">{property.builderName || builder.name}</span>
                     </div>
                   </div>
 
@@ -274,7 +267,7 @@ const AgentPropertiesModal = ({ agent, show, onClose, onViewProperty, onViewOwne
 
                   <div className="mt-3 pt-3 border-t border-[#E8F0EE]">
                     <button
-                      onClick={() => handleViewProperty(property)}
+                      onClick={() => onViewProperty && onViewProperty(property)}
                       className="w-full py-2 rounded-xl text-xs font-medium bg-[#00695C] text-white hover:bg-[#004D40] transition-all duration-300 flex items-center justify-center gap-2 hover:scale-[1.02] shadow-md"
                     >
                       <FiEye className="text-xs" />
@@ -282,23 +275,13 @@ const AgentPropertiesModal = ({ agent, show, onClose, onViewProperty, onViewOwne
                     </button>
                   </div>
 
-                  {/* NEW: View Owner Profile button, below View Property Details */}
-                  <div className="mt-2">
-                    <button
-                      onClick={() => handleViewOwnerProfile(property)}
-                      className="w-full py-2 rounded-xl text-xs font-medium bg-[#E7F6EF] text-[#167A54] border border-[#BEE4D2] hover:bg-[#D5EFE0] transition-all duration-300 flex items-center justify-center gap-2 hover:scale-[1.02]"
-                    >
-                      <FiExternalLink className="text-xs" />
-                      View Owner Profile
-                    </button>
-                  </div>
+                 
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* Footer */}
         <div className="sticky bottom-0 px-6 py-3 border-t border-[#E8F0EE] bg-white rounded-b-3xl flex items-center justify-between shrink-0">
           <span className="text-xs text-[#5A7D78]">
             Total: <span className="font-semibold text-[#1A2E2A]">{properties.length}</span> properties
@@ -315,8 +298,8 @@ const AgentPropertiesModal = ({ agent, show, onClose, onViewProperty, onViewOwne
   );
 };
 
-// Helper function to generate mock properties for an agent
-const generateAgentProperties = (agent) => {
+// Helper function to generate mock properties for a builder
+const generateBuilderProperties = (builder) => {
   const propertyTypes = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
   const statuses = ['pending', 'approved', 'rejected', 'suspended'];
   const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur', 'Lucknow', 'Nagpur'];
@@ -329,10 +312,10 @@ const generateAgentProperties = (agent) => {
     'Premium Hostel', 'Student Hostel', 'Working Professional Hostel'
   ];
 
-  const count = agent.propertiesCount || Math.floor(Math.random() * 8) + 1;
+  const count = builder.propertiesCount || Math.floor(Math.random() * 8) + 1;
   
   const properties = [];
-  const agentNames = [
+  const builderNames = [
     'Rajesh Kumar', 'Priya Sharma', 'Amit Singh', 'Sneha Patel', 'Vikram Reddy',
     'Deepak Verma', 'Meera Joshi', 'Arjun Nair', 'Kavya Rao', 'Suresh Gupta'
   ];
@@ -344,23 +327,10 @@ const generateAgentProperties = (agent) => {
     const type = propertyTypes[Math.floor(Math.random() * propertyTypes.length)];
     const status = statuses[Math.floor(Math.random() * statuses.length)];
     const city = cities[Math.floor(Math.random() * cities.length)];
-    const agentName = agentNames[Math.floor(Math.random() * agentNames.length)];
-
-    let amenities = [];
-    if (type === 'Individual') {
-      amenities = ['WiFi', 'Parking', 'Garden', 'Security', 'Balcony'];
-    } else if (type === 'Apartment') {
-      amenities = ['WiFi', 'Swimming Pool', 'AC', 'Parking', 'Gym', 'Elevator'];
-    } else if (type === 'Commercial') {
-      amenities = ['WiFi', 'Parking', 'Security', 'AC', 'Elevator'];
-    } else if (type === 'Land & Plots') {
-      amenities = ['Water Connection', 'Electricity', 'Road Access', 'Fencing'];
-    } else if (type === 'Hostel') {
-      amenities = ['WiFi', 'AC', 'Security', 'Mess', 'Laundry'];
-    }
+    const builderName = builderNames[Math.floor(Math.random() * builderNames.length)];
 
     properties.push({
-      id: `prop_${agent.id}_${i}`,
+      id: `prop_${builder.id}_${i}`,
       title: titles[Math.floor(Math.random() * titles.length)] + ` ${i}`,
       type: type,
       location: `${city}, ${['Maharashtra', 'Delhi', 'Karnataka', 'Tamil Nadu', 'Telangana', 'Gujarat', 'Rajasthan'][Math.floor(Math.random() * 7)]}`,
@@ -376,11 +346,11 @@ const generateAgentProperties = (agent) => {
       views: Math.floor(Math.random() * 500),
       inquiries: Math.floor(Math.random() * 50),
       description: `Beautiful ${type.toLowerCase()} located in ${city}. Features ${Math.floor(Math.random() * 3) + 2} bedrooms and modern amenities.`,
-      amenities: amenities,
+      amenities: ['WiFi', 'Parking', 'Security', 'AC'],
       parking: Math.random() > 0.5 ? `${Math.floor(Math.random() * 2) + 1} spots` : 'None',
-      agentName: agent.name || agentName,
-      agentEmail: agent.email || `${agentName.toLowerCase().replace(' ', '.')}@email.com`,
-      agentPhone: agent.phone || `+91 ${Math.floor(Math.random() * 9000000000 + 1000000000)}`,
+      builderName: builder.name || builderName,
+      builderEmail: builder.email || `${builderName.toLowerCase().replace(' ', '.')}@email.com`,
+      builderPhone: builder.phone || `+91 ${Math.floor(Math.random() * 9000000000 + 1000000000)}`,
     });
   }
 
@@ -388,19 +358,16 @@ const generateAgentProperties = (agent) => {
 };
 
 /* ============================================================
-   VIEW AGENT MODAL — redesigned, theme-token based
-   Signature element: a completion ring around the avatar that
-   visualizes how many of the 4 verification documents are verified.
+   VIEW BUILDER MODAL
 ============================================================ */
-
-const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReject, onEdit, onToggleBlock, onViewProperties, onViewProfile }) => {
+const ViewBuilderModal = ({ builder, show, actionLoading, onClose, onApprove, onReject, onEdit, onToggleBlock, onViewProperties, onViewProfile }) => {
   const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
     setActiveTab('overview');
-  }, [agent?.id]);
+  }, [builder?.id]);
 
-  if (!agent || !show) return null;
+  if (!builder || !show) return null;
 
   const verificationItems = [
     { key: 'email', label: 'Email' },
@@ -408,12 +375,12 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
     { key: 'aadhaar', label: 'Aadhaar' },
     { key: 'pan', label: 'PAN' },
   ];
-  const verifiedCount = verificationItems.filter(item => agent.verification[item.key]).length;
+  const verifiedCount = verificationItems.filter(item => builder.verification[item.key]).length;
   const verifiedPercent = Math.round((verifiedCount / verificationItems.length) * 100);
   const ringCircumference = 2 * Math.PI * 34;
   const ringOffset = ringCircumference - (verifiedPercent / 100) * ringCircumference;
 
-  const isBlockedLike = agent.status === 'blocked' || agent.status === 'rejected';
+  const isBlockedLike = builder.status === 'blocked' || builder.status === 'rejected';
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
@@ -421,7 +388,6 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
     { id: 'verification', label: 'Verification' },
   ];
 
-  // Specialization icon mapping
   const getSpecializationIcon = (spec) => {
     switch(spec) {
       case 'Individual': return <FiUser className="text-[#00695C]" />;
@@ -436,16 +402,16 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
       <div
-        className="agent-view-modal w-full max-w-lg max-h-[92vh] overflow-hidden rounded-[28px] shadow-2xl animate-slide-up flex flex-col"
-        style={{ background: 'var(--avm-bg)', color: 'var(--avm-text)', border: '1px solid var(--avm-border)' }}
+        className="builder-view-modal w-full max-w-lg max-h-[92vh] overflow-hidden rounded-[28px] shadow-2xl animate-slide-up flex flex-col"
+        style={{ background: 'var(--bvm-bg)', color: 'var(--bvm-text)', border: '1px solid var(--bvm-border)' }}
       >
         {/* Hero */}
         <div
           className="relative px-6 pt-6 pb-14 shrink-0"
-          style={{ background: 'linear-gradient(135deg, var(--avm-accent), var(--avm-accent-2))' }}
+          style={{ background: 'linear-gradient(135deg, var(--bvm-accent), var(--bvm-accent-2))' }}
         >
           <div className="flex items-start justify-between">
-            <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-white/70">Agent Registration</span>
+            <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-white/70">Builder Registration</span>
             <button
               onClick={onClose}
               className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 transition-colors flex items-center justify-center text-white"
@@ -455,81 +421,81 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
           </div>
 
           <div className="mt-3">
-            <h2 className="text-xl font-bold text-white leading-tight">{agent.name}</h2>
-            <p className="text-white/70 text-xs mt-0.5">{agent.agency} · {agent.city}, {agent.state}</p>
+            <h2 className="text-xl font-bold text-white leading-tight">{builder.name}</h2>
+            <p className="text-white/70 text-xs mt-0.5">{builder.company} · {builder.city}, {builder.state}</p>
           </div>
 
           <div className="flex items-center gap-2 mt-4 flex-wrap">
             <span className={`text-[10px] px-2.5 py-1 rounded-full font-semibold ${
-              agent.status === 'approved' ? 'bg-white text-emerald-700' :
-              agent.status === 'rejected' ? 'bg-white text-red-700' :
-              agent.status === 'blocked' ? 'bg-white/20 text-white' :
+              builder.status === 'approved' ? 'bg-white text-emerald-700' :
+              builder.status === 'rejected' ? 'bg-white text-red-700' :
+              builder.status === 'blocked' ? 'bg-white/20 text-white' :
               'bg-white text-amber-700'
             }`}>
-              {agent.status.charAt(0).toUpperCase() + agent.status.slice(1)}
+              {builder.status.charAt(0).toUpperCase() + builder.status.slice(1)}
             </span>
             <span className="text-[10px] px-2.5 py-1 rounded-full font-semibold bg-white/15 text-white">
-              {agent.subscriptionPlan} plan
+              {builder.subscriptionPlan} plan
             </span>
             <span className="text-[10px] px-2.5 py-1 rounded-full font-semibold bg-white/15 text-white flex items-center gap-1">
-              <FiAward className="text-[10px]" /> {agent.experience} years exp.
+              <FiAward className="text-[10px]" /> {builder.experience} years exp.
             </span>
           </div>
         </div>
 
-        {/* Avatar with verification completion ring, overlapping the hero */}
+        {/* Avatar with verification completion ring */}
         <div className="relative flex justify-center shrink-0" style={{ marginTop: '-44px' }}>
           <div className="relative w-[88px] h-[88px]">
             <svg viewBox="0 0 76 76" className="absolute inset-0 -rotate-90">
-              <circle cx="38" cy="38" r="34" fill="none" stroke="var(--avm-ring-track)" strokeWidth="5" />
+              <circle cx="38" cy="38" r="34" fill="none" stroke="var(--bvm-ring-track)" strokeWidth="5" />
               <circle
                 cx="38" cy="38" r="34" fill="none"
-                stroke="var(--avm-ring-active)" strokeWidth="5" strokeLinecap="round"
+                stroke="var(--bvm-ring-active)" strokeWidth="5" strokeLinecap="round"
                 strokeDasharray={ringCircumference} strokeDashoffset={ringOffset}
                 style={{ transition: 'stroke-dashoffset 0.6s ease' }}
               />
             </svg>
             <div
               className="absolute rounded-full flex items-center justify-center font-bold text-lg"
-              style={{ inset: '10px', background: 'var(--avm-surface)', color: 'var(--avm-accent)', border: '3px solid var(--avm-bg)' }}
+              style={{ inset: '10px', background: 'var(--bvm-surface)', color: 'var(--bvm-accent)', border: '3px solid var(--bvm-bg)' }}
             >
-              {agent.avatar}
+              {builder.avatar}
             </div>
           </div>
         </div>
-        <p className="text-center text-[10px] font-medium mt-1 shrink-0" style={{ color: 'var(--avm-muted)' }}>
+        <p className="text-center text-[10px] font-medium mt-1 shrink-0" style={{ color: 'var(--bvm-muted)' }}>
           {verifiedCount}/{verificationItems.length} verified · {verifiedPercent}%
         </p>
 
         {/* View Properties Button */}
         <div className="px-6 mt-3 shrink-0">
           <button
-            onClick={() => onViewProperties && onViewProperties(agent)}
+            onClick={() => onViewProperties && onViewProperties(builder)}
             className="w-full py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.02]"
             style={{ 
-              background: 'var(--avm-accent)', 
-              color: 'var(--avm-on-accent)',
+              background: 'var(--bvm-accent)', 
+              color: 'var(--bvm-on-accent)',
               boxShadow: '0 4px 12px rgba(15, 107, 92, 0.3)'
             }}
           >
             <FiHome className="text-sm" />
-            View All Properties ({agent.propertiesCount})
+            View All Properties ({builder.propertiesCount})
           </button>
         </div>
 
-        {/* View Agent Profile Button */}
+        {/* View Builder Profile Button */}
         <div className="px-6 mt-2 shrink-0">
           <button
-            onClick={() => onViewProfile && onViewProfile(agent.id)}
+            onClick={() => onViewProfile && onViewProfile(builder.id)}
             className="w-full py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.02]"
             style={{
-              background: 'var(--avm-success-bg)',
-              color: 'var(--avm-success)',
-              border: '1px solid var(--avm-success-border)'
+              background: 'var(--bvm-success-bg)',
+              color: 'var(--bvm-success)',
+              border: '1px solid var(--bvm-success-border)'
             }}
           >
             <FiExternalLink className="text-sm" />
-            View Agent Profile
+            View Builder Profile
           </button>
         </div>
 
@@ -541,8 +507,8 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
               onClick={() => setActiveTab(tab.id)}
               className="flex-1 py-2 rounded-xl text-xs font-semibold transition-all duration-200"
               style={{
-                background: activeTab === tab.id ? 'var(--avm-accent)' : 'transparent',
-                color: activeTab === tab.id ? 'var(--avm-on-accent)' : 'var(--avm-muted)'
+                background: activeTab === tab.id ? 'var(--bvm-accent)' : 'transparent',
+                color: activeTab === tab.id ? 'var(--bvm-on-accent)' : 'var(--bvm-muted)'
               }}
             >
               {tab.label}
@@ -552,12 +518,12 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
-          {agent.status === 'pending' && (
+          {builder.status === 'pending' && (
             <div
               className="rounded-xl px-4 py-3 flex flex-wrap items-center justify-between gap-3 mb-5"
-              style={{ background: 'var(--avm-warning-bg)', border: '1px solid var(--avm-warning-border)' }}
+              style={{ background: 'var(--bvm-warning-bg)', border: '1px solid var(--bvm-warning-border)' }}
             >
-              <span className="text-xs font-medium flex items-center gap-2" style={{ color: 'var(--avm-warning-text)' }}>
+              <span className="text-xs font-medium flex items-center gap-2" style={{ color: 'var(--bvm-warning-text)' }}>
                 <FiClock /> Awaiting approval
               </span>
             </div>
@@ -567,49 +533,49 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
             <div className="space-y-5">
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { label: 'Properties', value: agent.propertiesCount },
-                  { label: 'Clients', value: agent.clientsCount },
-                  { label: 'Rating', value: agent.rating },
+                  { label: 'Properties', value: builder.propertiesCount },
+                  { label: 'Projects', value: builder.projectsCount },
+                  { label: 'Rating', value: builder.rating },
                 ].map((stat, i) => (
                   <div
                     key={i}
                     className="rounded-2xl p-3 text-center"
-                    style={{ background: 'var(--avm-surface)', border: '1px solid var(--avm-border)' }}
+                    style={{ background: 'var(--bvm-surface)', border: '1px solid var(--bvm-border)' }}
                   >
                     <p className="text-lg font-bold">{stat.value}</p>
-                    <p className="text-[9px] uppercase tracking-wider mt-0.5" style={{ color: 'var(--avm-muted)' }}>{stat.label}</p>
+                    <p className="text-[9px] uppercase tracking-wider mt-0.5" style={{ color: 'var(--bvm-muted)' }}>{stat.label}</p>
                   </div>
                 ))}
               </div>
 
-              <div className="flex items-center justify-between text-xs py-2 border-b" style={{ borderColor: 'var(--avm-border)' }}>
-                <span style={{ color: 'var(--avm-muted)' }}>Registered</span>
+              <div className="flex items-center justify-between text-xs py-2 border-b" style={{ borderColor: 'var(--bvm-border)' }}>
+                <span style={{ color: 'var(--bvm-muted)' }}>Registered</span>
                 <span className="font-medium">
-                  {new Date(agent.registrationDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  {new Date(builder.registrationDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between text-xs py-2 border-b" style={{ borderColor: 'var(--avm-border)' }}>
-                <span style={{ color: 'var(--avm-muted)' }}>Experience</span>
-                <span className="font-medium">{agent.experience} years</span>
+              <div className="flex items-center justify-between text-xs py-2 border-b" style={{ borderColor: 'var(--bvm-border)' }}>
+                <span style={{ color: 'var(--bvm-muted)' }}>Experience</span>
+                <span className="font-medium">{builder.experience} years</span>
               </div>
 
-              <div className="flex items-center justify-between text-xs py-2 border-b" style={{ borderColor: 'var(--avm-border)' }}>
-                <span style={{ color: 'var(--avm-muted)' }}>Specialization</span>
+              <div className="flex items-center justify-between text-xs py-2 border-b" style={{ borderColor: 'var(--bvm-border)' }}>
+                <span style={{ color: 'var(--bvm-muted)' }}>Specialization</span>
                 <span className="font-medium flex items-center gap-1">
-                  {getSpecializationIcon(agent.specialization)}
-                  {agent.specialization}
+                  {getSpecializationIcon(builder.specialization)}
+                  {builder.specialization}
                 </span>
               </div>
 
-              {agent.bio && (
+              {builder.bio && (
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest font-semibold mb-2" style={{ color: 'var(--avm-muted)' }}>Bio</p>
+                  <p className="text-[10px] uppercase tracking-widest font-semibold mb-2" style={{ color: 'var(--bvm-muted)' }}>Bio</p>
                   <p
                     className="text-sm leading-relaxed pl-3"
-                    style={{ borderLeft: '2px solid var(--avm-accent-2)', color: 'var(--avm-text-soft)' }}
+                    style={{ borderLeft: '2px solid var(--bvm-accent-2)', color: 'var(--bvm-text-soft)' }}
                   >
-                    {agent.bio}
+                    {builder.bio}
                   </p>
                 </div>
               )}
@@ -619,21 +585,21 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
           {activeTab === 'contact' && (
             <div className="space-y-1">
               {[
-                { icon: <FiMail />, label: 'Email', value: agent.email, verified: agent.verification.email },
-                { icon: <FiPhone />, label: 'Phone', value: agent.phone, verified: agent.verification.phone },
-                { icon: <FiMapPin />, label: 'Location', value: `${agent.city}, ${agent.state}` },
-                { icon: <FiBriefcase />, label: 'Agency', value: agent.agency },
+                { icon: <FiMail />, label: 'Email', value: builder.email, verified: builder.verification.email },
+                { icon: <FiPhone />, label: 'Phone', value: builder.phone, verified: builder.verification.phone },
+                { icon: <FiMapPin />, label: 'Location', value: `${builder.city}, ${builder.state}` },
+                { icon: <FaBuilding />, label: 'Company', value: builder.company },
               ].map((row, i) => (
-                <div key={i} className="flex items-center justify-between gap-4 py-3 border-b" style={{ borderColor: 'var(--avm-border)' }}>
-                  <span className="flex items-center gap-2 text-xs" style={{ color: 'var(--avm-muted)' }}>
-                    <span style={{ color: 'var(--avm-accent)' }}>{row.icon}</span>{row.label}
+                <div key={i} className="flex items-center justify-between gap-4 py-3 border-b" style={{ borderColor: 'var(--bvm-border)' }}>
+                  <span className="flex items-center gap-2 text-xs" style={{ color: 'var(--bvm-muted)' }}>
+                    <span style={{ color: 'var(--bvm-accent)' }}>{row.icon}</span>{row.label}
                   </span>
                   <span className="text-sm font-medium text-right flex items-center gap-1.5">
                     {row.value}
                     {row.verified !== undefined && (
                       row.verified
-                        ? <FiCheckCircle style={{ color: 'var(--avm-success)' }} className="text-xs" />
-                        : <FiXCircle style={{ color: 'var(--avm-muted)' }} className="text-xs" />
+                        ? <FiCheckCircle style={{ color: 'var(--bvm-success)' }} className="text-xs" />
+                        : <FiXCircle style={{ color: 'var(--bvm-muted)' }} className="text-xs" />
                     )}
                   </span>
                 </div>
@@ -644,15 +610,15 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
           {activeTab === 'verification' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <p className="text-[10px] uppercase tracking-widest font-semibold" style={{ color: 'var(--avm-muted)' }}>Verification Status</p>
+                <p className="text-[10px] uppercase tracking-widest font-semibold" style={{ color: 'var(--bvm-muted)' }}>Verification Status</p>
                 <span
                   className="text-[10px] px-2.5 py-1 rounded-full font-semibold"
                   style={{
-                    background: agent.verificationStatus === 'verified' ? 'var(--avm-success-bg)' : agent.verificationStatus === 'rejected' ? 'var(--avm-danger-bg)' : 'var(--avm-warning-bg)',
-                    color: agent.verificationStatus === 'verified' ? 'var(--avm-success)' : agent.verificationStatus === 'rejected' ? 'var(--avm-danger)' : 'var(--avm-warning-text)'
+                    background: builder.verificationStatus === 'verified' ? 'var(--bvm-success-bg)' : builder.verificationStatus === 'rejected' ? 'var(--bvm-danger-bg)' : 'var(--bvm-warning-bg)',
+                    color: builder.verificationStatus === 'verified' ? 'var(--bvm-success)' : builder.verificationStatus === 'rejected' ? 'var(--bvm-danger)' : 'var(--bvm-warning-text)'
                   }}
                 >
-                  {agent.verificationStatus.charAt(0).toUpperCase() + agent.verificationStatus.slice(1)}
+                  {builder.verificationStatus.charAt(0).toUpperCase() + builder.verificationStatus.slice(1)}
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-2.5">
@@ -661,19 +627,19 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
                     key={item.key}
                     className="flex items-center gap-2 rounded-xl px-3 py-2.5"
                     style={{
-                      background: agent.verification[item.key] ? 'var(--avm-success-bg)' : 'var(--avm-surface)',
-                      border: `1px solid ${agent.verification[item.key] ? 'var(--avm-success-border)' : 'var(--avm-border)'}`
+                      background: builder.verification[item.key] ? 'var(--bvm-success-bg)' : 'var(--bvm-surface)',
+                      border: `1px solid ${builder.verification[item.key] ? 'var(--bvm-success-border)' : 'var(--bvm-border)'}`
                     }}
                   >
-                    {agent.verification[item.key]
-                      ? <FiCheckCircle style={{ color: 'var(--avm-success)' }} />
-                      : <FiXCircle style={{ color: 'var(--avm-muted)' }} />}
+                    {builder.verification[item.key]
+                      ? <FiCheckCircle style={{ color: 'var(--bvm-success)' }} />
+                      : <FiXCircle style={{ color: 'var(--bvm-muted)' }} />}
                     <span className="text-xs font-medium">{item.label}</span>
                   </div>
                 ))}
               </div>
-              <div className="mt-3 p-3 rounded-xl" style={{ background: 'var(--avm-surface)', border: '1px solid var(--avm-border)' }}>
-                <p className="text-[10px] font-medium" style={{ color: 'var(--avm-muted)' }}>Aadhaar & PAN verified agents get priority listing benefits.</p>
+              <div className="mt-3 p-3 rounded-xl" style={{ background: 'var(--bvm-surface)', border: '1px solid var(--bvm-border)' }}>
+                <p className="text-[10px] font-medium" style={{ color: 'var(--bvm-muted)' }}>Aadhaar & PAN verified builders get priority listing benefits.</p>
               </div>
             </div>
           )}
@@ -682,26 +648,26 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
         {/* Footer actions */}
         <div
           className="px-6 py-4 border-t flex items-center gap-2 shrink-0"
-          style={{ borderColor: 'var(--avm-border)', background: 'var(--avm-surface)' }}
+          style={{ borderColor: 'var(--bvm-border)', background: 'var(--bvm-surface)' }}
         >
-          {agent.status === 'pending' ? (
+          {builder.status === 'pending' ? (
             <>
               <button
-                onClick={() => onApprove(agent.id)}
-                disabled={actionLoading === agent.id}
+                onClick={() => onApprove(builder.id)}
+                disabled={actionLoading === builder.id}
                 className="flex-1 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 disabled:opacity-50"
-                style={{ background: 'var(--avm-success)', color: 'var(--avm-on-accent)' }}
+                style={{ background: 'var(--bvm-success)', color: 'var(--bvm-on-accent)' }}
               >
-                {actionLoading === agent.id ? <FiRefreshCw className="animate-spin text-xs" /> : <FiCheckCircle className="text-xs" />}
+                {actionLoading === builder.id ? <FiRefreshCw className="animate-spin text-xs" /> : <FiCheckCircle className="text-xs" />}
                 Approve
               </button>
               <button
-                onClick={() => onReject(agent.id)}
-                disabled={actionLoading === agent.id}
+                onClick={() => onReject(builder.id)}
+                disabled={actionLoading === builder.id}
                 className="flex-1 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 disabled:opacity-50"
-                style={{ background: 'transparent', color: 'var(--avm-danger)', border: '1px solid var(--avm-danger)' }}
+                style={{ background: 'transparent', color: 'var(--bvm-danger)', border: '1px solid var(--bvm-danger)' }}
               >
-                {actionLoading === agent.id ? <FiRefreshCw className="animate-spin text-xs" /> : <FiXCircle className="text-xs" />}
+                {actionLoading === builder.id ? <FiRefreshCw className="animate-spin text-xs" /> : <FiXCircle className="text-xs" />}
                 Reject
               </button>
             </>
@@ -710,20 +676,20 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
               <button
                 onClick={onEdit}
                 className="flex-1 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5"
-                style={{ background: 'var(--avm-accent)', color: 'var(--avm-on-accent)' }}
+                style={{ background: 'var(--bvm-accent)', color: 'var(--bvm-on-accent)' }}
               >
                 <FiEdit className="text-xs" /> Edit
               </button>
               <button
                 onClick={onToggleBlock}
-                disabled={actionLoading === `block_${agent.id}`}
+                disabled={actionLoading === `block_${builder.id}`}
                 className="flex-1 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 disabled:opacity-50"
                 style={{
-                  background: isBlockedLike ? 'var(--avm-success-bg)' : 'var(--avm-danger-bg)',
-                  color: isBlockedLike ? 'var(--avm-success)' : 'var(--avm-danger)'
+                  background: isBlockedLike ? 'var(--bvm-success-bg)' : 'var(--bvm-danger-bg)',
+                  color: isBlockedLike ? 'var(--bvm-success)' : 'var(--bvm-danger)'
                 }}
               >
-                {actionLoading === `block_${agent.id}` ? (
+                {actionLoading === `block_${builder.id}` ? (
                   <FiRefreshCw className="animate-spin text-xs" />
                 ) : isBlockedLike ? (
                   <FiUnlock className="text-xs" />
@@ -738,26 +704,26 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
       </div>
 
       <style>{`
-        .agent-view-modal {
-          --avm-bg: #FFFFFF;
-          --avm-surface: #F5F9F8;
-          --avm-border: #E5EEEB;
-          --avm-text: #12211D;
-          --avm-text-soft: #3E5C56;
-          --avm-muted: #6B8983;
-          --avm-accent: #0F6B5C;
-          --avm-accent-2: #2FAE9A;
-          --avm-on-accent: #FFFFFF;
-          --avm-ring-track: #E5EEEB;
-          --avm-ring-active: #0F6B5C;
-          --avm-success: #167A54;
-          --avm-success-bg: #E7F6EF;
-          --avm-success-border: #BEE4D2;
-          --avm-danger: #C0392B;
-          --avm-danger-bg: #FCEBE9;
-          --avm-warning-text: #92620C;
-          --avm-warning-bg: #FDF3DE;
-          --avm-warning-border: #F2DBA3;
+        .builder-view-modal {
+          --bvm-bg: #FFFFFF;
+          --bvm-surface: #F5F9F8;
+          --bvm-border: #E5EEEB;
+          --bvm-text: #12211D;
+          --bvm-text-soft: #3E5C56;
+          --bvm-muted: #6B8983;
+          --bvm-accent: #0F6B5C;
+          --bvm-accent-2: #2FAE9A;
+          --bvm-on-accent: #FFFFFF;
+          --bvm-ring-track: #E5EEEB;
+          --bvm-ring-active: #0F6B5C;
+          --bvm-success: #167A54;
+          --bvm-success-bg: #E7F6EF;
+          --bvm-success-border: #BEE4D2;
+          --bvm-danger: #C0392B;
+          --bvm-danger-bg: #FCEBE9;
+          --bvm-warning-text: #92620C;
+          --bvm-warning-bg: #FDF3DE;
+          --bvm-warning-border: #F2DBA3;
         }
       `}</style>
     </div>
@@ -765,40 +731,39 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
 };
 
 /* ============================================================
-   EDIT AGENT MODAL — now includes editable Verification Status
-   and per-document (Email / Phone / Aadhaar / PAN) toggles.
-   FIXED: Bottom buttons are now sticky/fixed at bottom
+   EDIT BUILDER MODAL
 ============================================================ */
-
-const EditAgentModal = ({ agent, show, onClose, onSave }) => {
+const EditBuilderModal = ({ builder, show, onClose, onSave }) => {
   const [formData, setFormData] = useState(null);
 
   useEffect(() => {
-    if (agent) {
+    if (builder) {
       setFormData({
-        name: agent.name,
-        email: agent.email,
-        phone: agent.phone,
-        city: agent.city,
-        state: agent.state,
-        agency: agent.agency,
-        status: agent.status,
-        subscriptionPlan: agent.subscriptionPlan,
-        experience: agent.experience,
-        specialization: agent.specialization,
-        bio: agent.bio || '',
-        verificationStatus: agent.verificationStatus || 'pending',
+        name: builder.name,
+        email: builder.email,
+        phone: builder.phone,
+        city: builder.city,
+        state: builder.state,
+        company: builder.company,
+        status: builder.status,
+        subscriptionPlan: builder.subscriptionPlan,
+        experience: builder.experience,
+        specialization: builder.specialization,
+        bio: builder.bio || '',
+        verificationStatus: builder.verificationStatus || 'pending',
         verification: {
-          email: !!agent.verification?.email,
-          phone: !!agent.verification?.phone,
-          aadhaar: !!agent.verification?.aadhaar,
-          pan: !!agent.verification?.pan,
+          email: !!builder.verification?.email,
+          phone: !!builder.verification?.phone,
+          aadhaar: !!builder.verification?.aadhaar,
+          pan: !!builder.verification?.pan,
         },
+        gstin: builder.gstin || '',
+        panNumber: builder.panNumber || '',
       });
     }
-  }, [agent]);
+  }, [builder]);
 
-  if (!agent || !show || !formData) return null;
+  if (!builder || !show || !formData) return null;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -835,7 +800,6 @@ const EditAgentModal = ({ agent, show, onClose, onSave }) => {
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-[#1A2E2A]/50 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
-        {/* Header - Sticky */}
         <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] p-6 rounded-t-3xl z-10 shrink-0">
           <button
             onClick={onClose}
@@ -843,13 +807,12 @@ const EditAgentModal = ({ agent, show, onClose, onSave }) => {
           >
             <FiX className="text-lg" />
           </button>
-          <h2 className="text-2xl font-bold text-white">Edit Agent</h2>
-          <p className="text-white/80 text-sm">Update agent information</p>
+          <h2 className="text-2xl font-bold text-white">Edit Builder</h2>
+          <p className="text-white/80 text-sm">Update builder information</p>
         </div>
 
-        {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-white">
-          <form id="edit-agent-form" onSubmit={handleSubmit} className="space-y-4">
+          <form id="edit-builder-form" onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-xs font-medium text-[#5A7D78] block mb-1">Full Name *</label>
@@ -905,11 +868,31 @@ const EditAgentModal = ({ agent, show, onClose, onSave }) => {
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Agency</label>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Company</label>
                 <input
                   type="text"
-                  name="agency"
-                  value={formData.agency}
+                  name="company"
+                  value={formData.company}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">GSTIN</label>
+                <input
+                  type="text"
+                  name="gstin"
+                  value={formData.gstin}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">PAN Number</label>
+                <input
+                  type="text"
+                  name="panNumber"
+                  value={formData.panNumber}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
                 />
@@ -970,7 +953,6 @@ const EditAgentModal = ({ agent, show, onClose, onSave }) => {
                 </select>
               </div>
 
-              {/* Verification Status (overall) */}
               <div className="col-span-2">
                 <label className="text-xs font-medium text-[#5A7D78] block mb-1">Verification Status</label>
                 <select
@@ -985,7 +967,6 @@ const EditAgentModal = ({ agent, show, onClose, onSave }) => {
                 </select>
               </div>
 
-              {/* Verification Documents (individual toggles) */}
               <div className="col-span-2">
                 <label className="text-xs font-medium text-[#5A7D78] block mb-2">Verification Documents</label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -1026,14 +1007,13 @@ const EditAgentModal = ({ agent, show, onClose, onSave }) => {
                   onChange={handleChange}
                   rows="2"
                   className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none resize-none text-[#1A2E2A]"
-                  placeholder="Brief description about the agent"
+                  placeholder="Brief description about the builder"
                 />
               </div>
             </div>
           </form>
         </div>
 
-        {/* Footer - Sticky at bottom with proper shadow and background */}
         <div className="sticky bottom-0 px-6 py-4 bg-white border-t border-[#E8F0EE] rounded-b-3xl shrink-0 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
           <div className="flex items-center gap-3">
             <button
@@ -1045,7 +1025,7 @@ const EditAgentModal = ({ agent, show, onClose, onSave }) => {
             </button>
             <button
               type="submit"
-              form="edit-agent-form"
+              form="edit-builder-form"
               className="flex-1 px-4 py-2.5 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-sm font-medium shadow-lg shadow-[#00695C]/30 hover:scale-[1.02]"
             >
               Save Changes
@@ -1058,16 +1038,15 @@ const EditAgentModal = ({ agent, show, onClose, onSave }) => {
 };
 
 /* ============================================================
-   MAIN COMPONENT
+   MAIN COMPONENT - BuildersRegistration
 ============================================================ */
-
-const AgentsRegistration = () => {
+const BuildersRegistration = () => {
   const navigate = useNavigate();
   const searchInputRef = useRef(null);
 
   // ============ STATE ============
-  const [agents, setAgents] = useState([]);
-  const [filteredAgents, setFilteredAgents] = useState([]);
+  const [builders, setBuilders] = useState([]);
+  const [filteredBuilders, setFilteredBuilders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -1077,12 +1056,12 @@ const AgentsRegistration = () => {
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState('asc');
   const [viewMode, setViewMode] = useState('grid');
-  const [selectedAgents, setSelectedAgents] = useState([]);
+  const [selectedBuilders, setSelectedBuilders] = useState([]);
   const [showStats, setShowStats] = useState(true);
   const [statsAnimating, setStatsAnimating] = useState(false);
-  const [viewingAgent, setViewingAgent] = useState(null);
+  const [viewingBuilder, setViewingBuilder] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
-  const [editingAgent, setEditingAgent] = useState(null);
+  const [editingBuilder, setEditingBuilder] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showApprovalConfirm, setShowApprovalConfirm] = useState(null);
   const [approvalAction, setApprovalAction] = useState(null);
@@ -1090,10 +1069,10 @@ const AgentsRegistration = () => {
   const [actionLoading, setActionLoading] = useState(null);
   const [filterCount, setFilterCount] = useState(0);
   const [activeFilter, setActiveFilter] = useState('all');
-  
+
   // ============ PROPERTIES MODAL STATE ============
   const [showPropertiesModal, setShowPropertiesModal] = useState(false);
-  const [selectedAgentForProperties, setSelectedAgentForProperties] = useState(null);
+  const [selectedBuilderForProperties, setSelectedBuilderForProperties] = useState(null);
 
   // ============ TOAST FUNCTION ============
   const showToast = useCallback((message, type = 'success', duration = 3000) => {
@@ -1103,17 +1082,17 @@ const AgentsRegistration = () => {
 
   // ============ STATS ============
   const [stats, setStats] = useState({
-    totalAgents: 0,
+    totalBuilders: 0,
     pendingApprovals: 0,
     approved: 0,
     rejected: 0,
     blocked: 0,
     verified: 0,
-    approvedAndVerified: 0, // NEW: Combined Approved & Verified
+    approvedAndVerified: 0,
   });
 
-  // ============ GENERATE MOCK AGENTS ============
-  const generateMockAgents = useCallback(() => {
+  // ============ GENERATE MOCK BUILDERS ============
+  const generateMockBuilders = useCallback(() => {
     const firstNames = ['Rajesh', 'Priya', 'Amit', 'Sneha', 'Vikram', 'Ananya', 'Deepak', 'Meera', 'Ravi', 'Kavya', 'Suresh', 'Pooja', 'Arjun', 'Lakshmi', 'Kiran', 'Mohan', 'Ritu', 'Gautam', 'Nisha', 'Tarun'];
     const lastNames = ['Kumar', 'Sharma', 'Singh', 'Patel', 'Reddy', 'Gupta', 'Verma', 'Joshi', 'Malhotra', 'Mehta', 'Nair', 'Pillai', 'Rao', 'Shetty', 'Agarwal', 'Khanna', 'Chopra', 'Saxena', 'Tiwari', 'Desai'];
     const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur', 'Lucknow', 'Nagpur', 'Kolkata', 'Surat', 'Indore'];
@@ -1121,9 +1100,9 @@ const AgentsRegistration = () => {
     const verificationStatuses = ['pending', 'verified', 'rejected'];
     const subscriptionPlans = ['Free', 'Silver', 'Gold', 'Platinum'];
     const specializations = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
-    const agencies = ['ABC Realty', 'Dream Homes', 'Green Valley', 'Luxury Living', 'Urban Estate', 'Prime Properties', 'Elite Homes', 'Royal Estate', 'Golden Key', 'Smart Living'];
+    const companies = ['ABC Builders', 'Dream Homes Constructions', 'Green Valley Developers', 'Luxury Living Corp', 'Urban Estate Builders', 'Prime Properties Ltd', 'Elite Homes Group', 'Royal Estate Developers', 'Golden Key Constructions', 'Smart Living Builders'];
 
-    const agents = [];
+    const builders = [];
     const usedNames = new Set();
 
     for (let i = 1; i <= 80; i++) {
@@ -1145,11 +1124,10 @@ const AgentsRegistration = () => {
       date.setDate(date.getDate() - Math.floor(Math.random() * 90));
 
       const propertiesCount = Math.floor(Math.random() * 30);
-      const clientsCount = Math.floor(Math.random() * 40);
+      const projectsCount = Math.floor(Math.random() * 10);
       const rating = (Math.random() * 4 + 1).toFixed(1);
       const experience = Math.floor(Math.random() * 15) + 1;
 
-      // Generate verification details
       const verification = {
         email: Math.random() > 0.15,
         phone: Math.random() > 0.2,
@@ -1157,45 +1135,46 @@ const AgentsRegistration = () => {
         pan: Math.random() > 0.35,
       };
 
-      agents.push({
-        id: `agent_${i}`,
+      builders.push({
+        id: `builder_${i}`,
         name: fullName,
         email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${Math.floor(Math.random() * 100)}@email.com`,
         phone: `+91 ${Math.floor(Math.random() * 9000000000 + 1000000000)}`,
         city: city,
         state: ['Maharashtra', 'Delhi', 'Karnataka', 'Tamil Nadu', 'Telangana', 'Uttar Pradesh', 'Gujarat', 'Rajasthan'][Math.floor(Math.random() * 8)],
-        agency: agencies[Math.floor(Math.random() * agencies.length)],
+        company: companies[Math.floor(Math.random() * companies.length)],
         status: status,
         verificationStatus: verificationStatus,
         verification: verification,
         registrationDate: date.toISOString(),
         propertiesCount: propertiesCount,
-        clientsCount: clientsCount,
+        projectsCount: projectsCount,
         rating: rating,
         experience: experience,
         specialization: specializations[Math.floor(Math.random() * specializations.length)],
         avatar: firstName[0] + lastName[0],
         subscriptionPlan: subscriptionPlans[Math.floor(Math.random() * subscriptionPlans.length)],
-        bio: `Experienced real estate agent with ${experience} years in the industry. Specializing in ${specializations[Math.floor(Math.random() * specializations.length)]} properties.`,
+        bio: `Experienced builder with ${experience} years in the construction industry. Specializing in ${specializations[Math.floor(Math.random() * specializations.length)]} properties.`,
         lastActive: new Date(Date.now() - Math.floor(Math.random() * 14 * 24 * 60 * 60 * 1000)).toISOString(),
         totalEarnings: Math.floor(Math.random() * 5000000),
         featured: Math.random() > 0.85,
         verifiedBadge: Math.random() > 0.7,
+        gstin: `GST${Math.floor(Math.random() * 1000000000)}`,
+        panNumber: `PAN${Math.floor(Math.random() * 1000000000)}`,
         reraRegistered: Math.random() > 0.6,
       });
     }
 
-    // Update stats
-    const total = agents.length;
-    const pending = agents.filter(a => a.status === 'pending').length;
-    const approved = agents.filter(a => a.status === 'approved').length;
-    const rejected = agents.filter(a => a.status === 'rejected').length;
-    const blocked = agents.filter(a => a.status === 'blocked').length;
-    const verified = agents.filter(a => a.verificationStatus === 'verified').length;
-    const approvedAndVerified = agents.filter(a => a.status === 'approved' && a.verificationStatus === 'verified').length;
+    const total = builders.length;
+    const pending = builders.filter(b => b.status === 'pending').length;
+    const approved = builders.filter(b => b.status === 'approved').length;
+    const rejected = builders.filter(b => b.status === 'rejected').length;
+    const blocked = builders.filter(b => b.status === 'blocked').length;
+    const verified = builders.filter(b => b.verificationStatus === 'verified').length;
+    const approvedAndVerified = builders.filter(b => b.status === 'approved' && b.verificationStatus === 'verified').length;
 
     setStats({
-      totalAgents: total,
+      totalBuilders: total,
       pendingApprovals: pending,
       approved: approved,
       rejected: rejected,
@@ -1204,40 +1183,40 @@ const AgentsRegistration = () => {
       approvedAndVerified: approvedAndVerified,
     });
 
-    return agents;
+    return builders;
   }, []);
 
   // ============ INITIALIZE DATA ============
   useEffect(() => {
-    const mockAgents = generateMockAgents();
-    setAgents(mockAgents);
-    setFilteredAgents(mockAgents);
+    const mockBuilders = generateMockBuilders();
+    setBuilders(mockBuilders);
+    setFilteredBuilders(mockBuilders);
     setStatsAnimating(true);
     setTimeout(() => setStatsAnimating(false), 1000);
-  }, [generateMockAgents]);
+  }, [generateMockBuilders]);
 
-  // ============ FILTER AGENTS ============
-  const filterAgents = useCallback(() => {
-    let filtered = [...agents];
+  // ============ FILTER BUILDERS ============
+  const filterBuilders = useCallback(() => {
+    let filtered = [...builders];
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(agent =>
-        agent.name.toLowerCase().includes(query) ||
-        agent.email.toLowerCase().includes(query) ||
-        agent.phone.includes(query) ||
-        agent.city.toLowerCase().includes(query) ||
-        agent.agency.toLowerCase().includes(query) ||
-        agent.specialization.toLowerCase().includes(query)
+      filtered = filtered.filter(builder =>
+        builder.name.toLowerCase().includes(query) ||
+        builder.email.toLowerCase().includes(query) ||
+        builder.phone.includes(query) ||
+        builder.city.toLowerCase().includes(query) ||
+        builder.company.toLowerCase().includes(query) ||
+        builder.specialization.toLowerCase().includes(query)
       );
     }
 
     if (selectedStatus !== 'all') {
-      filtered = filtered.filter(agent => agent.status === selectedStatus);
+      filtered = filtered.filter(builder => builder.status === selectedStatus);
     }
 
     if (selectedVerification !== 'all') {
-      filtered = filtered.filter(agent => agent.verificationStatus === selectedVerification);
+      filtered = filtered.filter(builder => builder.verificationStatus === selectedVerification);
     }
 
     let count = 0;
@@ -1258,22 +1237,22 @@ const AgentsRegistration = () => {
       return 0;
     });
 
-    setFilteredAgents(filtered);
+    setFilteredBuilders(filtered);
     setCurrentPage(1);
-  }, [agents, searchQuery, selectedStatus, selectedVerification, sortField, sortDirection]);
+  }, [builders, searchQuery, selectedStatus, selectedVerification, sortField, sortDirection]);
 
   useEffect(() => {
-    filterAgents();
-  }, [filterAgents]);
+    filterBuilders();
+  }, [filterBuilders]);
 
   // ============ PAGINATION ============
-  const totalPages = Math.ceil(filteredAgents.length / pageSize);
-  const paginatedAgents = useMemo(() =>
-    filteredAgents.slice(
+  const totalPages = Math.ceil(filteredBuilders.length / pageSize);
+  const paginatedBuilders = useMemo(() =>
+    filteredBuilders.slice(
       (currentPage - 1) * pageSize,
       currentPage * pageSize
     )
-  , [filteredAgents, currentPage, pageSize]);
+  , [filteredBuilders, currentPage, pageSize]);
 
   // ============ HANDLE SORT ============
   const handleSort = useCallback((field) => {
@@ -1287,119 +1266,118 @@ const AgentsRegistration = () => {
 
   // ============ HANDLE SELECT ALL ============
   const handleSelectAll = useCallback(() => {
-    if (selectedAgents.length === paginatedAgents.length) {
-      setSelectedAgents([]);
+    if (selectedBuilders.length === paginatedBuilders.length) {
+      setSelectedBuilders([]);
     } else {
-      setSelectedAgents(paginatedAgents.map(agent => agent.id));
+      setSelectedBuilders(paginatedBuilders.map(builder => builder.id));
     }
-  }, [selectedAgents, paginatedAgents]);
+  }, [selectedBuilders, paginatedBuilders]);
 
-  // ============ HANDLE SELECT AGENT ============
-  const handleSelectAgent = useCallback((agentId) => {
-    setSelectedAgents(prev =>
-      prev.includes(agentId)
-        ? prev.filter(id => id !== agentId)
-        : [...prev, agentId]
+  // ============ HANDLE SELECT BUILDER ============
+  const handleSelectBuilder = useCallback((builderId) => {
+    setSelectedBuilders(prev =>
+      prev.includes(builderId)
+        ? prev.filter(id => id !== builderId)
+        : [...prev, builderId]
     );
   }, []);
 
   // ============ HANDLE APPROVAL ============
-  const handleApproval = useCallback((agentId, action) => {
-    const agent = agents.find(a => a.id === agentId);
-    if (!agent) return;
-    setShowApprovalConfirm(agentId);
+  const handleApproval = useCallback((builderId, action) => {
+    const builder = builders.find(b => b.id === builderId);
+    if (!builder) return;
+    setShowApprovalConfirm(builderId);
     setApprovalAction(action);
-  }, [agents]);
+  }, [builders]);
 
   // ============ CONFIRM APPROVAL ============
   const confirmApproval = useCallback(() => {
-    const agentId = showApprovalConfirm;
+    const builderId = showApprovalConfirm;
     const action = approvalAction;
     setActionLoading(action);
     setShowApprovalConfirm(null);
 
     setTimeout(() => {
-      let updatedAgents = [...agents];
-      let agent = updatedAgents.find(a => a.id === agentId);
+      let updatedBuilders = [...builders];
+      let builder = updatedBuilders.find(b => b.id === builderId);
       
       if (action === 'approve') {
-        agent = { ...agent, status: 'approved' };
-        // Check if the agent is also verified for the combined stat
-        const isAlsoVerified = agent.verificationStatus === 'verified';
+        builder = { ...builder, status: 'approved' };
+        const isAlsoVerified = builder.verificationStatus === 'verified';
         setStats(prev => ({
           ...prev,
           pendingApprovals: Math.max(0, prev.pendingApprovals - 1),
           approved: prev.approved + 1,
           approvedAndVerified: isAlsoVerified ? prev.approvedAndVerified + 1 : prev.approvedAndVerified,
         }));
-        showToast(`${agent.name} has been approved successfully`, 'success');
+        showToast(`${builder.name} has been approved successfully`, 'success');
       } else if (action === 'reject') {
-        agent = { ...agent, status: 'rejected' };
+        builder = { ...builder, status: 'rejected' };
         setStats(prev => ({
           ...prev,
           pendingApprovals: Math.max(0, prev.pendingApprovals - 1),
           rejected: prev.rejected + 1,
         }));
-        showToast(`${agent.name} has been rejected`, 'warning');
+        showToast(`${builder.name} has been rejected`, 'warning');
       }
 
-      updatedAgents = updatedAgents.map(a => a.id === agentId ? agent : a);
-      setAgents(updatedAgents);
+      updatedBuilders = updatedBuilders.map(b => b.id === builderId ? builder : b);
+      setBuilders(updatedBuilders);
       setActionLoading(null);
       setApprovalAction(null);
 
-      setViewingAgent(prev => (prev && prev.id === agentId ? agent : prev));
+      setViewingBuilder(prev => (prev && prev.id === builderId ? builder : prev));
     }, 800);
-  }, [showApprovalConfirm, approvalAction, agents, showToast]);
+  }, [showApprovalConfirm, approvalAction, builders, showToast]);
 
   // ============ HANDLE TOGGLE BLOCK ============
-  const handleToggleBlock = useCallback((agentId) => {
-    setActionLoading(`block_${agentId}`);
+  const handleToggleBlock = useCallback((builderId) => {
+    setActionLoading(`block_${builderId}`);
 
     setTimeout(() => {
-      let updatedAgents = [...agents];
-      let agent = updatedAgents.find(a => a.id === agentId);
-      const wasBlocked = agent.status === 'blocked';
+      let updatedBuilders = [...builders];
+      let builder = updatedBuilders.find(b => b.id === builderId);
+      const wasBlocked = builder.status === 'blocked';
 
       if (wasBlocked) {
-        agent = { ...agent, status: 'approved' };
-        const isAlsoVerified = agent.verificationStatus === 'verified';
+        builder = { ...builder, status: 'approved' };
+        const isAlsoVerified = builder.verificationStatus === 'verified';
         setStats(prev => ({
           ...prev,
           blocked: Math.max(0, prev.blocked - 1),
           approved: prev.approved + 1,
           approvedAndVerified: isAlsoVerified ? prev.approvedAndVerified + 1 : prev.approvedAndVerified,
         }));
-        showToast(`${agent.name} has been unblocked`, 'success');
+        showToast(`${builder.name} has been unblocked`, 'success');
       } else {
-        agent = { ...agent, status: 'blocked' };
-        const wasAlsoVerified = agent.verificationStatus === 'verified' && agent.status === 'approved';
+        builder = { ...builder, status: 'blocked' };
+        const wasAlsoVerified = builder.verificationStatus === 'verified' && builder.status === 'approved';
         setStats(prev => ({
           ...prev,
           blocked: prev.blocked + 1,
           approved: Math.max(0, prev.approved - 1),
           approvedAndVerified: wasAlsoVerified ? Math.max(0, prev.approvedAndVerified - 1) : prev.approvedAndVerified,
         }));
-        showToast(`${agent.name} has been blocked`, 'warning');
+        showToast(`${builder.name} has been blocked`, 'warning');
       }
 
-      updatedAgents = updatedAgents.map(a => a.id === agentId ? agent : a);
-      setAgents(updatedAgents);
+      updatedBuilders = updatedBuilders.map(b => b.id === builderId ? builder : b);
+      setBuilders(updatedBuilders);
       setActionLoading(null);
 
-      setViewingAgent(prev => (prev && prev.id === agentId ? agent : prev));
+      setViewingBuilder(prev => (prev && prev.id === builderId ? builder : prev));
     }, 600);
-  }, [agents, showToast]);
+  }, [builders, showToast]);
 
-  // ============ VIEW AGENT DETAIL ============
-  const handleViewAgent = useCallback((agent) => {
-    setViewingAgent(agent);
+  // ============ VIEW BUILDER DETAIL ============
+  const handleViewBuilder = useCallback((builder) => {
+    setViewingBuilder(builder);
     setShowViewModal(true);
   }, []);
 
-  // ============ VIEW AGENT PROPERTIES ============
-  const handleViewAgentProperties = useCallback((agent) => {
-    setSelectedAgentForProperties(agent);
+  // ============ VIEW BUILDER PROPERTIES ============
+  const handleViewBuilderProperties = useCallback((builder) => {
+    setSelectedBuilderForProperties(builder);
     setShowPropertiesModal(true);
   }, []);
 
@@ -1409,44 +1387,41 @@ const AgentsRegistration = () => {
     showToast(`Opening ${property.title}...`, 'info');
   }, [navigate, showToast]);
 
-  // ============ VIEW AGENT PROFILE ============
-  const handleViewAgentProfile = useCallback((agentId) => {
-    navigate('/profile/agent');
-    showToast('Opening Agent Profile...', 'info');
+  // ============ VIEW BUILDER PROFILE ============
+  const handleViewBuilderProfile = useCallback((builderId) => {
+    navigate('/profile/builder');
+    showToast('Opening Builder Profile...', 'info');
   }, [navigate, showToast]);
 
-  // ============ VIEW PROPERTY OWNER PROFILE (from Properties modal) ============
-  const handleViewOwnerProfile = useCallback((ownerAgent, property) => {
-    // Reuses the same agent-profile navigation; falls back to the agent
-    // shown in the Properties modal since that agent is the property owner.
-    handleViewAgentProfile(ownerAgent?.id);
-  }, [handleViewAgentProfile]);
+  // ============ VIEW PROPERTY OWNER PROFILE ============
+  const handleViewOwnerProfile = useCallback((ownerBuilder, property) => {
+    handleViewBuilderProfile(ownerBuilder?.id);
+  }, [handleViewBuilderProfile]);
 
-  // ============ EDIT AGENT ============
-  const handleEditAgent = useCallback((agent) => {
-    setEditingAgent(agent);
+  // ============ EDIT BUILDER ============
+  const handleEditBuilder = useCallback((builder) => {
+    setEditingBuilder(builder);
     setShowEditModal(true);
   }, []);
 
   // ============ SAVE EDIT ============
   const saveEdit = useCallback((updatedData) => {
-    setAgents(prev => prev.map(agent => {
-      if (agent.id !== editingAgent.id) return agent;
-      return { ...agent, ...updatedData };
+    setBuilders(prev => prev.map(builder => {
+      if (builder.id !== editingBuilder.id) return builder;
+      return { ...builder, ...updatedData };
     }));
 
-    // Recompute stats fully to keep counts accurate after verification/status edits
-    setAgents(prev => {
+    setBuilders(prev => {
       const total = prev.length;
-      const pending = prev.filter(a => a.status === 'pending').length;
-      const approved = prev.filter(a => a.status === 'approved').length;
-      const rejected = prev.filter(a => a.status === 'rejected').length;
-      const blocked = prev.filter(a => a.status === 'blocked').length;
-      const verified = prev.filter(a => a.verificationStatus === 'verified').length;
-      const approvedAndVerified = prev.filter(a => a.status === 'approved' && a.verificationStatus === 'verified').length;
+      const pending = prev.filter(b => b.status === 'pending').length;
+      const approved = prev.filter(b => b.status === 'approved').length;
+      const rejected = prev.filter(b => b.status === 'rejected').length;
+      const blocked = prev.filter(b => b.status === 'blocked').length;
+      const verified = prev.filter(b => b.verificationStatus === 'verified').length;
+      const approvedAndVerified = prev.filter(b => b.status === 'approved' && b.verificationStatus === 'verified').length;
 
       setStats({
-        totalAgents: total,
+        totalBuilders: total,
         pendingApprovals: pending,
         approved: approved,
         rejected: rejected,
@@ -1459,9 +1434,9 @@ const AgentsRegistration = () => {
     });
 
     setShowEditModal(false);
-    setEditingAgent(null);
-    showToast('Agent updated successfully', 'success');
-  }, [editingAgent, showToast]);
+    setEditingBuilder(null);
+    showToast('Builder updated successfully', 'success');
+  }, [editingBuilder, showToast]);
 
   // ============ STAT CLICK HANDLER ============
   const handleStatClick = useCallback((filter) => {
@@ -1506,39 +1481,41 @@ const AgentsRegistration = () => {
   const handleRefresh = useCallback(() => {
     setLoading(true);
     setTimeout(() => {
-      const mockAgents = generateMockAgents();
-      setAgents(mockAgents);
-      setFilteredAgents(mockAgents);
+      const mockBuilders = generateMockBuilders();
+      setBuilders(mockBuilders);
+      setFilteredBuilders(mockBuilders);
       setLoading(false);
       setStatsAnimating(true);
       setTimeout(() => setStatsAnimating(false), 1000);
       showToast('Data refreshed successfully', 'success');
     }, 1000);
-  }, [generateMockAgents, showToast]);
+  }, [generateMockBuilders, showToast]);
 
-  // ============ EXPORT AGENTS ============
-  const handleExportAgents = useCallback(() => {
-    const data = filteredAgents.map(agent => ({
-      Name: agent.name,
-      Email: agent.email,
-      Phone: agent.phone,
-      City: agent.city,
-      State: agent.state,
-      Agency: agent.agency,
-      Status: agent.status,
-      'Verification Status': agent.verificationStatus,
-      'Email Verified': agent.verification.email ? 'Yes' : 'No',
-      'Phone Verified': agent.verification.phone ? 'Yes' : 'No',
-      'Aadhaar Verified': agent.verification.aadhaar ? 'Yes' : 'No',
-      'PAN Verified': agent.verification.pan ? 'Yes' : 'No',
-      Properties: agent.propertiesCount,
-      Clients: agent.clientsCount,
-      Rating: agent.rating,
-      Experience: agent.experience,
-      Specialization: agent.specialization,
-      'Registration Date': new Date(agent.registrationDate).toLocaleDateString(),
-      'Subscription Plan': agent.subscriptionPlan,
-      'RERA Registered': agent.reraRegistered ? 'Yes' : 'No',
+  // ============ EXPORT BUILDERS ============
+  const handleExportBuilders = useCallback(() => {
+    const data = filteredBuilders.map(builder => ({
+      Name: builder.name,
+      Email: builder.email,
+      Phone: builder.phone,
+      City: builder.city,
+      State: builder.state,
+      Company: builder.company,
+      Status: builder.status,
+      'Verification Status': builder.verificationStatus,
+      'Email Verified': builder.verification.email ? 'Yes' : 'No',
+      'Phone Verified': builder.verification.phone ? 'Yes' : 'No',
+      'Aadhaar Verified': builder.verification.aadhaar ? 'Yes' : 'No',
+      'PAN Verified': builder.verification.pan ? 'Yes' : 'No',
+      Properties: builder.propertiesCount,
+      Projects: builder.projectsCount,
+      Rating: builder.rating,
+      Experience: builder.experience,
+      Specialization: builder.specialization,
+      'Registration Date': new Date(builder.registrationDate).toLocaleDateString(),
+      'Subscription Plan': builder.subscriptionPlan,
+      'RERA Registered': builder.reraRegistered ? 'Yes' : 'No',
+      'GSTIN': builder.gstin || '',
+      'PAN Number': builder.panNumber || '',
     }));
 
     const csv = [
@@ -1550,11 +1527,11 @@ const AgentsRegistration = () => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `agents_registration_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `builders_registration_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
-    showToast(`${filteredAgents.length} agents exported successfully`, 'success');
-  }, [filteredAgents, showToast]);
+    showToast(`${filteredBuilders.length} builders exported successfully`, 'success');
+  }, [filteredBuilders, showToast]);
 
   // ============ VIEW MODAL ACTION HANDLERS ============
   const handleViewModalApprove = useCallback((id) => {
@@ -1566,52 +1543,52 @@ const AgentsRegistration = () => {
   }, [handleApproval]);
 
   const handleViewModalEdit = useCallback(() => {
-    if (!viewingAgent) return;
+    if (!viewingBuilder) return;
     setShowViewModal(false);
-    handleEditAgent(viewingAgent);
-  }, [viewingAgent, handleEditAgent]);
+    handleEditBuilder(viewingBuilder);
+  }, [viewingBuilder, handleEditBuilder]);
 
   const handleViewModalToggleBlock = useCallback(() => {
-    if (!viewingAgent) return;
-    handleToggleBlock(viewingAgent.id);
-  }, [viewingAgent, handleToggleBlock]);
+    if (!viewingBuilder) return;
+    handleToggleBlock(viewingBuilder.id);
+  }, [viewingBuilder, handleToggleBlock]);
 
-  const handleViewModalViewProperties = useCallback((agent) => {
+  const handleViewModalViewProperties = useCallback((builder) => {
     setShowViewModal(false);
-    handleViewAgentProperties(agent);
-  }, [handleViewAgentProperties]);
+    handleViewBuilderProperties(builder);
+  }, [handleViewBuilderProperties]);
 
   // ============ BULK ACTIONS ============
   const handleBulkAction = useCallback((action) => {
-    if (selectedAgents.length === 0) {
-      showToast('Please select agents first', 'warning');
+    if (selectedBuilders.length === 0) {
+      showToast('Please select builders first', 'warning');
       return;
     }
 
     setActionLoading(action);
 
     setTimeout(() => {
-      const selectedIds = new Set(selectedAgents);
-      let updatedAgents = [...agents];
+      const selectedIds = new Set(selectedBuilders);
+      let updatedBuilders = [...builders];
       let count = 0;
       let verifiedCount = 0;
 
-      updatedAgents = updatedAgents.map(agent => {
-        if (selectedIds.has(agent.id)) {
+      updatedBuilders = updatedBuilders.map(builder => {
+        if (selectedIds.has(builder.id)) {
           count++;
           if (action === 'approve') {
-            const isVerified = agent.verificationStatus === 'verified';
+            const isVerified = builder.verificationStatus === 'verified';
             if (isVerified) verifiedCount++;
-            return { ...agent, status: 'approved' };
+            return { ...builder, status: 'approved' };
           } else if (action === 'reject') {
-            return { ...agent, status: 'rejected' };
+            return { ...builder, status: 'rejected' };
           }
         }
-        return agent;
+        return builder;
       });
 
-      setAgents(updatedAgents);
-      setSelectedAgents([]);
+      setBuilders(updatedBuilders);
+      setSelectedBuilders([]);
       setActionLoading(null);
 
       if (action === 'approve') {
@@ -1621,17 +1598,17 @@ const AgentsRegistration = () => {
           approved: prev.approved + count,
           approvedAndVerified: prev.approvedAndVerified + verifiedCount,
         }));
-        showToast(`${count} agent(s) approved successfully`, 'success');
+        showToast(`${count} builder(s) approved successfully`, 'success');
       } else if (action === 'reject') {
         setStats(prev => ({
           ...prev,
           pendingApprovals: Math.max(0, prev.pendingApprovals - count),
           rejected: prev.rejected + count,
         }));
-        showToast(`${count} agent(s) rejected successfully`, 'warning');
+        showToast(`${count} builder(s) rejected successfully`, 'warning');
       }
     }, 800);
-  }, [selectedAgents, agents, showToast]);
+  }, [selectedBuilders, builders, showToast]);
 
   // ============ RENDER ============
   return (
@@ -1650,40 +1627,40 @@ const AgentsRegistration = () => {
         show={!!showApprovalConfirm}
         action={approvalAction}
         actionLoading={actionLoading}
-        agentName={agents.find(a => a.id === showApprovalConfirm)?.name || ''}
+        builderName={builders.find(b => b.id === showApprovalConfirm)?.name || ''}
         onCancel={() => { setShowApprovalConfirm(null); setApprovalAction(null); }}
         onConfirm={confirmApproval}
       />
 
-      {/* Agent Properties Modal */}
-      <AgentPropertiesModal
-        agent={selectedAgentForProperties}
+      {/* Builder Properties Modal */}
+      <BuilderPropertiesModal
+        builder={selectedBuilderForProperties}
         show={showPropertiesModal}
-        onClose={() => { setShowPropertiesModal(false); setSelectedAgentForProperties(null); }}
+        onClose={() => { setShowPropertiesModal(false); setSelectedBuilderForProperties(null); }}
         onViewProperty={handleViewPropertyDetail}
         onViewOwnerProfile={handleViewOwnerProfile}
       />
 
       {/* Edit Modal */}
-      <EditAgentModal
-        agent={editingAgent}
+      <EditBuilderModal
+        builder={editingBuilder}
         show={showEditModal}
-        onClose={() => { setShowEditModal(false); setEditingAgent(null); }}
+        onClose={() => { setShowEditModal(false); setEditingBuilder(null); }}
         onSave={saveEdit}
       />
 
       {/* View Modal */}
-      <ViewAgentModal
-        agent={viewingAgent}
+      <ViewBuilderModal
+        builder={viewingBuilder}
         show={showViewModal}
         actionLoading={actionLoading}
-        onClose={() => { setShowViewModal(false); setViewingAgent(null); }}
+        onClose={() => { setShowViewModal(false); setViewingBuilder(null); }}
         onApprove={handleViewModalApprove}
         onReject={handleViewModalReject}
         onEdit={handleViewModalEdit}
         onToggleBlock={handleViewModalToggleBlock}
         onViewProperties={handleViewModalViewProperties}
-        onViewProfile={handleViewAgentProfile}
+        onViewProfile={handleViewBuilderProfile}
       />
 
       {/* Header */}
@@ -1692,10 +1669,10 @@ const AgentsRegistration = () => {
           <div>
             <div className="flex items-center gap-3 mb-1 flex-wrap">
               <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
-                Agent Registrations
+                Builder Registrations
               </h1>
               <span className="px-3 py-1 bg-[#E8F4F2] text-[#00695C] text-xs font-semibold rounded-full animate-pulse">
-                {filteredAgents.length} Agents
+                {filteredBuilders.length} Builders
               </span>
               {filterCount > 0 && (
                 <span className="px-3 py-1 bg-[#FEF3E2] text-amber-700 text-xs font-semibold rounded-full">
@@ -1704,7 +1681,7 @@ const AgentsRegistration = () => {
               )}
             </div>
             <p className="text-sm text-[#5A7D78] flex items-center gap-2 flex-wrap">
-              <span>Review and manage agent registration requests</span>
+              <span>Review and manage builder registration requests</span>
               <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
               <span className="text-[#00695C] font-medium">{new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
             </p>
@@ -1727,7 +1704,7 @@ const AgentsRegistration = () => {
               <span className="hidden sm:inline">{loading ? 'Refreshing...' : 'Refresh'}</span>
             </button>
             <button
-              onClick={handleExportAgents}
+              onClick={handleExportBuilders}
               className="flex items-center gap-2 px-4 py-2 bg-white border border-[#E8F0EE] rounded-xl hover:border-[#00695C]/30 hover:shadow-md transition-all duration-300 text-sm font-medium text-[#1A2E2A] hover:scale-105"
             >
               <FiDownload className="text-sm" />
@@ -1737,15 +1714,15 @@ const AgentsRegistration = () => {
         </div>
       </div>
 
-      {/* Stats Section - Updated with Approved & Verified */}
+      {/* Stats Section */}
       {showStats && (
         <div className="relative animate-slide-in">
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3">
               <StatCard
                 icon={<FiUsers className="text-white text-sm" />}
-                title="Total Agents"
-                value={stats.totalAgents}
+                title="Total Builders"
+                value={stats.totalBuilders}
                 color="bg-gradient-to-br from-[#00695C] to-[#26A69A]"
                 delay={0}
                 isActive={activeFilter === 'all'}
@@ -1802,7 +1779,6 @@ const AgentsRegistration = () => {
                 statsAnimating={statsAnimating}
                 onClick={() => handleStatClick('verified')}
               />
-              {/* NEW: Approved & Verified Stat Card */}
               <StatCard
                 icon={<FaCheck className="text-white text-sm" />}
                 title="Approved & Verified"
@@ -1826,7 +1802,7 @@ const AgentsRegistration = () => {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search agents by name, email, phone, city, agency, or specialization..."
+              placeholder="Search builders by name, email, phone, city, company, or specialization..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none placeholder:text-[#B5C9C5]"
@@ -1900,10 +1876,10 @@ const AgentsRegistration = () => {
         </div>
 
         {/* Bulk Actions */}
-        {selectedAgents.length > 0 && (
+        {selectedBuilders.length > 0 && (
           <div className="mt-4 pt-4 border-t border-[#E8F0EE] flex flex-wrap items-center justify-between gap-3 animate-slide-in">
             <span className="text-sm text-[#5A7D78]">
-              <span className="font-semibold text-[#00695C]">{selectedAgents.length}</span> agent(s) selected
+              <span className="font-semibold text-[#00695C]">{selectedBuilders.length}</span> builder(s) selected
             </span>
             <div className="flex flex-wrap items-center gap-2">
               <button
@@ -1923,7 +1899,7 @@ const AgentsRegistration = () => {
                 Reject All
               </button>
               <button
-                onClick={() => setSelectedAgents([])}
+                onClick={() => setSelectedBuilders([])}
                 className="px-4 py-1.5 bg-[#F5F9F8] text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] transition-all duration-300 text-xs font-medium hover:scale-105"
               >
                 Clear
@@ -1933,7 +1909,7 @@ const AgentsRegistration = () => {
         )}
       </div>
 
-      {/* Agents Grid/List */}
+      {/* Builders Grid/List */}
       <div className="relative">
         {loading ? (
           <div className="flex items-center justify-center py-20">
@@ -1941,7 +1917,7 @@ const AgentsRegistration = () => {
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-            {paginatedAgents.map((agent, index) => {
+            {paginatedBuilders.map((builder, index) => {
               const statusColors = {
                 pending: 'bg-[#FEF3E2] text-amber-700 border-amber-200',
                 approved: 'bg-[#E8F8F5] text-[#00695C] border-[#A8D5CD]',
@@ -1949,14 +1925,14 @@ const AgentsRegistration = () => {
                 blocked: 'bg-gray-100 text-gray-600 border-gray-200'
               };
 
-              const isSelected = selectedAgents.includes(agent.id);
-              const isPending = agent.status === 'pending';
-              const isApproved = agent.status === 'approved';
-              const showVerifiedBadge = agent.verificationStatus === 'verified' && agent.status === 'approved';
+              const isSelected = selectedBuilders.includes(builder.id);
+              const isPending = builder.status === 'pending';
+              const isApproved = builder.status === 'approved';
+              const showVerifiedBadge = builder.verificationStatus === 'verified' && builder.status === 'approved';
 
               return (
                 <div
-                  key={agent.id}
+                  key={builder.id}
                   className={`bg-white rounded-2xl border border-[#E8F0EE] p-3.5 hover:shadow-xl hover:-translate-y-1 group animate-slide-in transition-all duration-500 ${isSelected ? 'ring-2 ring-[#00695C] shadow-lg' : ''} ${
                     isPending ? 'border-l-4 border-l-amber-500' : 
                     isApproved ? 'border-l-4 border-l-emerald-500' : ''
@@ -1968,12 +1944,12 @@ const AgentsRegistration = () => {
                       <input
                         type="checkbox"
                         checked={isSelected}
-                        onChange={() => handleSelectAgent(agent.id)}
+                        onChange={() => handleSelectBuilder(builder.id)}
                         className="w-4 h-4 shrink-0 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                       />
                       <div className="relative shrink-0">
                         <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white font-bold text-sm shadow-lg">
-                          {agent.avatar}
+                          {builder.avatar}
                         </div>
                         {showVerifiedBadge && (
                           <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#00695C] rounded-full flex items-center justify-center shadow-lg animate-pulse">
@@ -1982,12 +1958,12 @@ const AgentsRegistration = () => {
                         )}
                       </div>
                       <div className="min-w-0">
-                        <h3 className="font-semibold text-[#1A2E2A] text-sm truncate">{agent.name}</h3>
+                        <h3 className="font-semibold text-[#1A2E2A] text-sm truncate">{builder.name}</h3>
                         <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap inline-flex items-center gap-1 ${statusColors[agent.status]}`}>
-                            {agent.status.charAt(0).toUpperCase() + agent.status.slice(1)}
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap inline-flex items-center gap-1 ${statusColors[builder.status]}`}>
+                            {builder.status.charAt(0).toUpperCase() + builder.status.slice(1)}
                           </span>
-                          {agent.verificationStatus === 'verified' && (
+                          {builder.verificationStatus === 'verified' && (
                             <span className="text-[9px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap bg-[#E8F8F5] text-[#00695C]">
                               Verified
                             </span>
@@ -1996,7 +1972,7 @@ const AgentsRegistration = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-0.5 shrink-0">
-                      {agent.featured && (
+                      {builder.featured && (
                         <div className="w-5 h-5 bg-[#FEF3E2] rounded-full flex items-center justify-center">
                           <FaStarSolid className="text-amber-500 text-[9px]" />
                         </div>
@@ -2004,7 +1980,7 @@ const AgentsRegistration = () => {
                       <button
                         type="button"
                         className="w-7 h-7 rounded-xl hover:bg-[#F5F9F8] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
-                        onClick={() => handleViewAgent(agent)}
+                        onClick={() => handleViewBuilder(builder)}
                         title="View Details"
                       >
                         <FiEye className="text-sm" />
@@ -2015,27 +1991,27 @@ const AgentsRegistration = () => {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiMail className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate">{agent.email}</span>
+                      <span className="truncate">{builder.email}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiPhone className="text-[#00695C] flex-shrink-0" />
-                      <span>{agent.phone}</span>
+                      <span>{builder.phone}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiMapPin className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate">{agent.city}, {agent.state}</span>
+                      <span className="truncate">{builder.city}, {builder.state}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FiBriefcase className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate">{agent.agency}</span>
+                      <FaBuilding className="text-[#00695C] flex-shrink-0" />
+                      <span className="truncate">{builder.company}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiTag className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate">{agent.specialization}</span>
+                      <span className="truncate">{builder.specialization}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiCalendar className="text-[#00695C] flex-shrink-0" />
-                      <span>Registered {new Date(agent.registrationDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                      <span>Registered {new Date(builder.registrationDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                     </div>
                   </div>
 
@@ -2048,8 +2024,8 @@ const AgentsRegistration = () => {
                       { key: 'pan', label: 'PAN' }
                     ].map(item => (
                       <div key={item.key} className="text-center">
-                        <div className={`text-xs ${agent.verification[item.key] ? 'text-[#00695C]' : 'text-[#B5C9C5]'}`}>
-                          {agent.verification[item.key] ? <FiCheckCircle /> : <FiXCircle />}
+                        <div className={`text-xs ${builder.verification[item.key] ? 'text-[#00695C]' : 'text-[#B5C9C5]'}`}>
+                          {builder.verification[item.key] ? <FiCheckCircle /> : <FiXCircle />}
                         </div>
                         <p className="text-[7px] text-[#5A7D78] uppercase">{item.label}</p>
                       </div>
@@ -2058,17 +2034,17 @@ const AgentsRegistration = () => {
 
                   <div className="grid grid-cols-3 gap-2 mt-2.5 pt-2.5 border-t border-[#E8F0EE]">
                     <div className="text-center">
-                      <p className="text-sm font-bold text-[#1A2E2A]">{agent.propertiesCount}</p>
+                      <p className="text-sm font-bold text-[#1A2E2A]">{builder.propertiesCount}</p>
                       <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Properties</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm font-bold text-[#1A2E2A]">{agent.clientsCount}</p>
-                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Clients</p>
+                      <p className="text-sm font-bold text-[#1A2E2A]">{builder.projectsCount}</p>
+                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Projects</p>
                     </div>
                     <div className="text-center">
                       <p className="text-sm font-bold text-[#1A2E2A] flex items-center justify-center gap-0.5">
                         <FaStarSolid className="text-amber-400 text-[10px]" />
-                        {agent.rating}
+                        {builder.rating}
                       </p>
                       <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Rating</p>
                     </div>
@@ -2079,7 +2055,7 @@ const AgentsRegistration = () => {
                       <>
                         <button
                           type="button"
-                          onClick={() => handleApproval(agent.id, 'approve')}
+                          onClick={() => handleApproval(builder.id, 'approve')}
                           disabled={actionLoading === 'approve'}
                           className="flex-1 py-1.5 text-xs font-medium text-[#00695C] bg-[#E8F8F5] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 disabled:opacity-50"
                         >
@@ -2088,7 +2064,7 @@ const AgentsRegistration = () => {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleApproval(agent.id, 'reject')}
+                          onClick={() => handleApproval(builder.id, 'reject')}
                           disabled={actionLoading === 'reject'}
                           className="flex-1 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 disabled:opacity-50"
                         >
@@ -2100,57 +2076,56 @@ const AgentsRegistration = () => {
                       <>
                         <button
                           type="button"
-                          onClick={() => handleViewAgent(agent)}
+                          onClick={() => handleViewBuilder(builder)}
                           className="flex-1 py-1.5 text-xs font-medium text-[#00695C] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                         >
                           <FiEye className="text-[10px]" /> View
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleEditAgent(agent)}
+                          onClick={() => handleEditBuilder(builder)}
                           className="flex-1 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                         >
                           <FiEdit className="text-[10px]" /> Edit
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleViewAgentProperties(agent)}
+                          onClick={() => handleViewBuilderProperties(builder)}
                           className="flex-1 py-1.5 text-xs font-medium text-purple-600 bg-purple-50 rounded-xl hover:bg-purple-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                         >
                           <FiHome className="text-[10px]" /> Properties
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleToggleBlock(agent.id)}
-                          disabled={actionLoading === `block_${agent.id}`}
+                          onClick={() => handleToggleBlock(builder.id)}
+                          disabled={actionLoading === `block_${builder.id}`}
                           className={`flex-1 py-1.5 text-xs font-medium rounded-xl transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 disabled:opacity-50 ${
-                            agent.status === 'blocked'
+                            builder.status === 'blocked'
                               ? 'text-[#00695C] bg-[#E8F8F5] hover:bg-[#C5EDE5]'
                               : 'text-red-600 bg-red-50 hover:bg-red-100'
                           }`}
                         >
-                          {actionLoading === `block_${agent.id}` ? (
+                          {actionLoading === `block_${builder.id}` ? (
                             <FiRefreshCw className="text-[10px] animate-spin" />
-                          ) : agent.status === 'blocked' ? (
+                          ) : builder.status === 'blocked' ? (
                             <FiUnlock className="text-[10px]" />
                           ) : (
                             <FiLock className="text-[10px]" />
                           )}
-                          {agent.status === 'blocked' ? 'Unblock' : 'Block'}
+                          {builder.status === 'blocked' ? 'Unblock' : 'Block'}
                         </button>
                       </>
                     )}
                   </div>
 
-                  {/* NEW: View Profile button, its own row below View/Edit/Properties/Block */}
                   {!isPending && (
                     <div className="mt-1.5">
                       <button
                         type="button"
-                        onClick={() => handleViewAgentProfile(agent.id)}
+                        onClick={() => handleViewBuilderProfile(builder.id)}
                         className="w-full py-1.5 text-xs font-medium text-[#167A54] bg-[#E7F6EF] border border-[#BEE4D2] rounded-xl hover:bg-[#D5EFE0] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-[1.02]"
                       >
-                        <FiExternalLink className="text-[10px]" /> View Agent Profile
+                        <FiExternalLink className="text-[10px]" /> View Builder Profile
                       </button>
                     </div>
                   )}
@@ -2164,11 +2139,11 @@ const AgentsRegistration = () => {
               <div className="col-span-1 flex items-center gap-2">
                 <input
                   type="checkbox"
-                  checked={selectedAgents.length === paginatedAgents.length && paginatedAgents.length > 0}
+                  checked={selectedBuilders.length === paginatedBuilders.length && paginatedBuilders.length > 0}
                   onChange={handleSelectAll}
                   className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                 />
-                <span>Agent</span>
+                <span>Builder</span>
               </div>
               <div className="col-span-2 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('name')}>
                 Name {sortField === 'name' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
@@ -2178,7 +2153,7 @@ const AgentsRegistration = () => {
               <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('city')}>
                 City {sortField === 'city' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1">Agency</div>
+              <div className="col-span-1">Company</div>
               <div className="col-span-1 text-center">Phone</div>
               <div className="col-span-1 text-center cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('propertiesCount')}>
                 Props {sortField === 'propertiesCount' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
@@ -2192,7 +2167,7 @@ const AgentsRegistration = () => {
               <div className="col-span-1 text-right">Actions</div>
             </div>
 
-            {paginatedAgents.map((agent, index) => {
+            {paginatedBuilders.map((builder, index) => {
               const statusColors = {
                 pending: 'bg-[#FEF3E2] text-amber-700',
                 approved: 'bg-[#E8F8F5] text-[#00695C]',
@@ -2200,13 +2175,13 @@ const AgentsRegistration = () => {
                 blocked: 'bg-gray-100 text-gray-600'
               };
 
-              const isSelected = selectedAgents.includes(agent.id);
-              const isPending = agent.status === 'pending';
-              const showVerifiedBadge = agent.verificationStatus === 'verified' && agent.status === 'approved';
+              const isSelected = selectedBuilders.includes(builder.id);
+              const isPending = builder.status === 'pending';
+              const showVerifiedBadge = builder.verificationStatus === 'verified' && builder.status === 'approved';
 
               return (
                 <div
-                  key={agent.id}
+                  key={builder.id}
                   className={`grid grid-cols-12 gap-2 items-center py-3 px-4 border-b border-[#E8F0EE] hover:bg-[#F5F9F8] transition-all duration-300 group ${isSelected ? 'bg-[#E8F4F2]' : ''} ${isPending ? 'bg-amber-50/30' : ''}`}
                   style={{ animationDelay: `${index * 30}ms` }}
                 >
@@ -2214,12 +2189,12 @@ const AgentsRegistration = () => {
                     <input
                       type="checkbox"
                       checked={isSelected}
-                      onChange={() => handleSelectAgent(agent.id)}
+                      onChange={() => handleSelectBuilder(builder.id)}
                       className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                     />
                     <div className="relative">
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white font-bold text-xs shadow-md">
-                        {agent.avatar}
+                        {builder.avatar}
                       </div>
                       {showVerifiedBadge && (
                         <div className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#00695C] rounded-full flex items-center justify-center shadow-lg">
@@ -2230,18 +2205,18 @@ const AgentsRegistration = () => {
                   </div>
 
                   <div className="col-span-2">
-                    <p className="font-semibold text-sm text-[#1A2E2A]">{agent.name}</p>
-                    <p className="text-[10px] text-[#5A7D78] truncate">{agent.email}</p>
+                    <p className="font-semibold text-sm text-[#1A2E2A]">{builder.name}</p>
+                    <p className="text-[10px] text-[#5A7D78] truncate">{builder.email}</p>
                   </div>
 
                   <div className="col-span-1">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColors[agent.status]}`}>
-                      {agent.status.charAt(0).toUpperCase() + agent.status.slice(1)}
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColors[builder.status]}`}>
+                      {builder.status.charAt(0).toUpperCase() + builder.status.slice(1)}
                     </span>
                   </div>
 
                   <div className="col-span-1">
-                    {agent.verificationStatus === 'verified' ? (
+                    {builder.verificationStatus === 'verified' ? (
                       <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-[#E8F8F5] text-[#00695C]">
                         Verified
                       </span>
@@ -2250,25 +2225,25 @@ const AgentsRegistration = () => {
                     )}
                   </div>
 
-                  <div className="col-span-1 text-xs text-[#5A7D78]">{agent.city}</div>
+                  <div className="col-span-1 text-xs text-[#5A7D78]">{builder.city}</div>
 
-                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">{agent.agency}</div>
+                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">{builder.company}</div>
 
-                  <div className="col-span-1 text-center text-xs text-[#5A7D78]">{agent.phone}</div>
+                  <div className="col-span-1 text-center text-xs text-[#5A7D78]">{builder.phone}</div>
 
                   <div className="col-span-1 text-center">
-                    <p className="text-sm font-bold text-[#1A2E2A]">{agent.propertiesCount}</p>
+                    <p className="text-sm font-bold text-[#1A2E2A]">{builder.propertiesCount}</p>
                   </div>
 
                   <div className="col-span-1 text-center">
                     <p className="text-sm font-bold text-[#1A2E2A] flex items-center justify-center gap-0.5">
                       <FaStarSolid className="text-amber-400 text-[10px]" />
-                      {agent.rating}
+                      {builder.rating}
                     </p>
                   </div>
 
                   <div className="col-span-1 text-xs text-[#5A7D78]">
-                    {new Date(agent.registrationDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
+                    {new Date(builder.registrationDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
                   </div>
 
                   <div className="col-span-1 flex items-center justify-end gap-1">
@@ -2276,7 +2251,7 @@ const AgentsRegistration = () => {
                       <>
                         <button
                           type="button"
-                          onClick={() => handleApproval(agent.id, 'approve')}
+                          onClick={() => handleApproval(builder.id, 'approve')}
                           disabled={actionLoading === 'approve'}
                           className="w-7 h-7 rounded-lg hover:bg-[#E8F8F5] transition-all duration-300 flex items-center justify-center text-[#00695C] hover:scale-110 disabled:opacity-50"
                           title="Approve"
@@ -2285,7 +2260,7 @@ const AgentsRegistration = () => {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleApproval(agent.id, 'reject')}
+                          onClick={() => handleApproval(builder.id, 'reject')}
                           disabled={actionLoading === 'reject'}
                           className="w-7 h-7 rounded-lg hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-red-500 hover:scale-110 disabled:opacity-50"
                           title="Reject"
@@ -2297,7 +2272,7 @@ const AgentsRegistration = () => {
                       <>
                         <button
                           type="button"
-                          onClick={() => handleViewAgent(agent)}
+                          onClick={() => handleViewBuilder(builder)}
                           className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
                           title="View"
                         >
@@ -2305,7 +2280,7 @@ const AgentsRegistration = () => {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleEditAgent(agent)}
+                          onClick={() => handleEditBuilder(builder)}
                           className="w-7 h-7 rounded-lg hover:bg-blue-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-blue-600 hover:scale-110"
                           title="Edit"
                         >
@@ -2313,7 +2288,7 @@ const AgentsRegistration = () => {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleViewAgentProperties(agent)}
+                          onClick={() => handleViewBuilderProperties(builder)}
                           className="w-7 h-7 rounded-lg hover:bg-purple-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-purple-600 hover:scale-110"
                           title="View Properties"
                         >
@@ -2321,18 +2296,18 @@ const AgentsRegistration = () => {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleToggleBlock(agent.id)}
-                          disabled={actionLoading === `block_${agent.id}`}
+                          onClick={() => handleToggleBlock(builder.id)}
+                          disabled={actionLoading === `block_${builder.id}`}
                           className={`w-7 h-7 rounded-lg transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 ${
-                            agent.status === 'blocked'
+                            builder.status === 'blocked'
                               ? 'text-[#00695C] hover:bg-[#E8F8F5]'
                               : 'text-red-500 hover:bg-red-50'
                           }`}
-                          title={agent.status === 'blocked' ? 'Unblock' : 'Block'}
+                          title={builder.status === 'blocked' ? 'Unblock' : 'Block'}
                         >
-                          {actionLoading === `block_${agent.id}` ? (
+                          {actionLoading === `block_${builder.id}` ? (
                             <FiRefreshCw className="text-xs animate-spin" />
-                          ) : agent.status === 'blocked' ? (
+                          ) : builder.status === 'blocked' ? (
                             <FiUnlock className="text-xs" />
                           ) : (
                             <FiLock className="text-xs" />
@@ -2347,14 +2322,14 @@ const AgentsRegistration = () => {
           </div>
         )}
 
-        {paginatedAgents.length === 0 && !loading && (
+        {paginatedBuilders.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-[#E8F0EE]">
             <div className="w-24 h-24 rounded-full bg-[#F5F9F8] flex items-center justify-center mb-4 animate-float">
               <FiUserPlus className="text-4xl text-[#B5C9C5]" />
             </div>
-            <h3 className="text-xl font-semibold text-[#1A2E2A]">No agents found</h3>
+            <h3 className="text-xl font-semibold text-[#1A2E2A]">No builders found</h3>
             <p className="text-sm text-[#5A7D78] mt-1">
-              {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No agents match your current view'}
+              {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No builders match your current view'}
             </p>
             {filterCount > 0 && (
               <button
@@ -2374,8 +2349,8 @@ const AgentsRegistration = () => {
           <div className="flex items-center gap-2 text-sm text-[#5A7D78] flex-wrap">
             <span>
               Showing {(currentPage - 1) * pageSize + 1} to{' '}
-              {Math.min(currentPage * pageSize, filteredAgents.length)} of{' '}
-              {filteredAgents.length} agents
+              {Math.min(currentPage * pageSize, filteredBuilders.length)} of{' '}
+              {filteredBuilders.length} builders
             </span>
             <select
               value={pageSize}
@@ -2473,4 +2448,4 @@ const AgentsRegistration = () => {
   );
 };
 
-export default AgentsRegistration;
+export default BuildersRegistration;

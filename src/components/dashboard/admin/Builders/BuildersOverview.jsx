@@ -1,4 +1,4 @@
-// src/components/dashboard/admin/Owners/OwnersOverview.jsx
+// src/components/dashboard/admin/Builders/BuildersOverview.jsx
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +10,8 @@ import {
   FiLock, FiUnlock, FiXCircle, FiAlertCircle, FiInfo, FiSearch,
   FiTrendingDown, FiUserPlus, FiBriefcase, FiAward as FiAwardIcon,
   FiBell, FiSettings, FiHelpCircle, FiShare2, FiMoreHorizontal,
-  FiFileText, FiCheckSquare, FiClipboard, FiTrendingUp as FiTrendingUpIcon
+  FiFileText, FiCheckSquare, FiClipboard, FiTrendingUp as FiTrendingUpIcon,
+  FiBox, FiLayers
 } from 'react-icons/fi';
 import {
   FaCrown, FaGem, FaMedal, FaUser, FaBuilding,
@@ -21,9 +22,14 @@ import {
   FaClipboardList, FaWallet, FaHome as FaHomeIcon,
   FaRegSmile, FaRegHeart, FaRegCalendarAlt,
   FaHandshake, FaFileSignature, FaIdCard, FaPhoneAlt,
-  FaEnvelope, FaAddressCard, FaRegFileAlt, FaRegBuilding as FaRegBuildingIcon
+  FaEnvelope, FaAddressCard, FaRegFileAlt, FaRegBuilding as FaRegBuildingIcon,
+  FaCity, FaMapMarkedAlt, FaBuilding as FaBuildingSolid, FaIndustry
 } from 'react-icons/fa';
-import { MdOutlineRealEstateAgent, MdApartment, MdVerified, MdOutlineVerified, MdAssignment, MdAttachMoney } from 'react-icons/md';
+import { 
+  MdOutlineRealEstateAgent, MdApartment, MdVerified, MdOutlineVerified, 
+  MdAssignment, MdAttachMoney, MdBusiness, MdCorporateFare, 
+  MdOutlineBusinessCenter, MdConstruction, MdBuild 
+} from 'react-icons/md';
 
 // ============================================================
 // STAT CARD - Enhanced with Glassmorphism & Elegant Design (compact)
@@ -212,7 +218,7 @@ const QuickStat = ({ icon, label, value, color }) => (
 // ============================================================
 // MAIN COMPONENT
 // ============================================================
-const OwnersOverview = () => {
+const BuildersOverview = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [statsAnimating, setStatsAnimating] = useState(false);
@@ -221,93 +227,82 @@ const OwnersOverview = () => {
 
   // ---- Stats ----
   const [stats, setStats] = useState({
-    totalOwners: 523,
-    pendingApprovals: 47,
-    totalProperties: 1847,
-    totalRevenue: 1245000,
-    approvedOwners: 438,
-    rejectedOwners: 38,
-    pendingProperties: 62,
-    activeSubscriptions: 291,
-    premiumOwners: 96,
-    growthRate: 12.5,
-    monthlyGrowth: 8.3,
-    newThisWeek: 28,
-    verificationRate: 94,
-    avgPropertiesPerOwner: 3.5,
-    // Properties & Leads stats
-    propertiesAndLeads: 1847,
-    totalLeads: 532,
-    featuredProperties: 89,
-    verifiedProperties: 423,
-    totalCommission: 950000,
-    pendingListings: 62,
-    // Property Control stats
-    propertyControl: 1847,
-    approvedProperties: 1523,
-    rejectedProperties: 184,
-    suspendedProperties: 48,
-    pendingReviewProperties: 62,
-    underInspectionProperties: 30,
+    totalBuilders: 185,
+    registrationApproval: 22,
+    builderVerification: 94,
+    projectsAndUnits: 342,
+    propertyControl: 78,
+    pendingApprovals: 22,
+    verifiedBuilders: 94,
+    unverifiedBuilders: 43,
+    totalProjects: 126,
+    ongoingProjects: 48,
+    completedProjects: 42,
+    upcomingProjects: 36,
+    newLaunches: 18,
+    totalUnits: 216,
+    availableUnits: 89,
+    reraVerified: 67,
+    gstVerified: 112,
+    companyVerified: 74,
+    avgUnitsPerProject: 1.7,
+    totalRevenue: 12500000,
+    growthRate: 15.2,
+    monthlyGrowth: 8.7,
+    newThisWeek: 12,
+    featuredProjects: 45,
+    verifiedProperties: 156
   });
 
   // ---- Recent Activities ----
   const activities = useMemo(() => [
     {
-      icon: <FaUserPlus className="text-white text-sm" />,
-      title: 'New Owner Registration',
-      time: '2 min ago',
-      description: 'Rajesh Kumar registered as a property owner',
+      icon: <MdBusiness className="text-white text-sm" />,
+      title: 'New Builder Registration',
+      time: '8 min ago',
+      description: 'Shree Construction Pvt Ltd registered as a builder',
       color: 'bg-gradient-to-br',
       gradient: 'from-[#00695C] to-[#26A69A]'
     },
     {
       icon: <FiCheckCircle className="text-white text-sm" />,
-      title: 'KYC Approved',
-      time: '15 min ago',
-      description: 'Priya Sharma\'s Aadhaar & PAN verified successfully',
+      title: 'RERA Verification Approved',
+      time: '22 min ago',
+      description: 'RERA certificate verified for BuildWell Developers',
       color: 'bg-gradient-to-br',
       gradient: 'from-emerald-500 to-emerald-400'
     },
     {
-      icon: <FiHome className="text-white text-sm" />,
-      title: 'New Property Listed',
-      time: '32 min ago',
-      description: 'Amit Singh listed a Luxury Apartment in Bangalore',
+      icon: <MdConstruction className="text-white text-sm" />,
+      title: 'New Project Launched',
+      time: '1 hour ago',
+      description: 'Green Valley Residences - Phase 2 launched in Pune',
       color: 'bg-gradient-to-br',
       gradient: 'from-blue-500 to-blue-400'
     },
     {
-      icon: <FiEdit className="text-white text-sm" />,
-      title: 'Property Approved',
-      time: '45 min ago',
-      description: 'Vikram Patel\'s property listing was approved',
+      icon: <FaCity className="text-white text-sm" />,
+      title: 'Project Approved',
+      time: '2 hours ago',
+      description: 'Luxury Apartments project approved for construction',
       color: 'bg-gradient-to-br',
-      gradient: 'from-emerald-500 to-emerald-400'
+      gradient: 'from-purple-500 to-purple-400'
     },
     {
       icon: <FiDollarSign className="text-white text-sm" />,
-      title: 'Subscription Upgraded',
-      time: '1 hour ago',
-      description: 'Sneha Reddy upgraded to Gold Plan',
+      title: 'Revenue Recorded',
+      time: '3 hours ago',
+      description: '₹2,50,00,000 revenue recorded from recent project sales',
       color: 'bg-gradient-to-br',
       gradient: 'from-amber-500 to-amber-400'
-    },
-    {
-      icon: <FiUserCheck className="text-white text-sm" />,
-      title: 'Owner Verified',
-      time: '2 hours ago',
-      description: 'Vikram Patel\'s account was verified',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-purple-500 to-purple-400'
     }
   ], []);
 
   // ---- Quick Stats ----
   const quickStats = useMemo(() => [
     { icon: <FiUserPlus className="text-[#00695C]" />, label: 'New This Week', value: stats.newThisWeek },
-    { icon: <FiCheckCircle className="text-emerald-500" />, label: 'Verification Rate', value: `${stats.verificationRate}%` },
-    { icon: <FiHome className="text-blue-500" />, label: 'Avg Properties', value: stats.avgPropertiesPerOwner },
+    { icon: <FiCheckCircle className="text-emerald-500" />, label: 'Verified Builders', value: stats.verifiedBuilders },
+    { icon: <MdConstruction className="text-blue-500" />, label: 'Ongoing Projects', value: stats.ongoingProjects },
     { icon: <FiTrendingUp className="text-amber-500" />, label: 'Growth', value: `${stats.monthlyGrowth}%` },
   ], [stats]);
 
@@ -327,17 +322,12 @@ const OwnersOverview = () => {
     setTimeout(() => {
       setStats(prev => ({
         ...prev,
-        totalOwners: prev.totalOwners + Math.floor(Math.random() * 5),
-        pendingApprovals: Math.max(0, prev.pendingApprovals + Math.floor(Math.random() * 7) - 3),
-        totalProperties: prev.totalProperties + Math.floor(Math.random() * 10),
-        totalRevenue: prev.totalRevenue + Math.floor(Math.random() * 50000),
-        propertiesAndLeads: prev.propertiesAndLeads + Math.floor(Math.random() * 10),
-        totalLeads: prev.totalLeads + Math.floor(Math.random() * 5),
-        propertyControl: prev.propertyControl + Math.floor(Math.random() * 8),
-        pendingProperties: Math.max(0, prev.pendingProperties + Math.floor(Math.random() * 5) - 2),
-        featuredProperties: prev.featuredProperties + Math.floor(Math.random() * 3),
-        monthlyGrowth: prev.monthlyGrowth + (Math.random() * 2 - 1),
-        newThisWeek: prev.newThisWeek + Math.floor(Math.random() * 3),
+        totalBuilders: prev.totalBuilders + Math.floor(Math.random() * 3),
+        registrationApproval: Math.max(0, prev.registrationApproval + Math.floor(Math.random() * 5) - 2),
+        builderVerification: prev.builderVerification + Math.floor(Math.random() * 4),
+        projectsAndUnits: prev.projectsAndUnits + Math.floor(Math.random() * 8),
+        propertyControl: Math.max(0, prev.propertyControl + Math.floor(Math.random() * 6) - 3),
+        newThisWeek: prev.newThisWeek + Math.floor(Math.random() * 2),
       }));
       setLoading(false);
       setStatsAnimating(false);
@@ -365,14 +355,14 @@ const OwnersOverview = () => {
           <div className="flex items-center gap-3 flex-wrap">
             <div className="p-2.5 bg-gradient-to-br from-[#00695C] to-[#26A69A] rounded-2xl shadow-lg animate-pulse-glow relative">
               <div className="absolute inset-0 rounded-2xl bg-white/20 animate-pulse" />
-              <FaUserTie className="text-white text-xl relative z-10" />
+              <MdCorporateFare className="text-white text-xl relative z-10" />
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
-                Owners Overview
+                Builders Overview
               </h1>
               <div className="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
-                <span>Complete control over all property owners</span>
+                <span>Complete control over all real estate builders</span>
                 <span className="w-1 h-1 bg-gray-400 rounded-full hidden sm:block" />
                 <span className="text-[#00695C] font-medium">
                   {time.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
@@ -417,74 +407,74 @@ const OwnersOverview = () => {
       {/* ===== STATS GRID ===== */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 relative">
         <StatCard
-          icon={<FaUsers className="text-lg text-white" />}
-          title="Total Owners"
-          value={stats.totalOwners}
+          icon={<MdBusiness className="text-lg text-white" />}
+          title="Total Builders"
+          value={stats.totalBuilders}
           subtitle={`${stats.newThisWeek} new this week`}
           color="bg-gradient-to-br"
           gradient="from-[#00695C] to-[#26A69A]"
           borderColor="border-[#00695C]/30"
           delay={0}
           statsAnimating={statsAnimating}
-          onClick={() => navigateTo('/admin/owners/overview')}
+          onClick={() => navigateTo('/admin/builders/overview')}
           trend="up"
-          trendValue="12.5"
+          trendValue="15.2"
         />
         <StatCard
           icon={<FiClock className="text-lg text-white" />}
-          title="Pending Approvals"
-          value={stats.pendingApprovals}
-          subtitle="Awaiting KYC review"
+          title="Registration Approval"
+          value={stats.registrationApproval}
+          subtitle="Pending KYC review"
           color="bg-gradient-to-br"
           gradient="from-amber-500 to-amber-400"
           borderColor="border-amber-500/30"
           delay={100}
           statsAnimating={statsAnimating}
-          onClick={() => navigateTo('/admin/owners/registration')}
+          onClick={() => navigateTo('/admin/builders/registration')}
           trend="down"
-          trendValue="8.3"
+          trendValue="4.8"
         />
         <StatCard
-          icon={<FiHome className="text-lg text-white" />}
-          title="Properties & Leads"
-          value={stats.propertiesAndLeads}
-          subtitle={`${stats.totalLeads} leads assigned`}
+          icon={<FiShield className="text-lg text-white" />}
+          title="Builder Verification"
+          value={stats.verifiedBuilders}
+          subtitle={`${stats.reraVerified} RERA verified`}
+          color="bg-gradient-to-br"
+          gradient="from-purple-600 to-purple-400"
+          borderColor="border-purple-600/30"
+          delay={200}
+          statsAnimating={statsAnimating}
+          onClick={() => navigateTo('/admin/builders/verification')}
+          trend="up"
+          trendValue="11.3"
+        />
+        <StatCard
+          icon={<MdConstruction className="text-lg text-white" />}
+          title="Projects & Units"
+          value={stats.projectsAndUnits}
+          subtitle={`${stats.availableUnits} units available`}
           color="bg-gradient-to-br"
           gradient="from-blue-600 to-blue-400"
           borderColor="border-blue-600/30"
-          delay={200}
+          delay={300}
           statsAnimating={statsAnimating}
-          onClick={() => navigateTo('/admin/owners/leads')}
+          onClick={() => navigateTo('/admin/builders/projects')}
           trend="up"
-          trendValue="15.2"
+          trendValue="19.7"
         />
         <StatCard
           icon={<FiEdit className="text-lg text-white" />}
           title="Property Control"
           value={stats.propertyControl}
-          subtitle={`${stats.featuredProperties} featured, ${stats.pendingProperties} pending`}
+          subtitle={`${stats.featuredProjects} featured`}
           color="bg-gradient-to-br"
           gradient="from-emerald-600 to-emerald-400"
           borderColor="border-emerald-600/30"
-          delay={300}
-          statsAnimating={statsAnimating}
-          onClick={() => navigateTo('/admin/owners/property-control')}
-          trend="up"
-          trendValue="9.4"
-        />
-        <StatCard
-          icon={<FiDollarSign className="text-lg text-white" />}
-          title="Total Revenue"
-          value={`₹${(stats.totalRevenue / 100000).toFixed(1)}L`}
-          subtitle={`+${stats.growthRate}% growth`}
-          color="bg-gradient-to-br"
-          gradient="from-purple-600 to-purple-400"
-          borderColor="border-purple-600/30"
           delay={400}
           statsAnimating={statsAnimating}
-          onClick={() => navigateTo('/admin/owners/subscription')}
+          onClick={() => navigateTo('/admin/builders/property-control')}
           trend="up"
-          trendValue="22.7"
+          trendValue="8.2"
         />
       </div>
 
@@ -493,46 +483,65 @@ const OwnersOverview = () => {
         <SectionHeader
           icon={<FiShield className="text-white text-sm" />}
           title="Quick Access Modules"
-          subtitle="Manage owners, properties, leads, and subscriptions"
+          subtitle="Manage builders, registrations, projects, and properties"
         />
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {/* Registration & KYC Card */}
+          {/* Registration Approval Card */}
           <NavCard
             icon={<FiUserCheck className="text-white text-xl" />}
-            title="Registration & KYC"
-            description="Review new owner sign-ups, verify mobile, email, Aadhaar, PAN, and approve or reject registrations."
+            title="Registration Approval"
+            description="Approve or reject builder registrations. Verify mobile, email, Aadhaar, PAN, and KYC documents."
             color="bg-gradient-to-br"
             gradient="from-[#00695C] to-[#26A69A]"
             borderColor="border-[#00695C]/30"
             delay={0}
-            onClick={() => navigateTo('/admin/owners/registration')}
-            badge={`${stats.pendingApprovals} Pending`}
+            onClick={() => navigateTo('/admin/builders/registration')}
+            badge={`${stats.registrationApproval} Pending`}
             badgeColor="bg-gradient-to-r from-amber-500 to-amber-400"
             featured={true}
             stats={[
-              { label: 'Pending', value: stats.pendingApprovals },
-              { label: 'Approved', value: stats.approvedOwners },
-              { label: 'Rejected', value: stats.rejectedOwners },
+              { label: 'Pending', value: stats.registrationApproval },
+              { label: 'Verified', value: stats.verifiedBuilders },
+              { label: 'Total', value: stats.totalBuilders },
             ]}
           />
 
-          {/* Properties & Leads Card */}
+          {/* Builder Verification Card */}
           <NavCard
-            icon={<FiHome className="text-white text-xl" />}
-            title="Properties & Leads"
-            description="Manage property listings, leads, and owner performance with commission tracking."
+            icon={<FiShield className="text-white text-xl" />}
+            title="Builder Verification"
+            description="Verify company registration, GST, RERA certificates, and company documents."
+            color="bg-gradient-to-br"
+            gradient="from-purple-600 to-purple-400"
+            borderColor="border-purple-600/30"
+            delay={100}
+            onClick={() => navigateTo('/admin/builders/verification')}
+            badge={`${stats.reraVerified} RERA`}
+            badgeColor="bg-gradient-to-r from-purple-500 to-purple-400"
+            stats={[
+              { label: 'RERA', value: stats.reraVerified },
+              { label: 'GST', value: stats.gstVerified },
+              { label: 'Unverified', value: stats.unverifiedBuilders },
+            ]}
+          />
+
+          {/* Project Management Card */}
+          <NavCard
+            icon={<MdConstruction className="text-white text-xl" />}
+            title="Project Management"
+            description="Manage ongoing, completed, upcoming projects, new launches, unit availability, and floor plans."
             color="bg-gradient-to-br"
             gradient="from-blue-600 to-blue-400"
             borderColor="border-blue-600/30"
-            delay={100}
-            onClick={() => navigateTo('/admin/owners/leads')}
-            badge={`${stats.totalLeads} Leads`}
+            delay={200}
+            onClick={() => navigateTo('/admin/builders/projects')}
+            badge={`${stats.ongoingProjects} Ongoing`}
             badgeColor="bg-gradient-to-r from-blue-500 to-blue-400"
             stats={[
-              { label: 'Listings', value: stats.totalProperties },
-              { label: 'Leads', value: stats.totalLeads },
-              { label: 'Commission', value: '₹9.5L' },
+              { label: 'Ongoing', value: stats.ongoingProjects },
+              { label: 'Completed', value: stats.completedProjects },
+              { label: 'Upcoming', value: stats.upcomingProjects },
             ]}
           />
 
@@ -540,36 +549,18 @@ const OwnersOverview = () => {
           <NavCard
             icon={<FiEdit className="text-white text-xl" />}
             title="Property Control"
-            description="View, edit, approve, reject, suspend, delete listings. Manage featured & verified properties."
+            description="View, edit, approve, reject, suspend, delete listings. Feature & verify properties."
             color="bg-gradient-to-br"
             gradient="from-emerald-600 to-emerald-400"
             borderColor="border-emerald-600/30"
-            delay={200}
-            onClick={() => navigateTo('/admin/owners/property-control')}
-            badge={`${stats.pendingProperties} Pending`}
+            delay={300}
+            onClick={() => navigateTo('/admin/builders/property-control')}
+            badge={`${stats.featuredProjects} Featured`}
             badgeColor="bg-gradient-to-r from-emerald-500 to-emerald-400"
             stats={[
-              { label: 'Total', value: stats.propertyControl },
-              { label: 'Pending', value: stats.pendingProperties },
-              { label: 'Featured', value: stats.featuredProperties },
-            ]}
-          />
-
-          {/* Subscription Plans Card */}
-          <NavCard
-            icon={<FiDollarSign className="text-white text-xl" />}
-            title="Subscription Plans"
-            description="Manage Free, Silver, Gold, and Platinum plans. Upgrade or downgrade owner subscriptions."
-            color="bg-gradient-to-br"
-            gradient="from-amber-600 to-amber-400"
-            borderColor="border-amber-600/30"
-            delay={300}
-            onClick={() => navigateTo('/admin/owners/subscription')}
-            badge={`${stats.premiumOwners} Premium`}
-            badgeColor="bg-gradient-to-r from-purple-500 to-purple-400"
-            stats={[
-              { label: 'Active', value: stats.activeSubscriptions },
-              { label: 'Premium', value: stats.premiumOwners },
+              { label: 'Total', value: stats.totalProjects },
+              { label: 'Pending', value: stats.propertyControl },
+              { label: 'Featured', value: stats.featuredProjects },
             ]}
           />
         </div>
@@ -580,7 +571,7 @@ const OwnersOverview = () => {
         <SectionHeader
           icon={<FiActivity className="text-white text-sm" />}
           title="Recent Activities"
-          subtitle="Live updates from owners and properties"
+          subtitle="Live updates from builders and projects"
           action={true}
           actionLabel="View All"
           onAction={() => navigateTo('/admin/notifications')}
@@ -607,7 +598,7 @@ const OwnersOverview = () => {
       <div className="text-center pt-4">
         <p className="text-[11px] text-gray-500 flex items-center justify-center gap-2">
           <span className="w-4 h-0.5 bg-gray-300 rounded-full" />
-          <span>© 2026 Owners Overview • All rights reserved</span>
+          <span>© 2026 Builders Overview • All rights reserved</span>
           <span className="w-4 h-0.5 bg-gray-300 rounded-full" />
         </p>
       </div>
@@ -667,4 +658,4 @@ const OwnersOverview = () => {
   );
 };
 
-export default OwnersOverview;
+export default BuildersOverview;
