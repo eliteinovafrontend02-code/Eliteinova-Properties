@@ -13,7 +13,7 @@ import {
   FiImage, FiFileText, FiPhone, FiMail, FiGlobe, FiSettings,
   FiVideo, FiCamera, FiUsers, FiBarChart2, FiTrendingUp,
   FiAward, FiBriefcase, FiTarget, FiPieChart, FiLayers,
-  FiBox, FiFolder, FiGrid as FiGridIcon
+  FiCheckSquare, FiPlayCircle, FiFlag
 } from 'react-icons/fi';
 import {
   FaStar as FaStarSolid,
@@ -22,10 +22,9 @@ import {
   FaParking, FaWifi, FaSwimmingPool, FaSnowflake,
   FaFire, FaShieldAlt, FaCrown, FaMedal,
   FaUserCircle, FaStore, FaUserTie, FaUserGraduate,
-  FaCity, FaMapMarkedAlt, FaCalendarCheck, FaRuler,
-  FaClipboardList, FaChartLine
+  FaCity, FaHammer, FaHardHat, FaClipboardList
 } from 'react-icons/fa';
-import { MdOutlineRealEstateAgent, MdApartment, MdOutlineBusiness, MdOutlineLeaderboard, MdOutlineConstruction } from 'react-icons/md';
+import { MdOutlineRealEstateAgent, MdApartment, MdOutlineBusiness, MdOutlineLeaderboard, MdOutlineConstruction, MdOutlineApartment } from 'react-icons/md';
 
 // ============ TOAST COMPONENT ============
 const Toast = ({ toast }) => {
@@ -128,11 +127,38 @@ const StatCard = ({ icon, title, value, color, delay = 0, isActive, onClick }) =
   );
 };
 
-// ============ VIEW PROJECT MODAL ============
+// Status -> left border color
+const STATUS_BORDER = {
+  ongoing: 'border-l-blue-500',
+  completed: 'border-l-emerald-500',
+  upcoming: 'border-l-amber-500',
+  'new-launch': 'border-l-purple-500',
+  onHold: 'border-l-gray-500',
+  cancelled: 'border-l-red-500',
+};
+
+const STATUS_BADGE = {
+  ongoing: 'bg-blue-100 text-blue-700',
+  completed: 'bg-emerald-100 text-emerald-700',
+  upcoming: 'bg-amber-100 text-amber-700',
+  'new-launch': 'bg-purple-100 text-purple-700',
+  onHold: 'bg-gray-100 text-gray-700',
+  cancelled: 'bg-red-100 text-red-700',
+};
+
+// Unit availability status
+const UNIT_STATUS = {
+  available: 'bg-emerald-100 text-emerald-700',
+  booked: 'bg-red-100 text-red-700',
+  reserved: 'bg-amber-100 text-amber-700',
+  sold: 'bg-gray-100 text-gray-700',
+};
+
+// ============ VIEW PROJECT DETAILS MODAL ============
 const ViewProjectModal = ({ project, show, onClose }) => {
   if (!project || !show) return null;
 
-  const amenities = project.amenities || ['WiFi', 'Swimming Pool', 'AC', 'Parking', 'Gym'];
+  const amenities = project.amenities || ['Club House', 'Swimming Pool', 'Gymnasium', 'Children\'s Play Area'];
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
@@ -156,18 +182,14 @@ const ViewProjectModal = ({ project, show, onClose }) => {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-white">
+          {/* Title and Status */}
           <div className="flex items-start justify-between">
             <div>
               <h3 className="text-lg font-bold text-[#1A2E2A]">{project.name}</h3>
               <p className="text-sm text-[#5A7D78]">{project.type} · {project.location}</p>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className={`text-[10px] px-2.5 py-1 rounded-full font-semibold ${
-                project.status === 'ongoing' ? 'bg-emerald-100 text-emerald-700' :
-                project.status === 'completed' ? 'bg-blue-100 text-blue-700' :
-                project.status === 'upcoming' ? 'bg-amber-100 text-amber-700' :
-                'bg-gray-100 text-gray-700'
-              }`}>
+              <span className={`text-[10px] px-2.5 py-1 rounded-full font-semibold ${STATUS_BADGE[project.status] || 'bg-gray-100 text-gray-700'}`}>
                 {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
               </span>
               {project.isVerified && (
@@ -183,21 +205,23 @@ const ViewProjectModal = ({ project, show, onClose }) => {
             </div>
           </div>
 
+          {/* Quick Stats */}
           <div className="grid grid-cols-3 gap-3">
             <div className="text-center p-3 bg-[#F5F9F8] rounded-xl">
               <p className="text-lg font-bold text-[#1A2E2A]">₹{project.price.toLocaleString()}</p>
-              <p className="text-[9px] uppercase tracking-wider text-[#5A7D78]">Price</p>
+              <p className="text-[9px] uppercase tracking-wider text-[#5A7D78]">Starting Price</p>
             </div>
             <div className="text-center p-3 bg-[#F5F9F8] rounded-xl">
-              <p className="text-lg font-bold text-[#1A2E2A]">{project.units}</p>
+              <p className="text-lg font-bold text-[#1A2E2A]">{project.totalUnits}</p>
               <p className="text-[9px] uppercase tracking-wider text-[#5A7D78]">Total Units</p>
             </div>
             <div className="text-center p-3 bg-[#F5F9F8] rounded-xl">
-              <p className="text-lg font-bold text-[#1A2E2A]">{project.availableUnits}</p>
+              <p className="text-lg font-bold text-[#00695C]">{project.availableUnits}</p>
               <p className="text-[9px] uppercase tracking-wider text-[#5A7D78]">Available</p>
             </div>
           </div>
 
+          {/* Details */}
           <div>
             <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-2">Details</h4>
             <div className="grid grid-cols-2 gap-2 text-sm bg-[#F5F9F8] rounded-xl p-3">
@@ -211,14 +235,20 @@ const ViewProjectModal = ({ project, show, onClose }) => {
                 <FiTag className="text-[#00695C]" /> {project.type}
               </div>
               <div className="flex items-center gap-2 text-[#5A7D78]">
-                <FiUser className="text-[#00695C]" /> {project.builderName}
-              </div>
-              <div className="flex items-center gap-2 text-[#5A7D78] col-span-2">
-                <FiCalendar className="text-[#00695C]" /> Completion: {project.completionDate}
+                <FiCalendar className="text-[#00695C]" /> Expected: {project.expectedCompletion}
               </div>
             </div>
           </div>
 
+          {/* Builder */}
+          <div>
+            <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-2">Builder</h4>
+            <div className="bg-[#F5F9F8] rounded-xl p-3">
+              <p className="text-sm text-[#1A2E2A] font-medium">{project.builderName}</p>
+            </div>
+          </div>
+
+          {/* Amenities */}
           <div>
             <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-2">Amenities</h4>
             <div className="flex flex-wrap gap-2">
@@ -228,6 +258,7 @@ const ViewProjectModal = ({ project, show, onClose }) => {
             </div>
           </div>
 
+          {/* Description */}
           <div>
             <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-2">Description</h4>
             <p className="text-sm text-[#5A7D78] leading-relaxed bg-[#F5F9F8] rounded-xl p-3">
@@ -262,7 +293,7 @@ const EditProjectModal = ({ project, show, onClose, onSave, loading }) => {
         type: project.type || 'Residential',
         location: project.location || '',
         price: project.price || '',
-        units: project.units || 1,
+        totalUnits: project.totalUnits || 1,
         availableUnits: project.availableUnits || 0,
         area: project.area || '',
         areaUnit: project.areaUnit || 'sq ft',
@@ -270,10 +301,10 @@ const EditProjectModal = ({ project, show, onClose, onSave, loading }) => {
         isFeatured: project.isFeatured || false,
         isVerified: project.isVerified || false,
         builderName: project.builderName || '',
-        completionDate: project.completionDate || '',
         description: project.description || '',
         amenities: project.amenities ? project.amenities.join(', ') : '',
-        floorPlans: project.floorPlans || 0,
+        expectedCompletion: project.expectedCompletion || '',
+        launchDate: project.launchDate || '',
       });
       setErrors({});
     }
@@ -281,8 +312,8 @@ const EditProjectModal = ({ project, show, onClose, onSave, loading }) => {
 
   if (!project || !show || !formData) return null;
 
-  const projectTypes = ['Residential', 'Commercial', 'Mixed-Use', 'Luxury', 'Affordable'];
-  const statusOptions = ['ongoing', 'completed', 'upcoming', 'on-hold'];
+  const projectTypes = ['Residential', 'Commercial', 'Mixed-Use', 'Luxury', 'Affordable', 'Township'];
+  const statusOptions = ['ongoing', 'completed', 'upcoming', 'new-launch', 'onHold', 'cancelled'];
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -301,7 +332,6 @@ const EditProjectModal = ({ project, show, onClose, onSave, loading }) => {
     if (!formData.location.trim()) newErrors.location = 'Location is required';
     if (!formData.price || formData.price <= 0) newErrors.price = 'Valid price is required';
     if (!formData.area || formData.area <= 0) newErrors.area = 'Valid area is required';
-    if (!formData.completionDate) newErrors.completionDate = 'Completion date is required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -319,10 +349,9 @@ const EditProjectModal = ({ project, show, onClose, onSave, loading }) => {
       ...formData,
       amenities: amenitiesArray,
       price: Number(formData.price),
-      units: Number(formData.units),
+      totalUnits: Number(formData.totalUnits),
       availableUnits: Number(formData.availableUnits),
       area: Number(formData.area),
-      floorPlans: Number(formData.floorPlans),
     };
 
     setTimeout(() => {
@@ -384,7 +413,7 @@ const EditProjectModal = ({ project, show, onClose, onSave, loading }) => {
               {errors.location && <p className="text-[10px] text-red-500 mt-0.5">{errors.location}</p>}
             </div>
             <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Price (₹) <span className="text-red-500">*</span></label>
+              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Starting Price (₹) <span className="text-red-500">*</span></label>
               <input type="number" name="price" value={formData.price} onChange={handleChange}
                 className={`w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.price ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none`} min="0" />
               {errors.price && <p className="text-[10px] text-red-500 mt-0.5">{errors.price}</p>}
@@ -400,7 +429,7 @@ const EditProjectModal = ({ project, show, onClose, onSave, loading }) => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div>
               <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Total Units</label>
-              <input type="number" name="units" value={formData.units} onChange={handleChange}
+              <input type="number" name="totalUnits" value={formData.totalUnits} onChange={handleChange}
                 className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" min="0" />
             </div>
             <div>
@@ -415,33 +444,32 @@ const EditProjectModal = ({ project, show, onClose, onSave, loading }) => {
                 <option value="sq ft">sq ft</option>
                 <option value="sq m">sq m</option>
                 <option value="acres">acres</option>
-                <option value="hectares">hectares</option>
               </select>
             </div>
             <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Floor Plans</label>
-              <input type="number" name="floorPlans" value={formData.floorPlans} onChange={handleChange}
-                className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" min="0" />
+              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Builder</label>
+              <input type="text" name="builderName" value={formData.builderName} onChange={handleChange}
+                className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" />
             </div>
           </div>
 
-          <div>
-            <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Completion Date <span className="text-red-500">*</span></label>
-            <input type="date" name="completionDate" value={formData.completionDate} onChange={handleChange}
-              className={`w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.completionDate ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none`} />
-            {errors.completionDate && <p className="text-[10px] text-red-500 mt-0.5">{errors.completionDate}</p>}
-          </div>
-
-          <div>
-            <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Builder Name</label>
-            <input type="text" name="builderName" value={formData.builderName} onChange={handleChange}
-              className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Expected Completion</label>
+              <input type="date" name="expectedCompletion" value={formData.expectedCompletion} onChange={handleChange}
+                className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" />
+            </div>
+            <div>
+              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Launch Date</label>
+              <input type="date" name="launchDate" value={formData.launchDate} onChange={handleChange}
+                className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" />
+            </div>
           </div>
 
           <div>
             <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Amenities <span className="text-[#B5C9C5]">(comma separated)</span></label>
             <input type="text" name="amenities" value={formData.amenities} onChange={handleChange}
-              className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" placeholder="WiFi, Pool, AC, Gym" />
+              className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" placeholder="Club House, Swimming Pool, Gym" />
           </div>
 
           <div>
@@ -477,246 +505,100 @@ const EditProjectModal = ({ project, show, onClose, onSave, loading }) => {
   );
 };
 
-// ============ CREATE PROJECT MODAL ============
-const CreateProjectModal = ({ show, onClose, onSave, loading }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    type: 'Residential',
-    location: '',
-    price: '',
-    units: 1,
-    availableUnits: 0,
-    area: '',
-    areaUnit: 'sq ft',
-    status: 'upcoming',
-    isFeatured: false,
-    isVerified: false,
-    builderName: '',
-    completionDate: '',
-    description: '',
-    amenities: '',
-    floorPlans: 0,
-  });
-  const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+// ============ UNIT AVAILABILITY MODAL ============
+const UnitAvailabilityModal = ({ project, show, onClose }) => {
+  if (!show || !project) return null;
 
-  useEffect(() => {
-    if (show) {
-      setFormData({
-        name: '',
-        type: 'Residential',
-        location: '',
-        price: '',
-        units: 1,
-        availableUnits: 0,
-        area: '',
-        areaUnit: 'sq ft',
-        status: 'upcoming',
-        isFeatured: false,
-        isVerified: false,
-        builderName: '',
-        completionDate: '',
-        description: '',
-        amenities: '',
-        floorPlans: 0,
-      });
-      setErrors({});
-    }
-  }, [show]);
+  const units = [
+    { id: 1, number: '101', type: '2 BHK', area: '850 sq ft', price: '₹45,00,000', status: 'available' },
+    { id: 2, number: '102', type: '2 BHK', area: '850 sq ft', price: '₹46,00,000', status: 'booked' },
+    { id: 3, number: '103', type: '3 BHK', area: '1200 sq ft', price: '₹65,00,000', status: 'available' },
+    { id: 4, number: '104', type: '3 BHK', area: '1200 sq ft', price: '₹66,00,000', status: 'reserved' },
+    { id: 5, number: '105', type: '4 BHK', area: '1800 sq ft', price: '₹95,00,000', status: 'sold' },
+    { id: 6, number: '201', type: '2 BHK', area: '850 sq ft', price: '₹47,00,000', status: 'available' },
+    { id: 7, number: '202', type: '3 BHK', area: '1200 sq ft', price: '₹67,00,000', status: 'available' },
+    { id: 8, number: '203', type: '3 BHK', area: '1200 sq ft', price: '₹68,00,000', status: 'reserved' },
+    { id: 9, number: '301', type: '4 BHK', area: '1800 sq ft', price: '₹97,00,000', status: 'available' },
+    { id: 10, number: '302', type: '2 BHK', area: '850 sq ft', price: '₹48,00,000', status: 'booked' },
+  ];
 
-  if (!show) return null;
-
-  const projectTypes = ['Residential', 'Commercial', 'Mixed-Use', 'Luxury', 'Affordable'];
-  const statusOptions = ['ongoing', 'completed', 'upcoming', 'on-hold'];
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
-
-  const validate = () => {
-    const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = 'Project name is required';
-    if (!formData.location.trim()) newErrors.location = 'Location is required';
-    if (!formData.price || formData.price <= 0) newErrors.price = 'Valid price is required';
-    if (!formData.area || formData.area <= 0) newErrors.area = 'Valid area is required';
-    if (!formData.completionDate) newErrors.completionDate = 'Completion date is required';
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!validate()) return;
-
-    setIsSubmitting(true);
-    const amenitiesArray = formData.amenities
-      ? formData.amenities.split(',').map(a => a.trim()).filter(a => a)
-      : [];
-
-    const projectData = {
-      ...formData,
-      amenities: amenitiesArray,
-      price: Number(formData.price),
-      units: Number(formData.units),
-      availableUnits: Number(formData.availableUnits),
-      area: Number(formData.area),
-      floorPlans: Number(formData.floorPlans),
-    };
-
-    setTimeout(() => {
-      onSave(projectData);
-      setIsSubmitting(false);
-    }, 600);
+  const stats = {
+    total: units.length,
+    available: units.filter(u => u.status === 'available').length,
+    booked: units.filter(u => u.status === 'booked').length,
+    reserved: units.filter(u => u.status === 'reserved').length,
+    sold: units.filter(u => u.status === 'sold').length,
   };
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
+      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[85vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
         <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] px-5 py-3 rounded-t-2xl z-10 shrink-0 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white">
-              <FiPlus className="text-sm" />
+              <FiLayers className="text-sm" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white">Create Project</h2>
-              <p className="text-white/70 text-[10px]">Add a new project</p>
+              <h2 className="text-base font-bold text-white">Unit Availability</h2>
+              <p className="text-white/70 text-[10px]">{project.name}</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110"
-          >
+          <button onClick={onClose} className="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110">
             <FiX className="text-sm" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-3 bg-white">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div className="md:col-span-2">
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Project Name <span className="text-red-500">*</span></label>
-              <input type="text" name="name" value={formData.name} onChange={handleChange}
-                className={`w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.name ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none`} />
-              {errors.name && <p className="text-[10px] text-red-500 mt-0.5">{errors.name}</p>}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="grid grid-cols-5 gap-2">
+            <div className="text-center p-2 bg-[#F5F9F8] rounded-xl">
+              <p className="text-sm font-bold text-[#1A2E2A]">{stats.total}</p>
+              <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Total</p>
             </div>
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Type</label>
-              <select name="type" value={formData.type} onChange={handleChange}
-                className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none">
-                {projectTypes.map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
+            <div className="text-center p-2 bg-emerald-50 rounded-xl border-l-4 border-l-emerald-500">
+              <p className="text-sm font-bold text-emerald-600">{stats.available}</p>
+              <p className="text-[8px] text-emerald-600 uppercase tracking-wider">Available</p>
             </div>
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Status</label>
-              <select name="status" value={formData.status} onChange={handleChange}
-                className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none">
-                {statusOptions.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
-              </select>
+            <div className="text-center p-2 bg-red-50 rounded-xl border-l-4 border-l-red-500">
+              <p className="text-sm font-bold text-red-600">{stats.booked}</p>
+              <p className="text-[8px] text-red-600 uppercase tracking-wider">Booked</p>
             </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div className="md:col-span-2">
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Location <span className="text-red-500">*</span></label>
-              <input type="text" name="location" value={formData.location} onChange={handleChange}
-                className={`w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.location ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none`} />
-              {errors.location && <p className="text-[10px] text-red-500 mt-0.5">{errors.location}</p>}
+            <div className="text-center p-2 bg-amber-50 rounded-xl border-l-4 border-l-amber-500">
+              <p className="text-sm font-bold text-amber-600">{stats.reserved}</p>
+              <p className="text-[8px] text-amber-600 uppercase tracking-wider">Reserved</p>
             </div>
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Price (₹) <span className="text-red-500">*</span></label>
-              <input type="number" name="price" value={formData.price} onChange={handleChange}
-                className={`w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.price ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none`} min="0" />
-              {errors.price && <p className="text-[10px] text-red-500 mt-0.5">{errors.price}</p>}
-            </div>
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Area <span className="text-red-500">*</span></label>
-              <input type="number" name="area" value={formData.area} onChange={handleChange}
-                className={`w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.area ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none`} min="0" />
-              {errors.area && <p className="text-[10px] text-red-500 mt-0.5">{errors.area}</p>}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Total Units</label>
-              <input type="number" name="units" value={formData.units} onChange={handleChange}
-                className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" min="0" />
-            </div>
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Available Units</label>
-              <input type="number" name="availableUnits" value={formData.availableUnits} onChange={handleChange}
-                className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" min="0" />
-            </div>
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Area Unit</label>
-              <select name="areaUnit" value={formData.areaUnit} onChange={handleChange}
-                className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none">
-                <option value="sq ft">sq ft</option>
-                <option value="sq m">sq m</option>
-                <option value="acres">acres</option>
-                <option value="hectares">hectares</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Floor Plans</label>
-              <input type="number" name="floorPlans" value={formData.floorPlans} onChange={handleChange}
-                className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" min="0" />
+            <div className="text-center p-2 bg-gray-50 rounded-xl border-l-4 border-l-gray-500">
+              <p className="text-sm font-bold text-gray-600">{stats.sold}</p>
+              <p className="text-[8px] text-gray-600 uppercase tracking-wider">Sold</p>
             </div>
           </div>
 
           <div>
-            <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Builder Name</label>
-            <input type="text" name="builderName" value={formData.builderName} onChange={handleChange}
-              className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" />
+            <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3">Unit List</h4>
+            <div className="space-y-2">
+              {units.map((unit) => (
+                <div key={unit.id} className="flex items-center justify-between p-3 bg-[#F5F9F8] rounded-xl border-l-4 border-l-[#00695C]">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-3">
+                      <span className="font-semibold text-sm text-[#1A2E2A]">Unit {unit.number}</span>
+                      <span className="text-xs text-[#5A7D78]">{unit.type}</span>
+                      <span className="text-xs text-[#5A7D78]">{unit.area}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="text-sm font-semibold text-[#00695C]">{unit.price}</span>
+                    <span className={`text-[10px] px-2.5 py-1 rounded-full font-medium ${UNIT_STATUS[unit.status] || 'bg-gray-100 text-gray-700'}`}>
+                      {unit.status.charAt(0).toUpperCase() + unit.status.slice(1)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
+        </div>
 
-          <div>
-            <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Completion Date <span className="text-red-500">*</span></label>
-            <input type="date" name="completionDate" value={formData.completionDate} onChange={handleChange}
-              className={`w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.completionDate ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none`} />
-            {errors.completionDate && <p className="text-[10px] text-red-500 mt-0.5">{errors.completionDate}</p>}
-          </div>
-
-          <div>
-            <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Amenities <span className="text-[#B5C9C5]">(comma separated)</span></label>
-            <input type="text" name="amenities" value={formData.amenities} onChange={handleChange}
-              className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" placeholder="WiFi, Pool, AC, Gym" />
-          </div>
-
-          <div>
-            <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Description</label>
-            <textarea name="description" value={formData.description} onChange={handleChange}
-              rows="2" className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none resize-none" />
-          </div>
-
-          <div className="flex items-center gap-4">
-            <label className="flex items-center gap-2 text-xs font-medium text-[#1A2E2A]">
-              <input type="checkbox" name="isFeatured" checked={formData.isFeatured} onChange={handleChange}
-                className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C]" />
-              Featured
-            </label>
-            <label className="flex items-center gap-2 text-xs font-medium text-[#1A2E2A]">
-              <input type="checkbox" name="isVerified" checked={formData.isVerified} onChange={handleChange}
-                className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C]" />
-              Verified
-            </label>
-          </div>
-
-          <div className="sticky bottom-0 bg-white pt-3 border-t border-[#E8F0EE] flex items-center gap-3">
-            <button type="button" onClick={onClose}
-              className="flex-1 px-4 py-2 bg-[#F5F9F8] text-[#1A2E2A] rounded-lg hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium">Cancel</button>
-            <button type="submit" disabled={isSubmitting || loading}
-              className="flex-1 px-4 py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-lg hover:shadow-xl transition-all duration-300 text-sm font-medium shadow-md shadow-[#00695C]/30 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-              {isSubmitting || loading ? <><FiRefreshCw className="animate-spin text-sm" /> Creating...</> : <><FiPlus className="text-sm" /> Create Project</>}
-            </button>
-          </div>
-        </form>
+        <div className="sticky bottom-0 bg-white pt-3 px-4 pb-4 border-t border-[#E8F0EE] flex items-center justify-end gap-3">
+          <button onClick={onClose} className="px-6 py-2 bg-[#F5F9F8] text-[#1A2E2A] rounded-lg hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium">Close</button>
+        </div>
       </div>
     </div>
   );
@@ -727,23 +609,25 @@ const FloorPlansModal = ({ project, show, onClose }) => {
   if (!show || !project) return null;
 
   const floorPlans = [
-    { id: 1, name: 'Type A - 2 BHK', area: '850 sq ft', units: 24, available: 6, image: null },
-    { id: 2, name: 'Type B - 3 BHK', area: '1200 sq ft', units: 18, available: 3, image: null },
-    { id: 3, name: 'Type C - 4 BHK', area: '1600 sq ft', units: 12, available: 2, image: null },
-    { id: 4, name: 'Type D - Studio', area: '450 sq ft', units: 10, available: 4, image: null },
+    { id: 1, name: '2 BHK - Type A', area: '850 sq ft', bedrooms: 2, bathrooms: 2, price: '₹45,00,000', image: null },
+    { id: 2, name: '2 BHK - Type B', area: '920 sq ft', bedrooms: 2, bathrooms: 2, price: '₹48,00,000', image: null },
+    { id: 3, name: '3 BHK - Type A', area: '1200 sq ft', bedrooms: 3, bathrooms: 2, price: '₹65,00,000', image: null },
+    { id: 4, name: '3 BHK - Type B', area: '1350 sq ft', bedrooms: 3, bathrooms: 3, price: '₹70,00,000', image: null },
+    { id: 5, name: '4 BHK - Type A', area: '1800 sq ft', bedrooms: 4, bathrooms: 3, price: '₹95,00,000', image: null },
+    { id: 6, name: '4 BHK - Type B', area: '2000 sq ft', bedrooms: 4, bathrooms: 4, price: '₹1,05,00,000', image: null },
   ];
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[85vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
+      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[85vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
         <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] px-5 py-3 rounded-t-2xl z-10 shrink-0 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white">
-              <FiLayers className="text-sm" />
+              <FiSquare className="text-sm" />
             </div>
             <div>
               <h2 className="text-base font-bold text-white">Floor Plans</h2>
-              <p className="text-white/70 text-[10px]">{project.name} - {project.floorPlans || 4} floor plans</p>
+              <p className="text-white/70 text-[10px]">{project.name}</p>
             </div>
           </div>
           <button onClick={onClose} className="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110">
@@ -754,114 +638,38 @@ const FloorPlansModal = ({ project, show, onClose }) => {
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {floorPlans.map((plan) => (
-              <div key={plan.id} className="bg-[#F5F9F8] rounded-xl p-3 border border-[#E8F0EE] hover:shadow-md transition-all duration-300">
-                <div className="flex items-center gap-3">
-                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white text-2xl font-bold">
-                    {plan.name.charAt(0)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm text-[#1A2E2A] truncate">{plan.name}</p>
-                    <p className="text-xs text-[#5A7D78]">{plan.area}</p>
-                    <div className="flex items-center gap-2 text-xs mt-0.5">
-                      <span className="text-[#1A2E2A]">{plan.units} units</span>
+              <div key={plan.id} className="bg-[#F5F9F8] rounded-xl p-4 border border-[#E8F0EE] hover:shadow-md transition-all duration-300">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h4 className="font-semibold text-[#1A2E2A]">{plan.name}</h4>
+                    <div className="flex items-center gap-3 mt-1 text-xs text-[#5A7D78]">
+                      <span>{plan.area}</span>
                       <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
-                      <span className="text-emerald-600">{plan.available} available</span>
+                      <span>{plan.bedrooms} Beds</span>
+                      <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
+                      <span>{plan.bathrooms} Baths</span>
                     </div>
                   </div>
+                  <span className="text-sm font-bold text-[#00695C]">{plan.price}</span>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="sticky bottom-0 bg-white pt-3 px-4 pb-4 border-t border-[#E8F0EE] flex items-center justify-end gap-3">
-          <button onClick={onClose} className="px-6 py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-lg hover:shadow-xl transition-all duration-300 text-sm font-medium shadow-md shadow-[#00695C]/30 hover:scale-[1.02]">
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// ============ UNIT AVAILABILITY MODAL ============
-const UnitAvailabilityModal = ({ project, show, onClose }) => {
-  if (!show || !project) return null;
-
-  const units = [
-    { id: 1, name: 'Unit 101', type: '2 BHK', area: '850 sq ft', floor: 1, status: 'available', price: '₹45,00,000' },
-    { id: 2, name: 'Unit 102', type: '2 BHK', area: '850 sq ft', floor: 1, status: 'booked', price: '₹45,00,000' },
-    { id: 3, name: 'Unit 103', type: '3 BHK', area: '1200 sq ft', floor: 1, status: 'available', price: '₹65,00,000' },
-    { id: 4, name: 'Unit 201', type: '3 BHK', area: '1200 sq ft', floor: 2, status: 'booked', price: '₹67,00,000' },
-    { id: 5, name: 'Unit 202', type: '4 BHK', area: '1600 sq ft', floor: 2, status: 'available', price: '₹85,00,000' },
-    { id: 6, name: 'Unit 203', type: '2 BHK', area: '850 sq ft', floor: 2, status: 'available', price: '₹47,00,000' },
-  ];
-
-  const availableCount = units.filter(u => u.status === 'available').length;
-  const bookedCount = units.filter(u => u.status === 'booked').length;
-
-  return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[85vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
-        <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] px-5 py-3 rounded-t-2xl z-10 shrink-0 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white">
-              <FiBox className="text-sm" />
-            </div>
-            <div>
-              <h2 className="text-base font-bold text-white">Unit Availability</h2>
-              <p className="text-white/70 text-[10px]">{project.name} - {project.units || 6} units</p>
-            </div>
-          </div>
-          <button onClick={onClose} className="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110">
-            <FiX className="text-sm" />
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          <div className="grid grid-cols-3 gap-3">
-            <div className="text-center p-3 bg-[#F5F9F8] rounded-xl">
-              <p className="text-lg font-bold text-[#1A2E2A]">{units.length}</p>
-              <p className="text-[9px] uppercase tracking-wider text-[#5A7D78]">Total Units</p>
-            </div>
-            <div className="text-center p-3 bg-emerald-50 rounded-xl border-l-4 border-l-emerald-500">
-              <p className="text-lg font-bold text-emerald-600">{availableCount}</p>
-              <p className="text-[9px] uppercase tracking-wider text-emerald-600">Available</p>
-            </div>
-            <div className="text-center p-3 bg-blue-50 rounded-xl border-l-4 border-l-blue-500">
-              <p className="text-lg font-bold text-blue-600">{bookedCount}</p>
-              <p className="text-[9px] uppercase tracking-wider text-blue-600">Booked</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {units.map((unit) => (
-              <div key={unit.id} className={`flex items-center justify-between p-3 rounded-xl border-l-4 ${unit.status === 'available' ? 'border-l-emerald-500 bg-[#F5F9F8]' : 'border-l-blue-500 bg-blue-50'}`}>
-                <div>
-                  <p className="font-semibold text-sm text-[#1A2E2A]">{unit.name}</p>
-                  <div className="flex items-center gap-2 text-xs text-[#5A7D78]">
-                    <span>{unit.type}</span>
-                    <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
-                    <span>{unit.area}</span>
-                    <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
-                    <span>Floor {unit.floor}</span>
+                {plan.image ? (
+                  <div className="mt-2 h-32 bg-gray-200 rounded-lg flex items-center justify-center text-[#B5C9C5]">
+                    <FiImage className="text-2xl" />
+                    <span className="text-xs ml-2">Floor Plan Image</span>
                   </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-bold text-[#00695C]">{unit.price}</p>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${unit.status === 'available' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'}`}>
-                    {unit.status.charAt(0).toUpperCase() + unit.status.slice(1)}
-                  </span>
-                </div>
+                ) : (
+                  <div className="mt-2 h-20 bg-white rounded-lg border border-dashed border-[#B5C9C5] flex items-center justify-center text-[#B5C9C5]">
+                    <FiImage className="text-xl" />
+                    <span className="text-xs ml-2">No image uploaded</span>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
 
         <div className="sticky bottom-0 bg-white pt-3 px-4 pb-4 border-t border-[#E8F0EE] flex items-center justify-end gap-3">
-          <button onClick={onClose} className="px-6 py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-lg hover:shadow-xl transition-all duration-300 text-sm font-medium shadow-md shadow-[#00695C]/30 hover:scale-[1.02]">
-            Close
-          </button>
+          <button onClick={onClose} className="px-6 py-2 bg-[#F5F9F8] text-[#1A2E2A] rounded-lg hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium">Close</button>
         </div>
       </div>
     </div>
@@ -892,15 +700,14 @@ const BuildersProjects = () => {
   const [actionLoading, setActionLoading] = useState(null);
 
   // Modal states
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingProject, setEditingProject] = useState(null);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [viewingProject, setViewingProject] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
-  const [floorPlansProject, setFloorPlansProject] = useState(null);
-  const [showFloorPlansModal, setShowFloorPlansModal] = useState(false);
-  const [unitAvailabilityProject, setUnitAvailabilityProject] = useState(null);
-  const [showUnitAvailabilityModal, setShowUnitAvailabilityModal] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [unitProject, setUnitProject] = useState(null);
+  const [showUnitModal, setShowUnitModal] = useState(false);
+  const [floorPlanProject, setFloorPlanProject] = useState(null);
+  const [showFloorPlanModal, setShowFloorPlanModal] = useState(false);
 
   const searchInputRef = useRef(null);
 
@@ -924,10 +731,9 @@ const BuildersProjects = () => {
     ongoing: 0,
     completed: 0,
     upcoming: 0,
-    onHold: 0,
+    newLaunches: 0,
     totalUnits: 0,
     availableUnits: 0,
-    totalFloorPlans: 0,
   });
 
   // ============ TOAST FUNCTION ============
@@ -939,42 +745,43 @@ const BuildersProjects = () => {
   // ============ GENERATE MOCK PROJECTS ============
   const generateMockProjects = useCallback(() => {
     const projectNames = [
-      'Green Valley Residency', 'Lake View Towers', 'Royal Palm Estate',
-      'Golden Heights', 'Silver Springs', 'Crystal Grand',
-      'Emerald City', 'Sapphire Suites', 'Diamond Crest',
-      'Pearl Gateway', 'Ruby Palace', 'Opal Towers'
+      'Green Valley Residences', 'Lake View Apartments', 'Royal Palm Estate',
+      'City Heights Tower', 'Garden Villa', 'The Platinum Residences',
+      'Sunset Bay Project', 'Cedar Woods', 'Riverside Homes',
+      'Golden Sands Township', 'Emerald City', 'Palm Grove Estate'
     ];
-    const types = ['Residential', 'Commercial', 'Mixed-Use', 'Luxury', 'Affordable'];
-    const statuses = ['ongoing', 'completed', 'upcoming', 'on-hold'];
+
+    const types = ['Residential', 'Commercial', 'Mixed-Use', 'Luxury', 'Affordable', 'Township'];
+    const statuses = ['ongoing', 'completed', 'upcoming', 'new-launch'];
     const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur'];
-    const builders = ['Shree Developers', 'Goyal Constructions', 'Mahindra Realty', 'Godrej Properties', 'Prestige Group', 'Sobha Developers'];
+    const builders = ['Shriram Properties', 'Prestige Group', 'Sobha Ltd', 'Godrej Properties', 'DLF Ltd', 'Brigade Group'];
 
     return projectNames.map((name, i) => {
       const status = statuses[Math.floor(Math.random() * statuses.length)];
       const type = types[Math.floor(Math.random() * types.length)];
       const city = cities[Math.floor(Math.random() * cities.length)];
       const totalUnits = Math.floor(Math.random() * 200) + 50;
-      const availableUnits = Math.floor(Math.random() * totalUnits * 0.4);
+      const availableUnits = Math.floor(totalUnits * (Math.random() * 0.6 + 0.1));
 
       return {
         id: `project_${i + 1}`,
         name: name,
         type: type,
         location: `${city}, India`,
-        price: Math.floor(Math.random() * 80000000) + 20000000,
-        status: status,
-        units: totalUnits,
+        price: Math.floor(Math.random() * 45000000) + 5000000,
+        totalUnits: totalUnits,
         availableUnits: availableUnits,
-        area: Math.floor(Math.random() * 5000) + 1000,
+        area: Math.floor(Math.random() * 3000) + 400,
         areaUnit: 'sq ft',
+        status: status,
         isFeatured: Math.random() > 0.75,
         isVerified: Math.random() > 0.6,
         builderName: builders[Math.floor(Math.random() * builders.length)],
-        completionDate: new Date(Date.now() + Math.floor(Math.random() * 365 * 2 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
-        description: `${type} project in ${city} by ${builders[Math.floor(Math.random() * builders.length)]}. Premium amenities and prime location.`,
-        amenities: ['WiFi', 'Swimming Pool', 'Gym', 'Parking', 'Security', 'Garden', 'Club House'].filter(() => Math.random() > 0.3),
-        floorPlans: Math.floor(Math.random() * 4) + 1,
-        launchDate: new Date(Date.now() - Math.floor(Math.random() * 365 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+        description: `${type} project by ${builders[Math.floor(Math.random() * builders.length)]} in ${city}. Premium amenities and prime location.`,
+        amenities: ['Club House', 'Swimming Pool', 'Gymnasium', 'Children\'s Play Area', 'Landscaped Gardens', 'Security Systems'],
+        expectedCompletion: new Date(Date.now() + Math.floor(Math.random() * 365 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+        launchDate: new Date(Date.now() - Math.floor(Math.random() * 180 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+        completionDate: status === 'completed' ? new Date(Date.now() - Math.floor(Math.random() * 90 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0] : null,
       };
     });
   }, []);
@@ -989,19 +796,17 @@ const BuildersProjects = () => {
 
   // ============ UPDATE STATS ============
   const updateStats = useCallback((projectsList) => {
-    const totalUnits = projectsList.reduce((sum, p) => sum + (p.units || 0), 0);
+    const totalUnits = projectsList.reduce((sum, p) => sum + (p.totalUnits || 0), 0);
     const availableUnits = projectsList.reduce((sum, p) => sum + (p.availableUnits || 0), 0);
-    const totalFloorPlans = projectsList.reduce((sum, p) => sum + (p.floorPlans || 0), 0);
 
     setStats({
       total: projectsList.length,
       ongoing: projectsList.filter(p => p.status === 'ongoing').length,
       completed: projectsList.filter(p => p.status === 'completed').length,
       upcoming: projectsList.filter(p => p.status === 'upcoming').length,
-      onHold: projectsList.filter(p => p.status === 'on-hold').length,
+      newLaunches: projectsList.filter(p => p.status === 'new-launch').length,
       totalUnits,
       availableUnits,
-      totalFloorPlans,
     });
   }, []);
 
@@ -1014,8 +819,8 @@ const BuildersProjects = () => {
       filtered = filtered.filter(p =>
         p.name.toLowerCase().includes(query) ||
         p.location.toLowerCase().includes(query) ||
-        p.type.toLowerCase().includes(query) ||
-        p.builderName.toLowerCase().includes(query)
+        p.builderName.toLowerCase().includes(query) ||
+        p.type.toLowerCase().includes(query)
       );
     }
 
@@ -1109,8 +914,8 @@ const BuildersProjects = () => {
     } else if (filter === 'upcoming') {
       setSelectedStatus('upcoming');
       setSelectedType('all');
-    } else if (filter === 'on-hold') {
-      setSelectedStatus('on-hold');
+    } else if (filter === 'new-launch') {
+      setSelectedStatus('new-launch');
       setSelectedType('all');
     } else if (filter === 'featured') {
       setSelectedStatus('all');
@@ -1199,43 +1004,26 @@ const BuildersProjects = () => {
     }, 600);
   }, [editingProject, showToast]);
 
-  // ============ CREATE PROJECT ============
-  const handleCreateProject = useCallback((projectData) => {
-    setActionLoading('create');
-    setTimeout(() => {
-      const newProject = {
-        ...projectData,
-        id: `project_${Date.now()}`,
-        launchDate: new Date().toISOString().split('T')[0],
-      };
-      setProjects(prev => [newProject, ...prev]);
-      updateStats([...projects, newProject]);
-      setShowCreateModal(false);
-      setActionLoading(null);
-      showToast('Project created successfully!', 'success');
-    }, 600);
-  }, [projects, showToast, updateStats]);
-
   // ============ DELETE PROJECT ============
   const handleDeleteProject = useCallback((projectId) => {
     const project = projects.find(p => p.id === projectId);
-    if (!project) return;
-
     showConfirmation({
       title: 'Delete Project',
-      message: `Are you sure you want to delete "${project.name}"? This action cannot be undone.`,
+      message: `Are you sure you want to delete "${project?.name || 'this project'}"? This action cannot be undone.`,
       confirmText: 'Yes, Delete',
       confirmColor: 'bg-red-500',
       icon: <FiTrash2 className="text-4xl text-red-500" />,
       onConfirm: (id) => {
         return new Promise((resolve) => {
+          setActionLoading(`delete_${id}`);
           setTimeout(() => {
             setProjects(prev => {
               const updated = prev.filter(p => p.id !== id);
               updateStats(updated);
-              showToast('Project deleted successfully', 'error');
+              showToast('Project deleted successfully!', 'error');
               return updated;
             });
+            setActionLoading(null);
             resolve();
           }, 600);
         });
@@ -1245,26 +1033,39 @@ const BuildersProjects = () => {
     });
   }, [projects, showConfirmation, showToast, updateStats]);
 
+  // ============ VIEW UNIT AVAILABILITY ============
+  const handleViewUnits = useCallback((project) => {
+    setUnitProject(project);
+    setShowUnitModal(true);
+  }, []);
+
+  // ============ VIEW FLOOR PLANS ============
+  const handleViewFloorPlans = useCallback((project) => {
+    setFloorPlanProject(project);
+    setShowFloorPlanModal(true);
+  }, []);
+
   // ============ TOGGLE FEATURE ============
   const handleToggleFeature = useCallback((projectId) => {
     const project = projects.find(p => p.id === projectId);
-    if (!project) return;
-
+    const isFeatured = project?.isFeatured;
     showConfirmation({
-      title: project.isFeatured ? 'Remove Feature' : 'Feature Project',
-      message: project.isFeatured
-        ? `Are you sure you want to remove featured status from "${project.name}"?`
-        : `Are you sure you want to feature "${project.name}"? It will be highlighted in listings.`,
-      confirmText: project.isFeatured ? 'Yes, Unfeature' : 'Yes, Feature',
-      confirmColor: project.isFeatured ? 'bg-purple-500' : 'bg-amber-500',
-      icon: project.isFeatured ? <FiXCircle className="text-4xl text-purple-500" /> : <FaStarSolid className="text-4xl text-amber-500" />,
+      title: isFeatured ? 'Remove Feature' : 'Feature Project',
+      message: isFeatured
+        ? `Are you sure you want to remove featured status from "${project?.name}"?`
+        : `Are you sure you want to feature "${project?.name}"? It will be highlighted in listings.`,
+      confirmText: isFeatured ? 'Yes, Unfeature' : 'Yes, Feature',
+      confirmColor: isFeatured ? 'bg-purple-500' : 'bg-amber-500',
+      icon: isFeatured ? <FiXCircle className="text-4xl text-purple-500" /> : <FaStarSolid className="text-4xl text-amber-500" />,
       onConfirm: (id) => {
         return new Promise((resolve) => {
+          setActionLoading(`feature_${id}`);
           setTimeout(() => {
             setProjects(prev => prev.map(p =>
               p.id === id ? { ...p, isFeatured: !p.isFeatured } : p
             ));
-            showToast(`Project ${project.isFeatured ? 'unfeatured' : 'featured'} successfully`, 'success');
+            setActionLoading(null);
+            showToast(`Project ${isFeatured ? 'unfeatured' : 'featured'} successfully!`, 'success');
             resolve();
           }, 400);
         });
@@ -1277,23 +1078,24 @@ const BuildersProjects = () => {
   // ============ TOGGLE VERIFY ============
   const handleToggleVerify = useCallback((projectId) => {
     const project = projects.find(p => p.id === projectId);
-    if (!project) return;
-
+    const isVerified = project?.isVerified;
     showConfirmation({
-      title: project.isVerified ? 'Unverify Project' : 'Verify Project',
-      message: project.isVerified
-        ? `Are you sure you want to unverify "${project.name}"? The verified badge will be removed.`
-        : `Are you sure you want to verify "${project.name}"? It will get a verified badge.`,
-      confirmText: project.isVerified ? 'Yes, Unverify' : 'Yes, Verify',
-      confirmColor: project.isVerified ? 'bg-blue-500' : 'bg-emerald-500',
-      icon: project.isVerified ? <FiXCircle className="text-4xl text-blue-500" /> : <FiShield className="text-4xl text-emerald-500" />,
+      title: isVerified ? 'Unverify Project' : 'Verify Project',
+      message: isVerified
+        ? `Are you sure you want to unverify "${project?.name}"? The verified badge will be removed.`
+        : `Are you sure you want to verify "${project?.name}"? It will get a verified badge.`,
+      confirmText: isVerified ? 'Yes, Unverify' : 'Yes, Verify',
+      confirmColor: isVerified ? 'bg-blue-500' : 'bg-emerald-500',
+      icon: isVerified ? <FiXCircle className="text-4xl text-blue-500" /> : <FiShield className="text-4xl text-emerald-500" />,
       onConfirm: (id) => {
         return new Promise((resolve) => {
+          setActionLoading(`verify_${id}`);
           setTimeout(() => {
             setProjects(prev => prev.map(p =>
               p.id === id ? { ...p, isVerified: !p.isVerified } : p
             ));
-            showToast(`Project ${project.isVerified ? 'unverified' : 'verified'} successfully`, 'success');
+            setActionLoading(null);
+            showToast(`Project ${isVerified ? 'unverified' : 'verified'} successfully!`, 'success');
             resolve();
           }, 400);
         });
@@ -1303,64 +1105,6 @@ const BuildersProjects = () => {
     });
   }, [projects, showConfirmation, showToast]);
 
-  // ============ VIEW FLOOR PLANS ============
-  const handleViewFloorPlans = useCallback((project) => {
-    setFloorPlansProject(project);
-    setShowFloorPlansModal(true);
-  }, []);
-
-  // ============ VIEW UNIT AVAILABILITY ============
-  const handleViewUnitAvailability = useCallback((project) => {
-    setUnitAvailabilityProject(project);
-    setShowUnitAvailabilityModal(true);
-  }, []);
-
-  // ============ REFRESH DATA ============
-  const handleRefresh = useCallback(() => {
-    setLoading(true);
-    setTimeout(() => {
-      const mockProjects = generateMockProjects();
-      setProjects(mockProjects);
-      setFilteredProjects(mockProjects);
-      updateStats(mockProjects);
-      setLoading(false);
-      showToast('Data refreshed successfully', 'success');
-    }, 1000);
-  }, [generateMockProjects, showToast, updateStats]);
-
-  // ============ EXPORT PROJECTS ============
-  const handleExportProjects = useCallback(() => {
-    const data = filteredProjects.map(p => ({
-      Name: p.name,
-      Type: p.type,
-      Location: p.location,
-      Price: p.price,
-      Status: p.status,
-      Units: p.units,
-      'Available Units': p.availableUnits,
-      Area: `${p.area} ${p.areaUnit}`,
-      'Floor Plans': p.floorPlans,
-      Builder: p.builderName,
-      'Completion Date': p.completionDate,
-      Featured: p.isFeatured ? 'Yes' : 'No',
-      Verified: p.isVerified ? 'Yes' : 'No',
-    }));
-
-    const csv = [
-      Object.keys(data[0]).join(','),
-      ...data.map(row => Object.values(row).map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
-    ].join('\n');
-
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `projects_${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-    showToast(`${filteredProjects.length} projects exported successfully`, 'success');
-  }, [filteredProjects, showToast]);
-
   // ============ BULK ACTIONS ============
   const handleBulkAction = useCallback((action) => {
     if (selectedProjects.length === 0) {
@@ -1369,19 +1113,19 @@ const BuildersProjects = () => {
     }
 
     const actionMap = {
-      verify: {
-        title: 'Verify Projects',
-        message: `Are you sure you want to verify ${selectedProjects.length} selected project(s)?`,
-        confirmText: 'Yes, Verify All',
-        confirmColor: 'bg-emerald-500',
-        icon: <FiShield className="text-4xl text-emerald-500" />,
-      },
       feature: {
         title: 'Feature Projects',
         message: `Are you sure you want to feature ${selectedProjects.length} selected project(s)?`,
         confirmText: 'Yes, Feature All',
         confirmColor: 'bg-amber-500',
         icon: <FaStarSolid className="text-4xl text-amber-500" />,
+      },
+      unfeature: {
+        title: 'Unfeature Projects',
+        message: `Are you sure you want to unfeature ${selectedProjects.length} selected project(s)?`,
+        confirmText: 'Yes, Unfeature All',
+        confirmColor: 'bg-purple-500',
+        icon: <FiXCircle className="text-4xl text-purple-500" />,
       },
       delete: {
         title: 'Delete Projects',
@@ -1406,10 +1150,10 @@ const BuildersProjects = () => {
 
             updatedProjects = updatedProjects.map(p => {
               if (selectedIds.has(p.id)) {
-                if (action === 'verify') {
-                  return { ...p, isVerified: true };
-                } else if (action === 'feature') {
+                if (action === 'feature') {
                   return { ...p, isFeatured: true };
+                } else if (action === 'unfeature') {
+                  return { ...p, isFeatured: false };
                 } else if (action === 'delete') {
                   return null;
                 }
@@ -1421,7 +1165,7 @@ const BuildersProjects = () => {
             updateStats(updatedProjects);
             setSelectedProjects([]);
             setActionLoading(null);
-            showToast(`${selectedProjects.length} project(s) ${action === 'verify' ? 'verified' : action === 'feature' ? 'featured' : 'deleted'}`, 'success');
+            showToast(`${selectedProjects.length} project(s) ${action === 'feature' ? 'featured' : action === 'unfeature' ? 'unfeatured' : 'deleted'}`, 'success');
             resolve();
           }, 800);
         });
@@ -1430,6 +1174,51 @@ const BuildersProjects = () => {
       action: action,
     });
   }, [selectedProjects, projects, showConfirmation, showToast, updateStats]);
+
+  // ============ REFRESH DATA ============
+  const handleRefresh = useCallback(() => {
+    setLoading(true);
+    setTimeout(() => {
+      const mockProjects = generateMockProjects();
+      setProjects(mockProjects);
+      setFilteredProjects(mockProjects);
+      updateStats(mockProjects);
+      setLoading(false);
+      showToast('Data refreshed successfully', 'success');
+    }, 1000);
+  }, [generateMockProjects, showToast, updateStats]);
+
+  // ============ EXPORT PROJECTS ============
+  const handleExportProjects = useCallback(() => {
+    const data = filteredProjects.map(p => ({
+      Name: p.name,
+      Type: p.type,
+      Location: p.location,
+      'Starting Price': p.price,
+      'Total Units': p.totalUnits,
+      'Available Units': p.availableUnits,
+      Status: p.status,
+      Builder: p.builderName,
+      'Expected Completion': p.expectedCompletion,
+      'Launch Date': p.launchDate,
+      Featured: p.isFeatured ? 'Yes' : 'No',
+      Verified: p.isVerified ? 'Yes' : 'No',
+    }));
+
+    const csv = [
+      Object.keys(data[0]).join(','),
+      ...data.map(row => Object.values(row).map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `projects_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    showToast(`${filteredProjects.length} projects exported successfully`, 'success');
+  }, [filteredProjects, showToast]);
 
   // ============ RENDER ============
   return (
@@ -1457,14 +1246,6 @@ const BuildersProjects = () => {
         loading={actionLoading !== null}
       />
 
-      {/* Create Project Modal */}
-      <CreateProjectModal
-        show={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onSave={handleCreateProject}
-        loading={actionLoading === 'create'}
-      />
-
       {/* View Project Modal */}
       <ViewProjectModal
         project={viewingProject}
@@ -1481,18 +1262,18 @@ const BuildersProjects = () => {
         loading={actionLoading === 'edit'}
       />
 
-      {/* Floor Plans Modal */}
-      <FloorPlansModal
-        project={floorPlansProject}
-        show={showFloorPlansModal}
-        onClose={() => { setShowFloorPlansModal(false); setFloorPlansProject(null); }}
-      />
-
       {/* Unit Availability Modal */}
       <UnitAvailabilityModal
-        project={unitAvailabilityProject}
-        show={showUnitAvailabilityModal}
-        onClose={() => { setShowUnitAvailabilityModal(false); setUnitAvailabilityProject(null); }}
+        project={unitProject}
+        show={showUnitModal}
+        onClose={() => { setShowUnitModal(false); setUnitProject(null); }}
+      />
+
+      {/* Floor Plans Modal */}
+      <FloorPlansModal
+        project={floorPlanProject}
+        show={showFloorPlanModal}
+        onClose={() => { setShowFloorPlanModal(false); setFloorPlanProject(null); }}
       />
 
       {/* Header */}
@@ -1513,19 +1294,12 @@ const BuildersProjects = () => {
               )}
             </div>
             <p className="text-sm text-[#5A7D78] flex items-center gap-2 flex-wrap">
-              <span>Manage builders, projects, units, floor plans & launches</span>
+              <span>Manage builders, track projects, monitor unit availability & floor plans</span>
               <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
               <span className="text-[#00695C] font-medium">{new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
             </p>
           </div>
           <div className="flex items-center gap-2 w-full lg:w-auto flex-wrap">
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-xl hover:shadow-xl transition-all duration-300 text-sm font-medium shadow-md shadow-[#00695C]/30 hover:scale-105"
-            >
-              <FiPlus className="text-sm" />
-              <span className="hidden sm:inline">New Project</span>
-            </button>
             <button
               onClick={() => setShowStats(!showStats)}
               className="flex items-center gap-2 px-3 py-2 bg-white border border-[#E8F0EE] rounded-xl hover:border-[#00695C]/30 hover:shadow-md transition-all duration-300 text-sm font-medium text-[#1A2E2A] hover:scale-105"
@@ -1536,9 +1310,10 @@ const BuildersProjects = () => {
             <button
               onClick={handleRefresh}
               disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 bg-white border border-[#E8F0EE] rounded-xl hover:border-[#00695C]/30 hover:shadow-md transition-all duration-300 text-sm font-medium text-[#1A2E2A] hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-xl hover:shadow-xl transition-all duration-300 text-sm font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed group relative overflow-hidden hover:scale-105"
             >
-              <FiRefreshCw className={`text-sm ${loading ? 'animate-spin' : ''}`} />
+              <span className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+              <FiRefreshCw className={`text-sm ${loading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
               <span className="hidden sm:inline">{loading ? 'Refreshing...' : 'Refresh'}</span>
             </button>
             <button
@@ -1558,7 +1333,7 @@ const BuildersProjects = () => {
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3">
               <StatCard
-                icon={<FaCity className="text-white text-sm" />}
+                icon={<MdOutlineConstruction className="text-white text-sm" />}
                 title="Total Projects"
                 value={stats.total}
                 color="bg-gradient-to-br from-[#00695C] to-[#26A69A]"
@@ -1567,10 +1342,10 @@ const BuildersProjects = () => {
                 onClick={() => handleStatClick('all')}
               />
               <StatCard
-                icon={<FiTrendingUp className="text-white text-sm" />}
+                icon={<FiPlayCircle className="text-white text-sm" />}
                 title="Ongoing"
                 value={stats.ongoing}
-                color="bg-gradient-to-br from-emerald-600 to-emerald-400"
+                color="bg-gradient-to-br from-blue-600 to-blue-400"
                 delay={100}
                 isActive={activeFilter === 'ongoing'}
                 onClick={() => handleStatClick('ongoing')}
@@ -1579,7 +1354,7 @@ const BuildersProjects = () => {
                 icon={<FiCheckCircle className="text-white text-sm" />}
                 title="Completed"
                 value={stats.completed}
-                color="bg-gradient-to-br from-blue-600 to-blue-400"
+                color="bg-gradient-to-br from-emerald-600 to-emerald-400"
                 delay={200}
                 isActive={activeFilter === 'completed'}
                 onClick={() => handleStatClick('completed')}
@@ -1594,40 +1369,40 @@ const BuildersProjects = () => {
                 onClick={() => handleStatClick('upcoming')}
               />
               <StatCard
-                icon={<FiAlertTriangle className="text-white text-sm" />}
-                title="On Hold"
-                value={stats.onHold}
-                color="bg-gradient-to-br from-red-600 to-red-400"
+                icon={<FiFlag className="text-white text-sm" />}
+                title="New Launches"
+                value={stats.newLaunches}
+                color="bg-gradient-to-br from-purple-600 to-purple-400"
                 delay={350}
-                isActive={activeFilter === 'on-hold'}
-                onClick={() => handleStatClick('on-hold')}
+                isActive={activeFilter === 'new-launch'}
+                onClick={() => handleStatClick('new-launch')}
               />
               <StatCard
-                icon={<FiBox className="text-white text-sm" />}
+                icon={<FiHome className="text-white text-sm" />}
                 title="Total Units"
                 value={stats.totalUnits}
-                color="bg-gradient-to-br from-purple-600 to-purple-400"
+                color="bg-gradient-to-br from-indigo-600 to-indigo-400"
                 delay={400}
                 isActive={false}
                 onClick={() => {}}
               />
               <StatCard
-                icon={<FiHome className="text-white text-sm" />}
+                icon={<FiCheckSquare className="text-white text-sm" />}
                 title="Available Units"
                 value={stats.availableUnits}
-                color="bg-gradient-to-br from-indigo-600 to-indigo-400"
+                color="bg-gradient-to-br from-teal-600 to-teal-400"
                 delay={450}
                 isActive={false}
                 onClick={() => {}}
               />
               <StatCard
-                icon={<FiLayers className="text-white text-sm" />}
-                title="Floor Plans"
-                value={stats.totalFloorPlans}
-                color="bg-gradient-to-br from-teal-600 to-teal-400"
+                icon={<FaStarSolid className="text-white text-sm" />}
+                title="Featured"
+                value={projects.filter(p => p.isFeatured).length}
+                color="bg-gradient-to-br from-amber-600 to-amber-400"
                 delay={500}
-                isActive={false}
-                onClick={() => {}}
+                isActive={activeFilter === 'featured'}
+                onClick={() => handleStatClick('featured')}
               />
             </div>
           </div>
@@ -1642,7 +1417,7 @@ const BuildersProjects = () => {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search projects by name, location, type, or builder..."
+              placeholder="Search projects by name, location, builder, or type..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none placeholder:text-[#B5C9C5]"
@@ -1668,7 +1443,9 @@ const BuildersProjects = () => {
                 <option value="ongoing">Ongoing</option>
                 <option value="completed">Completed</option>
                 <option value="upcoming">Upcoming</option>
-                <option value="on-hold">On Hold</option>
+                <option value="new-launch">New Launch</option>
+                <option value="onHold">On Hold</option>
+                <option value="cancelled">Cancelled</option>
               </select>
               <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
             </div>
@@ -1685,6 +1462,7 @@ const BuildersProjects = () => {
                 <option value="mixed-use">Mixed-Use</option>
                 <option value="luxury">Luxury</option>
                 <option value="affordable">Affordable</option>
+                <option value="township">Township</option>
               </select>
               <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
             </div>
@@ -1725,20 +1503,20 @@ const BuildersProjects = () => {
             </span>
             <div className="flex flex-wrap items-center gap-2">
               <button
-                onClick={() => handleBulkAction('verify')}
-                disabled={actionLoading === 'verify'}
-                className="px-4 py-1.5 bg-emerald-50 text-emerald-700 rounded-xl hover:bg-emerald-100 transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 disabled:opacity-50"
-              >
-                {actionLoading === 'verify' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiShield className="text-[10px]" />}
-                Verify
-              </button>
-              <button
                 onClick={() => handleBulkAction('feature')}
                 disabled={actionLoading === 'feature'}
                 className="px-4 py-1.5 bg-amber-50 text-amber-700 rounded-xl hover:bg-amber-100 transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 disabled:opacity-50"
               >
                 {actionLoading === 'feature' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FaStarSolid className="text-[10px]" />}
                 Feature
+              </button>
+              <button
+                onClick={() => handleBulkAction('unfeature')}
+                disabled={actionLoading === 'unfeature'}
+                className="px-4 py-1.5 bg-purple-50 text-purple-700 rounded-xl hover:bg-purple-100 transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 disabled:opacity-50"
+              >
+                {actionLoading === 'unfeature' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiXCircle className="text-[10px]" />}
+                Unfeature
               </button>
               <button
                 onClick={() => handleBulkAction('delete')}
@@ -1770,16 +1548,20 @@ const BuildersProjects = () => {
             {paginatedProjects.map((project, index) => {
               const isSelected = selectedProjects.includes(project.id);
               const statusColors = {
-                ongoing: 'bg-emerald-100 text-emerald-700',
-                completed: 'bg-blue-100 text-blue-700',
-                upcoming: 'bg-amber-100 text-amber-700',
-                'on-hold': 'bg-red-100 text-red-700'
+                ongoing: 'bg-blue-100 text-blue-700 border-blue-200',
+                completed: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+                upcoming: 'bg-amber-100 text-amber-700 border-amber-200',
+                'new-launch': 'bg-purple-100 text-purple-700 border-purple-200',
+                onHold: 'bg-gray-100 text-gray-700 border-gray-200',
+                cancelled: 'bg-red-100 text-red-700 border-red-200',
               };
               const projectBorder = {
-                ongoing: 'border-l-emerald-500',
-                completed: 'border-l-blue-500',
+                ongoing: 'border-l-blue-500',
+                completed: 'border-l-emerald-500',
                 upcoming: 'border-l-amber-500',
-                'on-hold': 'border-l-red-500',
+                'new-launch': 'border-l-purple-500',
+                onHold: 'border-l-gray-400',
+                cancelled: 'border-l-red-500',
               };
 
               return (
@@ -1798,27 +1580,28 @@ const BuildersProjects = () => {
                       />
                       <div className="relative">
                         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white text-xl font-bold shadow-lg">
-                          {project.name.charAt(0)}
+                          <MdOutlineConstruction className="text-2xl" />
                         </div>
-                        {project.status === 'ongoing' && (
-                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white animate-pulse" />
-                        )}
                       </div>
                       <div>
-                        <h3 className="font-semibold text-[#1A2E2A] text-sm truncate max-w-[140px]">{project.name}</h3>
+                        <h3 className="font-semibold text-[#1A2E2A] text-sm truncate max-w-[120px]">{project.name}</h3>
                         <div className="flex items-center gap-1 mt-0.5 flex-wrap">
                           <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${statusColors[project.status] || 'bg-gray-100 text-gray-700'}`}>
                             {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
                           </span>
-                          {project.isFeatured && <FaStarSolid className="text-amber-400 text-[10px]" />}
-                          {project.isVerified && <FiShield className="text-blue-500 text-[10px]" />}
+                          {project.isVerified && (
+                            <FiShield className="text-blue-600 text-[10px]" />
+                          )}
+                          {project.isFeatured && (
+                            <FaStarSolid className="text-amber-500 text-[10px]" />
+                          )}
                         </div>
                       </div>
                     </div>
                     <button
                       onClick={() => handleViewProject(project)}
                       className="w-7 h-7 rounded-xl hover:bg-[#F5F9F8] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
-                      title="View Project"
+                      title="View Details"
                     >
                       <FiEye className="text-sm" />
                     </button>
@@ -1826,12 +1609,12 @@ const BuildersProjects = () => {
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FiMapPin className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate">{project.location}</span>
+                      <FiHome className="text-[#00695C] flex-shrink-0" />
+                      <span className="truncate">{project.type}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FiTag className="text-[#00695C] flex-shrink-0" />
-                      <span>{project.type}</span>
+                      <FiMapPin className="text-[#00695C] flex-shrink-0" />
+                      <span className="truncate">{project.location}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiUser className="text-[#00695C] flex-shrink-0" />
@@ -1839,41 +1622,47 @@ const BuildersProjects = () => {
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiCalendar className="text-[#00695C] flex-shrink-0" />
-                      <span>Completion: {new Date(project.completionDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                      <span>Completion: {project.expectedCompletion}</span>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-[#E8F0EE]">
                     <div className="text-center">
-                      <p className="text-sm font-bold text-[#1A2E2A]">{project.units}</p>
-                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Units</p>
+                      <p className="text-sm font-bold text-[#1A2E2A]">{project.totalUnits}</p>
+                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Total Units</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm font-bold text-emerald-600">{project.availableUnits}</p>
+                      <p className="text-sm font-bold text-[#00695C]">{project.availableUnits}</p>
                       <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Available</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm font-bold text-[#00695C]">₹{(project.price / 10000000).toFixed(1)}Cr</p>
-                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Price</p>
+                      <p className="text-sm font-bold text-[#1A2E2A]">₹{(project.price / 100000).toFixed(1)}L</p>
+                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Starting Price</p>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap gap-1 mt-3 pt-3 border-t border-[#E8F0EE]">
                     <button
-                      onClick={() => handleViewUnitAvailability(project)}
+                      onClick={() => handleViewUnits(project)}
                       className="flex-1 py-1.5 text-[10px] font-medium text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                     >
-                      <FiBox className="text-[10px]" /> Units
+                      <FiLayers className="text-[10px]" /> Units
                     </button>
                     <button
                       onClick={() => handleViewFloorPlans(project)}
-                      className="flex-1 py-1.5 text-[10px] font-medium text-purple-600 bg-purple-50 rounded-xl hover:bg-purple-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
+                      className="flex-1 py-1.5 text-[10px] font-medium text-indigo-600 bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                     >
-                      <FiLayers className="text-[10px]" /> Floor Plans
+                      <FiSquare className="text-[10px]" /> Floor Plans
                     </button>
+                      <button
+                        onClick={() => handleViewProject(project)}
+                        className="flex-1 py-1.5 text-[10px] font-medium text-emerald-600 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
+                      >
+                        <FiEye className="text-[10px]" /> View
+                      </button>
                     <button
                       onClick={() => handleEditProject(project)}
-                      className="flex-1 py-1.5 text-[10px] font-medium text-amber-600 bg-amber-50 rounded-xl hover:bg-amber-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
+                      className="flex-1 py-1.5 text-[10px] font-medium text-[#00695C] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                     >
                       <FiEdit className="text-[10px]" /> Edit
                     </button>
@@ -1943,17 +1732,15 @@ const BuildersProjects = () => {
                 <span>#</span>
               </div>
               <div className="col-span-2 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('name')}>
-                Project {sortField === 'name' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+                Project Name {sortField === 'name' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('status')}>
-                Status {sortField === 'status' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
-              </div>
+              <div className="col-span-1">Status</div>
               <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('type')}>
                 Type {sortField === 'type' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
               <div className="col-span-1">Location</div>
-              <div className="col-span-1 text-center cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('units')}>
-                Units {sortField === 'units' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+              <div className="col-span-1 text-center cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('totalUnits')}>
+                Units {sortField === 'totalUnits' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
               <div className="col-span-1 text-center cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('availableUnits')}>
                 Available {sortField === 'availableUnits' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
@@ -1961,31 +1748,33 @@ const BuildersProjects = () => {
               <div className="col-span-1 text-center cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('price')}>
                 Price {sortField === 'price' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1 text-center cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('floorPlans')}>
-                Plans {sortField === 'floorPlans' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
-              </div>
+              <div className="col-span-1 text-center">Featured</div>
               <div className="col-span-2 text-right">Actions</div>
             </div>
 
             {paginatedProjects.map((project, index) => {
               const isSelected = selectedProjects.includes(project.id);
               const statusColors = {
-                ongoing: 'bg-emerald-100 text-emerald-700',
-                completed: 'bg-blue-100 text-blue-700',
+                ongoing: 'bg-blue-100 text-blue-700',
+                completed: 'bg-emerald-100 text-emerald-700',
                 upcoming: 'bg-amber-100 text-amber-700',
-                'on-hold': 'bg-red-100 text-red-700'
+                'new-launch': 'bg-purple-100 text-purple-700',
+                onHold: 'bg-gray-100 text-gray-700',
+                cancelled: 'bg-red-100 text-red-700',
               };
               const projectBorder = {
-                ongoing: 'border-l-emerald-500',
-                completed: 'border-l-blue-500',
+                ongoing: 'border-l-blue-500',
+                completed: 'border-l-emerald-500',
                 upcoming: 'border-l-amber-500',
-                'on-hold': 'border-l-red-500',
+                'new-launch': 'border-l-purple-500',
+                onHold: 'border-l-gray-400',
+                cancelled: 'border-l-red-500',
               };
 
               return (
                 <div
                   key={project.id}
-                  className={`grid grid-cols-12 gap-2 items-center py-3 px-4 border-b border-[#E8F0EE] border-l-4 ${projectBorder[project.status] || 'border-l-[#00695C]'} hover:bg-[#F5F9F8] transition-all duration-300 group ${isSelected ? 'bg-[#E8F4F2]' : ''}`}
+                  className={`grid grid-cols-12 gap-2 items-center py-3 px-4 border-b border-[#E8F0EE] border-l-4 ${projectBorder[project.status] || 'border-l-[#00695C]'} hover:bg-[#F5F9F8] transition-all duration-300 group relative ${isSelected ? 'bg-[#E8F4F2]' : ''}`}
                 >
                   <div className="col-span-1 flex items-center gap-2">
                     <input
@@ -2000,7 +1789,7 @@ const BuildersProjects = () => {
                   <div className="col-span-2">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white text-xs font-bold">
-                        {project.name.charAt(0)}
+                        <MdOutlineConstruction className="text-sm" />
                       </div>
                       <div>
                         <p className="font-semibold text-sm text-[#1A2E2A] truncate">{project.name}</p>
@@ -2019,39 +1808,48 @@ const BuildersProjects = () => {
 
                   <div className="col-span-1 text-xs text-[#5A7D78] truncate">{project.location}</div>
 
-                  <div className="col-span-1 text-center text-sm font-medium text-[#1A2E2A]">{project.units}</div>
+                  <div className="col-span-1 text-center text-sm font-medium text-[#1A2E2A]">{project.totalUnits}</div>
 
-                  <div className="col-span-1 text-center text-sm font-medium text-emerald-600">{project.availableUnits}</div>
+                  <div className="col-span-1 text-center text-sm font-medium text-[#00695C]">{project.availableUnits}</div>
 
-                  <div className="col-span-1 text-center text-sm font-semibold text-[#00695C]">₹{(project.price / 10000000).toFixed(1)}Cr</div>
+                  <div className="col-span-1 text-center text-sm font-semibold text-[#1A2E2A]">₹{(project.price / 100000).toFixed(1)}L</div>
 
-                  <div className="col-span-1 text-center text-sm font-medium text-[#1A2E2A]">{project.floorPlans}</div>
+                  <div className="col-span-1 text-center">
+                    {project.isFeatured ? (
+                      <FaStarSolid className="text-amber-500 text-sm mx-auto" />
+                    ) : (
+                      <span className="text-[#B5C9C5] text-xs">-</span>
+                    )}
+                  </div>
+
+
+                   {/* In the List View */}
 
                   <div className="col-span-2 flex items-center justify-end gap-1 flex-wrap">
                     <button
-                      onClick={() => handleViewUnitAvailability(project)}
+                      onClick={() => handleViewUnits(project)}
                       className="p-1.5 rounded-lg hover:bg-blue-50 transition-all duration-300 text-blue-600 hover:scale-110"
-                      title="Units"
-                    >
-                      <FiBox className="text-sm" />
-                    </button>
-                    <button
-                      onClick={() => handleViewFloorPlans(project)}
-                      className="p-1.5 rounded-lg hover:bg-purple-50 transition-all duration-300 text-purple-600 hover:scale-110"
-                      title="Floor Plans"
+                      title="View Units"
                     >
                       <FiLayers className="text-sm" />
                     </button>
                     <button
+                      onClick={() => handleViewFloorPlans(project)}
+                      className="p-1.5 rounded-lg hover:bg-indigo-50 transition-all duration-300 text-indigo-600 hover:scale-110"
+                      title="Floor Plans"
+                    >
+                      <FiSquare className="text-sm" />
+                    </button>
+                    <button
                       onClick={() => handleViewProject(project)}
                       className="p-1.5 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 text-[#00695C] hover:scale-110"
-                      title="View"
+                      title="View Details"
                     >
                       <FiEye className="text-sm" />
                     </button>
                     <button
                       onClick={() => handleEditProject(project)}
-                      className="p-1.5 rounded-lg hover:bg-amber-50 transition-all duration-300 text-amber-600 hover:scale-110"
+                      className="p-1.5 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 text-[#00695C] hover:scale-110"
                       title="Edit"
                     >
                       <FiEdit className="text-sm" />
@@ -2060,7 +1858,9 @@ const BuildersProjects = () => {
                       onClick={() => handleToggleFeature(project.id)}
                       disabled={actionLoading === `feature_${project.id}`}
                       className={`p-1.5 rounded-lg transition-all duration-300 hover:scale-110 disabled:opacity-50 ${
-                        project.isFeatured ? 'text-purple-600 hover:bg-purple-50' : 'text-[#5A7D78] hover:bg-amber-50'
+                        project.isFeatured
+                          ? 'text-purple-600 hover:bg-purple-50'
+                          : 'text-amber-600 hover:bg-amber-50'
                       }`}
                       title={project.isFeatured ? 'Unfeature' : 'Feature'}
                     >
@@ -2074,7 +1874,9 @@ const BuildersProjects = () => {
                       onClick={() => handleToggleVerify(project.id)}
                       disabled={actionLoading === `verify_${project.id}`}
                       className={`p-1.5 rounded-lg transition-all duration-300 hover:scale-110 disabled:opacity-50 ${
-                        project.isVerified ? 'text-blue-600 hover:bg-blue-50' : 'text-[#5A7D78] hover:bg-emerald-50'
+                        project.isVerified
+                          ? 'text-blue-600 hover:bg-blue-50'
+                          : 'text-emerald-600 hover:bg-emerald-50'
                       }`}
                       title={project.isVerified ? 'Unverify' : 'Verify'}
                     >

@@ -1,4 +1,4 @@
-// src/components/dashboard/admin/Builders/BuildersPropertyControl.jsx
+// src/components/dashboard/admin/PropertyManagers/PropertyManagersPropertyControl.jsx
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +11,7 @@ import {
   FiTag, FiDollarSign, FiSquare, FiMaximize, FiMinimize,
   FiActivity, FiExternalLink, FiUserCheck, FiUserX, FiSave,
   FiImage, FiFileText, FiPhone, FiMail, FiGlobe, FiSettings,
-  FiVideo, FiCamera, FiUsers, FiBriefcase
+  FiVideo, FiCamera, FiUsers, FiBriefcase, FiKey
 } from 'react-icons/fi';
 import {
   FaStar as FaStarSolid,
@@ -19,9 +19,10 @@ import {
   FaHome, FaBed, FaBath, FaRulerCombined,
   FaParking, FaWifi, FaSwimmingPool, FaSnowflake,
   FaFire, FaShieldAlt, FaCrown, FaMedal,
-  FaUserCircle, FaStore, FaUserTie, FaCity, FaIndustry
+  FaUserCircle, FaStore, FaUserTie, FaCity, FaIndustry,
+  FaClipboardList
 } from 'react-icons/fa';
-import { MdOutlineRealEstateAgent, MdApartment, MdOutlineBusiness, MdOutlineConstruction } from 'react-icons/md';
+import { MdOutlineRealEstateAgent, MdApartment, MdOutlineBusiness, MdOutlineConstruction, MdOutlineManageAccounts } from 'react-icons/md';
 
 // ============ TOAST COMPONENT ============
 const Toast = ({ toast }) => {
@@ -144,10 +145,10 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
         status: property.status || 'pending',
         isFeatured: property.isFeatured || false,
         isVerified: property.isVerified || false,
-        builderName: property.builderName || '',
-        builderEmail: property.builderEmail || '',
-        builderPhone: property.builderPhone || '',
-        companyName: property.companyName || '',
+        managerName: property.managerName || '',
+        managerEmail: property.managerEmail || '',
+        managerPhone: property.managerPhone || '',
+        propertyManagerCompany: property.propertyManagerCompany || '',
         description: property.description || '',
         amenities: property.amenities ? property.amenities.join(', ') : '',
         parking: property.parking || 'None',
@@ -182,10 +183,10 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
     if (!formData.location.trim()) newErrors.location = 'Location is required';
     if (!formData.price || formData.price <= 0) newErrors.price = 'Valid price is required';
     if (!formData.area || formData.area <= 0) newErrors.area = 'Valid area is required';
-    if (!formData.builderName.trim()) newErrors.builderName = 'Builder name is required';
-    if (!formData.builderEmail.trim()) newErrors.builderEmail = 'Builder email is required';
-    if (formData.builderEmail && !/\S+@\S+\.\S+/.test(formData.builderEmail)) {
-      newErrors.builderEmail = 'Valid email is required';
+    if (!formData.managerName.trim()) newErrors.managerName = 'Property Manager name is required';
+    if (!formData.managerEmail.trim()) newErrors.managerEmail = 'Property Manager email is required';
+    if (formData.managerEmail && !/\S+@\S+\.\S+/.test(formData.managerEmail)) {
+      newErrors.managerEmail = 'Valid email is required';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -425,44 +426,44 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
             </div>
           </div>
 
-          {/* Builder Information - 4 Column */}
+          {/* Property Manager Information - 4 Column */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
             <div>
               <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">
-                Builder Name <span className="text-red-500">*</span>
+                Manager Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
-                name="builderName"
-                value={formData.builderName}
+                name="managerName"
+                value={formData.managerName}
                 onChange={handleChange}
-                className={`w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.builderName ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]`}
+                className={`w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.managerName ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]`}
                 placeholder="Full name"
               />
-              {errors.builderName && <p className="text-[10px] text-red-500 mt-0.5">{errors.builderName}</p>}
+              {errors.managerName && <p className="text-[10px] text-red-500 mt-0.5">{errors.managerName}</p>}
             </div>
 
             <div>
               <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">
-                Builder Email <span className="text-red-500">*</span>
+                Manager Email <span className="text-red-500">*</span>
               </label>
               <input
                 type="email"
-                name="builderEmail"
-                value={formData.builderEmail}
+                name="managerEmail"
+                value={formData.managerEmail}
                 onChange={handleChange}
-                className={`w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.builderEmail ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]`}
-                placeholder="builder@email.com"
+                className={`w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.managerEmail ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]`}
+                placeholder="manager@email.com"
               />
-              {errors.builderEmail && <p className="text-[10px] text-red-500 mt-0.5">{errors.builderEmail}</p>}
+              {errors.managerEmail && <p className="text-[10px] text-red-500 mt-0.5">{errors.managerEmail}</p>}
             </div>
 
             <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Builder Phone</label>
+              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Manager Phone</label>
               <input
                 type="text"
-                name="builderPhone"
-                value={formData.builderPhone}
+                name="managerPhone"
+                value={formData.managerPhone}
                 onChange={handleChange}
                 className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
                 placeholder="+91 9876543210"
@@ -473,11 +474,11 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
               <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Company Name</label>
               <input
                 type="text"
-                name="companyName"
-                value={formData.companyName}
+                name="propertyManagerCompany"
+                value={formData.propertyManagerCompany}
                 onChange={handleChange}
                 className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
-                placeholder="Company/Developer Name"
+                placeholder="Property Management Company"
               />
             </div>
           </div>
@@ -587,7 +588,7 @@ const ViewPropertyModal = ({
   onVerify,
   onSuspend,
   onDelete,
-  onViewBuilderProfile,
+  onViewManagerProfile,
   onApprove,
   onReject
 }) => {
@@ -617,7 +618,7 @@ const ViewPropertyModal = ({
           </button>
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center text-white text-3xl">
-              <FaBuilding />
+              <FaClipboardList />
             </div>
             <div className="flex-1">
               <h2 className="text-xl font-bold text-white">{property.title}</h2>
@@ -659,22 +660,22 @@ const ViewPropertyModal = ({
             </div>
           </div>
 
-          {/* Builder Info with View Profile Button */}
+          {/* Manager Info with View Profile Button */}
           <div className="flex items-center justify-between p-3 bg-[#F5F9F8] rounded-xl">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-[#00695C] flex items-center justify-center text-white font-bold">
-                {property.builderName?.charAt(0) || 'B'}
+                {property.managerName?.charAt(0) || 'M'}
               </div>
               <div>
-                <p className="text-sm font-semibold text-[#1A2E2A]">{property.builderName || 'Unknown Builder'}</p>
-                <p className="text-xs text-[#5A7D78]">Builder · {property.builderEmail || 'No email'}</p>
-                {property.companyName && (
-                  <p className="text-xs text-[#00695C] font-medium">{property.companyName}</p>
+                <p className="text-sm font-semibold text-[#1A2E2A]">{property.managerName || 'Unknown Manager'}</p>
+                <p className="text-xs text-[#5A7D78]">Property Manager · {property.managerEmail || 'No email'}</p>
+                {property.propertyManagerCompany && (
+                  <p className="text-xs text-[#00695C] font-medium">{property.propertyManagerCompany}</p>
                 )}
               </div>
             </div>
             <button
-              onClick={onViewBuilderProfile}
+              onClick={onViewManagerProfile}
               className="px-4 py-2 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-xs font-medium flex items-center gap-2 hover:scale-105"
             >
               <FiExternalLink className="text-xs" />
@@ -800,7 +801,7 @@ const ViewPropertyModal = ({
 };
 
 // ============ MAIN COMPONENT ============
-const BuildersPropertyControl = () => {
+const PropertyManagersPropertyControl = () => {
   const navigate = useNavigate();
 
   // ============ STATE ============
@@ -867,15 +868,15 @@ const BuildersPropertyControl = () => {
     const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur', 'Lucknow', 'Nagpur'];
     const amenitiesList = ['WiFi', 'Swimming Pool', 'AC', 'Parking', 'Gym', 'Security', 'Balcony', 'Garden', 'Elevator', 'Furnished'];
 
-    const builders = [
-      { id: 'builder_1', name: 'Rajesh Patel', email: 'rajesh.patel@builders.com', phone: '+91 9876543210', company: 'Patel Constructions' },
-      { id: 'builder_2', name: 'Anita Sharma', email: 'anita.sharma@builders.com', phone: '+91 9876543211', company: 'Sharma Builders' },
-      { id: 'builder_3', name: 'Vikram Reddy', email: 'vikram.reddy@builders.com', phone: '+91 9876543212', company: 'Reddy Developers' },
-      { id: 'builder_4', name: 'Priya Mehta', email: 'priya.mehta@builders.com', phone: '+91 9876543213', company: 'Mehta Infrastructure' },
-      { id: 'builder_5', name: 'Amit Desai', email: 'amit.desai@builders.com', phone: '+91 9876543214', company: 'Desai Group' },
-      { id: 'builder_6', name: 'Sneha Nair', email: 'sneha.nair@builders.com', phone: '+91 9876543215', company: 'Nair Estates' },
-      { id: 'builder_7', name: 'Arjun Singh', email: 'arjun.singh@builders.com', phone: '+91 9876543216', company: 'Singh Developers' },
-      { id: 'builder_8', name: 'Kavya Rao', email: 'kavya.rao@builders.com', phone: '+91 9876543217', company: 'Rao Constructions' },
+    const propertyManagers = [
+      { id: 'manager_1', name: 'Rahul Sharma', email: 'rahul.sharma@pm.com', phone: '+91 9876543210', company: 'Sharma Property Management' },
+      { id: 'manager_2', name: 'Priya Patel', email: 'priya.patel@pm.com', phone: '+91 9876543211', company: 'Patel Realty Services' },
+      { id: 'manager_3', name: 'Amit Deshmukh', email: 'amit.deshmukh@pm.com', phone: '+91 9876543212', company: 'Deshmukh Estates' },
+      { id: 'manager_4', name: 'Sneha Reddy', email: 'sneha.reddy@pm.com', phone: '+91 9876543213', company: 'Reddy Property Solutions' },
+      { id: 'manager_5', name: 'Vikram Singh', email: 'vikram.singh@pm.com', phone: '+91 9876543214', company: 'Singh Management Group' },
+      { id: 'manager_6', name: 'Meera Nair', email: 'meera.nair@pm.com', phone: '+91 9876543215', company: 'Nair Realty Partners' },
+      { id: 'manager_7', name: 'Arjun Iyer', email: 'arjun.iyer@pm.com', phone: '+91 9876543216', company: 'Iyer Property Advisors' },
+      { id: 'manager_8', name: 'Kavya Rao', email: 'kavya.rao@pm.com', phone: '+91 9876543217', company: 'Rao Management Services' },
     ];
 
     const properties = [];
@@ -887,7 +888,7 @@ const BuildersPropertyControl = () => {
 
     for (let i = 1; i <= 60; i++) {
       const status = statuses[Math.floor(Math.random() * statuses.length)];
-      const builder = builders[Math.floor(Math.random() * builders.length)];
+      const manager = propertyManagers[Math.floor(Math.random() * propertyManagers.length)];
       const city = cities[Math.floor(Math.random() * cities.length)];
       const type = propertyTypes[Math.floor(Math.random() * propertyTypes.length)];
 
@@ -911,16 +912,16 @@ const BuildersPropertyControl = () => {
         status: status,
         isFeatured: Math.random() > 0.8,
         isVerified: Math.random() > 0.7,
-        builderName: builder.name,
-        builderEmail: builder.email,
-        builderPhone: builder.phone,
-        builderId: builder.id,
-        companyName: builder.company,
+        managerName: manager.name,
+        managerEmail: manager.email,
+        managerPhone: manager.phone,
+        managerId: manager.id,
+        propertyManagerCompany: manager.company,
         listedDate: date.toISOString(),
         updatedDate: new Date(Date.now() - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000)).toISOString(),
         views: Math.floor(Math.random() * 500),
         inquiries: Math.floor(Math.random() * 50),
-        description: `Beautiful ${type.toLowerCase()} located in ${city}. Built by ${builder.company}. Features ${Math.floor(Math.random() * 3) + 2} bedrooms and modern amenities. Perfect for families and professionals.`,
+        description: `Beautiful ${type.toLowerCase()} located in ${city}. Managed by ${manager.company}. Features ${Math.floor(Math.random() * 3) + 2} bedrooms and modern amenities. Perfect for families and professionals.`,
         amenities: amenities,
         parking: Math.random() > 0.5 ? `${Math.floor(Math.random() * 2) + 1} spots` : 'None',
         images: [`https://picsum.photos/seed/${i}/400/300`],
@@ -962,8 +963,8 @@ const BuildersPropertyControl = () => {
       filtered = filtered.filter(p =>
         p.title.toLowerCase().includes(query) ||
         p.location.toLowerCase().includes(query) ||
-        p.builderName.toLowerCase().includes(query) ||
-        p.companyName.toLowerCase().includes(query) ||
+        p.managerName.toLowerCase().includes(query) ||
+        p.propertyManagerCompany.toLowerCase().includes(query) ||
         p.type.toLowerCase().includes(query)
       );
     }
@@ -1095,10 +1096,10 @@ const BuildersPropertyControl = () => {
     setShowViewModal(true);
   }, []);
 
-  // ============ VIEW BUILDER PROFILE ============
-  const handleViewBuilderProfile = useCallback((builderId) => {
-    navigate('/profile/builder');
-    showToast('Opening Builder Profile...', 'info');
+  // ============ VIEW MANAGER PROFILE ============
+  const handleViewManagerProfile = useCallback((managerId) => {
+    navigate('/profile/property-management');
+    showToast('Opening Property Manager Profile...', 'info');
   }, [navigate, showToast]);
 
   // ============ EDIT PROPERTY ============
@@ -1207,7 +1208,7 @@ const BuildersPropertyControl = () => {
   const handleRejectProperty = useCallback((propertyId) => {
     showConfirmation({
       title: 'Reject Property',
-      message: 'Are you sure you want to reject this property? The builder will be notified.',
+      message: 'Are you sure you want to reject this property? The property manager will be notified.',
       confirmText: 'Yes, Reject',
       confirmColor: 'bg-red-500',
       icon: <FiXCircle className="text-4xl text-red-500" />,
@@ -1524,8 +1525,8 @@ const BuildersPropertyControl = () => {
       Status: p.status,
       Featured: p.isFeatured ? 'Yes' : 'No',
       Verified: p.isVerified ? 'Yes' : 'No',
-      Builder: p.builderName,
-      Company: p.companyName,
+      'Property Manager': p.managerName,
+      Company: p.propertyManagerCompany,
       'Listed Date': new Date(p.listedDate).toLocaleDateString(),
       Views: p.views,
       Inquiries: p.inquiries,
@@ -1540,7 +1541,7 @@ const BuildersPropertyControl = () => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `builder_properties_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `property_manager_properties_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
     showToast(`${filteredProperties.length} properties exported successfully`, 'success');
@@ -1582,7 +1583,7 @@ const BuildersPropertyControl = () => {
         onVerify={() => handleToggleVerify(viewingProperty?.id)}
         onSuspend={() => handleToggleSuspend(viewingProperty?.id)}
         onDelete={() => handleDeleteProperty(viewingProperty?.id)}
-        onViewBuilderProfile={handleViewBuilderProfile}
+        onViewManagerProfile={handleViewManagerProfile}
         onApprove={handleApproveProperty}
         onReject={handleRejectProperty}
       />
@@ -1602,7 +1603,7 @@ const BuildersPropertyControl = () => {
           <div>
             <div className="flex items-center gap-3 mb-1 flex-wrap">
               <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
-                Builders Property Control
+                Property Managers Control
               </h1>
               <span className="px-3 py-1 bg-[#E8F4F2] text-[#00695C] text-xs font-semibold rounded-full animate-pulse">
                 {filteredProperties.length} Properties
@@ -1614,7 +1615,7 @@ const BuildersPropertyControl = () => {
               )}
             </div>
             <p className="text-sm text-[#5A7D78] flex items-center gap-2 flex-wrap">
-              <span>Manage and control all property listings from builders</span>
+              <span>Manage and control all property listings from property managers</span>
               <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
               <span className="text-[#00695C] font-medium">{new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
             </p>
@@ -1653,7 +1654,7 @@ const BuildersPropertyControl = () => {
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3">
               <StatCard
-                icon={<FaBuilding className="text-white text-sm" />}
+                icon={<FaClipboardList className="text-white text-sm" />}
                 title="Total"
                 value={stats.total}
                 color="bg-gradient-to-br from-[#00695C] to-[#26A69A]"
@@ -1728,7 +1729,7 @@ const BuildersPropertyControl = () => {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search properties by title, location, builder..."
+              placeholder="Search properties by title, location, property manager..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none placeholder:text-[#B5C9C5]"
@@ -1908,7 +1909,7 @@ const BuildersPropertyControl = () => {
                         className="w-4 h-4 shrink-0 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                       />
                       <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white text-sm shadow-lg">
-                        <FaBuilding />
+                        <FaClipboardList />
                       </div>
                       <div className="min-w-0">
                         <h3 className="font-semibold text-[#1A2E2A] text-sm truncate">{property.title}</h3>
@@ -1954,7 +1955,7 @@ const BuildersPropertyControl = () => {
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiBriefcase className="text-[#00695C] flex-shrink-0 text-xs" />
-                      <span className="truncate">{property.companyName || property.builderName}</span>
+                      <span className="truncate">{property.propertyManagerCompany || property.managerName}</span>
                     </div>
                   </div>
 
@@ -2092,11 +2093,11 @@ const BuildersPropertyControl = () => {
                   <div className="mt-1.5">
                     <button
                       type="button"
-                      onClick={() => handleViewBuilderProfile(property.builderId)}
+                      onClick={() => handleViewManagerProfile(property.managerId)}
                       className="w-full py-1.5 text-[10px] font-medium text-[#00695C] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-[1.02]"
                     >
                       <FiExternalLink className="text-[10px]" />
-                      View Builder Profile
+                      View Manager Profile
                     </button>
                   </div>
                 </div>
@@ -2126,7 +2127,7 @@ const BuildersPropertyControl = () => {
               </div>
               <div className="col-span-1">Bed</div>
               <div className="col-span-1">Bath</div>
-              <div className="col-span-1">Builder</div>
+              <div className="col-span-1">Manager</div>
               <div className="col-span-1 text-center">Featured</div>
               <div className="col-span-1 text-center">Verified</div>
               <div className="col-span-1 text-right">Actions</div>
@@ -2175,7 +2176,7 @@ const BuildersPropertyControl = () => {
 
                   <div className="col-span-1 text-center text-sm text-[#1A2E2A]">{property.bathrooms}</div>
 
-                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">{property.builderName}</div>
+                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">{property.managerName}</div>
 
                   <div className="col-span-1 text-center">
                     {property.isFeatured ? (
@@ -2314,11 +2315,11 @@ const BuildersPropertyControl = () => {
                   <div className="col-span-12 mt-1 flex justify-end">
                     <button
                       type="button"
-                      onClick={() => handleViewBuilderProfile(property.builderId)}
+                      onClick={() => handleViewManagerProfile(property.managerId)}
                       className="px-3 py-1 text-[10px] font-medium text-[#00695C] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center gap-1 hover:scale-[1.02]"
                     >
                       <FiExternalLink className="text-[10px]" />
-                      View Builder Profile
+                      View Manager Profile
                     </button>
                   </div>
                 </div>
@@ -2330,7 +2331,7 @@ const BuildersPropertyControl = () => {
         {paginatedProperties.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-[#E8F0EE]">
             <div className="w-24 h-24 rounded-full bg-[#F5F9F8] flex items-center justify-center mb-4 animate-float">
-              <FaBuilding className="text-4xl text-[#B5C9C5]" />
+              <FaClipboardList className="text-4xl text-[#B5C9C5]" />
             </div>
             <h3 className="text-xl font-semibold text-[#1A2E2A]">No properties found</h3>
             <p className="text-sm text-[#5A7D78] mt-1">
@@ -2447,4 +2448,4 @@ const BuildersPropertyControl = () => {
   );
 };
 
-export default BuildersPropertyControl;
+export default PropertyManagersPropertyControl;

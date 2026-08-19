@@ -55,11 +55,11 @@ import BuildersProjects from './admin/Builders/BuildersProjects';
 import BuildersPropertyControl from './admin/Builders/BuildersPropertyControl';
 
 // Property Managers
-// import PropertyManagersOverview from './admin/PropertyManagers/PropertyManagersOverview';
-// import PropertyManagersRegistration from './admin/PropertyManagers/PropertyManagersRegistration';
-// import PropertyManagersCompanyManagement from './admin/PropertyManagers/PropertyManagersCompanyManagement';
-// import PropertyManagersMaintenance from './admin/PropertyManagers/PropertyManagersMaintenance';
-// import PropertyManagersPropertyControl from './admin/PropertyManagers/PropertyManagersPropertyControl';
+import PropertyManagersOverview from './admin/PropertyManagers/PropertyManagersOverview';
+import PropertyManagersRegistration from './admin/PropertyManagers/PropertyManagersRegistration';
+import PropertyManagersCompanyManagement from './admin/PropertyManagers/PropertyManagersCompanyManagement';
+import PropertyManagersMaintenance from './admin/PropertyManagers/PropertyManagersMaintenance';
+import PropertyManagersPropertyControl from './admin/PropertyManagers/PropertyManagersPropertyControl';
 
 // Buyers & Tenants
 // import BuyersTenants from './admin/BuyersTenants';
@@ -491,11 +491,11 @@ const AdminDashboard = () => {
               <Route path="builders/property-control" element={<BuildersPropertyControl />} />
 
               {/* Property Managers */}
-              {/* <Route path="property-managers/overview" element={<PropertyManagersOverview />} />
+              <Route path="property-managers/overview" element={<PropertyManagersOverview />} />
               <Route path="property-managers/registration" element={<PropertyManagersRegistration />} />
               <Route path="property-managers/companies" element={<PropertyManagersCompanyManagement />} />
               <Route path="property-managers/maintenance" element={<PropertyManagersMaintenance />} />
-              <Route path="property-managers/property-control" element={<PropertyManagersPropertyControl />} /> */}
+              <Route path="property-managers/property-control" element={<PropertyManagersPropertyControl />} />
 
               {/* Buyers & Tenants */}
               {/* <Route path="buyers-tenants" element={<BuyersTenants />} /> */}
