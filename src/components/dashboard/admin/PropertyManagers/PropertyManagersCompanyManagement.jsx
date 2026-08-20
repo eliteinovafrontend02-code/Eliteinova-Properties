@@ -28,7 +28,7 @@ import {
 } from 'react-icons/fa';
 import { MdOutlineRealEstateAgent, MdApartment, MdOutlineBusiness, MdOutlineLeaderboard, MdOutlineConstruction, MdOutlineApartment, MdOutlineManageAccounts, MdOutlinePeople } from 'react-icons/md';
 
-// ============ TOAST COMPONENT ============
+// ========== TOAST COMPONENT ==========
 const Toast = ({ toast }) => {
   if (!toast) return null;
   const colors = {
