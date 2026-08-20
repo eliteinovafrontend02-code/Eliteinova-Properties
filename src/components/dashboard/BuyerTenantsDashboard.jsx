@@ -1,4 +1,4 @@
-// src/components/dashboard/AdminDashboard.jsx
+// src/components/dashboard/BuyerTenantsDashboard.jsx
 
 import React, { useState, useEffect } from 'react';
 
@@ -10,7 +10,9 @@ import {
   FiClock, FiPlus, FiEdit, FiTrash2, FiDownload, FiPrinter,
   FiRefreshCw, FiFilter, FiShare, FiCopy, FiUpload, FiDownloadCloud,
   FiLock, FiUnlock, FiInfo, FiAlertTriangle, FiHelpCircle,
-  FiCheckCircle, FiXCircle, FiTrendingUp, FiArrowUp, FiArrowDown
+  FiCheckCircle, FiXCircle, FiTrendingUp, FiArrowUp, FiArrowDown,
+  FiHeart, FiBookmark, FiMap, FiCheckSquare, FiSquare,
+  FiClipboard
 } from 'react-icons/fi';
 
 import { 
@@ -20,134 +22,87 @@ import {
   FaChartLine, FaWallet, FaBars, FaSun, FaMoon, FaClock,
   FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaYoutube,
   FaWhatsapp, FaCopy as FaCopyIcon, FaShareAlt, FaQrcode,
-  FaCloudUploadAlt, FaCloudDownloadAlt, FaEye, FaEyeSlash
+  FaCloudUploadAlt, FaCloudDownloadAlt, FaEye, FaEyeSlash,
+  FaUserCircle, FaUsers, FaUserFriends, FaHandshake, FaHome,
+  FaCalendarCheck, FaClipboardList, FaClipboardCheck,
+  FaUserPlus, FaUserMinus
 } from 'react-icons/fa';
 
-import { MdOutlineDashboard, MdOutlineRealEstateAgent, MdOutlineApartment, MdOutlineBusiness } from 'react-icons/md';
-import { BsBuilding, BsTools } from 'react-icons/bs';
-import { HiOutlineBuildingOffice, HiOutlineUserGroup } from 'react-icons/hi2';
+import { 
+  MdOutlineDashboard, MdOutlineRealEstateAgent, MdOutlineApartment, 
+  MdOutlineBusiness, MdOutlinePeople, MdOutlinePersonSearch,
+  MdOutlineFavorite, MdOutlineBookmark, MdOutlineLocationOn,
+  MdOutlineDateRange, MdOutlineAssignment, MdOutlinePending
+} from 'react-icons/md';
+
+import { 
+  BsBuilding, BsTools, BsPeople, BsPersonPlus, 
+  BsPersonCheck, BsPersonX, BsClock, BsCalendar3
+} from 'react-icons/bs';
+
+import { 
+  HiOutlineBuildingOffice, HiOutlineUserGroup
+} from 'react-icons/hi2';
 
 // ============ IMPORT ALL COMPONENTS ============
-import AdminOverview from './admin/AdminOverview';
-// import SuperAdmin from './admin/SuperAdmin';
-import UserManagement from './admin/UserManagement';
+// Overview
+import BuyerTenantsOverview from './buyer&tenants/BuyerTenantsOverview';
 
-// Owners
-import OwnersOverview from './admin/Owners/OwnersOverview';
-import OwnersRegistration from './admin/Owners/OwnersRegistration';
-import OwnersPropertyControl from './admin/Owners/OwnersPropertyControl';
-import OwnersSubscription from './admin/Owners/OwnersSubscription';
-import OwnersPropertiesLeads from './admin/Owners/OwnersPropertiesLeads';
+// Buyer Management
+// import BuyerManagementOverview from './buyer&tenants/BuyerManagement/BuyerManagementOverview';
+// import BuyerRegistration from './buyer&tenants/BuyerManagement/BuyerRegistration';
+// import BuyerProfile from './buyer&tenants/BuyerManagement/BuyerProfile';
+// import BuyerPropertyActivity from './buyer&tenants/BuyerManagement/BuyerPropertyActivity';
 
-// Agents
-import AgentsOverview from './admin/Agents/AgentsOverview';
-import AgentsRegistration from './admin/Agents/AgentsRegistration';
-import AgentsVerification from './admin/Agents/AgentsVerification';
-import AgentsPropertiesLeads from './admin/Agents/AgentsPropertiesLeads';
-import AgentsPropertyControl from './admin/Agents/AgentsPropertyControl';
+// Tenant Management
+// import TenantManagementOverview from './buyer&tenants/TenantManagement/TenantManagementOverview';
+// import TenantRegistration from './buyer&tenants/TenantManagement/TenantRegistration';
+// import TenantRequirements from './buyer&tenants/TenantManagement/TenantRequirements';
+// import TenantPropertyActivity from './buyer&tenants/TenantManagement/TenantPropertyActivity';
 
-// Builders
-import BuildersOverview from './admin/Builders/BuildersOverview';
-import BuildersRegistration from './admin/Builders/BuildersRegistration';
-import BuildersVerification from './admin/Builders/BuildersVerification';
-import BuildersProjects from './admin/Builders/BuildersProjects';
-import BuildersPropertyControl from './admin/Builders/BuildersPropertyControl';
+// Saved & Wishlist
+// import SavedWishlistOverview from './buyer&tenants/SavedWishlist/SavedWishlistOverview';
+// import SavedProperties from './buyer&tenants/SavedWishlist/SavedProperties';
+// import Wishlist from './buyer&tenants/SavedWishlist/Wishlist';
+// import SavedWishlistActions from './buyer&tenants/SavedWishlist/SavedWishlistActions';
 
-// Property Managers
-import PropertyManagersOverview from './admin/PropertyManagers/PropertyManagersOverview';
-import PropertyManagersRegistration from './admin/PropertyManagers/PropertyManagersRegistration';
-import PropertyManagersCompanyManagement from './admin/PropertyManagers/PropertyManagersCompanyManagement';
-import PropertyManagersMaintenance from './admin/PropertyManagers/PropertyManagersMaintenance';
-import PropertyManagersPropertyControl from './admin/PropertyManagers/PropertyManagersPropertyControl';
+// Site Visits
+// import SiteVisitsOverview from './buyer&tenants/SiteVisits/SiteVisitsOverview';
+// import SiteVisitDashboard from './buyer&tenants/SiteVisits/SiteVisitDashboard';
+// import SiteVisitDetails from './buyer&tenants/SiteVisits/SiteVisitDetails';
+// import SiteVisitStatus from './buyer&tenants/SiteVisits/SiteVisitStatus';
+// import SiteVisitActions from './buyer&tenants/SiteVisits/SiteVisitActions';
 
-// Buyers & Tenants
-import BuyerTenantsDashboard from './BuyerTenantsDashboard';
+// Rental Requests
+// import RentalRequestsOverview from './buyer&tenants/RentalRequests/RentalRequestsOverview';
+// import RentalRequestManagement from './buyer&tenants/RentalRequests/RentalRequestManagement';
+// import RentalRequestDetails from './buyer&tenants/RentalRequests/RentalRequestDetails';
+// import RentalRequestStatus from './buyer&tenants/RentalRequests/RentalRequestStatus';
 
-// Properties
-// import Properties from './admin/Properties';
+// Purchase Requests
+// import PurchaseRequestsOverview from './buyer&tenants/PurchaseRequests/PurchaseRequestsOverview';
+// import PurchaseRequestManagement from './buyer&tenants/PurchaseRequests/PurchaseRequestManagement';
+// import PurchaseRequestDetails from './buyer&tenants/PurchaseRequests/PurchaseRequestDetails';
+// import PurchaseRequestStatus from './buyer&tenants/PurchaseRequests/PurchaseRequestStatus';
 
-// Other modules
-// import LeadManagement from './admin/LeadManagement';
-// import Subscriptions from './admin/Subscriptions';
-// import Payments from './admin/Payments';
-// import ReportsAnalytics from './admin/ReportsAnalytics';
-// import ContentManagement from './admin/ContentManagement';
-// import Notifications from './admin/Notifications';
-// import Settings from './admin/Settings';
+// Lead Management
+// import LeadManagementOverview from './buyer&tenants/LeadManagement/LeadManagementOverview';
+// import LeadDashboard from './buyer&tenants/LeadManagement/LeadDashboard';
+// import LeadSources from './buyer&tenants/LeadManagement/LeadSources';
+// import LeadInformation from './buyer&tenants/LeadManagement/LeadInformation';
+// import LeadStatus from './buyer&tenants/LeadManagement/LeadStatus';
+// import LeadActions from './buyer&tenants/LeadManagement/LeadActions';
 
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 
-const AdminDashboard = () => {
+const BuyerTenantsDashboard = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const [openMenus, setOpenMenus] = useState(['owners']);
+  const [openMenus, setOpenMenus] = useState(['buyer-management']);
   const [darkMode, setDarkMode] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
-
-  const menuItems = [
-    { key: '/admin/overview', icon: <FiGrid />, label: 'Dashboard Overview' },
-    { key: '/admin/super-admin', icon: <FaUserCog />, label: 'Super Admin' },
-    { key: '/admin/user-management', icon: <FiUser />, label: 'User Management' },
-    {
-      key: 'owners',
-      icon: <FiUser />,
-      label: 'Owners',
-      children: [
-        { key: '/admin/owners/overview', icon: <FiGrid />, label: 'Owners Dashboard' },
-        { key: '/admin/owners/registration', icon: <FiCheckCircle />, label: 'Registration & KYC' },
-        { key: '/admin/owners/property-control', icon: <FiSettings />, label: 'Property Control' },
-        { key: '/admin/owners/subscription', icon: <FaDollarSign />, label: 'Subscription' },
-        { key: '/admin/owners/leads', icon: <FiMessageCircle />, label: 'Properties Leads' },
-      ],
-    },
-    {
-      key: 'agents',
-      icon: <FiUsers />,
-      label: 'Agents',
-      children: [
-        { key: '/admin/agents/overview', icon: <FiGrid />, label: 'Agents Dashboard' },
-        { key: '/admin/agents/registration', icon: <FiCheckCircle />, label: 'Registration Approval' },
-        { key: '/admin/agents/verification', icon: <FaShieldAlt />, label: 'Agent Verification' },
-        { key: '/admin/agents/leads', icon: <FiHome />, label: 'Properties Leads' },
-        { key: '/admin/agents/property-control', icon: <FiSettings />, label: 'Property Control' },
-      ],
-    },
-    {
-      key: 'builders',
-      icon: <FaBuilding />,
-      label: 'Builders',
-      children: [
-        { key: '/admin/builders/overview', icon: <FiGrid />, label: 'Builders Dashboard' },
-        { key: '/admin/builders/registration', icon: <FiCheckCircle />, label: 'Registration Approval' },
-        { key: '/admin/builders/verification', icon: <FaShieldAlt />, label: 'Builder Verification' },
-        { key: '/admin/builders/projects', icon: <FaProjectDiagram />, label: 'Project Management' },
-        { key: '/admin/builders/property-control', icon: <FiSettings />, label: 'Property Control' },
-      ],
-    },
-    {
-      key: 'property-managers',
-      icon: <HiOutlineBuildingOffice />,
-      label: 'Property Managers',
-      children: [
-        { key: '/admin/property-managers/overview', icon: <FiGrid />, label: 'PM Dashboard' },
-        { key: '/admin/property-managers/registration', icon: <FiCheckCircle />, label: 'Registration Approval' },
-        { key: '/admin/property-managers/companies', icon: <FaBuilding />, label: 'Company Management' },
-        { key: '/admin/property-managers/maintenance', icon: <BsTools />, label: 'Maintenance' },
-        { key: '/admin/property-managers/property-control', icon: <FiSettings />, label: 'Property Control' },
-      ],
-    },
-    { key: '/admin/buyers-tenants', icon: <HiOutlineUserGroup />, label: 'Buyers & Tenants' },
-    { key: '/admin/properties', icon: <FiHome />, label: 'Properties' },
-    { key: '/admin/leads', icon: <FiMessageCircle />, label: 'Lead Management' },
-    { key: '/admin/subscriptions', icon: <FaDollarSign />, label: 'Subscriptions' },
-    { key: '/admin/payments', icon: <FaWallet />, label: 'Payments' },
-    { key: '/admin/reports', icon: <FaChartLine />, label: 'Reports & Analytics' },
-    { key: '/admin/content', icon: <FaImage />, label: 'Content Management' },
-    { key: '/admin/notifications', icon: <FaBell />, label: 'Notifications' },
-    { key: '/admin/settings', icon: <FiSettings />, label: 'Settings' },
-  ];
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -169,6 +124,7 @@ const AdminDashboard = () => {
 
   const getPageTitle = () => {
     const path = location.pathname;
+    const cleanPath = path.replace('/admin/buyers-tenants', '');
     const segments = path.split('/').filter(Boolean);
     if (segments.length === 1) return 'Overview';
     const last = segments[segments.length - 1];
@@ -184,11 +140,89 @@ const AdminDashboard = () => {
     });
   };
 
-   if (location.pathname.startsWith('/admin/buyers-tenants')) {
-    return <BuyerTenantsDashboard />;
-  }
-
-  
+  const menuItems = [
+    { key: '/admin/buyers-tenants/overview', icon: <FiGrid />, label: 'Dashboard Overview' },
+    {
+      key: 'buyer-management',
+      icon: <FaUserCircle />,
+      label: 'Buyer Management',
+      children: [
+        { key: '/admin/buyers-tenants/buyer/overview', icon: <FiGrid />, label: 'Buyer Overview' },
+        { key: '/admin/buyers-tenants/buyer/registration', icon: <FaUserPlus />, label: 'Buyer Registration' },
+        { key: '/admin/buyers-tenants/buyer/profile', icon: <FiUser />, label: 'Buyer Profile' },
+        { key: '/admin/buyers-tenants/buyer/activity', icon: <FiEye />, label: 'Property Activity' },
+      ],
+    },
+    {
+      key: 'tenant-management',
+      icon: <BsPeople />,
+      label: 'Tenant Management',
+      children: [
+        { key: '/admin/buyers-tenants/tenant/overview', icon: <FiGrid />, label: 'Tenant Overview' },
+        { key: '/admin/buyers-tenants/tenant/registration', icon: <FaUserPlus />, label: 'Tenant Registration' },
+        { key: '/admin/buyers-tenants/tenant/requirements', icon: <FiClipboard />, label: 'Tenant Requirements' },
+        { key: '/admin/buyers-tenants/tenant/activity', icon: <FiEye />, label: 'Property Activity' },
+      ],
+    },
+    {
+      key: 'saved-wishlist',
+      icon: <MdOutlineFavorite />,
+      label: 'Saved & Wishlist',
+      children: [
+        { key: '/admin/buyers-tenants/saved/overview', icon: <FiGrid />, label: 'Saved Overview' },
+        { key: '/admin/buyers-tenants/saved/properties', icon: <FiHome />, label: 'Saved Properties' },
+        { key: '/admin/buyers-tenants/saved/wishlist', icon: <FiHeart />, label: 'Wishlist' },
+        { key: '/admin/buyers-tenants/saved/actions', icon: <FiSettings />, label: 'Actions' },
+      ],
+    },
+    {
+      key: 'site-visits',
+      icon: <MdOutlineLocationOn />,
+      label: 'Site Visits',
+      children: [
+        { key: '/admin/buyers-tenants/site-visits/overview', icon: <FiGrid />, label: 'Site Visits Overview' },
+        { key: '/admin/buyers-tenants/site-visits/dashboard', icon: <FiGrid />, label: 'Visit Dashboard' },
+        { key: '/admin/buyers-tenants/site-visits/details', icon: <FiInfo />, label: 'Visit Details' },
+        { key: '/admin/buyers-tenants/site-visits/status', icon: <FiCheckCircle />, label: 'Visit Status' },
+        { key: '/admin/buyers-tenants/site-visits/actions', icon: <FiSettings />, label: 'Visit Actions' },
+      ],
+    },
+    {
+      key: 'rental-requests',
+      icon: <FaClipboardList />,
+      label: 'Rental Requests',
+      children: [
+        { key: '/admin/buyers-tenants/rental/overview', icon: <FiGrid />, label: 'Rental Overview' },
+        { key: '/admin/buyers-tenants/rental/management', icon: <FiSettings />, label: 'Rental Management' },
+        { key: '/admin/buyers-tenants/rental/details', icon: <FiInfo />, label: 'Request Details' },
+        { key: '/admin/buyers-tenants/rental/status', icon: <FiCheckCircle />, label: 'Request Status' },
+      ],
+    },
+    {
+      key: 'purchase-requests',
+      icon: <FaHandshake />,
+      label: 'Purchase Requests',
+      children: [
+        { key: '/admin/buyers-tenants/purchase/overview', icon: <FiGrid />, label: 'Purchase Overview' },
+        { key: '/admin/buyers-tenants/purchase/management', icon: <FiSettings />, label: 'Purchase Management' },
+        { key: '/admin/buyers-tenants/purchase/details', icon: <FiInfo />, label: 'Request Details' },
+        { key: '/admin/buyers-tenants/purchase/status', icon: <FiCheckCircle />, label: 'Request Status' },
+      ],
+    },
+    {
+      key: 'lead-management',
+      icon: <MdOutlinePersonSearch />,
+      label: 'Lead Management',
+      children: [
+        { key: '/admin/buyers-tenants/lead/overview', icon: <FiGrid />, label: 'Lead Overview' },
+        { key: '/admin/buyers-tenants/lead/dashboard', icon: <FiGrid />, label: 'Lead Dashboard' },
+        { key: '/admin/buyers-tenants/lead/sources', icon: <FiShare />, label: 'Lead Sources' },
+        { key: '/admin/buyers-tenants/lead/information', icon: <FiInfo />, label: 'Lead Information' },
+        { key: '/admin/buyers-tenants/lead/status', icon: <FiCheckCircle />, label: 'Lead Status' },
+        { key: '/admin/buyers-tenants/lead/actions', icon: <FiSettings />, label: 'Lead Actions' },
+      ],
+    },
+  ];
 
   const isSubActive = (children) => {
     if (!children) return false;
@@ -301,12 +335,12 @@ const AdminDashboard = () => {
             w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm
             ${collapsed ? '' : 'animate-pulse-glow'}
           `}>
-            <FiHome className="text-white text-lg" />
+            <FiUsers className="text-white text-lg" />
           </div>
           {!collapsed && (
             <div>
               <div className="text-white font-bold text-base tracking-wide">Eliteinova</div>
-              <div className="text-[8px] text-white/60 tracking-widest uppercase -mt-0.5">Admin Panel</div>
+              <div className="text-[8px] text-white/60 tracking-widest uppercase -mt-0.5">Buyers & Tenants</div>
             </div>
           )}
         </div>
@@ -358,17 +392,14 @@ const AdminDashboard = () => {
               </button>
               <div className="flex items-center gap-2 text-xs">
                 <span className="text-[#00695C] font-medium">
-                  <FiGrid className="mr-1 inline" /> Admin
+                  <FiUsers className="mr-1 inline" /> Buyers & Tenants
                 </span>
                 <span className="text-gray-300">/</span>
                 <span className="font-medium text-gray-700">{getPageTitle()}</span>
               </div>
             </div>
 
-            {/* Right - EMPTY (all elements removed) */}
-            <div className="flex items-center gap-1.5">
-              {/* All right side elements have been removed */}
-            </div>
+           
           </div>
         </header>
 
@@ -379,61 +410,58 @@ const AdminDashboard = () => {
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#00695C]/5 rounded-full blur-3xl animate-float" />
             <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-[#26A69A]/5 rounded-full blur-3xl animate-float-delayed" />
             
-            <Routes>
-              {/* Main overview routes */}
-              <Route index element={<AdminOverview />} />
-              <Route path="overview" element={<AdminOverview />} />
-              {/* <Route path="super-admin" element={<SuperAdmin />} /> */}
+            <Routes location={{ ...location, pathname: location.pathname.replace(/^\/admin\/buyers-tenants/, '/admin') || '/admin' }}>
+              {/* Overview */}
+              <Route index element={<BuyerTenantsOverview />} />
+              <Route path="overview" element={<BuyerTenantsOverview />} />
 
-              {/* User Management */}
-              <Route path="user-management" element={<UserManagement />} />
+              {/* Buyer Management */}
+              {/* <Route path="buyer/overview" element={<BuyerManagementOverview />} />
+              <Route path="buyer/registration" element={<BuyerRegistration />} />
+              <Route path="buyer/profile" element={<BuyerProfile />} />
+              <Route path="buyer/activity" element={<BuyerPropertyActivity />} /> */}
 
-              {/* Owners */}
-              <Route path="owners/overview" element={<OwnersOverview />} />
-              <Route path="owners/registration" element={<OwnersRegistration />} />
-              <Route path="owners/property-control" element={<OwnersPropertyControl />} />
-              <Route path="owners/subscription" element={<OwnersSubscription />} />
-              <Route path="owners/leads" element={<OwnersPropertiesLeads />} />
+              {/* Tenant Management */}
+              {/* <Route path="tenant/overview" element={<TenantManagementOverview />} />
+              <Route path="tenant/registration" element={<TenantRegistration />} />
+              <Route path="tenant/requirements" element={<TenantRequirements />} />
+              <Route path="tenant/activity" element={<TenantPropertyActivity />} /> */}
 
-              {/* Agents */}
-              <Route path="agents/overview" element={<AgentsOverview />} />
-              <Route path="agents/registration" element={<AgentsRegistration />} />
-              <Route path="agents/verification" element={<AgentsVerification />} />
-              <Route path="agents/leads" element={<AgentsPropertiesLeads />} />
-              <Route path="agents/property-control" element={<AgentsPropertyControl />} />
+              {/* Saved & Wishlist */}
+              {/* <Route path="saved/overview" element={<SavedWishlistOverview />} />
+              <Route path="saved/properties" element={<SavedProperties />} />
+              <Route path="saved/wishlist" element={<Wishlist />} />
+              <Route path="saved/actions" element={<SavedWishlistActions />} /> */}
 
-              {/* Builders */}
-              <Route path="builders/overview" element={<BuildersOverview />} />
-              <Route path="builders/registration" element={<BuildersRegistration />} />
-              <Route path="builders/verification" element={<BuildersVerification />} />
-              <Route path="builders/projects" element={<BuildersProjects />} />
-              <Route path="builders/property-control" element={<BuildersPropertyControl />} />
+              {/* Site Visits */}
+              {/* <Route path="site-visits/overview" element={<SiteVisitsOverview />} />
+              <Route path="site-visits/dashboard" element={<SiteVisitDashboard />} />
+              <Route path="site-visits/details" element={<SiteVisitDetails />} />
+              <Route path="site-visits/status" element={<SiteVisitStatus />} />
+              <Route path="site-visits/actions" element={<SiteVisitActions />} /> */}
 
-              {/* Property Managers */}
-              <Route path="property-managers/overview" element={<PropertyManagersOverview />} />
-              <Route path="property-managers/registration" element={<PropertyManagersRegistration />} />
-              <Route path="property-managers/companies" element={<PropertyManagersCompanyManagement />} />
-              <Route path="property-managers/maintenance" element={<PropertyManagersMaintenance />} />
-              <Route path="property-managers/property-control" element={<PropertyManagersPropertyControl />} />
+              {/* Rental Requests */}
+              {/* <Route path="rental/overview" element={<RentalRequestsOverview />} />
+              <Route path="rental/management" element={<RentalRequestManagement />} />
+              <Route path="rental/details" element={<RentalRequestDetails />} />
+              <Route path="rental/status" element={<RentalRequestStatus />} /> */}
 
-               {/* Buyers & Tenants  */}
-               {/* <Route path="buyers-tenants/*" element={<BuyerTenantsDashboard />} /> */}
+              {/* Purchase Requests */}
+              {/* <Route path="purchase/overview" element={<PurchaseRequestsOverview />} />
+              <Route path="purchase/management" element={<PurchaseRequestManagement />} />
+              <Route path="purchase/details" element={<PurchaseRequestDetails />} />
+              <Route path="purchase/status" element={<PurchaseRequestStatus />} /> */}
 
-              {/* Properties */}
-              {/* <Route path="properties" element={<Properties />} /> */}
-
-              {/* Other routes */}
-              {/* <Route path="leads" element={<LeadManagement />} /> */}
-              {/* <Route path="subscriptions" element={<Subscriptions />} /> */}
-              {/* <Route path="payments" element={<Payments />} /> */}
-              {/* <Route path="reports" element={<ReportsAnalytics />} /> */}
-              {/* <Route path="content" element={<ContentManagement />} /> */}
-              {/* <Route path="notifications" element={<Notifications />} /> */}
-              {/* <Route path="settings" element={<Settings />} /> */}
+              {/* Lead Management */}
+              {/* <Route path="lead/overview" element={<LeadManagementOverview />} />
+              <Route path="lead/dashboard" element={<LeadDashboard />} />
+              <Route path="lead/sources" element={<LeadSources />} />
+              <Route path="lead/information" element={<LeadInformation />} />
+              <Route path="lead/status" element={<LeadStatus />} />
+              <Route path="lead/actions" element={<LeadActions />} /> */}
             </Routes>
           </div>
         </div>
-        
 
         {/* ============ FOOTER ============ */}
         <footer className="flex-shrink-0 py-2 px-4 border-t border-gray-100 bg-white/50">
@@ -522,4 +550,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default BuyerTenantsDashboard;
