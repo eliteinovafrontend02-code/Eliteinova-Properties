@@ -401,13 +401,6 @@ const ViewProfileModal = ({ buyer, show, onClose, onEdit, onDelete, onBlock, onV
 
         {/* Footer actions */}
         <div className="px-6 py-4 border-t flex items-center gap-2 shrink-0" style={{ borderColor: 'var(--bpm-border)', background: 'var(--bpm-surface)' }}>
-          {/* <button
-            onClick={() => onEdit && onEdit(buyer)}
-            className="flex-1 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5"
-            style={{ background: 'var(--bpm-accent)', color: 'var(--bpm-on-accent)' }}
-          >
-            <FiEdit className="text-xs" /> Edit Activity
-          </button> */}
           <button
             onClick={() => onDelete && onDelete(buyer.id)}
             disabled={actionLoading === `delete_${buyer.id}`}
@@ -470,7 +463,6 @@ const BuyerPropertyActivity = () => {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
-  const [selectedActivityFilter, setSelectedActivityFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [viewMode, setViewMode] = useState('grid');
@@ -492,31 +484,13 @@ const BuyerPropertyActivity = () => {
     total: 0,
     active: 0,
     pending: 0,
-    blocked: 0,
-    totalViewed: 0,
-    totalSaved: 0,
-    totalEnquiries: 0,
-    totalVisits: 0
+    blocked: 0
   });
 
   const showToast = useCallback((message, type = 'success', duration = 3000) => {
     setToast({ message, type });
     setTimeout(() => setToast(null), duration);
   }, []);
-
-  // ============ ACTIVITY FILTER OPTIONS ============
-  const activityFilters = [
-    { id: 'all', label: 'All Activities' },
-    { id: 'viewed', label: 'Viewed', icon: <FiEye className="text-xs" /> },
-    { id: 'saved', label: 'Saved', icon: <FiBookmark className="text-xs" /> },
-    { id: 'wishlist', label: 'Wishlist', icon: <FiHeart className="text-xs" /> },
-    { id: 'enquiries', label: 'Enquiries', icon: <FiMessageSquare className="text-xs" /> },
-    { id: 'visits', label: 'Site Visits', icon: <FiMapPin className="text-xs" /> },
-    { id: 'purchase', label: 'Purchase Requests', icon: <FiHome className="text-xs" /> },
-    { id: 'offers', label: 'Offers Submitted', icon: <FiDollarSign className="text-xs" /> },
-    { id: 'contacted', label: 'Recently Contacted', icon: <FiUsers className="text-xs" /> },
-    { id: 'lead', label: 'Lead History', icon: <FiClock className="text-xs" /> },
-  ];
 
   // ============ MOCK DATA WITH ACTIVITY ============
   const generateMockBuyers = useCallback(() => {
@@ -632,12 +606,8 @@ const BuyerPropertyActivity = () => {
     const active = buyers.filter(b => b.status === 'active').length;
     const pending = buyers.filter(b => b.status === 'pending').length;
     const blocked = buyers.filter(b => b.status === 'blocked').length;
-    const totalViewed = buyers.reduce((sum, b) => sum + b.activity.viewedProperties, 0);
-    const totalSaved = buyers.reduce((sum, b) => sum + b.activity.savedProperties, 0);
-    const totalEnquiries = buyers.reduce((sum, b) => sum + b.activity.enquiries, 0);
-    const totalVisits = buyers.reduce((sum, b) => sum + b.activity.siteVisits, 0);
 
-    setStats({ total, active, pending, blocked, totalViewed, totalSaved, totalEnquiries, totalVisits });
+    setStats({ total, active, pending, blocked });
     return buyers;
   }, []);
 
@@ -669,39 +639,17 @@ const BuyerPropertyActivity = () => {
       filtered = filtered.filter(b => b.status === selectedStatus);
     }
 
-    // Activity filter
-    if (selectedActivityFilter !== 'all') {
-      const filterMap = {
-        'viewed': 'viewedProperties',
-        'saved': 'savedProperties',
-        'wishlist': 'wishlist',
-        'enquiries': 'enquiries',
-        'visits': 'siteVisits',
-        'purchase': 'purchaseRequests',
-        'offers': 'offersSubmitted',
-        'contacted': 'recentlyContacted',
-        'lead': 'leadHistory'
-      };
-      const key = filterMap[selectedActivityFilter];
-      if (key) {
-        filtered = filtered.filter(b => (b.activity?.[key] || 0) > 0);
-        // Sort by the selected activity count (descending)
-        filtered.sort((a, b) => (b.activity?.[key] || 0) - (a.activity?.[key] || 0));
-      }
-    } else {
-      // Default sort by name
-      filtered.sort((a, b) => a.personal.name.localeCompare(b.personal.name));
-    }
+    // Default sort by name
+    filtered.sort((a, b) => a.personal.name.localeCompare(b.personal.name));
 
     let count = 0;
     if (selectedStatus !== 'all') count++;
-    if (selectedActivityFilter !== 'all') count++;
     if (searchQuery) count++;
     setFilterCount(count);
 
     setFilteredBuyers(filtered);
     setCurrentPage(1);
-  }, [buyers, searchQuery, selectedStatus, selectedActivityFilter]);
+  }, [buyers, searchQuery, selectedStatus]);
 
   useEffect(() => { filterBuyers(); }, [filterBuyers]);
 
@@ -716,11 +664,7 @@ const BuyerPropertyActivity = () => {
     const active = list.filter(b => b.status === 'active').length;
     const pending = list.filter(b => b.status === 'pending').length;
     const blocked = list.filter(b => b.status === 'blocked').length;
-    const totalViewed = list.reduce((sum, b) => sum + (b.activity?.viewedProperties || 0), 0);
-    const totalSaved = list.reduce((sum, b) => sum + (b.activity?.savedProperties || 0), 0);
-    const totalEnquiries = list.reduce((sum, b) => sum + (b.activity?.enquiries || 0), 0);
-    const totalVisits = list.reduce((sum, b) => sum + (b.activity?.siteVisits || 0), 0);
-    setStats({ total, active, pending, blocked, totalViewed, totalSaved, totalEnquiries, totalVisits });
+    setStats({ total, active, pending, blocked });
   };
 
   // ============ HANDLERS ============
@@ -780,7 +724,6 @@ const BuyerPropertyActivity = () => {
   const handleEditBuyer = useCallback((buyer) => {
     setEditingBuyer(buyer);
     setShowEditModal(true);
-    // Close view modal if open
     if (showViewModal) {
       setShowViewModal(false);
     }
@@ -796,7 +739,6 @@ const BuyerPropertyActivity = () => {
           ...b.activity,
           ...updatedActivity
         },
-        // Update top-level fields for compatibility
         savedProperties: updatedActivity.savedProperties || 0,
         viewedProperties: updatedActivity.viewedProperties || 0,
         inquiries: updatedActivity.enquiries || 0,
@@ -833,22 +775,8 @@ const BuyerPropertyActivity = () => {
     setActiveFilter(filter);
     if (filter === 'all') {
       setSelectedStatus('all');
-      setSelectedActivityFilter('all');
     } else if (['active', 'pending', 'blocked'].includes(filter)) {
       setSelectedStatus(filter);
-      setSelectedActivityFilter('all');
-    } else {
-      // Activity filter
-      const filterMap = {
-        'totalViewed': 'viewed',
-        'totalSaved': 'saved',
-        'totalEnquiries': 'enquiries',
-        'totalVisits': 'visits'
-      };
-      if (filterMap[filter]) {
-        setSelectedActivityFilter(filterMap[filter]);
-        setSelectedStatus('all');
-      }
     }
     setSearchQuery('');
     searchInputRef.current?.focus();
@@ -857,7 +785,6 @@ const BuyerPropertyActivity = () => {
   const clearAllFilters = useCallback(() => {
     setSearchQuery('');
     setSelectedStatus('all');
-    setSelectedActivityFilter('all');
     setActiveFilter('all');
     searchInputRef.current?.focus();
     showToast('All filters cleared', 'info');
@@ -1017,11 +944,11 @@ const BuyerPropertyActivity = () => {
         </div>
       </div>
 
-      {/* Stats - Same as before */}
+      {/* Stats - Only Total, Active, Pending, Blocked */}
       {showStats && (
         <div className="relative animate-slide-in">
           <div className="bg-green/400 rounded-3xl p-4 border border-[#d8f4ec] shadow-sm">
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <StatCard 
                 icon={<FiUsers className="text-white text-sm" />} 
                 title="Total Buyers" 
@@ -1062,74 +989,10 @@ const BuyerPropertyActivity = () => {
                 statsAnimating={statsAnimating} 
                 onClick={() => handleStatClick('blocked')} 
               />
-              <StatCard 
-                icon={<FiEye className="text-white text-sm" />} 
-                title="Total Viewed" 
-                value={stats.totalViewed} 
-                color="bg-gradient-to-br from-blue-600 to-blue-400" 
-                delay={400} 
-                isActive={activeFilter === 'totalViewed'} 
-                statsAnimating={statsAnimating} 
-                onClick={() => handleStatClick('totalViewed')} 
-              />
-              <StatCard 
-                icon={<FiBookmark className="text-white text-sm" />} 
-                title="Total Saved" 
-                value={stats.totalSaved} 
-                color="bg-gradient-to-br from-purple-600 to-purple-400" 
-                delay={500} 
-                isActive={activeFilter === 'totalSaved'} 
-                statsAnimating={statsAnimating} 
-                onClick={() => handleStatClick('totalSaved')} 
-              />
-              <StatCard 
-                icon={<FiMessageSquare className="text-white text-sm" />} 
-                title="Enquiries" 
-                value={stats.totalEnquiries} 
-                color="bg-gradient-to-br from-indigo-600 to-indigo-400" 
-                delay={600} 
-                isActive={activeFilter === 'totalEnquiries'} 
-                statsAnimating={statsAnimating} 
-                onClick={() => handleStatClick('totalEnquiries')} 
-              />
-              <StatCard 
-                icon={<FiMapPin className="text-white text-sm" />} 
-                title="Site Visits" 
-                value={stats.totalVisits} 
-                color="bg-gradient-to-br from-rose-600 to-rose-400" 
-                delay={700} 
-                isActive={activeFilter === 'totalVisits'} 
-                statsAnimating={statsAnimating} 
-                onClick={() => handleStatClick('totalVisits')} 
-              />
             </div>
           </div>
         </div>
       )}
-
-      {/* Activity Filter Chips */}
-      <div className="relative">
-        <div className="flex flex-wrap items-center gap-2">
-          {activityFilters.map(filter => (
-            <button
-              key={filter.id}
-              onClick={() => {
-                setSelectedActivityFilter(filter.id);
-                setActiveFilter(filter.id === 'all' ? 'all' : filter.id);
-                if (filter.id !== 'all') setSelectedStatus('all');
-              }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 hover:scale-105 ${
-                selectedActivityFilter === filter.id
-                  ? 'bg-[#00695C] text-white shadow-md shadow-[#00695C]/30'
-                  : 'bg-white border border-[#E8F0EE] text-[#5A7D78] hover:border-[#00695C]/30'
-              }`}
-            >
-              {filter.icon}
-              {filter.label}
-            </button>
-          ))}
-        </div>
-      </div>
 
       {/* Search & Filters */}
       <div className="relative bg-white rounded-2xl p-4 shadow-sm border border-[#E8F0EE] hover:shadow-md transition-all duration-300">
@@ -1180,7 +1043,7 @@ const BuyerPropertyActivity = () => {
         </div>
       </div>
 
-      {/* Profiles Grid/List - Same as before with Edit button */}
+      {/* Profiles Grid/List */}
       <div className="relative">
         {loading ? (
           <div className="flex items-center justify-center py-20">
@@ -1261,13 +1124,6 @@ const BuyerPropertyActivity = () => {
                     <button type="button" onClick={() => handleViewBuyer(buyer)} className="flex-1 py-1.5 text-xs font-medium text-[#00695C] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105">
                       <FiEye className="text-[10px]" /> View
                     </button>
-                    {/* <button
-                      type="button"
-                      onClick={() => handleEditBuyer(buyer)}
-                      className="flex-1 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
-                    >
-                      <FiEdit className="text-[10px]" /> Edit
-                    </button> */}
                     <button
                       type="button"
                       onClick={() => handleBlockClick(buyer.id, buyer.status !== 'blocked')}
@@ -1357,9 +1213,6 @@ const BuyerPropertyActivity = () => {
                   <div className="col-span-1 flex items-center justify-end gap-1">
                     <button type="button" onClick={() => handleViewBuyer(buyer)} className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110" title="View">
                       <FiEye className="text-xs" />
-                    </button>
-                    <button type="button" onClick={() => handleEditBuyer(buyer)} className="w-7 h-7 rounded-lg hover:bg-blue-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-blue-600 hover:scale-110" title="Edit Activity">
-                      <FiEdit className="text-xs" />
                     </button>
                     <button
                       type="button"
