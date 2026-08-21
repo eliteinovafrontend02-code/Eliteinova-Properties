@@ -49,10 +49,10 @@ import {
 import BuyerTenantsOverview from './buyer&tenants/BuyerTenantsOverview';
 
 // Buyer Management
-// import BuyerManagementOverview from './buyer&tenants/BuyerManagement/BuyerManagementOverview';
-// import BuyerRegistration from './buyer&tenants/BuyerManagement/BuyerRegistration';
-// import BuyerProfile from './buyer&tenants/BuyerManagement/BuyerProfile';
-// import BuyerPropertyActivity from './buyer&tenants/BuyerManagement/BuyerPropertyActivity';
+import BuyerManagementOverview from './buyer&tenants/BuyerManagement/BuyerManagementOverview';
+import BuyerRegistration from './buyer&tenants/BuyerManagement/BuyerRegistration';
+import BuyerProfile from './buyer&tenants/BuyerManagement/BuyerProfile';
+import BuyerPropertyActivity from './buyer&tenants/BuyerManagement/BuyerPropertyActivity';
 
 // Tenant Management
 // import TenantManagementOverview from './buyer&tenants/TenantManagement/TenantManagementOverview';
@@ -416,10 +416,10 @@ const BuyerTenantsDashboard = () => {
               <Route path="overview" element={<BuyerTenantsOverview />} />
 
               {/* Buyer Management */}
-              {/* <Route path="buyer/overview" element={<BuyerManagementOverview />} />
+              <Route path="buyer/overview" element={<BuyerManagementOverview />} />
               <Route path="buyer/registration" element={<BuyerRegistration />} />
               <Route path="buyer/profile" element={<BuyerProfile />} />
-              <Route path="buyer/activity" element={<BuyerPropertyActivity />} /> */}
+              <Route path="buyer/activity" element={<BuyerPropertyActivity />} />
 
               {/* Tenant Management */}
               {/* <Route path="tenant/overview" element={<TenantManagementOverview />} />

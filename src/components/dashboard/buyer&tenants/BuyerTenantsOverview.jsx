@@ -10,7 +10,7 @@ import {
   FiMoreVertical, FiEdit, FiTrash2, FiMail, FiPhone,
   FiClock as FiClockIcon, FiDollarSign, FiMap, FiBookmark,
   FiGrid, FiBell, FiPlus, FiUserPlus, FiChevronRight,
-  FiInfo, FiAlertCircle, FiFile, FiSettings  // <-- ADDED FiFile and FiSettings
+  FiInfo, FiAlertCircle, FiFile, FiSettings
 } from 'react-icons/fi';
 import { 
   FaUsers, FaUserCheck, FaUserTimes, FaBuilding,
@@ -86,6 +86,23 @@ const BuyerTenantsOverview = () => {
   
   const [toast, setToast] = useState({ show: false, message: '', type: '' });
 
+  // Theme colors
+  const themeColors = {
+    primary: '#00695C',
+    primaryLight: '#26A69A',
+    primaryDark: '#004D40',
+    secondary: '#00897B',
+    accent: '#4DB6AC',
+    gradient: 'from-[#00695C] to-[#26A69A]',
+    gradientDark: 'from-[#004D40] to-[#00897B]',
+    lightBg: 'bg-teal-50',
+    lightBorder: 'border-teal-200',
+    textPrimary: 'text-[#00695C]',
+    textLight: 'text-[#26A69A]',
+    hoverBg: 'hover:bg-teal-50',
+    shadow: 'shadow-[#00695C]/20',
+  };
+
   // ============ NAVIGATION HANDLERS ============
   const handleNavigate = (path) => {
     navigate(path);
@@ -113,8 +130,11 @@ const BuyerTenantsOverview = () => {
       setShowCustomDatePicker(false);
       setStartDate('');
       setEndDate('');
-      showToast(`Showing data for ${getPeriodLabel(period)}`, 'info');
-      handleRefresh();
+      // Correct notification based on period selected
+      const periodLabel = getPeriodLabel(period);
+      showToast(`📊 Showing data for ${periodLabel}`, 'info');
+      // Refresh data with new period
+      refreshDataForPeriod(period);
     } else {
       setShowCustomDatePicker(true);
     }
@@ -123,13 +143,22 @@ const BuyerTenantsOverview = () => {
   const getPeriodLabel = (period) => {
     const labels = {
       'today': 'Today',
+      'yesterday': 'Yesterday',
       'this-week': 'This Week',
       'this-month': 'This Month',
-      'this-quarter': 'This Quarter',
       'this-year': 'This Year',
       'custom': 'Custom Range'
     };
     return labels[period] || period;
+  };
+
+  // Refresh data for specific period without showing "Data refreshed" message
+  const refreshDataForPeriod = (period) => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      // No toast message here - handled by handlePeriodChange
+    }, 500);
   };
 
   const handleCustomDateApply = () => {
@@ -137,10 +166,14 @@ const BuyerTenantsOverview = () => {
       setShowCustomDatePicker(false);
       const start = new Date(startDate);
       const end = new Date(endDate);
-      showToast(`Showing data from ${start.toLocaleDateString()} to ${end.toLocaleDateString()}`, 'info');
-      handleRefresh();
+      showToast(`📅 Showing data from ${start.toLocaleDateString()} to ${end.toLocaleDateString()}`, 'info');
+      // Refresh data with custom range
+      setLoading(true);
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
     } else {
-      showToast('Please select both start and end dates', 'error');
+      showToast('⚠️ Please select both start and end dates', 'error');
     }
   };
 
@@ -152,10 +185,12 @@ const BuyerTenantsOverview = () => {
       value: '1,284',
       change: '+12.5%',
       trend: 'up',
-      icon: <FaUserCircle className="text-[#00695C] dark:text-[#4DB6AC]" />,
-      color: 'from-[#00695C]/10 to-[#26A69A]/10 dark:from-[#00695C]/20 dark:to-[#26A69A]/10',
+      icon: <FaUserCircle className="text-[#00695C]" />,
+      color: 'from-[#E0F2F1] to-[#B2DFDB]',
       borderColor: 'border-[#00695C]',
-      path: '/admin/buyers-tenants/buyer/overview'
+      accentColor: '#00695C',
+      path: '/admin/buyers-tenants/buyer/overview',
+      notification: 'Navigating to Total Buyers overview...'
     },
     {
       id: 2,
@@ -163,10 +198,12 @@ const BuyerTenantsOverview = () => {
       value: '856',
       change: '+8.2%',
       trend: 'up',
-      icon: <BsPeople className="text-[#26A69A] dark:text-[#80CBC4]" />,
-      color: 'from-[#26A69A]/10 to-[#80CBC4]/10 dark:from-[#26A69A]/20 dark:to-[#80CBC4]/10',
+      icon: <BsPeople className="text-[#26A69A]" />,
+      color: 'from-[#E8F5E9] to-[#C8E6C9]',
       borderColor: 'border-[#26A69A]',
-      path: '/admin/buyers-tenants/tenant/overview'
+      accentColor: '#26A69A',
+      path: '/admin/buyers-tenants/tenant/overview',
+      notification: 'Navigating to Total Tenants overview...'
     },
     {
       id: 3,
@@ -174,10 +211,12 @@ const BuyerTenantsOverview = () => {
       value: '2,156',
       change: '+18.7%',
       trend: 'up',
-      icon: <MdOutlinePeople className="text-[#9C27B0] dark:text-[#CE93D8]" />,
-      color: 'from-[#9C27B0]/10 to-[#CE93D8]/10 dark:from-[#9C27B0]/20 dark:to-[#CE93D8]/10',
+      icon: <MdOutlinePeople className="text-[#9C27B0]" />,
+      color: 'from-[#F3E5F5] to-[#E1BEE7]',
       borderColor: 'border-[#9C27B0]',
-      path: '/admin/buyers-tenants/lead/overview'
+      accentColor: '#9C27B0',
+      path: '/admin/buyers-tenants/lead/overview',
+      notification: 'Navigating to Total Leads overview...'
     },
     {
       id: 4,
@@ -185,10 +224,12 @@ const BuyerTenantsOverview = () => {
       value: '47',
       change: '-3.1%',
       trend: 'down',
-      icon: <FiUserPlus className="text-[#FF6B6B] dark:text-[#FF8A8A]" />,
-      color: 'from-[#FF6B6B]/10 to-[#FF8A8A]/10 dark:from-[#FF6B6B]/20 dark:to-[#FF8A8A]/10',
+      icon: <FiUserPlus className="text-[#FF6B6B]" />,
+      color: 'from-[#FFEBEE] to-[#FFCDD2]',
       borderColor: 'border-[#FF6B6B]',
-      path: '/admin/buyers-tenants/buyer/registration'
+      accentColor: '#FF6B6B',
+      path: '/admin/buyers-tenants/buyer/registration',
+      notification: 'Navigating to New Registrations...'
     },
     {
       id: 5,
@@ -196,10 +237,12 @@ const BuyerTenantsOverview = () => {
       value: '3,429',
       change: '+24.7%',
       trend: 'up',
-      icon: <FiHeart className="text-[#E91E63] dark:text-[#F06292]" />,
-      color: 'from-[#E91E63]/10 to-[#F06292]/10 dark:from-[#E91E63]/20 dark:to-[#F06292]/10',
+      icon: <FiHeart className="text-[#E91E63]" />,
+      color: 'from-[#FCE4EC] to-[#F8BBD0]',
       borderColor: 'border-[#E91E63]',
-      path: '/admin/buyers-tenants/saved/wishlist'
+      accentColor: '#E91E63',
+      path: '/admin/buyers-tenants/saved/wishlist',
+      notification: 'Navigating to Wishlist Properties...'
     },
     {
       id: 6,
@@ -207,10 +250,12 @@ const BuyerTenantsOverview = () => {
       value: '892',
       change: '+18.9%',
       trend: 'up',
-      icon: <FiMapPin className="text-[#FF9800] dark:text-[#FFB74D]" />,
-      color: 'from-[#FF9800]/10 to-[#FFB74D]/10 dark:from-[#FF9800]/20 dark:to-[#FFB74D]/10',
+      icon: <FiMapPin className="text-[#FF9800]" />,
+      color: 'from-[#FFF3E0] to-[#FFE0B2]',
       borderColor: 'border-[#FF9800]',
-      path: '/admin/buyers-tenants/site-visits/dashboard'
+      accentColor: '#FF9800',
+      path: '/admin/buyers-tenants/site-visits/dashboard',
+      notification: 'Navigating to Site Visits dashboard...'
     },
     {
       id: 7,
@@ -218,10 +263,12 @@ const BuyerTenantsOverview = () => {
       value: '156',
       change: '+22.3%',
       trend: 'up',
-      icon: <FaHandshake className="text-[#4CAF50] dark:text-[#81C784]" />,
-      color: 'from-[#4CAF50]/10 to-[#81C784]/10 dark:from-[#4CAF50]/20 dark:to-[#81C784]/10',
+      icon: <FaHandshake className="text-[#4CAF50]" />,
+      color: 'from-[#E8F5E9] to-[#C8E6C9]',
       borderColor: 'border-[#4CAF50]',
-      path: '/admin/buyers-tenants/purchase/overview'
+      accentColor: '#4CAF50',
+      path: '/admin/buyers-tenants/purchase/overview',
+      notification: 'Navigating to Purchase Requests...'
     },
     {
       id: 8,
@@ -229,10 +276,12 @@ const BuyerTenantsOverview = () => {
       value: '234',
       change: '+14.8%',
       trend: 'up',
-      icon: <FaClipboardList className="text-[#2196F3] dark:text-[#64B5F6]" />,
-      color: 'from-[#2196F3]/10 to-[#64B5F6]/10 dark:from-[#2196F3]/20 dark:to-[#64B5F6]/10',
+      icon: <FaClipboardList className="text-[#2196F3]" />,
+      color: 'from-[#E3F2FD] to-[#BBDEFB]',
       borderColor: 'border-[#2196F3]',
-      path: '/admin/buyers-tenants/rental/overview'
+      accentColor: '#2196F3',
+      path: '/admin/buyers-tenants/rental/overview',
+      notification: 'Navigating to Rental Requests...'
     }
   ];
 
@@ -246,7 +295,8 @@ const BuyerTenantsOverview = () => {
       property: 'Luxury Villa in Whitefield',
       time: '2 minutes ago',
       avatar: 'https://ui-avatars.com/api/?name=Rahul+Sharma&background=00695C&color=fff&size=32',
-      path: '/admin/buyers-tenants/buyer/profile'
+      path: '/admin/buyers-tenants/buyer/profile',
+      notification: 'Viewing Rahul Sharma\'s profile...'
     },
     {
       id: 2,
@@ -256,7 +306,8 @@ const BuyerTenantsOverview = () => {
       property: '3BHK Apartment in Indiranagar',
       time: '15 minutes ago',
       avatar: 'https://ui-avatars.com/api/?name=Priya+Patel&background=26A69A&color=fff&size=32',
-      path: '/admin/buyers-tenants/tenant/profile'
+      path: '/admin/buyers-tenants/tenant/profile',
+      notification: 'Viewing Priya Patel\'s profile...'
     },
     {
       id: 3,
@@ -266,7 +317,8 @@ const BuyerTenantsOverview = () => {
       property: 'Penthouse in Koramangala',
       time: '45 minutes ago',
       avatar: 'https://ui-avatars.com/api/?name=Amit+Kumar&background=00897B&color=fff&size=32',
-      path: '/admin/buyers-tenants/site-visits/details'
+      path: '/admin/buyers-tenants/site-visits/details',
+      notification: 'Viewing Site Visit details...'
     },
     {
       id: 4,
@@ -276,7 +328,8 @@ const BuyerTenantsOverview = () => {
       property: '2BHK in Electronic City',
       time: '1 hour ago',
       avatar: 'https://ui-avatars.com/api/?name=Sneha+Reddy&background=E91E63&color=fff&size=32',
-      path: '/admin/buyers-tenants/saved/wishlist'
+      path: '/admin/buyers-tenants/saved/wishlist',
+      notification: 'Viewing Wishlist...'
     },
     {
       id: 5,
@@ -286,7 +339,8 @@ const BuyerTenantsOverview = () => {
       property: '4BHK Villa in Sarjapur',
       time: '2 hours ago',
       avatar: 'https://ui-avatars.com/api/?name=Vikram+Singh&background=4CAF50&color=fff&size=32',
-      path: '/admin/buyers-tenants/purchase/details'
+      path: '/admin/buyers-tenants/purchase/details',
+      notification: 'Viewing Purchase Request details...'
     }
   ];
 
@@ -300,7 +354,8 @@ const BuyerTenantsOverview = () => {
       revenue: '₹2.4 Cr',
       rating: 4.9,
       avatar: 'https://ui-avatars.com/api/?name=Sanjay+Mehta&background=00695C&color=fff&size=40',
-      path: '/profile/agent'
+      path: '/profile/agent',
+      notification: 'Viewing Sanjay Mehta\'s profile...'
     },
     {
       id: 2,
@@ -310,7 +365,8 @@ const BuyerTenantsOverview = () => {
       revenue: '₹1.8 Cr',
       rating: 4.8,
       avatar: 'https://ui-avatars.com/api/?name=Ananya+Iyer&background=26A69A&color=fff&size=40',
-      path: '/profile/property-management'
+      path: '/profile/property-management',
+      notification: 'Viewing Ananya Iyer\'s profile...'
     },
     {
       id: 3,
@@ -320,7 +376,8 @@ const BuyerTenantsOverview = () => {
       revenue: '₹1.5 Cr',
       rating: 4.7,
       avatar: 'https://ui-avatars.com/api/?name=Ravi+Desai&background=00897B&color=fff&size=40',
-      path: '/profile/agent'
+      path: '/profile/agent',
+      notification: 'Viewing Ravi Desai\'s profile...'
     },
     {
       id: 4,
@@ -330,7 +387,8 @@ const BuyerTenantsOverview = () => {
       revenue: '₹1.2 Cr',
       rating: 4.6,
       avatar: 'https://ui-avatars.com/api/?name=Neha+Gupta&background=FF9800&color=fff&size=40',
-      path: '/profile/property-management'
+      path: '/profile/property-management',
+      notification: 'Viewing Neha Gupta\'s profile...'
     }
   ];
 
@@ -352,68 +410,92 @@ const BuyerTenantsOverview = () => {
       icon: <FiUserPlus />, 
       label: 'Add Buyer', 
       color: 'bg-[#00695C]', 
+      lightColor: 'bg-teal-100',
+      textColor: 'text-[#00695C]',
       path: '/admin/buyers-tenants/buyer/registration',
-      actionName: 'Add Buyer'
+      actionName: 'Add Buyer',
+      notification: '📝 Opening Add Buyer form...'
     },
     { 
       icon: <FiUserPlus />, 
       label: 'Add Tenant', 
-      color: 'bg-[#26A69A]', 
+      color: 'bg-[#26A69A]',
+      lightColor: 'bg-green-100', 
+      textColor: 'text-[#26A69A]',
       path: '/admin/buyers-tenants/tenant/registration',
-      actionName: 'Add Tenant'
+      actionName: 'Add Tenant',
+      notification: '📝 Opening Add Tenant form...'
     },
     { 
       icon: <FiHeart />, 
       label: 'View Wishlist', 
-      color: 'bg-[#E91E63]', 
+      color: 'bg-[#E91E63]',
+      lightColor: 'bg-pink-100', 
+      textColor: 'text-[#E91E63]',
       path: '/admin/buyers-tenants/saved/wishlist',
-      actionName: 'Wishlist'
+      actionName: 'Wishlist',
+      notification: '❤️ Viewing Wishlist...'
     },
     { 
       icon: <FiMapPin />, 
       label: 'Site Visits', 
-      color: 'bg-[#FF9800]', 
+      color: 'bg-[#FF9800]',
+      lightColor: 'bg-orange-100', 
+      textColor: 'text-[#FF9800]',
       path: '/admin/buyers-tenants/site-visits/dashboard',
-      actionName: 'Site Visits'
+      actionName: 'Site Visits',
+      notification: '📍 Navigating to Site Visits...'
     },
     { 
       icon: <FaHandshake />, 
       label: 'Purchase Requests', 
-      color: 'bg-[#4CAF50]', 
+      color: 'bg-[#4CAF50]',
+      lightColor: 'bg-emerald-100', 
+      textColor: 'text-[#4CAF50]',
       path: '/admin/buyers-tenants/purchase/overview',
-      actionName: 'Purchase Requests'
+      actionName: 'Purchase Requests',
+      notification: '🤝 Viewing Purchase Requests...'
     },
     { 
       icon: <FaClipboardList />, 
       label: 'Rental Requests', 
-      color: 'bg-[#2196F3]', 
+      color: 'bg-[#2196F3]',
+      lightColor: 'bg-blue-100', 
+      textColor: 'text-[#2196F3]',
       path: '/admin/buyers-tenants/rental/overview',
-      actionName: 'Rental Requests'
+      actionName: 'Rental Requests',
+      notification: '📋 Viewing Rental Requests...'
     },
     { 
       icon: <MdOutlinePeople />, 
       label: 'Lead Management', 
-      color: 'bg-[#9C27B0]', 
+      color: 'bg-[#9C27B0]',
+      lightColor: 'bg-purple-100', 
+      textColor: 'text-[#9C27B0]',
       path: '/admin/buyers-tenants/lead/overview',
-      actionName: 'Lead Management'
+      actionName: 'Lead Management',
+      notification: '👥 Opening Lead Management...'
     },
     { 
       icon: <FaChartLine />, 
       label: 'Reports', 
-      color: 'bg-[#607D8B]', 
+      color: 'bg-[#607D8B]',
+      lightColor: 'bg-slate-100', 
+      textColor: 'text-[#607D8B]',
       path: '/admin/reports',
-      actionName: 'Reports'
+      actionName: 'Reports',
+      notification: '📊 Generating Reports...'
     }
   ];
 
   // ============ LEAD STATUS DATA ============
   const leadStatusData = [
-    { label: 'New Leads', value: 45, color: 'bg-blue-500', path: '/admin/buyers-tenants/lead/status' },
-    { label: 'In Progress', value: 82, color: 'bg-yellow-500', path: '/admin/buyers-tenants/lead/dashboard' },
-    { label: 'Site Visits', value: 38, color: 'bg-purple-500', path: '/admin/buyers-tenants/site-visits/dashboard' },
-    { label: 'Negotiation', value: 27, color: 'bg-orange-500', path: '/admin/buyers-tenants/lead/dashboard' },
-    { label: 'Closed Won', value: 64, color: 'bg-green-500', path: '/admin/buyers-tenants/lead/status' },
-    { label: 'Closed Lost', value: 23, color: 'bg-red-500', path: '/admin/buyers-tenants/lead/status' }
+    { label: 'New Leads', value: 45, color: 'bg-blue-500', lightBg: 'bg-blue-100', lightText: 'text-blue-700', path: '/admin/buyers-tenants/lead/status', notification: '📊 Viewing New Leads status...' },
+    { label: 'In Progress', value: 82, color: 'bg-yellow-500', lightBg: 'bg-yellow-100', lightText: 'text-yellow-700', path: '/admin/buyers-tenants/lead/dashboard', notification: '🔄 Viewing In Progress leads...' },
+    { label: 'Site Visits', value: 38, color: 'bg-purple-500', lightBg: 'bg-purple-100', lightText: 'text-purple-700', path: '/admin/buyers-tenants/site-visits/dashboard', notification: '📍 Viewing Site Visits status...' },
+    { label: 'Negotiation', value: 27, color: 'bg-orange-500', lightBg: 'bg-orange-100', lightText: 'text-orange-700', path: '/admin/buyers-tenants/lead/dashboard', notification: '🤝 Viewing Negotiation status...' },
+    { label: 'Closed Won', value: 64, color: 'bg-green-500', lightBg: 'bg-green-100', lightText: 'text-green-700', path: '/admin/buyers-tenants/lead/status', notification: '✅ Viewing Closed Won leads...' },
+    { label: 'Closed Lost', value: 23, color: 'bg-red-500', lightBg: 'bg-red-100', lightText: 'text-red-700', path: '/admin/buyers-tenants/lead/status', notification: '❌ Viewing Closed Lost leads...' }
   ];
 
   const maxLeadValue = Math.max(...leadStatusData.map(item => item.value));
@@ -421,7 +503,7 @@ const BuyerTenantsOverview = () => {
   // ============ EXPORT HANDLER ============
   const handleExport = (format = 'csv') => {
     setExportLoading(true);
-    showToast('Preparing export data...', 'info');
+    showToast('📤 Preparing export data...', 'info');
 
     setTimeout(() => {
       try {
@@ -477,10 +559,10 @@ const BuyerTenantsOverview = () => {
           exportToCSV(flatData, `${filename}.csv`);
         }
 
-        showToast(`Data exported successfully as ${format.toUpperCase()}!`, 'success');
+        showToast(`✅ Data exported successfully as ${format.toUpperCase()}!`, 'success');
         setShowExportMenu(false);
       } catch (error) {
-        showToast('Failed to export data. Please try again.', 'error');
+        showToast('❌ Failed to export data. Please try again.', 'error');
       } finally {
         setExportLoading(false);
       }
@@ -490,10 +572,10 @@ const BuyerTenantsOverview = () => {
   // ============ REFRESH HANDLER ============
   const handleRefresh = () => {
     setLoading(true);
-    showToast('Refreshing data...', 'info');
+    showToast('🔄 Refreshing dashboard data...', 'info');
     setTimeout(() => {
       setLoading(false);
-      showToast('Data refreshed successfully!', 'success');
+      showToast('✅ Dashboard data refreshed successfully!', 'success');
     }, 1000);
   };
 
@@ -501,7 +583,7 @@ const BuyerTenantsOverview = () => {
   const handleStatClick = (stat) => {
     if (stat.path) {
       navigate(stat.path);
-      showToast(`Navigating to ${stat.title}...`, 'info');
+      showToast(stat.notification || `Navigating to ${stat.title}...`, 'info');
     }
   };
 
@@ -516,6 +598,12 @@ const BuyerTenantsOverview = () => {
         start.setHours(0, 0, 0, 0);
         end.setHours(23, 59, 59, 999);
         break;
+      case 'yesterday':
+        start.setDate(now.getDate() - 1);
+        start.setHours(0, 0, 0, 0);
+        end.setDate(now.getDate() - 1);
+        end.setHours(23, 59, 59, 999);
+        break;
       case 'this-week':
         const day = now.getDay();
         start.setDate(now.getDate() - day);
@@ -526,12 +614,6 @@ const BuyerTenantsOverview = () => {
       case 'this-month':
         start = new Date(now.getFullYear(), now.getMonth(), 1);
         end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        end.setHours(23, 59, 59, 999);
-        break;
-      case 'this-quarter':
-        const quarter = Math.floor(now.getMonth() / 3);
-        start = new Date(now.getFullYear(), quarter * 3, 1);
-        end = new Date(now.getFullYear(), quarter * 3 + 3, 0);
         end.setHours(23, 59, 59, 999);
         break;
       case 'this-year':
@@ -556,22 +638,46 @@ const BuyerTenantsOverview = () => {
 
   const dateRange = getDateRange();
 
+  // Handle click on lead status
+  const handleLeadStatusClick = (item) => {
+    if (item.path) {
+      navigate(item.path);
+      showToast(item.notification || `Viewing ${item.label}...`, 'info');
+    }
+  };
+
+  // Handle click on recent activity
+  const handleActivityClick = (activity) => {
+    if (activity.path) {
+      navigate(activity.path);
+      showToast(activity.notification || `Viewing ${activity.user}'s activity...`, 'info');
+    }
+  };
+
+  // Handle click on top performer
+  const handlePerformerClick = (performer) => {
+    if (performer.path) {
+      navigate(performer.path);
+      showToast(performer.notification || `Viewing ${performer.name}'s profile...`, 'info');
+    }
+  };
+
   return (
-    <div className="relative">
+    <div className="relative bg-gray-50 dark:bg-gray-900 min-h-screen p-4 md:p-6">
       {/* ============ TOAST NOTIFICATION ============ */}
       {toast.show && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg animate-slide-in-right flex items-center gap-3 ${
-          toast.type === 'success' ? 'bg-green-50 border border-green-200 text-green-700 dark:bg-green-900/30 dark:border-green-700 dark:text-green-300' :
-          toast.type === 'error' ? 'bg-red-50 border border-red-200 text-red-700 dark:bg-red-900/30 dark:border-red-700 dark:text-red-300' :
-          'bg-blue-50 border border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-700 dark:text-blue-300'
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-xl animate-slide-in-right flex items-center gap-3 ${
+          toast.type === 'success' ? 'bg-white border-l-4 border-green-500 shadow-green-100 text-green-700' :
+          toast.type === 'error' ? 'bg-white border-l-4 border-red-500 shadow-red-100 text-red-700' :
+          'bg-white border-l-4 border-[#00695C] shadow-[#00695C]/20 text-[#00695C]'
         }`}>
-          {toast.type === 'success' && <FiCheckCircle className="text-green-500" />}
-          {toast.type === 'error' && <FiXCircle className="text-red-500" />}
-          {toast.type === 'info' && <FiInfo className="text-blue-500" />}
+          {toast.type === 'success' && <FiCheckCircle className="text-green-500 text-lg" />}
+          {toast.type === 'error' && <FiXCircle className="text-red-500 text-lg" />}
+          {toast.type === 'info' && <FiInfo className="text-[#00695C] text-lg" />}
           <span className="text-sm font-medium">{toast.message}</span>
           <button 
             onClick={() => setToast({ show: false, message: '', type: '' })}
-            className="ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+            className="ml-2 text-gray-400 hover:text-gray-600 transition-colors"
           >
             <FiXCircle className="text-sm" />
           </button>
@@ -579,83 +685,96 @@ const BuyerTenantsOverview = () => {
       )}
 
       {/* ============ PAGE HEADER ============ */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 animate-fade-in">
         <div>
-          <div className="flex items-center gap-3">  {/* Changed from h1 to div */}
-            <span className="bg-gradient-to-r from-[#00695C] to-[#26A69A] p-2 rounded-xl shadow-lg shadow-[#00695C]/20">
-              <FiUsers className="text-white text-lg" />
-            </span>
-            <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
-              Buyer & Tenant Overview
-            </h1>
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-br from-[#00695C] to-[#26A69A] p-2.5 rounded-2xl shadow-lg shadow-[#00695C]/20 animate-pulse-soft">
+              <FiUsers className="text-white text-xl" />
+            </div>
+            <div>
+              <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent animate-gradient">
+                Buyer & Tenant Overview
+              </h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#26A69A] animate-pulse" />
+                Real-time overview of buyers and tenants activity
+              </p>
+            </div>
           </div>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#26A69A] animate-pulse" />
-            Real-time overview of buyers and tenants activity
-          </p>
         </div>
 
-        {/* ============ HEADER RIGHT SIDE - THEME BASED CONTROLS ============ */}
+        {/* ============ HEADER RIGHT SIDE ============ */}
         <div className="flex items-center gap-2 flex-wrap relative">
-          {/* Period Selector */}
-          <div className="flex items-center gap-2 bg-white dark:bg-gray-800 rounded-xl px-3 py-2 border border-gray-200 dark:border-gray-700 shadow-sm">
-            <FiCalendar className="text-gray-400 dark:text-gray-500 text-sm" />
+          {/* Period Selector - Theme Color */}
+          <div className="flex items-center gap-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] rounded-xl px-3 py-2 shadow-lg shadow-[#00695C]/30 transition-all duration-300 hover:shadow-xl hover:shadow-[#00695C]/40">
+            <FiCalendar className="text-white text-sm" />
             <select 
               value={selectedPeriod}
               onChange={(e) => handlePeriodChange(e.target.value)}
-              className="bg-transparent text-sm text-gray-600 dark:text-gray-300 focus:outline-none cursor-pointer pr-6 [&>option]:text-gray-700 dark:[&>option]:bg-gray-800 dark:[&>option]:text-gray-200"
+              className="bg-transparent text-sm text-white focus:outline-none cursor-pointer pr-6 [&>option]:text-gray-700 [&>option]:bg-white [&>option:hover]:bg-[#00695C] [&>option:hover]:text-white"
             >
               <option value="today">Today</option>
+              <option value="yesterday">Yesterday</option>
               <option value="this-week">This Week</option>
               <option value="this-month">This Month</option>
-              <option value="this-quarter">This Quarter</option>
               <option value="this-year">This Year</option>
               <option value="custom">Custom Range</option>
             </select>
             {selectedPeriod === 'custom' && startDate && endDate && (
-              <span className="text-xs text-[#00695C] dark:text-[#4DB6AC] font-medium ml-1">
+              <span className="text-xs text-white bg-white/20 px-2 py-0.5 rounded-full font-medium animate-fade-in">
                 {new Date(startDate).toLocaleDateString()} - {new Date(endDate).toLocaleDateString()}
               </span>
             )}
           </div>
 
-          {/* Custom Date Picker */}
+          {/* Custom Date Picker - Theme Color */}
           {showCustomDatePicker && (
-            <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-4 z-40 w-72">
-              <div className="flex flex-col gap-3">
-                <div className="flex flex-col gap-1">
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-300">Start Date</label>
+            <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-2xl border border-[#00695C]/20 p-5 z-50 w-80 animate-slide-down">
+              <div className="flex items-center gap-2 mb-4">
+                <FiCalendar className="text-[#00695C] text-lg" />
+                <h4 className="font-semibold text-gray-800">Select Custom Range</h4>
+              </div>
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-[#00695C] flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#00695C]"></span>
+                    Start Date
+                  </label>
                   <input
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900 focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 outline-none [color-scheme:light] dark:[color-scheme:dark]"
+                    className="w-full px-3 py-2.5 border-2 border-[#00695C]/20 rounded-lg text-sm text-gray-700 bg-gray-50 focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 focus:bg-white outline-none transition-all duration-200"
                   />
                 </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-300">End Date</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-[#00695C] flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#26A69A]"></span>
+                    End Date
+                  </label>
                   <input
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
                     min={startDate}
-                    className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900 focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 outline-none [color-scheme:light] dark:[color-scheme:dark]"
+                    className="w-full px-3 py-2.5 border-2 border-[#00695C]/20 rounded-lg text-sm text-gray-700 bg-gray-50 focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 focus:bg-white outline-none transition-all duration-200"
                   />
                 </div>
-                <div className="flex gap-2 mt-1">
+                <div className="flex gap-2 mt-2">
                   <button
                     onClick={handleCustomDateApply}
-                    className="flex-1 px-3 py-1.5 bg-[#00695C] text-white rounded-lg text-sm font-medium hover:bg-[#004D40] transition-all"
+                    className="flex-1 px-4 py-2.5 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-lg text-sm font-medium hover:shadow-lg hover:shadow-[#00695C]/30 hover:scale-[1.02] transition-all duration-300"
                   >
-                    Apply
+                    Apply Range
                   </button>
                   <button
                     onClick={() => {
                       setShowCustomDatePicker(false);
                       setStartDate('');
                       setEndDate('');
+                      setSelectedPeriod('this-month');
                     }}
-                    className="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+                    className="px-4 py-2.5 border-2 border-[#00695C]/20 rounded-lg text-sm text-[#00695C] font-medium hover:bg-[#00695C]/10 transition-all duration-300"
                   >
                     Cancel
                   </button>
@@ -664,66 +783,63 @@ const BuyerTenantsOverview = () => {
             </div>
           )}
 
-          {/* Refresh Button */}
+          {/* Refresh Button - Theme Color */}
           <button 
             onClick={handleRefresh}
-            className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] dark:from-[#00897B] dark:to-[#26A69A] text-white rounded-xl text-sm font-medium hover:shadow-lg hover:shadow-[#00695C]/30 dark:hover:shadow-black/40 transition-all duration-300"
+            className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-xl text-sm font-medium hover:shadow-lg hover:shadow-[#00695C]/30 hover:scale-[1.02] transition-all duration-300"
           >
             <FiRefreshCw className={`text-sm ${loading ? 'animate-spin' : ''}`} />
-            Refresh
+            <span className="hidden sm:inline">Refresh</span>
           </button>
 
-          {/* Export Button with Dropdown Menu */}
+          {/* Export Button - Theme Color */}
           <div className="relative">
             <button 
               onClick={() => setShowExportMenu(!showExportMenu)}
               disabled={exportLoading}
-              className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:border-[#00695C] hover:text-[#00695C] dark:hover:border-[#4DB6AC] dark:hover:text-[#4DB6AC] transition-all duration-300 shadow-sm disabled:opacity-70"
+              className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-xl text-sm font-medium hover:shadow-lg hover:shadow-[#00695C]/30 hover:scale-[1.02] transition-all duration-300 disabled:opacity-70"
             >
               {exportLoading ? (
                 <FiRefreshCw className="text-sm animate-spin" />
               ) : (
                 <FiDownload className="text-sm" />
               )}
-              {exportLoading ? 'Exporting...' : 'Export'}
+              {exportLoading ? 'Exporting...' : <span className="hidden sm:inline">Export</span>}
               <FiChevronRight className={`text-xs transition-transform duration-200 ${showExportMenu ? 'rotate-90' : ''}`} />
             </button>
 
-            {/* Export Dropdown Menu */}
             {showExportMenu && (
-              <div className="absolute top-full right-0 mt-1 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 py-1 z-50 min-w-[160px] animate-slide-down">
+              <div className="absolute top-full right-0 mt-1 bg-white rounded-xl shadow-xl border border-[#00695C]/20 py-1 z-50 min-w-[160px] animate-slide-down">
                 <button
                   onClick={() => handleExport('csv')}
-                  className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-[#00695C]/10 transition-colors flex items-center gap-2"
                 >
-                  <span className="w-4 h-4 flex items-center justify-center text-[#00695C] dark:text-[#4DB6AC]">
+                  <span className="w-4 h-4 flex items-center justify-center text-[#00695C]">
                     <FiDownload className="text-xs" />
                   </span>
                   Export as CSV
                 </button>
                 <button
                   onClick={() => handleExport('json')}
-                  className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-[#00695C]/10 transition-colors flex items-center gap-2"
                 >
-                  <span className="w-4 h-4 flex items-center justify-center text-[#00695C] dark:text-[#4DB6AC]">
+                  <span className="w-4 h-4 flex items-center justify-center text-[#00695C]">
                     <FiFile className="text-xs" />
                   </span>
                   Export as JSON
                 </button>
-                <div className="border-t border-gray-100 dark:border-gray-700 my-1"></div>
-               
+                <div className="border-t border-[#00695C]/10 my-1"></div>
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* ============ REST OF THE COMPONENT (unchanged) ============ */}
-      {/* Date Range Display */}
-      <div className="mb-4 flex items-center gap-2">
-        <div className="bg-gray-50 dark:bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            Showing data for: <span className="font-medium text-gray-700 dark:text-gray-200">
+      {/* ============ DATE RANGE DISPLAY ============ */}
+      <div className="mb-4 flex items-center gap-2 animate-fade-in">
+        <div className="bg-white px-3 py-1.5 rounded-lg border border-[#00695C]/20 shadow-sm">
+          <span className="text-sm text-gray-500">
+            Showing data for: <span className="font-medium text-[#00695C]">
               {selectedPeriod === 'custom' && startDate && endDate 
                 ? `${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}`
                 : getPeriodLabel(selectedPeriod)
@@ -732,41 +848,43 @@ const BuyerTenantsOverview = () => {
           </span>
         </div>
         {selectedPeriod === 'custom' && startDate && endDate && (
-          <span className="text-xs text-[#00695C] dark:text-[#4DB6AC] bg-[#00695C]/10 dark:bg-[#00695C]/20 px-2 py-0.5 rounded-full">
+          <span className="text-xs text-white bg-gradient-to-r from-[#00695C] to-[#26A69A] px-2 py-0.5 rounded-full font-medium animate-pulse-soft">
             {Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24))} days
           </span>
         )}
       </div>
 
       {/* ============ STATISTICS CARDS ============ */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         {statsData.map((stat, index) => (
           <div
             key={stat.id}
             onClick={() => handleStatClick(stat)}
-            className={`bg-gradient-to-br ${stat.color} backdrop-blur-sm rounded-xl p-3 border border-gray-100/50 dark:border-white/5 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden cursor-pointer`}
+            className={`bg-gradient-to-br ${stat.color} backdrop-blur-sm rounded-xl p-3 border border-gray-200/60 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden cursor-pointer animate-fade-in-up`}
             style={{ animationDelay: `${index * 0.05}s` }}
             onMouseEnter={() => setHoveredCard(stat.id)}
             onMouseLeave={() => setHoveredCard(null)}
           >
-            <div className="absolute -top-8 -right-8 w-20 h-20 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
-            <div className="absolute -bottom-8 -left-8 w-20 h-20 bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
+            <div className="absolute -top-8 -right-8 w-20 h-20 bg-white/40 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
+            <div className="absolute -bottom-8 -left-8 w-20 h-20 bg-white/30 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
             
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-1">
-                <div className={`w-7 h-7 rounded-lg bg-white/50 dark:bg-gray-900/40 backdrop-blur-sm flex items-center justify-center text-base shadow-sm group-hover:scale-110 transition-transform duration-300`}>
+                <div className={`w-7 h-7 rounded-lg bg-white/70 backdrop-blur-sm flex items-center justify-center text-base shadow-sm group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
                   {stat.icon}
                 </div>
-                <span className={`text-xs font-medium px-1.5 py-0.5 rounded-full flex items-center gap-0.5 ${
-                  stat.trend === 'up' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
+                <span className={`text-xs font-medium px-1.5 py-0.5 rounded-full flex items-center gap-0.5 animate-pulse-soft ${
+                  stat.trend === 'up' 
+                    ? 'bg-green-100 text-green-700' 
+                    : 'bg-red-100 text-red-700'
                 }`}>
                   {stat.trend === 'up' ? <FiArrowUp className="text-xs" /> : <FiArrowDown className="text-xs" />}
                   {stat.change}
                 </span>
               </div>
               <div>
-                <p className="text-xs text-gray-600 dark:text-gray-300">{stat.title}</p>
-                <p className="text-lg font-bold text-gray-800 dark:text-gray-50">{stat.value}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-700">{stat.title}</p>
+                <p className="text-lg font-bold text-gray-800">{stat.value}</p>
               </div>
             </div>
           </div>
@@ -778,106 +896,151 @@ const BuyerTenantsOverview = () => {
         {/* Left Column (2/3) */}
         <div className="lg:col-span-2 space-y-4">
           {/* Chart Section */}
-          <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300">
-            <div className="flex items-center justify-between mb-3">
+          <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in-up">
+            <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="font-semibold text-gray-800 flex items-center gap-2 text-base">
-                  <FaChartLine className="text-[#00695C]" />
+                  <FaChartLine className="text-[#00695C] animate-pulse-soft" />
                   User Growth Overview
                 </h3>
-                <p className="text-xs text-gray-400 mt-0.5">Monthly user registrations trend</p>
+                <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-2">
+                  <span className="w-1 h-1 rounded-full bg-[#26A69A] animate-pulse" />
+                  Monthly user registrations trend
+                </p>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1 text-xs cursor-pointer hover:opacity-70 transition-opacity" onClick={() => showToast('Showing buyers data', 'info')}>
-                  <span className="w-2 h-2 rounded-full bg-[#00695C]"></span>
-                  <span className="text-gray-600">Buyers</span>
+              <div className="flex items-center gap-4">
+                <div 
+                  className="flex items-center gap-1.5 text-xs cursor-pointer hover:opacity-70 transition-opacity group"
+                  onClick={() => showToast('📊 Showing buyers data', 'info')}
+                >
+                  <span className="w-3 h-3 rounded-full bg-[#00695C] shadow-sm shadow-[#00695C]/20 animate-pulse-soft"></span>
+                  <span className="text-gray-600 group-hover:text-[#00695C] transition-colors">Buyers</span>
+                  <span className="text-gray-400 text-[10px]">(1,284)</span>
                 </div>
-                <div className="flex items-center gap-1 text-xs cursor-pointer hover:opacity-70 transition-opacity" onClick={() => showToast('Showing tenants data', 'info')}>
-                  <span className="w-2 h-2 rounded-full bg-[#26A69A]"></span>
-                  <span className="text-gray-600">Tenants</span>
+                <div 
+                  className="flex items-center gap-1.5 text-xs cursor-pointer hover:opacity-70 transition-opacity group"
+                  onClick={() => showToast('📊 Showing tenants data', 'info')}
+                >
+                  <span className="w-3 h-3 rounded-full bg-[#26A69A] shadow-sm shadow-[#26A69A]/20 animate-pulse-soft"></span>
+                  <span className="text-gray-600 group-hover:text-[#26A69A] transition-colors">Tenants</span>
+                  <span className="text-gray-400 text-[10px]">(856)</span>
                 </div>
               </div>
             </div>
             
-            <div className="relative h-[100px] mt-3">
-              <div className="absolute inset-0 flex flex-col justify-between">
+            {/* Chart Container */}
+            <div className="relative h-[120px] mt-4">
+              {/* Grid Lines */}
+              <div className="absolute inset-0 flex flex-col justify-between px-2">
                 {[0, 25, 50, 75, 100].map((val) => (
                   <div key={val} className="w-full border-t border-gray-100 relative">
-                    <span className="absolute -left-10 -top-2 text-[10px] text-gray-400">{val}%</span>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="absolute inset-0 flex items-end justify-between pl-2 pr-1">
-                {months.map((month, index) => (
-                  <div key={month} className="flex items-end gap-1 group relative h-full">
-                    <div className="relative flex flex-col items-center h-full justify-end">
-                      <div 
-                        className="w-2.5 bg-gradient-to-t from-[#00695C] to-[#26A69A] rounded-t-sm transition-all duration-500 cursor-pointer hover:opacity-80"
-                        style={{ 
-                          height: `${getBarHeight(buyersData[index])}px`,
-                          minHeight: '3px'
-                        }}
-                        onClick={() => showToast(`Buyers: ${buyersData[index]} registrations in ${month}`, 'info')}
-                      >
-                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                          {buyersData[index]}
-                        </div>
-                      </div>
-                      <div 
-                        className="w-2.5 bg-gradient-to-t from-[#26A69A] to-[#80CBC4] rounded-t-sm transition-all duration-500 cursor-pointer hover:opacity-80 mt-0.5"
-                        style={{ 
-                          height: `${getBarHeight(tenantsData[index])}px`,
-                          minHeight: '3px'
-                        }}
-                        onClick={() => showToast(`Tenants: ${tenantsData[index]} registrations in ${month}`, 'info')}
-                      >
-                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                          {tenantsData[index]}
-                        </div>
-                      </div>
-                    </div>
-                    <span className="absolute -bottom-5 text-[10px] text-gray-500 font-medium">
-                      {month}
+                    <span className="absolute -left-12 -top-2 text-[10px] text-gray-400 font-medium">
+                      {val}%
                     </span>
                   </div>
                 ))}
               </div>
+              
+              {/* Bars Container */}
+              <div className="absolute inset-0 flex items-end justify-between pl-4 pr-2 pb-4">
+                {months.map((month, index) => {
+                  const buyerHeight = getBarHeight(buyersData[index]);
+                  const tenantHeight = getBarHeight(tenantsData[index]);
+                  
+                  return (
+                    <div 
+                      key={month} 
+                      className="flex flex-col items-center gap-0.5 group relative h-full justify-end"
+                    >
+                      {/* Tooltip */}
+                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 whitespace-nowrap pointer-events-none shadow-lg z-10">
+                        <div className="flex flex-col items-center">
+                          <span className="font-semibold">{month}</span>
+                          <div className="flex gap-2 mt-0.5">
+                            <span>👤 {buyersData[index]}</span>
+                            <span>🏠 {tenantsData[index]}</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Bars Stack */}
+                      <div className="flex items-end gap-0.5">
+                        <div 
+                          className="w-3 bg-gradient-to-t from-[#00695C] to-[#26A69A] rounded-t-sm transition-all duration-500 cursor-pointer hover:opacity-80 hover:scale-y-105 origin-bottom"
+                          style={{ 
+                            height: `${buyerHeight}px`,
+                            minHeight: buyerHeight > 0 ? '2px' : '0px'
+                          }}
+                          onClick={() => showToast(`📊 Buyers: ${buyersData[index]} registrations in ${month}`, 'info')}
+                        />
+                        <div 
+                          className="w-3 bg-gradient-to-t from-[#26A69A] to-[#80CBC4] rounded-t-sm transition-all duration-500 cursor-pointer hover:opacity-80 hover:scale-y-105 origin-bottom"
+                          style={{ 
+                            height: `${tenantHeight}px`,
+                            minHeight: tenantHeight > 0 ? '2px' : '0px'
+                          }}
+                          onClick={() => showToast(`📊 Tenants: ${tenantsData[index]} registrations in ${month}`, 'info')}
+                        />
+                      </div>
+                      
+                      {/* Month Label */}
+                      <span className="absolute -bottom-5 text-[9px] text-gray-500 font-medium group-hover:text-[#00695C] transition-colors">
+                        {month}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
             
-            <div className="flex items-center justify-between mt-5 pt-2 border-t border-gray-100 text-xs">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00695C]"></span>
-                  <span className="text-gray-500">Total Buyers: <span className="font-semibold text-gray-700">1,284</span></span>
+            {/* Stats Footer */}
+            <div className="flex items-center justify-between mt-6 pt-3 border-t border-gray-200">
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-[#00695C] animate-pulse-soft"></span>
+                    <span className="text-xs text-gray-500">Buyers</span>
+                  </div>
+                  <span className="text-sm font-bold text-gray-800">1,284</span>
+                  <span className="text-[10px] text-green-600 bg-green-100 px-1.5 py-0.5 rounded-full">+12.5%</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#26A69A]"></span>
-                  <span className="text-gray-500">Total Tenants: <span className="font-semibold text-gray-700">856</span></span>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-[#26A69A] animate-pulse-soft"></span>
+                    <span className="text-xs text-gray-500">Tenants</span>
+                  </div>
+                  <span className="text-sm font-bold text-gray-800">856</span>
+                  <span className="text-[10px] text-green-600 bg-green-100 px-1.5 py-0.5 rounded-full">+8.2%</span>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[#00695C] font-medium">+22.8%</span>
-                <span className="text-gray-400">vs last year</span>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1">
+                  <FiTrendingUp className="text-[#00695C] text-xs animate-pulse-soft" />
+                  <span className="text-xs font-semibold text-[#00695C]">+22.8%</span>
+                </div>
+                <span className="text-[10px] text-gray-400">vs last year</span>
               </div>
             </div>
           </div>
 
           {/* Recent Activity */}
-          <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in-up">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <h3 className="font-semibold text-gray-800 flex items-center gap-2 text-base">
-                  <FiClock className="text-[#00695C]" />
+                  <FiClock className="text-[#00695C] animate-pulse-soft" />
                   Recent Activity
                 </h3>
                 <p className="text-xs text-gray-400 mt-0.5">Latest actions by buyers and tenants</p>
               </div>
               <button 
-                onClick={() => handleNavigate('/admin/buyers-tenants/buyer/overview')}
-                className="text-xs text-[#00695C] font-medium hover:underline flex items-center gap-1"
+                onClick={() => {
+                  navigate('/admin/buyers-tenants/buyer/overview');
+                  showToast('📋 Viewing all recent activities...', 'info');
+                }}
+                className="text-xs text-[#00695C] font-medium hover:underline flex items-center gap-1 hover:gap-2 transition-all duration-300"
               >
-                View All <FiArrowUp className="rotate-90 text-xs" />
+                View All <FiArrowUp className="rotate-90 text-xs transition-transform duration-300" />
               </button>
             </div>
             
@@ -885,20 +1048,20 @@ const BuyerTenantsOverview = () => {
               {recentActivities.map((activity, index) => (
                 <div 
                   key={activity.id}
-                  onClick={() => handleNavigate(activity.path)}
-                  className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 transition-all duration-300 group border border-transparent hover:border-gray-100 cursor-pointer"
+                  onClick={() => handleActivityClick(activity)}
+                  className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 transition-all duration-300 group border border-transparent hover:border-gray-200 cursor-pointer animate-fade-in-up"
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
                   <img 
                     src={activity.avatar} 
                     alt={activity.user}
-                    className="w-8 h-8 rounded-full border-2 border-white shadow-sm"
+                    className="w-8 h-8 rounded-full border-2 border-white shadow-sm group-hover:scale-110 transition-transform duration-300"
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium text-sm text-gray-800">{activity.user}</span>
                       <span className={`text-[10px] px-1.5 py-0.5 rounded-full uppercase font-medium ${
-                        activity.type === 'buyer' ? 'bg-[#00695C]/10 text-[#00695C]' : 'bg-[#26A69A]/10 text-[#26A69A]'
+                        activity.type === 'buyer' ? 'bg-teal-100 text-[#00695C]' : 'bg-green-100 text-[#26A69A]'
                       }`}>
                         {activity.type}
                       </span>
@@ -910,30 +1073,35 @@ const BuyerTenantsOverview = () => {
                     <FiClockIcon className="text-xs" />
                     {activity.time}
                   </div>
-                  <FiChevronRight className="text-gray-300 text-sm opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <FiChevronRight className="text-gray-300 text-sm opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
                 </div>
               ))}
             </div>
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in-up">
             <h3 className="font-semibold text-gray-800 flex items-center gap-2 text-base mb-3">
-              <FiGrid className="text-[#00695C]" />
+              <FiGrid className="text-[#00695C] animate-pulse-soft" />
               Quick Actions
             </h3>
             <div className="grid grid-cols-4 gap-2">
               {quickActions.map((action, index) => (
                 <div
                   key={index}
-                  onClick={() => handleQuickAction(action.path, action.actionName)}
-                  className="group flex flex-col items-center gap-1.5 p-2 rounded-xl bg-gray-50 hover:bg-white hover:shadow-md border border-transparent hover:border-gray-200 transition-all duration-300 cursor-pointer"
+                  onClick={() => {
+                    handleQuickAction(action.path, action.actionName);
+                    showToast(action.notification, 'info');
+                  }}
+                  className="group flex flex-col items-center gap-1.5 p-2 rounded-xl bg-gray-50 hover:bg-white hover:shadow-md border border-transparent hover:border-gray-200 transition-all duration-300 cursor-pointer animate-fade-in-up"
                   style={{ animationDelay: `${index * 0.03}s` }}
                 >
-                  <div className={`w-9 h-9 rounded-lg ${action.color} flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                  <div className={`w-9 h-9 rounded-lg ${action.color} flex items-center justify-center text-white group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-md`}>
                     {action.icon}
                   </div>
-                  <span className="text-xs text-gray-600 text-center font-medium leading-tight">{action.label}</span>
+                  <span className="text-xs text-gray-600 text-center font-medium leading-tight group-hover:text-[#00695C] transition-colors duration-300">
+                    {action.label}
+                  </span>
                 </div>
               ))}
             </div>
@@ -943,20 +1111,23 @@ const BuyerTenantsOverview = () => {
         {/* Right Column (1/3) */}
         <div className="space-y-4">
           {/* Top Performers */}
-          <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in-up">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <h3 className="font-semibold text-gray-800 flex items-center gap-2 text-base">
-                  <FiStar className="text-yellow-500" />
+                  <FiStar className="text-yellow-500 animate-pulse-soft" />
                   Top Performers
                 </h3>
                 <p className="text-xs text-gray-400 mt-0.5">Best performing agents & managers</p>
               </div>
               <button 
-                onClick={() => handleNavigate('/admin/agents/overview')}
-                className="text-xs text-[#00695C] font-medium hover:underline"
+                onClick={() => {
+                  navigate('/admin/agents/overview');
+                  showToast('⭐ Viewing all top performers...', 'info');
+                }}
+                className="text-xs text-[#00695C] font-medium hover:underline hover:gap-2 transition-all duration-300 flex items-center gap-1"
               >
-                View All
+                View All <FiArrowUp className="rotate-90 text-xs transition-transform duration-300" />
               </button>
             </div>
             
@@ -964,19 +1135,19 @@ const BuyerTenantsOverview = () => {
               {topPerformers.map((performer, index) => (
                 <div 
                   key={performer.id}
-                  onClick={() => handleNavigate(performer.path)}
-                  className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-50 transition-all duration-300 group cursor-pointer"
+                  onClick={() => handlePerformerClick(performer)}
+                  className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-50 transition-all duration-300 group cursor-pointer animate-fade-in-up"
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
                   <img 
                     src={performer.avatar} 
                     alt={performer.name}
-                    className="w-9 h-9 rounded-full border-2 border-white shadow-sm"
+                    className="w-9 h-9 rounded-full border-2 border-white shadow-sm group-hover:scale-110 transition-transform duration-300"
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
                       <span className="font-medium text-sm text-gray-800">{performer.name}</span>
-                      <span className="text-[10px] px-1 py-0.5 rounded-full bg-yellow-100 text-yellow-700">
+                      <span className="text-[10px] px-1 py-0.5 rounded-full bg-yellow-100 text-yellow-700 font-medium animate-pulse-soft">
                         ★ {performer.rating}
                       </span>
                     </div>
@@ -992,17 +1163,20 @@ const BuyerTenantsOverview = () => {
           </div>
 
           {/* Lead Status */}
-          <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in-up">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-gray-800 flex items-center gap-2 text-base">
-                <FiTrendingUp className="text-[#00695C]" />
+                <FiTrendingUp className="text-[#00695C] animate-pulse-soft" />
                 Lead Status
               </h3>
               <button 
-                onClick={() => handleNavigate('/admin/buyers-tenants/lead/dashboard')}
-                className="text-xs text-[#00695C] font-medium hover:underline"
+                onClick={() => {
+                  navigate('/admin/buyers-tenants/lead/dashboard');
+                  showToast('📊 Viewing all lead status...', 'info');
+                }}
+                className="text-xs text-[#00695C] font-medium hover:underline hover:gap-2 transition-all duration-300 flex items-center gap-1"
               >
-                View All
+                View All <FiArrowUp className="rotate-90 text-xs transition-transform duration-300" />
               </button>
             </div>
             
@@ -1010,8 +1184,9 @@ const BuyerTenantsOverview = () => {
               {leadStatusData.map((item, index) => (
                 <div 
                   key={index} 
-                  className="space-y-1 cursor-pointer hover:opacity-80 transition-opacity"
-                  onClick={() => handleNavigate(item.path)}
+                  className="space-y-1 cursor-pointer hover:opacity-80 transition-opacity animate-fade-in-up"
+                  style={{ animationDelay: `${index * 0.03}s` }}
+                  onClick={() => handleLeadStatusClick(item)}
                 >
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-gray-600">{item.label}</span>
@@ -1019,7 +1194,7 @@ const BuyerTenantsOverview = () => {
                   </div>
                   <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
                     <div 
-                      className={`h-full ${item.color} rounded-full transition-all duration-1000`}
+                      className={`h-full ${item.color} rounded-full transition-all duration-1000 hover:scale-y-110 origin-center`}
                       style={{ width: `${(item.value / maxLeadValue) * 100}%` }}
                     />
                   </div>
@@ -1028,42 +1203,58 @@ const BuyerTenantsOverview = () => {
             </div>
           </div>
 
-          {/* Notifications / Alerts */}
-          <div className="bg-gradient-to-br from-[#00695C]/5 to-[#26A69A]/5 rounded-2xl p-4 border border-[#00695C]/10 shadow-sm">
+          {/* Notifications / Alerts - Theme Color */}
+          <div 
+            className="bg-gradient-to-br from-[#00695C]/5 to-[#26A69A]/5 rounded-2xl p-4 border border-[#00695C]/20 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in-up cursor-pointer"
+            onClick={() => {
+              navigate('/admin/buyers-tenants/buyer/registration');
+              showToast('🔔 Viewing pending verifications...', 'info');
+            }}
+          >
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-[#00695C]/10 flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 rounded-lg bg-[#00695C]/10 flex items-center justify-center flex-shrink-0 animate-pulse-soft">
                 <FiBell className="text-[#00695C] text-base" />
               </div>
               <div>
                 <h4 className="text-sm font-semibold text-gray-800">Pending Verifications</h4>
                 <p className="text-xs text-gray-500 mt-0.5">12 buyers and 8 tenants require KYC verification</p>
                 <button 
-                  onClick={() => handleNavigate('/admin/buyers-tenants/buyer/registration')}
-                  className="mt-1.5 text-xs text-[#00695C] font-medium hover:underline flex items-center gap-1"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate('/admin/buyers-tenants/buyer/registration');
+                    showToast('🔔 Reviewing pending verifications...', 'info');
+                  }}
+                  className="mt-1.5 text-xs text-[#00695C] font-medium hover:underline flex items-center gap-1 hover:gap-2 transition-all duration-300"
                 >
-                  Review Now <FiArrowUp className="rotate-90 text-xs" />
+                  Review Now <FiArrowUp className="rotate-90 text-xs transition-transform duration-300" />
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Quick Stats */}
+          {/* Quick Stats - Theme Color */}
           <div className="grid grid-cols-2 gap-2">
             <div 
-              className="bg-white rounded-2xl p-3 border border-gray-100 shadow-sm text-center cursor-pointer hover:shadow-md transition-all duration-300 hover:scale-[1.02]"
-              onClick={() => handleNavigate('/admin/buyers-tenants/buyer/registration')}
+              className="bg-white rounded-2xl p-3 border border-gray-200 shadow-sm text-center cursor-pointer hover:shadow-md hover:scale-[1.02] transition-all duration-300 animate-fade-in-up"
+              onClick={() => {
+                navigate('/admin/buyers-tenants/buyer/registration');
+                showToast('📝 Viewing new registrations...', 'info');
+              }}
             >
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#00695C]/10 text-[#00695C] mx-auto mb-1">
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#00695C]/10 text-[#00695C] mx-auto mb-1 group-hover:scale-110 transition-transform duration-300">
                 <FiUsers className="text-base" />
               </div>
               <div className="text-xl font-bold text-gray-800">47</div>
               <div className="text-xs text-gray-500">New Registrations</div>
             </div>
             <div 
-              className="bg-white rounded-2xl p-3 border border-gray-100 shadow-sm text-center cursor-pointer hover:shadow-md transition-all duration-300 hover:scale-[1.02]"
-              onClick={() => handleNavigate('/admin/buyers-tenants/saved/wishlist')}
+              className="bg-white rounded-2xl p-3 border border-gray-200 shadow-sm text-center cursor-pointer hover:shadow-md hover:scale-[1.02] transition-all duration-300 animate-fade-in-up"
+              onClick={() => {
+                navigate('/admin/buyers-tenants/saved/wishlist');
+                showToast('❤️ Viewing wishlist items...', 'info');
+              }}
             >
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#E91E63]/10 text-[#E91E63] mx-auto mb-1">
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-pink-100 text-[#E91E63] mx-auto mb-1 group-hover:scale-110 transition-transform duration-300">
                 <FiHeart className="text-base" />
               </div>
               <div className="text-xl font-bold text-gray-800">3.4K</div>
@@ -1074,7 +1265,7 @@ const BuyerTenantsOverview = () => {
       </div>
 
       {/* ============ FOOTER NOTE ============ */}
-      <div className="mt-4 text-center">
+      <div className="mt-6 text-center animate-fade-in">
         <p className="text-xs text-gray-500 flex items-center justify-center gap-2">
           <span className="w-1 h-1 rounded-full bg-[#26A69A] animate-pulse" />
           Live Data Updated Every 30 Seconds
@@ -1082,7 +1273,7 @@ const BuyerTenantsOverview = () => {
           Last Updated: {new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}
           <button 
             onClick={handleRefresh}
-            className="text-[#00695C] hover:underline ml-1"
+            className="text-[#00695C] hover:underline ml-1 font-medium hover:text-[#004D40] transition-colors duration-300"
           >
             Refresh
           </button>
@@ -1111,11 +1302,62 @@ const BuyerTenantsOverview = () => {
             transform: translateX(0);
           }
         }
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        @keyframes pulseSoft {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.7;
+          }
+        }
+        @keyframes gradient {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
         .animate-slide-down {
           animation: slideDown 0.3s ease-out;
         }
         .animate-slide-in-right {
           animation: slideInRight 0.3s ease-out;
+        }
+        .animate-fade-in-up {
+          animation: fadeInUp 0.5s ease-out forwards;
+          opacity: 0;
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.3s ease-out;
+        }
+        .animate-pulse-soft {
+          animation: pulseSoft 2s ease-in-out infinite;
+        }
+        .animate-gradient {
+          background-size: 200% 200%;
+          animation: gradient 3s ease infinite;
         }
       `}</style>
     </div>
