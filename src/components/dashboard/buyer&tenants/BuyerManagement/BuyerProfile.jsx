@@ -1245,7 +1245,7 @@ const BuyerProfile = () => {
     filteredBuyers.slice((currentPage - 1) * pageSize, currentPage * pageSize)
   , [filteredBuyers, currentPage, pageSize]);
 
-  // ============ RECOMPUTE STATS HELPER ============
+  // ========== RECOMPUTE STATS HELPER ==========
   const recomputeStats = (list) => {
     const total = list.length;
     const active = list.filter(b => b.status === 'active').length;
