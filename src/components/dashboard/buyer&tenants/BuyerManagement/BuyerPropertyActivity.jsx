@@ -128,9 +128,9 @@ const DeleteConfirmModal = ({ show, buyerName, onCancel, onConfirm, actionLoadin
   );
 };
 
-// ============================================================
+// ==========================================================
 // CUSTOM EDIT ACTIVITY MODAL (Simple version for this page)
-// ============================================================
+// ==========================================================
 const EditActivityModal = ({ buyer, show, onClose, onSave }) => {
   const [formData, setFormData] = useState(null);
 
