@@ -1021,7 +1021,7 @@ const BuyerPropertyActivity = () => {
       {showStats && (
         <div className="relative animate-slide-in">
           <div className="bg-green/400 rounded-3xl p-4 border border-[#d8f4ec] shadow-sm">
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3">
               <StatCard 
                 icon={<FiUsers className="text-white text-sm" />} 
                 title="Total Buyers" 
