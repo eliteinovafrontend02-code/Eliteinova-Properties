@@ -12,7 +12,7 @@ import {
   FiLock, FiUnlock, FiInfo, FiAlertTriangle, FiHelpCircle,
   FiCheckCircle, FiXCircle, FiTrendingUp, FiArrowUp, FiArrowDown,
   FiHeart, FiBookmark, FiMap, FiCheckSquare, FiSquare,
-  FiClipboard
+  FiClipboard, FiLayers
 } from 'react-icons/fi';
 
 import { 
@@ -25,7 +25,7 @@ import {
   FaCloudUploadAlt, FaCloudDownloadAlt, FaEye, FaEyeSlash,
   FaUserCircle, FaUsers, FaUserFriends, FaHandshake, FaHome,
   FaCalendarCheck, FaClipboardList, FaClipboardCheck,
-  FaUserPlus, FaUserMinus
+  FaUserPlus, FaUserMinus, FaCrown
 } from 'react-icons/fa';
 
 import { 
@@ -229,6 +229,23 @@ const BuyerTenantsDashboard = () => {
     return children.some(child => location.pathname === child.key);
   };
 
+  // Helper function to check if current path is Admin Dashboard
+  const isAdminDashboard = () => {
+    const path = location.pathname;
+    // Exclude buyers-tenants, properties, super-admin paths
+    if (path.includes('buyers-tenants') || path.includes('properties') || path.includes('super-admin')) {
+      return false;
+    }
+    // Check if path is exactly /admin or /admin/overview or starts with /admin/ but not other dashboards
+    return path === '/admin' || path === '/admin/' || path === '/admin/overview' || 
+           (path.startsWith('/admin/') && !path.includes('buyers-tenants') && !path.includes('properties') && !path.includes('super-admin'));
+  };
+
+  // Helper function to check if current path is Super Admin
+  const isSuperAdmin = () => {
+    return location.pathname.includes('super-admin');
+  };
+
   const renderMenuItem = (item) => {
     if (item.children) {
       const isOpen = openMenus.includes(item.key);
@@ -381,16 +398,16 @@ const BuyerTenantsDashboard = () => {
       `}>
         {/* ============ HEADER ============ */}
         <header className="relative z-10 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm flex-shrink-0">
-          <div className="flex items-center justify-between px-4 h-12">
+          <div className="flex items-center justify-between px-4 h-14">
             {/* Left */}
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setCollapsed(!collapsed)}
-                className="w-8 h-8 rounded-xl bg-[#00695C]/5 text-[#00695C] hover:bg-[#00695C]/10 hover:scale-105 transition-all duration-300 flex items-center justify-center"
+                className="w-9 h-9 rounded-xl bg-[#00695C]/5 text-[#00695C] hover:bg-[#00695C]/10 hover:scale-105 transition-all duration-300 flex items-center justify-center"
               >
-                <FaBars className="text-sm" />
+                <FaBars className="text-base" />
               </button>
-              <div className="flex items-center gap-2 text-xs">
+              <div className="flex items-center gap-2 text-sm">
                 <span className="text-[#00695C] font-medium">
                   <FiUsers className="mr-1 inline" /> Buyers & Tenants
                 </span>
@@ -399,7 +416,64 @@ const BuyerTenantsDashboard = () => {
               </div>
             </div>
 
-           
+            {/* Right - Dashboard Navigation Links - CORRECTED ACTIVE STATES */}
+            <div className="flex items-center gap-2">
+              {/* Admin Dashboard */}
+              <button
+                onClick={() => navigate('/admin/overview')}
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                  isAdminDashboard()
+                    ? 'bg-[#00695C] text-white shadow-md shadow-[#00695C]/30'
+                    : 'bg-gray-100 text-gray-600 hover:bg-[#00695C]/10 hover:text-[#00695C]'
+                }`}
+              >
+                <FiGrid className="text-base" />
+                Admin
+              </button>
+
+              {/* Buyers & Tenants Dashboard - Active */}
+              <button
+                onClick={() => navigate('/admin/buyers-tenants/overview')}
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                  location.pathname.includes('buyers-tenants')
+                    ? 'bg-[#00695C] text-white shadow-md shadow-[#00695C]/30'
+                    : 'bg-gray-100 text-gray-600 hover:bg-[#00695C]/10 hover:text-[#00695C]'
+                }`}
+              >
+                <HiOutlineUserGroup className="text-base" />
+                Buyers & Tenants
+              </button>
+
+              {/* Properties Dashboard */}
+              <button
+                onClick={() => navigate('/admin/properties/overview')}
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                  location.pathname.includes('properties')
+                    ? 'bg-[#00695C] text-white shadow-md shadow-[#00695C]/30'
+                    : 'bg-gray-100 text-gray-600 hover:bg-[#00695C]/10 hover:text-[#00695C]'
+                }`}
+              >
+                <FiHome className="text-base" />
+                Properties
+              </button>
+
+              {/* Super Admin Dashboard */}
+              <button
+                onClick={() => navigate('/admin/super-admin')}
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                  isSuperAdmin()
+                    ? 'bg-[#00695C] text-white shadow-md shadow-[#00695C]/30'
+                    : 'bg-gray-100 text-gray-600 hover:bg-[#00695C]/10 hover:text-[#00695C]'
+                }`}
+              >
+                <FaCrown className="text-base" />
+                Super Admin
+              </button>
+
+              <div className="w-px h-8 bg-gray-200 mx-1.5" />
+
+             
+            </div>
           </div>
         </header>
 
