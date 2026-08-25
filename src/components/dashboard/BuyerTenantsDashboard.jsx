@@ -55,15 +55,15 @@ import BuyerProfile from './buyer&tenants/BuyerManagement/BuyerProfile';
 import BuyerPropertyActivity from './buyer&tenants/BuyerManagement/BuyerPropertyActivity';
 
 // Tenant Management
-// import TenantManagementOverview from './buyer&tenants/TenantManagement/TenantManagementOverview';
-// import TenantRegistration from './buyer&tenants/TenantManagement/TenantRegistration';
-// import TenantRequirements from './buyer&tenants/TenantManagement/TenantRequirements';
-// import TenantPropertyActivity from './buyer&tenants/TenantManagement/TenantPropertyActivity';
+import TenantManagementOverview from './buyer&tenants/TenantManagement/TenantManagementOverview';
+import TenantRegistration from './buyer&tenants/TenantManagement/TenantRegistration';
+import TenantRequirements from './buyer&tenants/TenantManagement/TenantRequirements';
+import TenantPropertyActivity from './buyer&tenants/TenantManagement/TenantPropertyActivity';
 
 // Saved & Wishlist
-// import SavedWishlistOverview from './buyer&tenants/SavedWishlist/SavedWishlistOverview';
-// import SavedProperties from './buyer&tenants/SavedWishlist/SavedProperties';
-// import Wishlist from './buyer&tenants/SavedWishlist/Wishlist';
+import SavedWishlistOverview from './buyer&tenants/SavedWishlist/SavedWishlistOverview';
+import SavedProperties from './buyer&tenants/SavedWishlist/SavedProperties';
+import Wishlist from './buyer&tenants/SavedWishlist/Wishlist';
 // import SavedWishlistActions from './buyer&tenants/SavedWishlist/SavedWishlistActions';
 
 // Site Visits
@@ -246,6 +246,14 @@ const BuyerTenantsDashboard = () => {
     return location.pathname.includes('super-admin');
   };
 
+  // Helper function to check if current path is Properties Dashboard
+  // FIXED: Only check for '/admin/properties' path, not any path containing 'properties'
+  const isPropertiesDashboard = () => {
+    const path = location.pathname;
+    // Only match if the path starts with /admin/properties (not /admin/buyers-tenants/saved/properties)
+    return path.startsWith('/admin/properties') || path === '/admin/properties';
+  };
+
   const renderMenuItem = (item) => {
     if (item.children) {
       const isOpen = openMenus.includes(item.key);
@@ -416,7 +424,7 @@ const BuyerTenantsDashboard = () => {
               </div>
             </div>
 
-            {/* Right - Dashboard Navigation Links - CORRECTED ACTIVE STATES */}
+            {/* Right - Dashboard Navigation Links - FIXED PROPERTIES CHECK */}
             <div className="flex items-center gap-2">
               {/* Admin Dashboard */}
               <button
@@ -444,11 +452,11 @@ const BuyerTenantsDashboard = () => {
                 Buyers & Tenants
               </button>
 
-              {/* Properties Dashboard */}
+              {/* Properties Dashboard - FIXED: Only highlight when in /admin/properties path */}
               <button
                 onClick={() => navigate('/admin/properties/overview')}
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
-                  location.pathname.includes('properties')
+                  isPropertiesDashboard()
                     ? 'bg-[#00695C] text-white shadow-md shadow-[#00695C]/30'
                     : 'bg-gray-100 text-gray-600 hover:bg-[#00695C]/10 hover:text-[#00695C]'
                 }`}
@@ -496,16 +504,16 @@ const BuyerTenantsDashboard = () => {
               <Route path="buyer/activity" element={<BuyerPropertyActivity />} />
 
               {/* Tenant Management */}
-              {/* <Route path="tenant/overview" element={<TenantManagementOverview />} />
+              <Route path="tenant/overview" element={<TenantManagementOverview />} />
               <Route path="tenant/registration" element={<TenantRegistration />} />
               <Route path="tenant/requirements" element={<TenantRequirements />} />
-              <Route path="tenant/activity" element={<TenantPropertyActivity />} /> */}
+              <Route path="tenant/activity" element={<TenantPropertyActivity />} />
 
               {/* Saved & Wishlist */}
-              {/* <Route path="saved/overview" element={<SavedWishlistOverview />} />
+              <Route path="saved/overview" element={<SavedWishlistOverview />} />
               <Route path="saved/properties" element={<SavedProperties />} />
               <Route path="saved/wishlist" element={<Wishlist />} />
-              <Route path="saved/actions" element={<SavedWishlistActions />} /> */}
+              {/* <Route path="saved/actions" element={<SavedWishlistActions />} /> */}
 
               {/* Site Visits */}
               {/* <Route path="site-visits/overview" element={<SiteVisitsOverview />} />

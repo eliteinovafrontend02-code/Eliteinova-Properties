@@ -1162,7 +1162,7 @@ const AdminOverview = () => {
 
               {/* Filter Buttons */}
               <div className="flex items-center gap-2 mt-4">
-                <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
+                <div className="flex items-center gap-2 overflow-x-auto pb-1 p-2 scrollbar-thin">
                   {['today', 'yesterday', 'week', 'month', 'year'].map((filter) => (
                     <button
                       key={filter}

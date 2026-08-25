@@ -1,4 +1,4 @@
-// src/components/dashboard/admin/buyer&tenants/BuyerManagement/BuyerPropertyActivity.jsx
+// src/components/dashboard/admin/buyer&tenants/TenantManagement/TenantPropertyActivity.jsx
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +11,7 @@ import {
   FiEdit, FiTrash2, FiLock, FiUnlock, FiUsers, FiActivity,
   FiCalendar, FiMail, FiPhone, FiBriefcase, FiShield,
   FiMoreVertical, FiFilter, FiUserCheck, FiUserX,
-  FiGlobe, FiSave, FiSliders
+  FiGlobe, FiSave, FiSliders, FiFileText, FiClipboard
 } from 'react-icons/fi';
 import { FaCheck, FaStar, FaRegStar, FaBuilding, FaRegCalendarAlt, FaIdCard, FaFileAlt, FaCertificate, FaShieldAlt } from 'react-icons/fa';
 
@@ -60,14 +60,14 @@ const StatCard = ({ icon, title, value, color, delay = 0, isActive, statsAnimati
 );
 
 // ============ BLOCK CONFIRM MODAL ============
-const BlockConfirmModal = ({ show, buyerName, isBlocking, onCancel, onConfirm, actionLoading }) => {
+const BlockConfirmModal = ({ show, tenantName, isBlocking, onCancel, onConfirm, actionLoading }) => {
   if (!show) return null;
   const Icon = isBlocking ? FiLock : FiUnlock;
   const color = isBlocking ? 'red' : 'emerald';
-  const title = isBlocking ? 'Block Buyer' : 'Unblock Buyer';
+  const title = isBlocking ? 'Block Tenant' : 'Unblock Tenant';
   const message = isBlocking
-    ? `Are you sure you want to block ${buyerName}? They will lose access to the platform.`
-    : `Are you sure you want to unblock ${buyerName}? They will regain access to the platform.`;
+    ? `Are you sure you want to block ${tenantName}? They will lose access to the platform.`
+    : `Are you sure you want to unblock ${tenantName}? They will regain access to the platform.`;
 
   return (
     <div className="fixed inset-0 z-[65] flex items-center justify-center p-4 bg-[#1A2E2A]/50 backdrop-blur-sm animate-fade-in">
@@ -97,7 +97,7 @@ const BlockConfirmModal = ({ show, buyerName, isBlocking, onCancel, onConfirm, a
 };
 
 // ============ DELETE CONFIRM MODAL ============
-const DeleteConfirmModal = ({ show, buyerName, onCancel, onConfirm, actionLoading }) => {
+const DeleteConfirmModal = ({ show, tenantName, onCancel, onConfirm, actionLoading }) => {
   if (!show) return null;
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[#1A2E2A]/50 backdrop-blur-sm animate-fade-in">
@@ -106,9 +106,9 @@ const DeleteConfirmModal = ({ show, buyerName, onCancel, onConfirm, actionLoadin
           <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
             <FiTrash2 className="text-3xl text-red-600" />
           </div>
-          <h3 className="text-xl font-bold text-[#1A2E2A]">Delete Buyer Profile</h3>
+          <h3 className="text-xl font-bold text-[#1A2E2A]">Delete Tenant Profile</h3>
           <p className="text-sm text-[#5A7D78] mt-2">
-            Are you sure you want to delete <span className="font-semibold text-[#1A2E2A]">{buyerName}</span>'s profile? This action cannot be undone.
+            Are you sure you want to delete <span className="font-semibold text-[#1A2E2A]">{tenantName}</span>'s profile? This action cannot be undone.
           </p>
           <div className="flex items-center gap-3 mt-6">
             <button onClick={onCancel} className="flex-1 px-4 py-2.5 bg-[#F5F9F8] text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium">
@@ -131,29 +131,29 @@ const DeleteConfirmModal = ({ show, buyerName, onCancel, onConfirm, actionLoadin
 // ==========================================================
 // CUSTOM EDIT ACTIVITY MODAL (Simple version for this page)
 // ==========================================================
-const EditActivityModal = ({ buyer, show, onClose, onSave }) => {
+const EditActivityModal = ({ tenant, show, onClose, onSave }) => {
   const [formData, setFormData] = useState(null);
 
   useEffect(() => {
-    if (!show || !buyer) {
+    if (!show || !tenant) {
       setFormData(null);
       return;
     }
-    // Initialize form with buyer activity data
+    // Initialize form with tenant activity data
     setFormData({
-      viewedProperties: buyer.activity?.viewedProperties || 0,
-      savedProperties: buyer.activity?.savedProperties || 0,
-      wishlist: buyer.activity?.wishlist || 0,
-      enquiries: buyer.activity?.enquiries || 0,
-      siteVisits: buyer.activity?.siteVisits || 0,
-      purchaseRequests: buyer.activity?.purchaseRequests || 0,
-      offersSubmitted: buyer.activity?.offersSubmitted || 0,
-      recentlyContacted: buyer.activity?.recentlyContacted || 0,
-      leadHistory: buyer.activity?.leadHistory || 0,
+      viewedProperties: tenant.activity?.viewedProperties || 0,
+      savedProperties: tenant.activity?.savedProperties || 0,
+      wishlist: tenant.activity?.wishlist || 0,
+      rentalEnquiries: tenant.activity?.rentalEnquiries || 0,
+      rentalRequests: tenant.activity?.rentalRequests || 0,
+      siteVisits: tenant.activity?.siteVisits || 0,
+      applications: tenant.activity?.applications || 0,
+      leaseRequests: tenant.activity?.leaseRequests || 0,
+      leadHistory: tenant.activity?.leadHistory || 0,
     });
-  }, [buyer, show]);
+  }, [tenant, show]);
 
-  if (!show || !formData || !buyer) return null;
+  if (!show || !formData || !tenant) return null;
 
   const handleChange = (key, value) => {
     const numValue = parseInt(value) || 0;
@@ -170,12 +170,12 @@ const EditActivityModal = ({ buyer, show, onClose, onSave }) => {
     { key: 'viewedProperties', label: 'Viewed Properties', icon: <FiEye className="text-sm" />, color: 'bg-blue-50 text-blue-600' },
     { key: 'savedProperties', label: 'Saved Properties', icon: <FiBookmark className="text-sm" />, color: 'bg-purple-50 text-purple-600' },
     { key: 'wishlist', label: 'Wishlist', icon: <FiHeart className="text-sm" />, color: 'bg-red-50 text-red-600' },
-    { key: 'enquiries', label: 'Enquiries', icon: <FiMessageSquare className="text-sm" />, color: 'bg-indigo-50 text-indigo-600' },
-    { key: 'siteVisits', label: 'Site Visits', icon: <FiMapPin className="text-sm" />, color: 'bg-amber-50 text-amber-600' },
-    { key: 'purchaseRequests', label: 'Purchase Requests', icon: <FiHome className="text-sm" />, color: 'bg-emerald-50 text-emerald-600' },
-    { key: 'offersSubmitted', label: 'Offers Submitted', icon: <FiDollarSign className="text-sm" />, color: 'bg-green-50 text-green-600' },
-    { key: 'recentlyContacted', label: 'Recently Contacted', icon: <FiUsers className="text-sm" />, color: 'bg-cyan-50 text-cyan-600' },
-    { key: 'leadHistory', label: 'Lead History', icon: <FiClock className="text-sm" />, color: 'bg-rose-50 text-rose-600' },
+    { key: 'rentalEnquiries', label: 'Rental Enquiries', icon: <FiMessageSquare className="text-sm" />, color: 'bg-indigo-50 text-indigo-600' },
+    { key: 'rentalRequests', label: 'Rental Requests', icon: <FiHome className="text-sm" />, color: 'bg-amber-50 text-amber-600' },
+    { key: 'siteVisits', label: 'Site Visits', icon: <FiMapPin className="text-sm" />, color: 'bg-emerald-50 text-emerald-600' },
+    { key: 'applications', label: 'Applications', icon: <FiFileText className="text-sm" />, color: 'bg-cyan-50 text-cyan-600' },
+    { key: 'leaseRequests', label: 'Lease Requests', icon: <FiClipboard className="text-sm" />, color: 'bg-rose-50 text-rose-600' },
+    { key: 'leadHistory', label: 'Lead History', icon: <FiClock className="text-sm" />, color: 'bg-green-50 text-green-600' },
   ];
 
   return (
@@ -189,7 +189,7 @@ const EditActivityModal = ({ buyer, show, onClose, onSave }) => {
             </div>
             <div>
               <h2 className="text-xl font-bold text-white">Edit Activity</h2>
-              <p className="text-white/80 text-sm">{buyer.personal.name}</p>
+              <p className="text-white/80 text-sm">{tenant.personal.name}</p>
             </div>
           </div>
           <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110">
@@ -242,14 +242,14 @@ const EditActivityModal = ({ buyer, show, onClose, onSave }) => {
 // ============================================================
 // VIEW PROFILE MODAL (READ-ONLY)
 // ============================================================
-const ViewProfileModal = ({ buyer, show, onClose, onEdit, onDelete, onBlock, onViewFullProfile, actionLoading }) => {
+const ViewProfileModal = ({ tenant, show, onClose, onEdit, onDelete, onBlock, onViewFullProfile, actionLoading }) => {
   const [activeTab, setActiveTab] = useState('personal');
 
-  useEffect(() => { setActiveTab('personal'); }, [buyer?.id]);
+  useEffect(() => { setActiveTab('personal'); }, [tenant?.id]);
 
-  if (!buyer || !show) return null;
+  if (!tenant || !show) return null;
 
-  const isBlocked = buyer.status === 'blocked';
+  const isBlocked = tenant.status === 'blocked';
 
   const tabs = [
     { id: 'personal', label: 'Personal' },
@@ -291,28 +291,28 @@ const ViewProfileModal = ({ buyer, show, onClose, onEdit, onDelete, onBlock, onV
         {/* Hero */}
         <div className="relative px-6 pt-6 pb-14 shrink-0" style={{ background: 'linear-gradient(135deg, var(--bpm-accent), var(--bpm-accent-2))' }}>
           <div className="flex items-start justify-between">
-            <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-white/70">Buyer Profile</span>
+            <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-white/70">Tenant Profile</span>
             <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 transition-colors flex items-center justify-center text-white">
               <FiX className="text-base" />
             </button>
           </div>
           <div className="mt-3">
-            <h2 className="text-xl font-bold text-white leading-tight">{buyer.personal.name}</h2>
-            <p className="text-white/70 text-xs mt-0.5">{buyer.location.city}, {buyer.location.state}</p>
+            <h2 className="text-xl font-bold text-white leading-tight">{tenant.personal.name}</h2>
+            <p className="text-white/70 text-xs mt-0.5">{tenant.location.city}, {tenant.location.state}</p>
           </div>
           <div className="flex items-center gap-2 mt-4 flex-wrap">
             <span className={`text-[10px] px-2.5 py-1 rounded-full font-semibold ${
-              buyer.status === 'active' ? 'bg-white text-emerald-700' :
-              buyer.status === 'blocked' ? 'bg-white/20 text-white' : 'bg-white text-amber-700'
+              tenant.status === 'active' ? 'bg-white text-emerald-700' :
+              tenant.status === 'blocked' ? 'bg-white/20 text-white' : 'bg-white text-amber-700'
             }`}>
-              {buyer.status.charAt(0).toUpperCase() + buyer.status.slice(1)}
+              {tenant.status.charAt(0).toUpperCase() + tenant.status.slice(1)}
             </span>
-            {buyer.kycStatus === 'verified' && (
+            {tenant.kycStatus === 'verified' && (
               <span className="text-[10px] px-2.5 py-1 rounded-full font-semibold bg-white/15 text-white flex items-center gap-1">
                 <FaCheck className="text-[10px]" /> KYC Verified
               </span>
             )}
-            
+           
           </div>
         </div>
 
@@ -323,7 +323,7 @@ const ViewProfileModal = ({ buyer, show, onClose, onEdit, onDelete, onBlock, onV
               className="absolute rounded-full flex items-center justify-center font-bold text-2xl"
               style={{ inset: '4px', background: 'var(--bpm-surface)', color: 'var(--bpm-accent)', border: '3px solid var(--bpm-bg)' }}
             >
-              {buyer.avatar}
+              {tenant.avatar}
             </div>
           </div>
         </div>
@@ -331,7 +331,7 @@ const ViewProfileModal = ({ buyer, show, onClose, onEdit, onDelete, onBlock, onV
         {/* View Full Profile Button */}
         <div className="px-6 mt-3 shrink-0">
           <button
-            onClick={() => onViewFullProfile && onViewFullProfile(buyer)}
+            onClick={() => onViewFullProfile && onViewFullProfile(tenant)}
             className="w-full py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.02]"
             style={{ background: 'var(--bpm-accent)', color: 'var(--bpm-on-accent)', boxShadow: '0 4px 12px rgba(15, 107, 92, 0.3)' }}
           >
@@ -360,39 +360,39 @@ const ViewProfileModal = ({ buyer, show, onClose, onEdit, onDelete, onBlock, onV
         <div className="flex-1 overflow-y-auto px-6 py-5">
           {activeTab === 'personal' && (
             <div className="space-y-1">
-              <Row icon={<FiUser />} label="Full Name" value={buyer.personal.name} />
-              <Row icon={<FiCalendar />} label="Date of Birth" value={buyer.personal.dob} />
-              <Row icon={<FiUsers />} label="Gender" value={buyer.personal.gender} />
-              <Row icon={<FiUser />} label="Marital Status" value={buyer.personal.maritalStatus} />
+              <Row icon={<FiUser />} label="Full Name" value={tenant.personal.name} />
+              <Row icon={<FiCalendar />} label="Date of Birth" value={tenant.personal.dob} />
+              <Row icon={<FiUsers />} label="Gender" value={tenant.personal.gender} />
+              <Row icon={<FiUser />} label="Marital Status" value={tenant.personal.maritalStatus} />
               <div className="mt-4">
                 <p className="text-[10px] uppercase tracking-widest font-semibold mb-2" style={{ color: 'var(--bpm-muted)' }}>Location</p>
-                <Row icon={<FiMapPin />} label="City" value={buyer.location.city} />
-                <Row icon={<FiMapPin />} label="State" value={buyer.location.state} />
-                <Row icon={<FiHome />} label="Address" value={buyer.location.address} />
-                <Row icon={<FiTag />} label="Pincode" value={buyer.location.pincode} />
+                <Row icon={<FiMapPin />} label="City" value={tenant.location.city} />
+                <Row icon={<FiMapPin />} label="State" value={tenant.location.state} />
+                <Row icon={<FiHome />} label="Address" value={tenant.location.address} />
+                <Row icon={<FiTag />} label="Pincode" value={tenant.location.pincode} />
               </div>
             </div>
           )}
 
           {activeTab === 'contact' && (
             <div className="space-y-1">
-              <Row icon={<FiMail />} label="Email" value={buyer.contact.email} verified={buyer.contact.verification.email} />
-              <Row icon={<FiPhone />} label="Phone" value={buyer.contact.phone} verified={buyer.contact.verification.phone} />
-              <Row icon={<FiPhone />} label="Alternate Phone" value={buyer.contact.altPhone} />
+              <Row icon={<FiMail />} label="Email" value={tenant.contact.email} verified={tenant.contact.verification.email} />
+              <Row icon={<FiPhone />} label="Phone" value={tenant.contact.phone} verified={tenant.contact.verification.phone} />
+              <Row icon={<FiPhone />} label="Alternate Phone" value={tenant.contact.altPhone} />
             </div>
           )}
 
           {activeTab === 'activity' && (
             <div className="space-y-1">
-              <ActivityRow icon={<FiEye />} label="Viewed Properties" value={buyer.activity?.viewedProperties || 0} />
-              <ActivityRow icon={<FiBookmark />} label="Saved Properties" value={buyer.activity?.savedProperties || 0} />
-              <ActivityRow icon={<FiHeart />} label="Wishlist" value={buyer.activity?.wishlist || 0} />
-              <ActivityRow icon={<FiMessageSquare />} label="Enquiries" value={buyer.activity?.enquiries || 0} />
-              <ActivityRow icon={<FiMapPin />} label="Site Visits" value={buyer.activity?.siteVisits || 0} />
-              <ActivityRow icon={<FiHome />} label="Purchase Requests" value={buyer.activity?.purchaseRequests || 0} />
-              <ActivityRow icon={<FiDollarSign />} label="Offers Submitted" value={buyer.activity?.offersSubmitted || 0} />
-              <ActivityRow icon={<FiUsers />} label="Recently Contacted" value={buyer.activity?.recentlyContacted || 0} />
-              <ActivityRow icon={<FiClock />} label="Lead History" value={buyer.activity?.leadHistory || 0} />
+              <ActivityRow icon={<FiEye />} label="Viewed Properties" value={tenant.activity?.viewedProperties || 0} />
+              <ActivityRow icon={<FiBookmark />} label="Saved Properties" value={tenant.activity?.savedProperties || 0} />
+              <ActivityRow icon={<FiHeart />} label="Wishlist" value={tenant.activity?.wishlist || 0} />
+              <ActivityRow icon={<FiMessageSquare />} label="Rental Enquiries" value={tenant.activity?.rentalEnquiries || 0} />
+              <ActivityRow icon={<FiHome />} label="Rental Requests" value={tenant.activity?.rentalRequests || 0} />
+              <ActivityRow icon={<FiMapPin />} label="Site Visits" value={tenant.activity?.siteVisits || 0} />
+              <ActivityRow icon={<FiFileText />} label="Applications" value={tenant.activity?.applications || 0} />
+              <ActivityRow icon={<FiClipboard />} label="Lease Requests" value={tenant.activity?.leaseRequests || 0} />
+              <ActivityRow icon={<FiClock />} label="Lead History" value={tenant.activity?.leadHistory || 0} />
             </div>
           )}
         </div>
@@ -400,24 +400,24 @@ const ViewProfileModal = ({ buyer, show, onClose, onEdit, onDelete, onBlock, onV
         {/* Footer actions */}
         <div className="px-6 py-4 border-t flex items-center gap-2 shrink-0" style={{ borderColor: 'var(--bpm-border)', background: 'var(--bpm-surface)' }}>
           <button
-            onClick={() => onDelete && onDelete(buyer.id)}
-            disabled={actionLoading === `delete_${buyer.id}`}
+            onClick={() => onDelete && onDelete(tenant.id)}
+            disabled={actionLoading === `delete_${tenant.id}`}
             className="flex-1 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 disabled:opacity-50"
             style={{ background: 'var(--bpm-danger-bg)', color: 'var(--bpm-danger)' }}
           >
-            {actionLoading === `delete_${buyer.id}` ? <FiRefreshCw className="animate-spin text-xs" /> : <FiTrash2 className="text-xs" />}
+            {actionLoading === `delete_${tenant.id}` ? <FiRefreshCw className="animate-spin text-xs" /> : <FiTrash2 className="text-xs" />}
             Delete
           </button>
           <button
-            onClick={() => onBlock && onBlock(buyer.id)}
-            disabled={actionLoading === `block_${buyer.id}`}
+            onClick={() => onBlock && onBlock(tenant.id)}
+            disabled={actionLoading === `block_${tenant.id}`}
             className="flex-1 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 disabled:opacity-50"
             style={{
               background: isBlocked ? 'var(--bpm-success-bg)' : 'var(--bpm-danger-bg)',
               color: isBlocked ? 'var(--bpm-success)' : 'var(--bpm-danger)'
             }}
           >
-            {actionLoading === `block_${buyer.id}` ? <FiRefreshCw className="animate-spin text-xs" /> : isBlocked ? <FiUnlock className="text-xs" /> : <FiLock className="text-xs" />}
+            {actionLoading === `block_${tenant.id}` ? <FiRefreshCw className="animate-spin text-xs" /> : isBlocked ? <FiUnlock className="text-xs" /> : <FiLock className="text-xs" />}
             {isBlocked ? 'Unblock' : 'Block'}
           </button>
         </div>
@@ -452,12 +452,12 @@ const ViewProfileModal = ({ buyer, show, onClose, onEdit, onDelete, onBlock, onV
 // MAIN COMPONENT
 // ============================================================
 
-const BuyerPropertyActivity = () => {
+const TenantPropertyActivity = () => {
   const navigate = useNavigate();
   const searchInputRef = useRef(null);
 
-  const [buyers, setBuyers] = useState([]);
-  const [filteredBuyers, setFilteredBuyers] = useState([]);
+  const [tenants, setTenants] = useState([]);
+  const [filteredTenants, setFilteredTenants] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -466,9 +466,9 @@ const BuyerPropertyActivity = () => {
   const [viewMode, setViewMode] = useState('grid');
   const [showStats, setShowStats] = useState(true);
   const [statsAnimating, setStatsAnimating] = useState(false);
-  const [viewingBuyer, setViewingBuyer] = useState(null);
+  const [viewingTenant, setViewingTenant] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
-  const [editingBuyer, setEditingBuyer] = useState(null);
+  const [editingTenant, setEditingTenant] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const [showBlockConfirm, setShowBlockConfirm] = useState(null);
@@ -491,20 +491,20 @@ const BuyerPropertyActivity = () => {
   }, []);
 
   // ============ MOCK DATA WITH ACTIVITY ============
-  const generateMockBuyers = useCallback(() => {
+  const generateMockTenants = useCallback(() => {
     const firstNames = ['Rajesh', 'Priya', 'Amit', 'Sneha', 'Vikram', 'Ananya', 'Deepak', 'Meera', 'Ravi', 'Kavya', 'Suresh', 'Pooja', 'Arjun', 'Lakshmi', 'Kiran'];
     const lastNames = ['Kumar', 'Sharma', 'Singh', 'Patel', 'Reddy', 'Gupta', 'Verma', 'Joshi', 'Malhotra', 'Mehta', 'Nair', 'Rao', 'Shetty', 'Agarwal', 'Desai'];
     const cities = ['Chennai', 'Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Pune', 'Coimbatore', 'Madurai'];
     const stateByCity = { Chennai: 'Tamil Nadu', Coimbatore: 'Tamil Nadu', Madurai: 'Tamil Nadu', Mumbai: 'Maharashtra', Pune: 'Maharashtra', Delhi: 'Delhi', Bangalore: 'Karnataka', Hyderabad: 'Telangana' };
     const statuses = ['pending', 'active', 'blocked'];
     const kycStatuses = ['pending', 'verified', 'rejected'];
-    const requirements = ['Buy', 'Rent', 'Both'];
+    const requirements = ['Rent', 'Lease', 'Both'];
     const occupations = ['Software Engineer', 'Doctor', 'Business Owner', 'Bank Manager', 'Architect', 'Government Employee', 'Consultant'];
     const employmentTypes = ['Salaried', 'Self-Employed', 'Business Owner', 'Retired'];
     const budgetPairs = [['20L', '50L'], ['50L', '1Cr'], ['1Cr', '2Cr'], ['2Cr', '5Cr']];
     const localities = ['Anna Nagar', 'T Nagar', 'Velachery', 'Adyar', 'Whitefield', 'Koramangala', 'Bandra', 'Andheri', 'Gachibowli', 'Banjara Hills'];
 
-    const buyers = [];
+    const tenants = [];
     const usedNames = new Set();
 
     for (let i = 1; i <= 60; i++) {
@@ -533,21 +533,21 @@ const BuyerPropertyActivity = () => {
       const localityCount = 1 + Math.floor(Math.random() * 2);
       const shuffledLocalities = [...localities].sort(() => Math.random() - 0.5).slice(0, localityCount);
 
-      // Generate activity data
+      // Generate activity data for tenants
       const activity = {
         viewedProperties: Math.floor(Math.random() * 50) + 5,
         savedProperties: Math.floor(Math.random() * 25) + 2,
         wishlist: Math.floor(Math.random() * 20) + 1,
-        enquiries: Math.floor(Math.random() * 15) + 1,
+        rentalEnquiries: Math.floor(Math.random() * 15) + 1,
+        rentalRequests: Math.floor(Math.random() * 10) + 1,
         siteVisits: Math.floor(Math.random() * 10) + 1,
-        purchaseRequests: Math.floor(Math.random() * 8) + 1,
-        offersSubmitted: Math.floor(Math.random() * 12) + 1,
-        recentlyContacted: Math.floor(Math.random() * 20) + 1,
+        applications: Math.floor(Math.random() * 12) + 1,
+        leaseRequests: Math.floor(Math.random() * 8) + 1,
         leadHistory: Math.floor(Math.random() * 30) + 1,
       };
 
-      buyers.push({
-        id: `buyer_${i}`,
+      tenants.push({
+        id: `tenant_${i}`,
         avatar: firstName[0] + lastName[0],
         status,
         kycStatus,
@@ -596,30 +596,30 @@ const BuyerPropertyActivity = () => {
         activity,
         savedProperties: activity.savedProperties,
         viewedProperties: activity.viewedProperties,
-        inquiries: activity.enquiries,
+        inquiries: activity.rentalEnquiries,
       });
     }
 
-    const total = buyers.length;
-    const active = buyers.filter(b => b.status === 'active').length;
-    const pending = buyers.filter(b => b.status === 'pending').length;
-    const blocked = buyers.filter(b => b.status === 'blocked').length;
+    const total = tenants.length;
+    const active = tenants.filter(b => b.status === 'active').length;
+    const pending = tenants.filter(b => b.status === 'pending').length;
+    const blocked = tenants.filter(b => b.status === 'blocked').length;
 
     setStats({ total, active, pending, blocked });
-    return buyers;
+    return tenants;
   }, []);
 
   useEffect(() => {
-    const mockBuyers = generateMockBuyers();
-    setBuyers(mockBuyers);
-    setFilteredBuyers(mockBuyers);
+    const mockTenants = generateMockTenants();
+    setTenants(mockTenants);
+    setFilteredTenants(mockTenants);
     setStatsAnimating(true);
     setTimeout(() => setStatsAnimating(false), 1000);
-  }, [generateMockBuyers]);
+  }, [generateMockTenants]);
 
   // ============ FILTER ============
-  const filterBuyers = useCallback(() => {
-    let filtered = [...buyers];
+  const filterTenants = useCallback(() => {
+    let filtered = [...tenants];
 
     // Search filter
     if (searchQuery) {
@@ -645,16 +645,16 @@ const BuyerPropertyActivity = () => {
     if (searchQuery) count++;
     setFilterCount(count);
 
-    setFilteredBuyers(filtered);
+    setFilteredTenants(filtered);
     setCurrentPage(1);
-  }, [buyers, searchQuery, selectedStatus]);
+  }, [tenants, searchQuery, selectedStatus]);
 
-  useEffect(() => { filterBuyers(); }, [filterBuyers]);
+  useEffect(() => { filterTenants(); }, [filterTenants]);
 
-  const totalPages = Math.ceil(filteredBuyers.length / pageSize);
-  const paginatedBuyers = useMemo(() =>
-    filteredBuyers.slice((currentPage - 1) * pageSize, currentPage * pageSize)
-  , [filteredBuyers, currentPage, pageSize]);
+  const totalPages = Math.ceil(filteredTenants.length / pageSize);
+  const paginatedTenants = useMemo(() =>
+    filteredTenants.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+  , [filteredTenants, currentPage, pageSize]);
 
   // ============ RECOMPUTE STATS HELPER ============
   const recomputeStats = (list) => {
@@ -666,22 +666,22 @@ const BuyerPropertyActivity = () => {
   };
 
   // ============ HANDLERS ============
-  const handleBlockClick = useCallback((buyerId, isBlocking) => {
-    setShowBlockConfirm(buyerId);
+  const handleBlockClick = useCallback((tenantId, isBlocking) => {
+    setShowBlockConfirm(tenantId);
     setIsBlockingAction(isBlocking);
   }, []);
 
   const confirmBlock = useCallback(() => {
-    const buyerId = showBlockConfirm;
+    const tenantId = showBlockConfirm;
     const isBlocking = isBlockingAction;
-    setActionLoading(`block_${buyerId}`);
+    setActionLoading(`block_${tenantId}`);
     setTimeout(() => {
-      setBuyers(prev => {
-        const updated = prev.map(b => b.id === buyerId ? { ...b, status: isBlocking ? 'blocked' : 'active' } : b);
+      setTenants(prev => {
+        const updated = prev.map(b => b.id === tenantId ? { ...b, status: isBlocking ? 'blocked' : 'active' } : b);
         recomputeStats(updated);
-        const changed = updated.find(b => b.id === buyerId);
+        const changed = updated.find(b => b.id === tenantId);
         showToast(`${changed?.personal.name} has been ${isBlocking ? 'blocked' : 'unblocked'}`, isBlocking ? 'warning' : 'success');
-        setViewingBuyer(prevView => (prevView && prevView.id === buyerId ? changed : prevView));
+        setViewingTenant(prevView => (prevView && prevView.id === tenantId ? changed : prevView));
         return updated;
       });
       setShowBlockConfirm(null);
@@ -690,17 +690,17 @@ const BuyerPropertyActivity = () => {
     }, 600);
   }, [showBlockConfirm, isBlockingAction, showToast]);
 
-  const handleDelete = useCallback((buyerId) => setShowDeleteConfirm(buyerId), []);
+  const handleDelete = useCallback((tenantId) => setShowDeleteConfirm(tenantId), []);
 
   const confirmDelete = useCallback(() => {
-    const buyerId = showDeleteConfirm;
-    setActionLoading(`delete_${buyerId}`);
+    const tenantId = showDeleteConfirm;
+    setActionLoading(`delete_${tenantId}`);
     setTimeout(() => {
-      setBuyers(prev => {
-        const target = prev.find(b => b.id === buyerId);
-        const updated = prev.filter(b => b.id !== buyerId);
+      setTenants(prev => {
+        const target = prev.find(b => b.id === tenantId);
+        const updated = prev.filter(b => b.id !== tenantId);
         recomputeStats(updated);
-        showToast(`${target?.personal.name || 'Buyer'} profile has been deleted`, 'error');
+        showToast(`${target?.personal.name || 'Tenant'} profile has been deleted`, 'error');
         return updated;
       });
       setShowDeleteConfirm(null);
@@ -708,19 +708,19 @@ const BuyerPropertyActivity = () => {
     }, 600);
   }, [showDeleteConfirm, showToast]);
 
-  const handleViewBuyer = useCallback((buyer) => {
-    setViewingBuyer(buyer);
+  const handleViewTenant = useCallback((tenant) => {
+    setViewingTenant(tenant);
     setShowViewModal(true);
   }, []);
 
-  const handleViewFullProfile = useCallback((buyer) => {
+  const handleViewFullProfile = useCallback((tenant) => {
     navigate('/profile/customer');
-    showToast(`Opening ${buyer.personal.name}'s full profile...`, 'info');
+    showToast(`Opening ${tenant.personal.name}'s full profile...`, 'info');
   }, [navigate, showToast]);
 
   // ============ EDIT HANDLERS ============
-  const handleEditBuyer = useCallback((buyer) => {
-    setEditingBuyer(buyer);
+  const handleEditTenant = useCallback((tenant) => {
+    setEditingTenant(tenant);
     setShowEditModal(true);
     if (showViewModal) {
       setShowViewModal(false);
@@ -728,10 +728,10 @@ const BuyerPropertyActivity = () => {
   }, [showViewModal]);
 
   const saveEdit = useCallback((updatedActivity) => {
-    if (!editingBuyer) return;
+    if (!editingTenant) return;
 
-    setBuyers(prev => {
-      const updated = prev.map(b => b.id === editingBuyer.id ? {
+    setTenants(prev => {
+      const updated = prev.map(b => b.id === editingTenant.id ? {
         ...b,
         activity: {
           ...b.activity,
@@ -739,34 +739,34 @@ const BuyerPropertyActivity = () => {
         },
         savedProperties: updatedActivity.savedProperties || 0,
         viewedProperties: updatedActivity.viewedProperties || 0,
-        inquiries: updatedActivity.enquiries || 0,
+        inquiries: updatedActivity.rentalEnquiries || 0,
       } : b);
       recomputeStats(updated);
       return updated;
     });
     setShowEditModal(false);
-    setEditingBuyer(null);
+    setEditingTenant(null);
     showToast('Activity updated successfully', 'success');
-  }, [editingBuyer, showToast]);
+  }, [editingTenant, showToast]);
 
-  const handleViewModalEdit = useCallback((buyer) => {
-    handleEditBuyer(buyer);
-  }, [handleEditBuyer]);
+  const handleViewModalEdit = useCallback((tenant) => {
+    handleEditTenant(tenant);
+  }, [handleEditTenant]);
 
   const handleViewModalBlock = useCallback((id) => {
-    const buyer = buyers.find(b => b.id === id);
-    if (!buyer) return;
-    handleBlockClick(id, buyer.status !== 'blocked');
-  }, [buyers, handleBlockClick]);
+    const tenant = tenants.find(b => b.id === id);
+    if (!tenant) return;
+    handleBlockClick(id, tenant.status !== 'blocked');
+  }, [tenants, handleBlockClick]);
 
   const handleViewModalDelete = useCallback((id) => {
     setShowViewModal(false);
     handleDelete(id);
   }, [handleDelete]);
 
-  const handleViewModalFullProfile = useCallback((buyer) => {
+  const handleViewModalFullProfile = useCallback((tenant) => {
     setShowViewModal(false);
-    handleViewFullProfile(buyer);
+    handleViewFullProfile(tenant);
   }, [handleViewFullProfile]);
 
   const handleStatClick = useCallback((filter) => {
@@ -791,22 +791,22 @@ const BuyerPropertyActivity = () => {
   const handleRefresh = useCallback(() => {
     setLoading(true);
     setTimeout(() => {
-      const mockBuyers = generateMockBuyers();
-      setBuyers(mockBuyers);
-      setFilteredBuyers(mockBuyers);
+      const mockTenants = generateMockTenants();
+      setTenants(mockTenants);
+      setFilteredTenants(mockTenants);
       setLoading(false);
       setStatsAnimating(true);
       setTimeout(() => setStatsAnimating(false), 1000);
       showToast('Activity data refreshed successfully', 'success');
     }, 1000);
-  }, [generateMockBuyers, showToast]);
+  }, [generateMockTenants, showToast]);
 
-  const handleExportBuyers = useCallback(() => {
-    if (filteredBuyers.length === 0) {
+  const handleExportTenants = useCallback(() => {
+    if (filteredTenants.length === 0) {
       showToast('No profiles to export', 'warning');
       return;
     }
-    const data = filteredBuyers.map(b => ({
+    const data = filteredTenants.map(b => ({
       Name: b.personal.name,
       Email: b.contact.email,
       Phone: b.contact.phone,
@@ -815,11 +815,11 @@ const BuyerPropertyActivity = () => {
       'Viewed Properties': b.activity.viewedProperties,
       'Saved Properties': b.activity.savedProperties,
       Wishlist: b.activity.wishlist,
-      Enquiries: b.activity.enquiries,
+      'Rental Enquiries': b.activity.rentalEnquiries,
+      'Rental Requests': b.activity.rentalRequests,
       'Site Visits': b.activity.siteVisits,
-      'Purchase Requests': b.activity.purchaseRequests,
-      'Offers Submitted': b.activity.offersSubmitted,
-      'Recently Contacted': b.activity.recentlyContacted,
+      Applications: b.activity.applications,
+      'Lease Requests': b.activity.leaseRequests,
       'Lead History': b.activity.leadHistory,
     }));
     const csv = [Object.keys(data[0]).join(','), ...data.map(row => Object.values(row).map(v => `"${v}"`).join(','))].join('\n');
@@ -827,24 +827,24 @@ const BuyerPropertyActivity = () => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `buyer_activity_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `tenant_activity_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
-    showToast(`${filteredBuyers.length} activity records exported successfully`, 'success');
-  }, [filteredBuyers, showToast]);
+    showToast(`${filteredTenants.length} activity records exported successfully`, 'success');
+  }, [filteredTenants, showToast]);
 
   // ============ GET ACTIVITY SUMMARY ============
-  const getActivitySummary = (buyer) => {
-    const { activity } = buyer;
+  const getActivitySummary = (tenant) => {
+    const { activity } = tenant;
     const items = [
       { key: 'viewedProperties', label: 'Viewed', icon: <FiEye className="text-[10px]" />, value: activity.viewedProperties },
       { key: 'savedProperties', label: 'Saved', icon: <FiBookmark className="text-[10px]" />, value: activity.savedProperties },
       { key: 'wishlist', label: 'Wishlist', icon: <FiHeart className="text-[10px]" />, value: activity.wishlist },
-      { key: 'enquiries', label: 'Enquiries', icon: <FiMessageSquare className="text-[10px]" />, value: activity.enquiries },
+      { key: 'rentalEnquiries', label: 'Enquiries', icon: <FiMessageSquare className="text-[10px]" />, value: activity.rentalEnquiries },
+      { key: 'rentalRequests', label: 'Requests', icon: <FiHome className="text-[10px]" />, value: activity.rentalRequests },
       { key: 'siteVisits', label: 'Visits', icon: <FiMapPin className="text-[10px]" />, value: activity.siteVisits },
-      { key: 'purchaseRequests', label: 'Purchase', icon: <FiHome className="text-[10px]" />, value: activity.purchaseRequests },
-      { key: 'offersSubmitted', label: 'Offers', icon: <FiDollarSign className="text-[10px]" />, value: activity.offersSubmitted },
-      { key: 'recentlyContacted', label: 'Contacted', icon: <FiUsers className="text-[10px]" />, value: activity.recentlyContacted },
+      { key: 'applications', label: 'Applications', icon: <FiFileText className="text-[10px]" />, value: activity.applications },
+      { key: 'leaseRequests', label: 'Leases', icon: <FiClipboard className="text-[10px]" />, value: activity.leaseRequests },
       { key: 'leadHistory', label: 'Leads', icon: <FiClock className="text-[10px]" />, value: activity.leadHistory },
     ];
     return items;
@@ -862,10 +862,10 @@ const BuyerPropertyActivity = () => {
 
       {/* VIEW MODAL */}
       <ViewProfileModal
-        buyer={viewingBuyer}
+        tenant={viewingTenant}
         show={showViewModal}
         actionLoading={actionLoading}
-        onClose={() => { setShowViewModal(false); setViewingBuyer(null); }}
+        onClose={() => { setShowViewModal(false); setViewingTenant(null); }}
         onBlock={handleViewModalBlock}
         onEdit={handleViewModalEdit}
         onDelete={handleViewModalDelete}
@@ -874,15 +874,15 @@ const BuyerPropertyActivity = () => {
 
       {/* EDIT ACTIVITY MODAL - Custom for this page */}
       <EditActivityModal
-        buyer={editingBuyer}
+        tenant={editingTenant}
         show={showEditModal}
-        onClose={() => { setShowEditModal(false); setEditingBuyer(null); }}
+        onClose={() => { setShowEditModal(false); setEditingTenant(null); }}
         onSave={saveEdit}
       />
 
       <DeleteConfirmModal
         show={!!showDeleteConfirm}
-        buyerName={buyers.find(b => b.id === showDeleteConfirm)?.personal.name || ''}
+        tenantName={tenants.find(b => b.id === showDeleteConfirm)?.personal.name || ''}
         onCancel={() => setShowDeleteConfirm(null)}
         onConfirm={confirmDelete}
         actionLoading={actionLoading === `delete_${showDeleteConfirm}`}
@@ -890,7 +890,7 @@ const BuyerPropertyActivity = () => {
 
       <BlockConfirmModal
         show={!!showBlockConfirm}
-        buyerName={buyers.find(b => b.id === showBlockConfirm)?.personal.name || ''}
+        tenantName={tenants.find(b => b.id === showBlockConfirm)?.personal.name || ''}
         isBlocking={isBlockingAction}
         onCancel={() => { setShowBlockConfirm(null); setIsBlockingAction(false); }}
         onConfirm={confirmBlock}
@@ -903,17 +903,17 @@ const BuyerPropertyActivity = () => {
           <div>
             <div className="flex items-center gap-3 mb-1 flex-wrap">
               <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
-                Buyer Property Activity
+                Tenant Property Activity
               </h1>
               <span className="px-3 py-1 bg-[#E8F4F2] text-[#00695C] text-xs font-semibold rounded-full animate-pulse">
-                {filteredBuyers.length} Buyers
+                {filteredTenants.length} Tenants
               </span>
               {filterCount > 0 && (
                 <span className="px-3 py-1 bg-[#FEF3E2] text-amber-700 text-xs font-semibold rounded-full">{filterCount} filters</span>
               )}
             </div>
             <p className="text-sm text-[#5A7D78] flex items-center gap-2 flex-wrap">
-              <span>Track buyer engagement: viewed properties, saved, wishlist, enquiries &amp; more</span>
+              <span>Track tenant engagement: viewed properties, saved, wishlist, rental enquiries &amp; more</span>
             </p>
           </div>
           <div className="flex items-center gap-2 w-full lg:w-auto flex-wrap">
@@ -933,7 +933,7 @@ const BuyerPropertyActivity = () => {
               <span className="hidden sm:inline">{loading ? 'Refreshing...' : 'Refresh'}</span>
             </button>
             <button
-              onClick={handleExportBuyers}
+              onClick={handleExportTenants}
               className="flex items-center gap-2 px-4 py-2 bg-white border border-[#E8F0EE] rounded-xl hover:border-[#00695C]/30 hover:shadow-md transition-all duration-300 text-sm font-medium text-[#1A2E2A] hover:scale-105"
             >
               <FiDownload className="text-sm" /><span className="hidden sm:inline">Export</span>
@@ -949,7 +949,7 @@ const BuyerPropertyActivity = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <StatCard 
                 icon={<FiUsers className="text-white text-sm" />} 
-                title="Total Buyers" 
+                title="Total Tenants" 
                 value={stats.total} 
                 color="bg-gradient-to-br from-[#00695C] to-[#26A69A]" 
                 delay={0} 
@@ -1000,7 +1000,7 @@ const BuyerPropertyActivity = () => {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search buyers by name, email, phone, or city..."
+              placeholder="Search tenants by name, email, phone, or city..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none placeholder:text-[#B5C9C5]"
@@ -1049,23 +1049,23 @@ const BuyerPropertyActivity = () => {
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-            {paginatedBuyers.map((buyer, index) => {
+            {paginatedTenants.map((tenant, index) => {
               const statusColors = {
                 pending: 'bg-[#FEF3E2] text-amber-700 border-amber-200',
                 active: 'bg-[#E8F8F5] text-[#00695C] border-[#A8D5CD]',
                 blocked: 'bg-gray-100 text-gray-600 border-gray-200'
               };
-              const isPending = buyer.status === 'pending';
-              const isActive = buyer.status === 'active';
-              const showVerifiedBadge = buyer.kycStatus === 'verified' && buyer.status !== 'blocked';
-              const activityItems = getActivitySummary(buyer);
+              const isPending = tenant.status === 'pending';
+              const isActive = tenant.status === 'active';
+              const showVerifiedBadge = tenant.kycStatus === 'verified' && tenant.status !== 'blocked';
+              const activityItems = getActivitySummary(tenant);
               const topActivities = [...activityItems]
                 .sort((a, b) => b.value - a.value)
                 .slice(0, 4);
 
               return (
                 <div
-                  key={buyer.id}
+                  key={tenant.id}
                   className={`bg-white rounded-2xl border border-[#E8F0EE] p-3.5 hover:shadow-xl hover:-translate-y-1 group animate-slide-in transition-all duration-500 ${
                     isPending ? 'border-l-4 border-l-amber-500' : isActive ? 'border-l-4 border-l-emerald-500' : ''
                   }`}
@@ -1075,7 +1075,7 @@ const BuyerPropertyActivity = () => {
                     <div className="flex items-center gap-2 min-w-0">
                       <div className="relative shrink-0">
                         <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white font-bold text-sm shadow-lg">
-                          {buyer.avatar}
+                          {tenant.avatar}
                         </div>
                         {showVerifiedBadge && (
                           <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#00695C] rounded-full flex items-center justify-center shadow-lg animate-pulse">
@@ -1084,19 +1084,19 @@ const BuyerPropertyActivity = () => {
                         )}
                       </div>
                       <div className="min-w-0">
-                        <h3 className="font-semibold text-[#1A2E2A] text-sm truncate">{buyer.personal.name}</h3>
+                        <h3 className="font-semibold text-[#1A2E2A] text-sm truncate">{tenant.personal.name}</h3>
                         <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap ${statusColors[buyer.status]}`}>
-                            {buyer.status.charAt(0).toUpperCase() + buyer.status.slice(1)}
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap ${statusColors[tenant.status]}`}>
+                            {tenant.status.charAt(0).toUpperCase() + tenant.status.slice(1)}
                           </span>
-                          
+                         
                         </div>
                       </div>
                     </div>
                     <button
                       type="button"
                       className="w-7 h-7 rounded-xl hover:bg-[#F5F9F8] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110 shrink-0"
-                      onClick={() => handleViewBuyer(buyer)}
+                      onClick={() => handleViewTenant(tenant)}
                       title="View Details"
                     >
                       <FiEye className="text-sm" />
@@ -1117,27 +1117,27 @@ const BuyerPropertyActivity = () => {
                   </div>
 
                   <div className="flex flex-wrap gap-1 mt-2.5 pt-2.5 border-t border-[#E8F0EE]">
-                    <button type="button" onClick={() => handleViewBuyer(buyer)} className="flex-1 py-1.5 text-xs font-medium text-[#00695C] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105">
+                    <button type="button" onClick={() => handleViewTenant(tenant)} className="flex-1 py-1.5 text-xs font-medium text-[#00695C] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105">
                       <FiEye className="text-[10px]" /> View
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleBlockClick(buyer.id, buyer.status !== 'blocked')}
-                      disabled={actionLoading === `block_${buyer.id}`}
+                      onClick={() => handleBlockClick(tenant.id, tenant.status !== 'blocked')}
+                      disabled={actionLoading === `block_${tenant.id}`}
                       className={`flex-1 py-1.5 text-xs font-medium rounded-xl transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 disabled:opacity-50 ${
-                        buyer.status === 'blocked' ? 'text-[#00695C] bg-[#E8F8F5] hover:bg-[#C5EDE5]' : 'text-red-600 bg-red-50 hover:bg-red-100'
+                        tenant.status === 'blocked' ? 'text-[#00695C] bg-[#E8F8F5] hover:bg-[#C5EDE5]' : 'text-red-600 bg-red-50 hover:bg-red-100'
                       }`}
                     >
-                      {actionLoading === `block_${buyer.id}` ? <FiRefreshCw className="text-[10px] animate-spin" /> : buyer.status === 'blocked' ? <FiUnlock className="text-[10px]" /> : <FiLock className="text-[10px]" />}
-                      {buyer.status === 'blocked' ? 'Unblock' : 'Block'}
+                      {actionLoading === `block_${tenant.id}` ? <FiRefreshCw className="text-[10px] animate-spin" /> : tenant.status === 'blocked' ? <FiUnlock className="text-[10px]" /> : <FiLock className="text-[10px]" />}
+                      {tenant.status === 'blocked' ? 'Unblock' : 'Block'}
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleDelete(buyer.id)}
-                      disabled={actionLoading === `delete_${buyer.id}`}
+                      onClick={() => handleDelete(tenant.id)}
+                      disabled={actionLoading === `delete_${tenant.id}`}
                       className="flex-1 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 disabled:opacity-50"
                     >
-                      {actionLoading === `delete_${buyer.id}` ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiTrash2 className="text-[10px]" />}
+                      {actionLoading === `delete_${tenant.id}` ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiTrash2 className="text-[10px]" />}
                       Delete
                     </button>
                   </div>
@@ -1145,7 +1145,7 @@ const BuyerPropertyActivity = () => {
                   <div className="mt-1.5">
                     <button
                       type="button"
-                      onClick={() => handleViewFullProfile(buyer)}
+                      onClick={() => handleViewFullProfile(tenant)}
                       className="w-full py-1.5 text-xs font-medium text-[#167A54] bg-[#E7F6EF] border border-[#BEE4D2] rounded-xl hover:bg-[#D5EFE0] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-[1.02]"
                     >
                       <FiExternalLink className="text-[10px]" /> View Full Profile
@@ -1158,69 +1158,69 @@ const BuyerPropertyActivity = () => {
         ) : (
           <div className="bg-white rounded-2xl border border-[#E8F0EE] shadow-sm overflow-hidden">
             <div className="grid grid-cols-12 gap-2 items-center px-4 py-3 bg-[#F5F9F8] border-b border-[#E8F0EE] text-xs font-medium text-[#5A7D78] uppercase tracking-wider">
-              <div className="col-span-2">Buyer</div>
+              <div className="col-span-2">Tenant</div>
               <div className="col-span-1">Status</div>
               <div className="col-span-1">Viewed</div>
               <div className="col-span-1">Saved</div>
               <div className="col-span-1">Wishlist</div>
               <div className="col-span-1">Enquiries</div>
+              <div className="col-span-1">Requests</div>
               <div className="col-span-1">Visits</div>
-              <div className="col-span-1">Purchase</div>
-              <div className="col-span-1">Offers</div>
+              <div className="col-span-1">Applications</div>
               <div className="col-span-1 text-right">Actions</div>
             </div>
 
-            {paginatedBuyers.map((buyer, index) => {
+            {paginatedTenants.map((tenant, index) => {
               const statusColors = {
                 pending: 'bg-[#FEF3E2] text-amber-700',
                 active: 'bg-[#E8F8F5] text-[#00695C]',
                 blocked: 'bg-gray-100 text-gray-600'
               };
               return (
-                <div key={buyer.id} className={`grid grid-cols-12 gap-2 items-center py-3 px-4 border-b border-[#E8F0EE] hover:bg-[#F5F9F8] transition-all duration-300 group ${buyer.status === 'pending' ? 'bg-amber-50/30' : ''}`} style={{ animationDelay: `${index * 30}ms` }}>
+                <div key={tenant.id} className={`grid grid-cols-12 gap-2 items-center py-3 px-4 border-b border-[#E8F0EE] hover:bg-[#F5F9F8] transition-all duration-300 group ${tenant.status === 'pending' ? 'bg-amber-50/30' : ''}`} style={{ animationDelay: `${index * 30}ms` }}>
                   <div className="col-span-2 flex items-center gap-2">
                     <div className="relative shrink-0">
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white font-bold text-xs shadow-md">
-                        {buyer.avatar}
+                        {tenant.avatar}
                       </div>
-                      {buyer.kycStatus === 'verified' && buyer.status !== 'blocked' && (
+                      {tenant.kycStatus === 'verified' && tenant.status !== 'blocked' && (
                         <div className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#00695C] rounded-full flex items-center justify-center shadow-lg">
                           <FaCheck className="text-white text-[6px]" />
                         </div>
                       )}
                     </div>
                     <div className="min-w-0">
-                      <p className="font-semibold text-sm text-[#1A2E2A] truncate">{buyer.personal.name}</p>
-                      <p className="text-[10px] text-[#5A7D78] truncate">{buyer.contact.email}</p>
+                      <p className="font-semibold text-sm text-[#1A2E2A] truncate">{tenant.personal.name}</p>
+                      <p className="text-[10px] text-[#5A7D78] truncate">{tenant.contact.email}</p>
                     </div>
                   </div>
                   <div className="col-span-1">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColors[buyer.status]}`}>
-                      {buyer.status.charAt(0).toUpperCase() + buyer.status.slice(1)}
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColors[tenant.status]}`}>
+                      {tenant.status.charAt(0).toUpperCase() + tenant.status.slice(1)}
                     </span>
                   </div>
-                  <div className="col-span-1 text-sm font-medium text-[#1A2E2A]">{buyer.activity.viewedProperties}</div>
-                  <div className="col-span-1 text-sm font-medium text-[#1A2E2A]">{buyer.activity.savedProperties}</div>
-                  <div className="col-span-1 text-sm font-medium text-[#1A2E2A]">{buyer.activity.wishlist}</div>
-                  <div className="col-span-1 text-sm font-medium text-[#1A2E2A]">{buyer.activity.enquiries}</div>
-                  <div className="col-span-1 text-sm font-medium text-[#1A2E2A]">{buyer.activity.siteVisits}</div>
-                  <div className="col-span-1 text-sm font-medium text-[#1A2E2A]">{buyer.activity.purchaseRequests}</div>
-                  <div className="col-span-1 text-sm font-medium text-[#1A2E2A]">{buyer.activity.offersSubmitted}</div>
+                  <div className="col-span-1 text-sm font-medium text-[#1A2E2A]">{tenant.activity.viewedProperties}</div>
+                  <div className="col-span-1 text-sm font-medium text-[#1A2E2A]">{tenant.activity.savedProperties}</div>
+                  <div className="col-span-1 text-sm font-medium text-[#1A2E2A]">{tenant.activity.wishlist}</div>
+                  <div className="col-span-1 text-sm font-medium text-[#1A2E2A]">{tenant.activity.rentalEnquiries}</div>
+                  <div className="col-span-1 text-sm font-medium text-[#1A2E2A]">{tenant.activity.rentalRequests}</div>
+                  <div className="col-span-1 text-sm font-medium text-[#1A2E2A]">{tenant.activity.siteVisits}</div>
+                  <div className="col-span-1 text-sm font-medium text-[#1A2E2A]">{tenant.activity.applications}</div>
                   <div className="col-span-1 flex items-center justify-end gap-1">
-                    <button type="button" onClick={() => handleViewBuyer(buyer)} className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110" title="View">
+                    <button type="button" onClick={() => handleViewTenant(tenant)} className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110" title="View">
                       <FiEye className="text-xs" />
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleBlockClick(buyer.id, buyer.status !== 'blocked')}
-                      disabled={actionLoading === `block_${buyer.id}`}
-                      className={`w-7 h-7 rounded-lg transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 ${buyer.status === 'blocked' ? 'text-[#00695C] hover:bg-[#E8F8F5]' : 'text-red-500 hover:bg-red-50'}`}
-                      title={buyer.status === 'blocked' ? 'Unblock' : 'Block'}
+                      onClick={() => handleBlockClick(tenant.id, tenant.status !== 'blocked')}
+                      disabled={actionLoading === `block_${tenant.id}`}
+                      className={`w-7 h-7 rounded-lg transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 ${tenant.status === 'blocked' ? 'text-[#00695C] hover:bg-[#E8F8F5]' : 'text-red-500 hover:bg-red-50'}`}
+                      title={tenant.status === 'blocked' ? 'Unblock' : 'Block'}
                     >
-                      {actionLoading === `block_${buyer.id}` ? <FiRefreshCw className="text-xs animate-spin" /> : buyer.status === 'blocked' ? <FiUnlock className="text-xs" /> : <FiLock className="text-xs" />}
+                      {actionLoading === `block_${tenant.id}` ? <FiRefreshCw className="text-xs animate-spin" /> : tenant.status === 'blocked' ? <FiUnlock className="text-xs" /> : <FiLock className="text-xs" />}
                     </button>
-                    <button type="button" onClick={() => handleDelete(buyer.id)} disabled={actionLoading === `delete_${buyer.id}`} className="w-7 h-7 rounded-lg hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-red-500 hover:scale-110 disabled:opacity-50" title="Delete">
-                      {actionLoading === `delete_${buyer.id}` ? <FiRefreshCw className="text-xs animate-spin" /> : <FiTrash2 className="text-xs" />}
+                    <button type="button" onClick={() => handleDelete(tenant.id)} disabled={actionLoading === `delete_${tenant.id}`} className="w-7 h-7 rounded-lg hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-red-500 hover:scale-110 disabled:opacity-50" title="Delete">
+                      {actionLoading === `delete_${tenant.id}` ? <FiRefreshCw className="text-xs animate-spin" /> : <FiTrash2 className="text-xs" />}
                     </button>
                   </div>
                 </div>
@@ -1229,14 +1229,14 @@ const BuyerPropertyActivity = () => {
           </div>
         )}
 
-        {paginatedBuyers.length === 0 && !loading && (
+        {paginatedTenants.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-[#E8F0EE]">
             <div className="w-24 h-24 rounded-full bg-[#F5F9F8] flex items-center justify-center mb-4 animate-float">
               <FiActivity className="text-4xl text-[#B5C9C5]" />
             </div>
             <h3 className="text-xl font-semibold text-[#1A2E2A]">No activity data found</h3>
             <p className="text-sm text-[#5A7D78] mt-1">
-              {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No buyer activity matches your current view'}
+              {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No tenant activity matches your current view'}
             </p>
             {filterCount > 0 && (
               <button onClick={clearAllFilters} className="mt-4 px-6 py-2.5 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-sm font-medium shadow-lg shadow-[#00695C]/30 hover:scale-105">
@@ -1252,7 +1252,7 @@ const BuyerPropertyActivity = () => {
         <div className="flex flex-wrap items-center justify-between bg-white rounded-2xl px-4 py-3 border border-[#E8F0EE] shadow-sm gap-3">
           <div className="flex items-center gap-2 text-sm text-[#5A7D78] flex-wrap">
             <span>
-              Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, filteredBuyers.length)} of {filteredBuyers.length} buyers
+              Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, filteredTenants.length)} of {filteredTenants.length} tenants
             </span>
             <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }} className="ml-2 px-2 py-1 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] text-sm text-[#1A2E2A] outline-none focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300">
               <option value={5}>5</option>
@@ -1303,4 +1303,4 @@ const BuyerPropertyActivity = () => {
   );
 };
 
-export default BuyerPropertyActivity;
+export default TenantPropertyActivity;
