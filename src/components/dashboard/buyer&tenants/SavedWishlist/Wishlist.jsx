@@ -232,7 +232,7 @@ const AddToWishlistModal = ({ show, onClose, onAdd, properties, existingWishlist
 };
 
 // ============================================================
-// VIEW WISHLIST ITEM MODAL (with Image)
+// VIEW WISHLIST ITEM MODAL
 // ============================================================
 const ViewWishlistItemModal = ({ item, show, onClose, onRemove, onViewProperty, onEdit }) => {
   if (!item || !show) return null;
@@ -287,7 +287,7 @@ const ViewWishlistItemModal = ({ item, show, onClose, onRemove, onViewProperty, 
 
         <div className="flex-1 overflow-y-auto p-6 bg-white">
           <div className="space-y-6">
-            {/* ====== AVAILABILITY STATUS & BADGES ====== */}
+            {/* Availability Status & Badges */}
             <div className="flex items-center gap-3 flex-wrap">
               <span className={`px-4 py-1.5 rounded-full text-xs font-semibold ${statusColors[item.status] || statusColors.available}`}>
                 {item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : 'Available'}
@@ -298,7 +298,6 @@ const ViewWishlistItemModal = ({ item, show, onClose, onRemove, onViewProperty, 
               {item.isNew && (
                 <span className="px-4 py-1.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 animate-pulse">New</span>
               )}
-              {/* ====== PRICE CHANGE INDICATOR ====== */}
               {item.originalPrice && item.originalPrice !== item.price && (
                 <span className={`px-4 py-1.5 rounded-full text-xs font-semibold ${isPriceUp ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>
                   {isPriceUp ? <FiTrendingUp className="inline mr-1" /> : <FiTrendingDown className="inline mr-1" />}
@@ -307,7 +306,7 @@ const ViewWishlistItemModal = ({ item, show, onClose, onRemove, onViewProperty, 
               )}
             </div>
 
-            {/* ====== PROPERTY IMAGE ====== */}
+            {/* Property Image */}
             <div className="bg-[#F5F9F8] rounded-2xl overflow-hidden relative">
               {!imageLoaded && !imageError && (
                 <div className="w-full h-64 bg-gradient-to-br from-[#00695C]/10 to-[#26A69A]/10 flex items-center justify-center animate-pulse">
@@ -330,7 +329,7 @@ const ViewWishlistItemModal = ({ item, show, onClose, onRemove, onViewProperty, 
               )}
             </div>
 
-            {/* ====== BUYER / TENANT DETAILS ====== */}
+            {/* Buyer / Tenant Details */}
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-[#F5F9F8] rounded-2xl p-4 col-span-2">
                 <div className="flex items-center gap-2 mb-1">
@@ -342,7 +341,7 @@ const ViewWishlistItemModal = ({ item, show, onClose, onRemove, onViewProperty, 
                 <p className="text-xs text-[#5A7D78]">{item.buyerPhone || ''}</p>
               </div>
 
-              {/* ====== PROPERTY DETAILS ====== */}
+              {/* Property Details */}
               <div className="bg-[#F5F9F8] rounded-2xl p-4 col-span-2">
                 <div className="flex items-center gap-2 mb-1">
                   <FiHome className="text-[#00695C] text-sm" />
@@ -352,6 +351,7 @@ const ViewWishlistItemModal = ({ item, show, onClose, onRemove, onViewProperty, 
                 <p className="text-xs text-[#5A7D78]">{item.propertyType || ''}</p>
               </div>
 
+              {/* Location */}
               <div className="bg-[#F5F9F8] rounded-2xl p-4 col-span-2">
                 <div className="flex items-center gap-2 mb-1">
                   <FiMapPin className="text-[#00695C] text-sm" />
@@ -361,7 +361,7 @@ const ViewWishlistItemModal = ({ item, show, onClose, onRemove, onViewProperty, 
                 <p className="text-xs text-[#5A7D78]">{item.city || ''}, {item.state || ''}</p>
               </div>
 
-              {/* ====== PRICE WITH CHANGE ====== */}
+              {/* Price with Change */}
               <div className="bg-[#F5F9F8] rounded-2xl p-4 col-span-2">
                 <div className="flex items-center justify-between">
                   <div>
@@ -383,6 +383,7 @@ const ViewWishlistItemModal = ({ item, show, onClose, onRemove, onViewProperty, 
                 </div>
               </div>
 
+              {/* Added Date */}
               <div className="bg-[#F5F9F8] rounded-2xl p-4 col-span-2">
                 <div className="flex items-center gap-2 mb-1">
                   <FiCalendar className="text-[#00695C] text-sm" />
@@ -393,6 +394,7 @@ const ViewWishlistItemModal = ({ item, show, onClose, onRemove, onViewProperty, 
                 </p>
               </div>
 
+              {/* Property Specifications */}
               <div className="bg-[#F5F9F8] rounded-2xl p-4 col-span-2">
                 <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-2 flex items-center gap-2">
                   <FaBuilding className="text-[#00695C]" />
@@ -1037,7 +1039,7 @@ const Wishlist = () => {
               <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
                 Wishlist
               </h1>
-              {/* ====== WISHLIST COUNT ====== */}
+              {/* Wishlist Count */}
               <span className="px-3 py-1 bg-[#E8F4F2] text-[#00695C] text-xs font-semibold rounded-full animate-pulse">
                 {filteredItems.length} Items
               </span>
@@ -1060,7 +1062,7 @@ const Wishlist = () => {
               <FiActivity className={`text-sm transition-transform duration-300 ${showStats ? 'rotate-0' : 'rotate-180'}`} />
               <span className="hidden sm:inline">{showStats ? 'Hide Stats' : 'Show Stats'}</span>
             </button>
-            {/* ====== ADD PROPERTY BUTTON ====== */}
+            {/* Add Property Button */}
             <button onClick={() => setShowAddModal(true)} className="flex items-center gap-2 px-4 py-2 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-sm font-medium shadow-lg shadow-[#00695C]/30 hover:scale-105">
               <FiPlus className="text-sm" />
               <span className="hidden sm:inline">Add Property</span>
@@ -1081,15 +1083,48 @@ const Wishlist = () => {
       {showStats && (
         <div className="relative animate-slide-in">
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
-              <StatCard icon={<FaHeartSolid className="text-white text-sm" />} title="Total Items" value={stats.total} color="bg-gradient-to-br from-[#00695C] to-[#26A69A]" delay={0} isActive={activeFilter === 'all'} statsAnimating={statsAnimating} onClick={() => handleStatClick('all')} />
-              <StatCard icon={<FiCheckCircle className="text-white text-sm" />} title="Available" value={stats.available} color="bg-gradient-to-br from-emerald-600 to-emerald-400" delay={50} isActive={activeFilter === 'available'} statsAnimating={statsAnimating} onClick={() => handleStatClick('available')} />
-              <StatCard icon={<FiClock className="text-white text-sm" />} title="Pending" value={stats.pending} color="bg-gradient-to-br from-amber-600 to-amber-400" delay={100} isActive={activeFilter === 'pending'} statsAnimating={statsAnimating} onClick={() => handleStatClick('pending')} />
-              <StatCard icon={<FiTrendingUp className="text-white text-sm" />} title="Price Changed" value={stats.withPriceChanges} color="bg-gradient-to-br from-red-600 to-red-400" delay={150} isActive={activeFilter === 'price-changed'} statsAnimating={statsAnimating} onClick={() => handleStatClick('price-changed')} />
-              <StatCard icon={<FiStar className="text-white text-sm" />} title="New This Week" value={stats.newThisWeek} color="bg-gradient-to-br from-blue-600 to-blue-400" delay={200} isActive={activeFilter === 'new'} statsAnimating={statsAnimating} onClick={() => handleStatClick('new')} />
-              {/* ====== BUYER / TENANT COUNT ====== */}
-              <StatCard icon={<FiUsers className="text-white text-sm" />} title="Buyers/Tenants" value={stats.uniqueBuyers} color="bg-gradient-to-br from-purple-600 to-purple-400" delay={250} statsAnimating={statsAnimating} subtitle="Unique" />
-              <StatCard icon={<FiHome className="text-white text-sm" />} title="Properties" value={wishlistItems.length} color="bg-gradient-to-br from-orange-600 to-orange-400" delay={300} statsAnimating={statsAnimating} subtitle="Total Listed" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3">
+              <StatCard 
+                icon={<FaHeartSolid className="text-white text-sm" />} 
+                title="Total Items" 
+                value={stats.total} 
+                color="bg-gradient-to-br from-[#00695C] to-[#26A69A]" 
+                delay={0} 
+                isActive={activeFilter === 'all'} 
+                statsAnimating={statsAnimating} 
+                onClick={() => handleStatClick('all')} 
+              />
+              <StatCard 
+                icon={<FiCheckCircle className="text-white text-sm" />} 
+                title="Available" 
+                value={stats.available} 
+                color="bg-gradient-to-br from-emerald-600 to-emerald-400" 
+                delay={50} 
+                isActive={activeFilter === 'available'} 
+                statsAnimating={statsAnimating} 
+                onClick={() => handleStatClick('available')} 
+              />
+              <StatCard 
+                icon={<FiClock className="text-white text-sm" />} 
+                title="Pending" 
+                value={stats.pending} 
+                color="bg-gradient-to-br from-amber-600 to-amber-400" 
+                delay={100} 
+                isActive={activeFilter === 'pending'} 
+                statsAnimating={statsAnimating} 
+                onClick={() => handleStatClick('pending')} 
+              />
+              <StatCard 
+                icon={<FiTrendingUp className="text-white text-sm" />} 
+                title="Price Changed" 
+                value={stats.withPriceChanges} 
+                color="bg-gradient-to-br from-red-600 to-red-400" 
+                delay={150} 
+                isActive={activeFilter === 'price-changed'} 
+                statsAnimating={statsAnimating} 
+                onClick={() => handleStatClick('price-changed')} 
+              />
+             
             </div>
           </div>
         </div>
@@ -1147,29 +1182,29 @@ const Wishlist = () => {
                     <div className="min-w-0">
                       <h3 className="font-semibold text-[#1A2E2A] text-sm truncate">{item.buyerName}</h3>
                       <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                        {/* ====== AVAILABILITY STATUS ====== */}
+                        {/* Availability Status */}
                         <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap ${getStatusColor(item.status)}`}>
                           {item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : 'N/A'}
                         </span>
-                        {/* ====== PRICE CHANGE ====== */}
+                        {/* Price Change */}
                         <PriceChangeIndicator item={item} />
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    {/* ====== EDIT BUTTON ====== */}
+                    {/* Edit Button */}
                     <button onClick={() => handleEditItem(item)} className="w-7 h-7 rounded-xl hover:bg-[#F5F9F8] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#26A69A] hover:scale-110" title="Edit"><FiEdit className="text-sm" /></button>
                     <button onClick={() => handleViewItem(item)} className="w-7 h-7 rounded-xl hover:bg-[#F5F9F8] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110" title="View Details"><FiEye className="text-sm" /></button>
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  {/* ====== BUYER / TENANT ====== */}
+                  {/* Buyer / Tenant */}
                   <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                     <FiUser className="text-[#00695C] flex-shrink-0" />
                     <span className="truncate font-medium text-[#1A2E2A]">{item.buyerName || 'N/A'}</span>
                   </div>
-                  {/* ====== PROPERTY DETAILS ====== */}
+                  {/* Property Details */}
                   <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                     <FiHome className="text-[#00695C] flex-shrink-0" />
                     <span className="truncate">{item.propertyName || 'N/A'}</span>
@@ -1195,7 +1230,7 @@ const Wishlist = () => {
                   <button onClick={() => handleViewItem(item)} className="flex-1 py-1.5 text-xs font-medium text-[#00695C] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"><FiEye className="text-[10px]" /> View</button>
                   <button onClick={() => handleEditItem(item)} className="flex-1 py-1.5 text-xs font-medium text-[#26A69A] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"><FiEdit className="text-[10px]" /> Edit</button>
                   <button onClick={() => handleViewPropertyDetails(item.propertyId)} className="flex-1 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"><FiExternalLink className="text-[10px]" /> Details</button>
-                  {/* ====== REMOVE PROPERTY ====== */}
+                  {/* Remove Property */}
                   <button onClick={() => handleRemoveFromWishlist(item.id)} disabled={actionLoading === item.id} className="flex-1 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 disabled:opacity-50">
                     {actionLoading === item.id ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiHeart className="text-[10px]" />} Remove
                   </button>
@@ -1218,7 +1253,7 @@ const Wishlist = () => {
 
             {paginatedItems.map((item, index) => (
               <div key={item.id} className={`grid grid-cols-12 gap-2 items-center py-3 px-4 border-b border-[#E8F0EE] hover:bg-[#F5F9F8] transition-all duration-300 group ${item.isNew ? 'bg-blue-50/30' : ''}`} style={{ animationDelay: `${index * 30}ms` }}>
-                {/* ====== BUYER / TENANT ====== */}
+                {/* Buyer / Tenant */}
                 <div className="col-span-2 flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white font-bold text-xs shadow-md">
                     {item.buyerName ? item.buyerName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() : 'NA'}
@@ -1229,13 +1264,13 @@ const Wishlist = () => {
                   </div>
                 </div>
 
-                {/* ====== PROPERTY DETAILS ====== */}
+                {/* Property Details */}
                 <div className="col-span-2">
                   <p className="text-xs font-medium text-[#1A2E2A] truncate">{item.propertyName || 'N/A'}</p>
                   <p className="text-[9px] text-[#5A7D78]">{item.propertyType || ''}</p>
                 </div>
 
-                {/* ====== AVAILABILITY STATUS ====== */}
+                {/* Availability Status */}
                 <div className="col-span-1">
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${getStatusColor(item.status)}`}>
                     {item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : 'N/A'}
@@ -1246,14 +1281,14 @@ const Wishlist = () => {
 
                 <div className="col-span-1 text-center text-sm font-semibold text-[#1A2E2A]">₹{item.price ? Math.floor(item.price / 100000) : 0}L</div>
 
-                {/* ====== PRICE CHANGE ====== */}
+                {/* Price Change */}
                 <div className="col-span-1 text-center"><PriceChangeIndicator item={item} /></div>
 
                 <div className="col-span-1 text-center text-[10px] text-[#5A7D78]">
                   {item.addedDate ? new Date(item.addedDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) : 'N/A'}
                 </div>
 
-                {/* ====== ACTIONS ====== */}
+                {/* Actions */}
                 <div className="col-span-2 flex items-center justify-end gap-1">
                   <button onClick={() => handleEditItem(item)} className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#26A69A] hover:scale-110" title="Edit"><FiEdit className="text-xs" /></button>
                   <button onClick={() => handleViewItem(item)} className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110" title="View"><FiEye className="text-xs" /></button>

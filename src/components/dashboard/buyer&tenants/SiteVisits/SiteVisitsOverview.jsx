@@ -1,23 +1,83 @@
-// src/components/dashboard/buyer&tenants/TenantManagement/TenantManagementOverview.jsx
+// src/components/dashboard/buyer&tenants/SiteVisits/SiteVisitsOverview.jsx
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  FiUser, FiUsers, FiUserCheck, FiUserX, FiClock, FiHome, FiDollarSign,
-  FiArrowRight, FiRefreshCw, FiCheckCircle, FiShield, FiTrendingUp,
-  FiGrid, FiStar, FiActivity, FiCalendar, FiBarChart2,
-  FiPlus, FiEye, FiEdit, FiTrash2, FiLock, FiUnlock, FiXCircle,
-  FiAlertCircle, FiInfo, FiSearch, FiUserPlus, FiPhone, FiMail,
-  FiMapPin, FiBriefcase, FiHeart, FiClipboard, FiMessageCircle,
-  FiKey, FiHome as FiHomeIcon, FiCalendar as FiCalendarIcon
+  FiArrowRight,
+  FiRefreshCw,
+  FiActivity,
+  FiCalendar,
+  FiClock,
+  FiPhone,
+  FiUser,
+  FiHome,
+  FiUsers,
+  FiCheckCircle,
+  FiXCircle,
+  FiAlertCircle,
+  FiEdit,
+  FiEye,
+  FiMessageCircle,
+  FiUserCheck,
+  FiUserX,
+  FiBookmark,
+  FiShield,
+  FiTrendingUp,
+  FiBell,
+  FiPlus,
+  FiTrash2,
+  FiMapPin,
+  FiBriefcase,
+  FiSlash,
+  FiInfo,
+  FiChevronRight,
+  FiUserPlus, // This is actually available in react-icons/fi
 } from 'react-icons/fi';
 import {
-  FaUserTie, FaUsers, FaUserPlus, FaUserCheck as FaUserCheckSolid,
-  FaStar as FaStarSolid, FaHandshake, FaWallet, FaHome as FaHomeIcon,
-  FaClipboardList, FaMapMarkerAlt, FaIdCard, FaRegBuilding,
-  FaBed, FaCalendarAlt, FaParking, FaPaw, FaUserFriends
+  FaUserTie,
+  FaUsers,
+  FaUserPlus as FaUserPlusSolid,
+  FaUserCheck as FaUserCheckSolid,
+  FaStar as FaStarSolid,
+  FaHandshake,
+  FaWallet,
+  FaHome as FaHomeIcon,
+  FaClipboardList,
+  FaMapMarkerAlt,
+  FaIdCard,
+  FaRegBuilding,
+  FaRegHeart,
+  FaHeart as FaHeartSolid,
+  FaCalendarCheck,
+  FaCalendarTimes,
+  FaClock as FaClockSolid,
+  FaPhone as FaPhoneSolid,
+  FaRegCalendarAlt,
 } from 'react-icons/fa';
-import { MdVerified, MdOutlinePersonSearch, MdOutlineFavorite } from 'react-icons/md';
+import {
+  MdVerified,
+  MdOutlinePersonSearch,
+  MdOutlineFavorite,
+  MdOutlinePriceChange,
+  MdOutlinePendingActions,
+  MdOutlineEventAvailable,
+  MdOutlineEventBusy,
+  MdOutlineAssignmentInd,
+} from 'react-icons/md';
+
+// ============================================================
+// ROUTES - Site Visit module pages
+// ============================================================
+// <Route path="site-visits/dashboard" element={<SiteVisitDashboard />} />
+// <Route path="site-visits/details" element={<SiteVisitDetails />} />
+// <Route path="site-visits/status" element={<SiteVisitStatus />} />
+// <Route path="site-visits/actions" element={<SiteVisitActions />} />
+const ROUTES = {
+  dashboard: '/admin/buyers-tenants/site-visits/dashboard',
+  details: '/admin/buyers-tenants/site-visits/details',
+  status: '/admin/buyers-tenants/site-visits/status',
+  actions: '/admin/buyers-tenants/site-visits/actions',
+};
 
 // ============================================================
 // STAT CARD - Enhanced with Glassmorphism & Elegant Design (compact)
@@ -206,7 +266,7 @@ const QuickStat = ({ icon, label, value, color }) => (
 // ============================================================
 // MAIN COMPONENT
 // ============================================================
-const TenantManagementOverview = () => {
+const SiteVisitsOverview = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [statsAnimating, setStatsAnimating] = useState(false);
@@ -214,104 +274,88 @@ const TenantManagementOverview = () => {
 
   // ---- Stats ----
   const [stats, setStats] = useState({
-    // Tenant Registration Stats
-    totalTenants: 875,
-    newThisWeek: 28,
-    pendingKyc: 42,
-    verifiedTenants: 748,
-    activeTenants: 689,
-    blockedTenants: 18,
-    mobileVerified: 812,
-    emailVerified: 723,
-    verificationRate: 89,
-    
-    // Tenant Requirements Stats
-    rentalBudget: 28000,
-    preferredLocation: 'Indiranagar, Bangalore',
-    propertyType: 'Apartment',
-    furnishingPreference: 'Fully Furnished',
-    bedrooms: 2,
-    moveInDate: '2026-09-15',
-    rentalDuration: '12 months',
-    familyBachelor: 'Family',
-    parkingRequirement: 'Yes',
-    petRequirement: 'No',
-    
-    // Property Activity Stats
-    viewedProperties: 4120,
-    savedProperties: 1456,
-    wishlistCount: 789,
-    rentalEnquiries: 523,
-    rentalRequests: 312,
-    siteVisits: 178,
-    applications: 245,
-    leaseRequests: 96,
-    leadHistoryCount: 589,
-    
-    // Growth & Metrics
-    growthRate: 12.6,
-    monthlyGrowth: 7.8,
+    totalVisits: 847,
+    pendingVisits: 143,
+    confirmedVisits: 298,
+    completedVisits: 276,
+    cancelledVisits: 68,
+    rescheduledVisits: 42,
+    noShowVisits: 20,
+    todayVisits: 34,
+    unassignedVisits: 19,
   });
 
   // ---- Recent Activities ----
   const activities = useMemo(() => [
     {
-      icon: <FaUserPlus className="text-white text-sm" />,
-      title: 'New Tenant Registration',
-      time: '4 min ago',
-      description: 'Priya Sharma registered as a new tenant',
+      icon: <FiUserCheck className="text-white text-sm" />,
+      title: 'Visit Confirmed',
+      time: '8 min ago',
+      description: 'Ananya Iyer confirmed site visit for 3BHK Apartment in Adyar',
       color: 'bg-gradient-to-br',
       gradient: 'from-[#00695C] to-[#26A69A]'
     },
     {
-      icon: <FiCheckCircle className="text-white text-sm" />,
-      title: 'KYC Approved',
+      icon: <FiClock className="text-white text-sm" />,
+      title: 'Visit Rescheduled',
       time: '22 min ago',
-      description: 'Rohit Mehra\'s Aadhaar & PAN verified successfully',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-emerald-500 to-emerald-400'
-    },
-    {
-      icon: <FiHomeIcon className="text-white text-sm" />,
-      title: 'Property Saved',
-      time: '35 min ago',
-      description: 'Neha Patel saved a 2BHK Apartment in Indiranagar',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-blue-500 to-blue-400'
-    },
-    {
-      icon: <FiCalendarIcon className="text-white text-sm" />,
-      title: 'Site Visit Scheduled',
-      time: '48 min ago',
-      description: 'Vikram Singh booked a site visit for a Villa in Whitefield',
+      description: 'Karthik Raja rescheduled villa visit to tomorrow at 11:00 AM',
       color: 'bg-gradient-to-br',
       gradient: 'from-amber-500 to-amber-400'
     },
     {
-      icon: <FaHandshake className="text-white text-sm" />,
-      title: 'Lease Request Submitted',
+      icon: <FiCheckCircle className="text-white text-sm" />,
+      title: 'Visit Completed',
+      time: '45 min ago',
+      description: 'Divya Menon completed site visit for Plot in Coimbatore',
+      color: 'bg-gradient-to-br',
+      gradient: 'from-emerald-500 to-emerald-400'
+    },
+    {
+      icon: <FiXCircle className="text-white text-sm" />,
+      title: 'Visit Cancelled',
       time: '1 hour ago',
-      description: 'Anjali Nair submitted a lease request for a 3BHK House',
+      description: 'Rahul Verma cancelled visit for Luxury Apartment in ECR',
+      color: 'bg-gradient-to-br',
+      gradient: 'from-red-500 to-red-400'
+    },
+    {
+      icon: <FiUserX className="text-white text-sm" />,
+      title: 'No Show',
+      time: '2 hours ago',
+      description: 'Priya Patel marked as no-show for 2BHK visit in Velachery',
       color: 'bg-gradient-to-br',
       gradient: 'from-purple-500 to-purple-400'
     },
     {
-      icon: <FiPhone className="text-white text-sm" />,
-      title: 'Mobile Verified',
-      time: '2 hours ago',
-      description: 'Suresh Kumar\'s mobile number was successfully verified',
+      icon: <FiUserPlus className="text-white text-sm" />,
+      title: 'New Visit Request',
+      time: '3 hours ago',
+      description: 'Suresh Kumar requested visit for 4BHK Villa in ECR',
       color: 'bg-gradient-to-br',
-      gradient: 'from-pink-500 to-pink-400'
+      gradient: 'from-blue-500 to-blue-400'
     }
   ], []);
 
   // ---- Quick Stats ----
   const quickStats = useMemo(() => [
-    { icon: <FiUserPlus className="text-[#00695C]" />, label: 'New This Week', value: stats.newThisWeek },
-    { icon: <FiCheckCircle className="text-emerald-500" />, label: 'Verification Rate', value: `${stats.verificationRate}%` },
-    { icon: <FiHeart className="text-pink-500" />, label: 'Wishlisted', value: stats.wishlistCount },
-    { icon: <FiTrendingUp className="text-amber-500" />, label: 'Growth', value: `${stats.monthlyGrowth}%` },
+    { icon: <FiClock className="text-[#00695C]" />, label: 'Pending', value: stats.pendingVisits },
+    { icon: <FiCheckCircle className="text-emerald-500" />, label: 'Confirmed', value: stats.confirmedVisits },
+    { icon: <FiUserCheck className="text-blue-500" />, label: 'Completed', value: stats.completedVisits },
+    { icon: <FiXCircle className="text-red-500" />, label: 'Cancelled', value: stats.cancelledVisits },
   ], [stats]);
+
+  // ---- Quick Actions ----
+  const quickActions = useMemo(() => [
+    { icon: <FiEye className="text-white text-base" />, label: 'View All Visits', color: 'bg-gradient-to-br from-[#00695C] to-[#26A69A]', route: ROUTES.details },
+    { icon: <FiUserCheck className="text-white text-base" />, label: 'Approve Visit', color: 'bg-gradient-to-br from-green-600 to-green-400', route: ROUTES.actions },
+    { icon: <FiUsers className="text-white text-base" />, label: 'Assign Agent', color: 'bg-gradient-to-br from-blue-600 to-blue-400', route: ROUTES.actions },
+    { icon: <FiClock className="text-white text-base" />, label: 'Reschedule', color: 'bg-gradient-to-br from-amber-600 to-amber-400', route: ROUTES.actions },
+    { icon: <FiXCircle className="text-white text-base" />, label: 'Cancel Visit', color: 'bg-gradient-to-br from-red-600 to-red-400', route: ROUTES.actions },
+    { icon: <FiEdit className="text-white text-base" />, label: 'Add Remarks', color: 'bg-gradient-to-br from-purple-600 to-purple-400', route: ROUTES.actions },
+    { icon: <FiMessageCircle className="text-white text-base" />, label: 'Contact Buyer', color: 'bg-gradient-to-br from-teal-600 to-teal-400', route: ROUTES.actions },
+    { icon: <FiPhone className="text-white text-base" />, label: 'Contact Owner', color: 'bg-gradient-to-br from-cyan-600 to-cyan-400', route: ROUTES.actions },
+  ], []);
 
   useEffect(() => {
     setStatsAnimating(true);
@@ -329,30 +373,15 @@ const TenantManagementOverview = () => {
     setTimeout(() => {
       setStats(prev => ({
         ...prev,
-        // Registration Stats
-        totalTenants: prev.totalTenants + Math.floor(Math.random() * 5),
-        pendingKyc: Math.max(0, prev.pendingKyc + Math.floor(Math.random() * 6) - 3),
-        verifiedTenants: prev.verifiedTenants + Math.floor(Math.random() * 3),
-        activeTenants: prev.activeTenants + Math.floor(Math.random() * 4),
-        newThisWeek: prev.newThisWeek + Math.floor(Math.random() * 3),
-        
-        // Requirements Stats
-        rentalBudget: prev.rentalBudget + Math.floor(Math.random() * 1000) - 500,
-        bedrooms: prev.bedrooms + (Math.random() > 0.7 ? 1 : 0),
-        parkingRequirement: Math.random() > 0.3 ? 'Yes' : 'No',
-        petRequirement: Math.random() > 0.5 ? 'Yes' : 'No',
-        
-        // Property Activity Stats
-        viewedProperties: prev.viewedProperties + Math.floor(Math.random() * 35),
-        savedProperties: prev.savedProperties + Math.floor(Math.random() * 10),
-        wishlistCount: prev.wishlistCount + Math.floor(Math.random() * 7),
-        rentalEnquiries: prev.rentalEnquiries + Math.floor(Math.random() * 5),
-        siteVisits: prev.siteVisits + Math.floor(Math.random() * 3),
-        applications: prev.applications + Math.floor(Math.random() * 3),
-        leaseRequests: prev.leaseRequests + Math.floor(Math.random() * 2),
-        
-        // Growth
-        monthlyGrowth: prev.monthlyGrowth + (Math.random() * 2 - 1),
+        totalVisits: prev.totalVisits + Math.floor(Math.random() * 5),
+        pendingVisits: prev.pendingVisits + Math.floor(Math.random() * 3) - 1,
+        confirmedVisits: prev.confirmedVisits + Math.floor(Math.random() * 4),
+        completedVisits: prev.completedVisits + Math.floor(Math.random() * 3),
+        cancelledVisits: Math.max(0, prev.cancelledVisits + Math.floor(Math.random() * 2) - 1),
+        rescheduledVisits: prev.rescheduledVisits + Math.floor(Math.random() * 2),
+        noShowVisits: Math.max(0, prev.noShowVisits + Math.floor(Math.random() * 2) - 1),
+        todayVisits: Math.max(0, prev.todayVisits + Math.floor(Math.random() * 3) - 1),
+        unassignedVisits: Math.max(0, prev.unassignedVisits + Math.floor(Math.random() * 2) - 1),
       }));
       setLoading(false);
       setStatsAnimating(false);
@@ -380,14 +409,14 @@ const TenantManagementOverview = () => {
           <div className="flex items-center gap-3 flex-wrap">
             <div className="p-2.5 bg-gradient-to-br from-[#00695C] to-[#26A69A] rounded-2xl shadow-lg animate-pulse-glow relative">
               <div className="absolute inset-0 rounded-2xl bg-white/20 animate-pulse" />
-              <FiHome className="text-white text-xl relative z-10" />
+              <FaCalendarCheck className="text-white text-xl relative z-10" />
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
-                Tenant Management
+                Site Visit Management
               </h1>
               <div className="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
-                <span>Complete control over all rental tenants</span>
+                <span>Track and manage all property site visits</span>
                 <span className="w-1 h-1 bg-gray-400 rounded-full hidden sm:block" />
                 <span className="text-[#00695C] font-medium">
                   {time.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
@@ -429,144 +458,168 @@ const TenantManagementOverview = () => {
         </div>
       </div>
 
-      {/* ===== STATS GRID - ONLY 5 STATS ===== */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 relative">
+      {/* ===== STATS GRID (5 cards) ===== */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 relative">
+        {/* 1. Total Visits -> site-visits/dashboard */}
         <StatCard
-          icon={<FaUsers className="text-lg text-white" />}
-          title="Total Tenants"
-          value={stats.totalTenants}
-          subtitle={`${stats.newThisWeek} new this week`}
+          icon={<FaCalendarCheck className="text-lg text-white" />}
+          title="Total Visits"
+          value={stats.totalVisits}
+          subtitle={`${stats.pendingVisits} pending`}
           color="bg-gradient-to-br"
           gradient="from-[#00695C] to-[#26A69A]"
           borderColor="border-[#00695C]/30"
           delay={0}
           statsAnimating={statsAnimating}
-          onClick={() => {}}
+          onClick={() => navigateTo(ROUTES.dashboard)}
           trend="up"
-          trendValue="12.6"
+          trendValue="8.4"
         />
+        {/* 2. Visit Time -> site-visits/details */}
         <StatCard
-            icon={<FiUserCheck className="text-lg text-white" />}
-            title="Active Tenants"
-            value={stats.activeTenants}
-            subtitle={`${stats.blockedTenants} blocked`}
-            color="bg-gradient-to-br"
-            gradient="from-blue-600 to-blue-400"
-            borderColor="border-blue-600/30"
-            delay={100}
-            statsAnimating={statsAnimating}
-            onClick={() => navigateTo('/admin/buyers-tenants/tenant/registration')}
-            trend="up"
-            trendValue={stats.monthlyGrowth.toFixed(1)}
-          />
+          icon={<FiClock className="text-lg text-white" />}
+          title="Visit Time"
+          value={stats.todayVisits}
+          subtitle="Scheduled today"
+          color="bg-gradient-to-br"
+          gradient="from-blue-600 to-blue-400"
+          borderColor="border-blue-600/30"
+          delay={100}
+          statsAnimating={statsAnimating}
+          onClick={() => navigateTo(ROUTES.details)}
+          trend="up"
+          trendValue="3.1"
+        />
+        {/* 3. Confirmation Status -> site-visits/status */}
         <StatCard
-          icon={<FiUserCheck className="text-lg text-white" />}
-          title="Verified Tenants"
-          value={stats.verifiedTenants}
-          subtitle={`${stats.verificationRate}% verification rate`}
+          icon={<FiCheckCircle className="text-lg text-white" />}
+          title="Confirmation Status"
+          value={stats.confirmedVisits}
+          subtitle={`${stats.rescheduledVisits} rescheduled`}
           color="bg-gradient-to-br"
           gradient="from-emerald-600 to-emerald-400"
           borderColor="border-emerald-600/30"
           delay={200}
           statsAnimating={statsAnimating}
-          onClick={() => navigateTo('/admin/buyers-tenants/tenant/registration')}
+          onClick={() => navigateTo(ROUTES.status)}
           trend="up"
-          trendValue="9.2"
+          trendValue="6.7"
         />
+        {/* 4. Visit Status -> site-visits/details */}
         <StatCard
-          icon={<FiClipboard className="text-lg text-white" />}
-          title="Tenant Requirements"
-          value={`${stats.bedrooms} BHK`}
-          subtitle={`${stats.furnishingPreference} • ${stats.familyBachelor}`}
+          icon={<MdOutlineEventAvailable className="text-lg text-white" />}
+          title="Visit Status"
+          value={stats.completedVisits}
+          subtitle={`${stats.cancelledVisits} cancelled • ${stats.noShowVisits} no-shows`}
           color="bg-gradient-to-br"
-          gradient="from-orange-600 to-orange-400"
-          borderColor="border-orange-600/30"
+          gradient="from-amber-500 to-amber-400"
+          borderColor="border-amber-500/30"
           delay={300}
           statsAnimating={statsAnimating}
-          onClick={() => navigateTo('/admin/buyers-tenants/tenant/requirements')}
-          trend="up"
-          trendValue="4.5"
+          onClick={() => navigateTo(ROUTES.details)}
+          trend="down"
+          trendValue="1.8"
         />
+        {/* 5. Assign Agent -> site-visits/actions */}
         <StatCard
-          icon={<FiActivity className="text-lg text-white" />}
-          title="Property Activity"
-          value={stats.viewedProperties}
-          subtitle={`${stats.rentalEnquiries} enquiries, ${stats.siteVisits} visits`}
+          icon={<MdOutlineAssignmentInd className="text-lg text-white" />}
+          title="Assign Agent"
+          value={stats.unassignedVisits}
+          subtitle="Awaiting agent assignment"
           color="bg-gradient-to-br"
           gradient="from-purple-600 to-purple-400"
           borderColor="border-purple-600/30"
           delay={400}
           statsAnimating={statsAnimating}
-          onClick={() => navigateTo('/admin/buyers-tenants/tenant/activity')}
-          trend="up"
-          trendValue="15.7"
+          onClick={() => navigateTo(ROUTES.actions)}
+          trend="down"
+          trendValue="2.3"
         />
       </div>
 
-      {/* ===== NAVIGATION CARDS ===== */}
+      {/* ===== NAVIGATION CARDS (4 modules) ===== */}
       <div>
         <SectionHeader
           icon={<FiShield className="text-white text-sm" />}
-          title="Tenant Management Modules"
-          subtitle="Manage registration, requirements, and property activity"
+          title="Site Visit Modules"
+          subtitle="Manage visits, statuses, and admin actions"
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {/* Tenant Registration Card */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {/* Site Visit Dashboard Card */}
           <NavCard
-            icon={<FiUserCheck className="text-white text-xl" />}
-            title="Tenant Registration"
-            description="View, add, edit tenants. Verify mobile, email & KYC, then activate, block, or delete accounts."
+            icon={<FiActivity className="text-white text-xl" />}
+            title="Site Visit Dashboard"
+            description="High-level overview of all site visit activity, trends, and key numbers at a glance."
             color="bg-gradient-to-br"
             gradient="from-[#00695C] to-[#26A69A]"
             borderColor="border-[#00695C]/30"
             delay={0}
-            onClick={() => navigateTo('/admin/buyers-tenants/tenant/registration')}
-            badge={`${stats.pendingKyc} Pending`}
-            badgeColor="bg-gradient-to-r from-amber-500 to-amber-400"
+            onClick={() => navigateTo(ROUTES.dashboard)}
+            badge="Overview"
+            badgeColor="bg-gradient-to-r from-[#00695C] to-[#26A69A]"
             featured={true}
             stats={[
-              { label: 'Total', value: stats.totalTenants },
-              { label: 'Verified', value: stats.verifiedTenants },
-              { label: 'Blocked', value: stats.blockedTenants },
+              { label: 'Total', value: stats.totalVisits },
+              { label: 'Today', value: stats.todayVisits },
+              { label: 'Completed', value: stats.completedVisits },
             ]}
           />
 
-          {/* Tenant Requirements Card */}
+          {/* Site Visit Details Card */}
           <NavCard
-            icon={<FiClipboard className="text-white text-xl" />}
-            title="Tenant Requirements"
-            description="Rental budget, location, property type, furnishing, bedrooms, move-in date, duration, family/bachelor, parking & pet requirements."
+            icon={<FaClipboardList className="text-white text-xl" />}
+            title="Site Visit Details"
+            description="View complete visit information including buyer/tenant, property, owner/agent, dates, contact, assigned agent, status and remarks."
             color="bg-gradient-to-br"
-            gradient="from-orange-600 to-orange-400"
-            borderColor="border-orange-600/30"
+            gradient="from-blue-600 to-blue-400"
+            borderColor="border-blue-600/30"
             delay={100}
-            onClick={() => navigateTo('/admin/buyers-tenants/tenant/requirements')}
-            badge={`${stats.familyBachelor}`}
-            badgeColor="bg-gradient-to-r from-orange-500 to-orange-400"
+            onClick={() => navigateTo(ROUTES.details)}
+            badge={`${stats.pendingVisits} Pending`}
+            badgeColor="bg-gradient-to-r from-blue-500 to-blue-400"
             stats={[
-              { label: 'Budget', value: `₹${(stats.rentalBudget / 1000).toFixed(0)}K` },
-              { label: 'Beds', value: stats.bedrooms },
-              { label: 'Parking', value: stats.parkingRequirement },
+              { label: 'Confirmed', value: stats.confirmedVisits },
+              { label: 'Completed', value: stats.completedVisits },
+              { label: 'Cancelled', value: stats.cancelledVisits },
             ]}
           />
 
-          {/* Tenant Property Activity Card */}
+          {/* Site Visit Status Card */}
           <NavCard
-            icon={<FiEye className="text-white text-xl" />}
-            title="Tenant Property Activity"
-            description="Track viewed, saved & wishlisted properties, rental enquiries, requests, site visits, applications, lease requests & lead history."
+            icon={<MdOutlineEventAvailable className="text-white text-xl" />}
+            title="Site Visit Status"
+            description="Track visits by status: Requested, Pending Confirmation, Confirmed, Rescheduled, Completed, Cancelled, and No Show."
+            color="bg-gradient-to-br"
+            gradient="from-indigo-600 to-indigo-400"
+            borderColor="border-indigo-600/30"
+            delay={200}
+            onClick={() => navigateTo(ROUTES.status)}
+            badge="7 Statuses"
+            badgeColor="bg-gradient-to-r from-indigo-500 to-indigo-400"
+            stats={[
+              { label: 'Pending', value: stats.pendingVisits },
+              { label: 'Rescheduled', value: stats.rescheduledVisits },
+              { label: 'No Show', value: stats.noShowVisits },
+            ]}
+          />
+
+          {/* Admin Actions Card */}
+          <NavCard
+            icon={<FiShield className="text-white text-xl" />}
+            title="Admin Actions"
+            description="Approve visits, assign agents, reschedule, cancel, mark completed, add remarks, and contact buyers or owners/agents."
             color="bg-gradient-to-br"
             gradient="from-purple-600 to-purple-400"
             borderColor="border-purple-600/30"
-            delay={200}
-            onClick={() => navigateTo('/admin/buyers-tenants/tenant/activity')}
-            badge={`${stats.siteVisits} Visits`}
+            delay={300}
+            onClick={() => navigateTo(ROUTES.actions)}
+            badge="8 Actions"
             badgeColor="bg-gradient-to-r from-purple-500 to-purple-400"
             stats={[
-              { label: 'Wishlist', value: stats.wishlistCount },
-              { label: 'Enquiries', value: stats.rentalEnquiries },
-              { label: 'Applications', value: stats.applications },
+              { label: 'Pending Approval', value: stats.pendingVisits },
+              { label: 'Unassigned', value: stats.unassignedVisits },
+              { label: 'No Show', value: stats.noShowVisits },
             ]}
           />
         </div>
@@ -577,10 +630,10 @@ const TenantManagementOverview = () => {
         <SectionHeader
           icon={<FiActivity className="text-white text-sm" />}
           title="Recent Activities"
-          subtitle="Live updates from tenants and property engagement"
+          subtitle="Live updates from site visit management"
           action={true}
           actionLabel="View All"
-          onAction={() => navigateTo('/admin/buyers-tenants/tenant/activity')}
+          onAction={() => navigateTo(ROUTES.details)}
         />
 
         <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/50 shadow-lg p-4 hover:shadow-xl transition-all duration-300 hover:border-[#00695C]/20">
@@ -604,7 +657,7 @@ const TenantManagementOverview = () => {
       <div className="text-center pt-4">
         <p className="text-[11px] text-gray-500 flex items-center justify-center gap-2">
           <span className="w-4 h-0.5 bg-gray-300 rounded-full" />
-          <span>© 2026 Tenant Management • All rights reserved</span>
+          <span>© 2026 Site Visit Management • All rights reserved</span>
           <span className="w-4 h-0.5 bg-gray-300 rounded-full" />
         </p>
       </div>
@@ -664,4 +717,4 @@ const TenantManagementOverview = () => {
   );
 };
 
-export default TenantManagementOverview
+export default SiteVisitsOverview;

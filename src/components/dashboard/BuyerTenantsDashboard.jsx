@@ -64,11 +64,11 @@ import TenantPropertyActivity from './buyer&tenants/TenantManagement/TenantPrope
 import SavedWishlistOverview from './buyer&tenants/SavedWishlist/SavedWishlistOverview';
 import SavedProperties from './buyer&tenants/SavedWishlist/SavedProperties';
 import Wishlist from './buyer&tenants/SavedWishlist/Wishlist';
-// import SavedWishlistActions from './buyer&tenants/SavedWishlist/SavedWishlistActions';
+import SavedWishlistActions from './buyer&tenants/SavedWishlist/SavedWishlistActions';
 
 // Site Visits
-// import SiteVisitsOverview from './buyer&tenants/SiteVisits/SiteVisitsOverview';
-// import SiteVisitDashboard from './buyer&tenants/SiteVisits/SiteVisitDashboard';
+import SiteVisitsOverview from './buyer&tenants/SiteVisits/SiteVisitsOverview';
+import SiteVisitDashboard from './buyer&tenants/SiteVisits/SiteVisitDashboard';
 // import SiteVisitDetails from './buyer&tenants/SiteVisits/SiteVisitDetails';
 // import SiteVisitStatus from './buyer&tenants/SiteVisits/SiteVisitStatus';
 // import SiteVisitActions from './buyer&tenants/SiteVisits/SiteVisitActions';
@@ -513,14 +513,14 @@ const BuyerTenantsDashboard = () => {
               <Route path="saved/overview" element={<SavedWishlistOverview />} />
               <Route path="saved/properties" element={<SavedProperties />} />
               <Route path="saved/wishlist" element={<Wishlist />} />
-              {/* <Route path="saved/actions" element={<SavedWishlistActions />} /> */}
+              <Route path="saved/actions" element={<SavedWishlistActions />} />
 
               {/* Site Visits */}
-              {/* <Route path="site-visits/overview" element={<SiteVisitsOverview />} />
+              <Route path="site-visits/overview" element={<SiteVisitsOverview />} />
               <Route path="site-visits/dashboard" element={<SiteVisitDashboard />} />
-              <Route path="site-visits/details" element={<SiteVisitDetails />} />
-              <Route path="site-visits/status" element={<SiteVisitStatus />} />
-              <Route path="site-visits/actions" element={<SiteVisitActions />} /> */}
+              {/* <Route path="site-visits/details" element={<SiteVisitDetails />} /> */}
+              {/* <Route path="site-visits/status" element={<SiteVisitStatus />} /> */}
+              {/* <Route path="site-visits/actions" element={<SiteVisitActions />} /> */}
 
               {/* Rental Requests */}
               {/* <Route path="rental/overview" element={<RentalRequestsOverview />} />
