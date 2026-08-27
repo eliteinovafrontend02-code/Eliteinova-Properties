@@ -209,7 +209,7 @@ const RentalRequestsOverview = () => {
   const [time, setTime] = useState(new Date());
 
   // ---- Stats ----
-  const [stats, setStats] = useState({
+   const [stats, setStats] = useState({
     // Rental Request Management Stats
     totalRequests: 612,
     newRequests: 84,
@@ -241,13 +241,14 @@ const RentalRequestsOverview = () => {
     avgOccupants: 3,
     familyRequests: 402,
     bachelorRequests: 210,
+    furnishedRequests: 310,       
+    employmentVerified: 289,       
 
     // Growth & Metrics
     growthRate: 9.4,
     monthlyGrowth: 6.2,
     conversionRate: 43.8,
   });
-
   // ---- Recent Activities ----
   const activities = useMemo(() => [
     {
@@ -428,7 +429,7 @@ const RentalRequestsOverview = () => {
 
       {/* ===== STATS GRID ===== */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 relative">
-        <StatCard
+                <StatCard
           icon={<FiFileText className="text-lg text-white" />}
           title="Total Requests"
           value={stats.totalRequests}
@@ -443,58 +444,58 @@ const RentalRequestsOverview = () => {
           trendValue={stats.growthRate}
         />
         <StatCard
-          icon={<FiClock className="text-lg text-white" />}
-          title="Pending Requests"
-          value={stats.pendingRequests}
-          subtitle="Awaiting action"
+          icon={<FiHome className="text-lg text-white" />}
+          title="Furnishing Requirement"
+          value={stats.furnishedRequests}
+          subtitle="Fully & semi furnished"
           color="bg-gradient-to-br"
           gradient="from-amber-600 to-amber-400"
           borderColor="border-amber-600/30"
           delay={100}
           statsAnimating={statsAnimating}
-          onClick={() => navigateTo(`${BASE}/management?filter=pending`)}
+          onClick={() => navigateTo(`${BASE}/details`)}
           trend="up"
           trendValue={stats.monthlyGrowth.toFixed(1)}
         />
         <StatCard
-          icon={<FiThumbsUp className="text-lg text-white" />}
-          title="Approved Requests"
-          value={stats.approvedRequests}
-          subtitle={`${stats.conversionRate.toFixed(1)}% conversion rate`}
+          icon={<FiBriefcase className="text-lg text-white" />}
+          title="Employment Details"
+          value={stats.employmentVerified}
+          subtitle="Verified employment records"
           color="bg-gradient-to-br"
           gradient="from-emerald-600 to-emerald-400"
           borderColor="border-emerald-600/30"
           delay={200}
           statsAnimating={statsAnimating}
-          onClick={() => navigateTo(`${BASE}/management?filter=approved`)}
+          onClick={() => navigateTo(`${BASE}/details`)}
           trend="up"
           trendValue="8.3"
         />
         <StatCard
-          icon={<FiThumbsDown className="text-lg text-white" />}
-          title="Rejected Requests"
-          value={stats.rejectedRequests}
-          subtitle="Declined by owners"
+          icon={<FiHeart className="text-lg text-white" />}
+          title="Property Shortlisted"
+          value={stats.statusCounts.shortlisted}
+          subtitle="Tenant-shortlisted properties"
           color="bg-gradient-to-br"
           gradient="from-red-600 to-red-400"
           borderColor="border-red-600/30"
           delay={300}
           statsAnimating={statsAnimating}
-          onClick={() => navigateTo(`${BASE}/management?filter=rejected`)}
+          onClick={() => navigateTo(`${BASE}/status`)}
           trend="down"
           trendValue="2.1"
         />
         <StatCard
-          icon={<FiArchive className="text-lg text-white" />}
-          title="Closed Requests"
-          value={stats.closedRequests}
-          subtitle="Completed lifecycle"
+          icon={<FiFileText className="text-lg text-white" />}
+          title="Application Submitted"
+          value={stats.statusCounts.applicationSubmitted}
+          subtitle="Applications in progress"
           color="bg-gradient-to-br"
           gradient="from-purple-600 to-purple-400"
           borderColor="border-purple-600/30"
           delay={400}
           statsAnimating={statsAnimating}
-          onClick={() => navigateTo(`${BASE}/management?filter=closed`)}
+          onClick={() => navigateTo(`${BASE}/status`)}
           trend="up"
           trendValue="5.9"
         />

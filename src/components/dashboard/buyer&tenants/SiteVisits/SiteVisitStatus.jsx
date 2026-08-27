@@ -1153,7 +1153,7 @@ const SiteVisitStatus = () => {
       {showStats && (
         <div className="relative animate-slide-in">
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-8 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4  gap-3">
               <StatCard
                 icon={<FiActivity className="text-white text-sm" />}
                 title="Total"

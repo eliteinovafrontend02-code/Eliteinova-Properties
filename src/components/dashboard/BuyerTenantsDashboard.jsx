@@ -75,8 +75,8 @@ import SiteVisitActions from './buyer&tenants/SiteVisits/SiteVisitActions';
 
 // Rental Requests
 import RentalRequestsOverview from './buyer&tenants/RentalRequests/RentalRequestsOverview';
-// import RentalRequestManagement from './buyer&tenants/RentalRequests/RentalRequestManagement';
-// import RentalRequestDetails from './buyer&tenants/RentalRequests/RentalRequestDetails';
+import RentalRequestManagement from './buyer&tenants/RentalRequests/RentalRequestManagement';
+import RentalRequestDetails from './buyer&tenants/RentalRequests/RentalRequestDetails';
 // import RentalRequestStatus from './buyer&tenants/RentalRequests/RentalRequestStatus';
 
 // Purchase Requests
@@ -524,8 +524,8 @@ const BuyerTenantsDashboard = () => {
 
               {/* Rental Requests */}
               <Route path="rental/overview" element={<RentalRequestsOverview />} />
-              {/* <Route path="rental/management" element={<RentalRequestManagement />} /> */}
-              {/* <Route path="rental/details" element={<RentalRequestDetails />} /> */}
+              <Route path="rental/management" element={<RentalRequestManagement />} />
+              <Route path="rental/details" element={<RentalRequestDetails />} />
               {/* <Route path="rental/status" element={<RentalRequestStatus />} /> */}
 
               {/* Purchase Requests */}
