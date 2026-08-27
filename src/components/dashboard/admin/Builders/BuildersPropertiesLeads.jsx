@@ -1,4 +1,4 @@
-// src/components/dashboard/admin/Agents/AgentsPropertiesLeads.jsx
+// src/components/dashboard/admin/Builders/BuildersPropertiesLeads.jsx
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -156,7 +156,7 @@ const seedFromString = (str) => {
   return hash || 1;
 };
 
-// ============ VIEW PROPERTY MODAL - UPDATED to match Edit Modal style (clear view, no blur overlay) ============
+// ============ VIEW PROPERTY MODAL ============
 const ViewPropertyModal = ({ property, show, onClose }) => {
   if (!property || !show) return null;
 
@@ -165,7 +165,6 @@ const ViewPropertyModal = ({ property, show, onClose }) => {
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
-        {/* Header - same as Edit modal */}
         <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] px-5 py-3 rounded-t-2xl z-10 shrink-0 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white">
@@ -184,9 +183,7 @@ const ViewPropertyModal = ({ property, show, onClose }) => {
           </button>
         </div>
 
-        {/* Content - Clean, well-organized view */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-white">
-          {/* Title and Status */}
           <div className="flex items-start justify-between">
             <div>
               <h3 className="text-lg font-bold text-[#1A2E2A]">{property.title}</h3>
@@ -209,7 +206,6 @@ const ViewPropertyModal = ({ property, show, onClose }) => {
             </div>
           </div>
 
-          {/* Quick Stats */}
           <div className="grid grid-cols-3 gap-3">
             <div className="text-center p-3 bg-[#F5F9F8] rounded-xl">
               <p className="text-lg font-bold text-[#1A2E2A]">₹{property.price.toLocaleString()}</p>
@@ -225,7 +221,6 @@ const ViewPropertyModal = ({ property, show, onClose }) => {
             </div>
           </div>
 
-          {/* Details */}
           <div>
             <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-2">Details</h4>
             <div className="grid grid-cols-2 gap-2 text-sm bg-[#F5F9F8] rounded-xl p-3">
@@ -239,12 +234,11 @@ const ViewPropertyModal = ({ property, show, onClose }) => {
                 <FiTag className="text-[#00695C]" /> {property.type}
               </div>
               <div className="flex items-center gap-2 text-[#5A7D78]">
-                <FiUser className="text-[#00695C]" /> {property.ownerName}
+                <FiUser className="text-[#00695C]" /> {property.builderName}
               </div>
             </div>
           </div>
 
-          {/* Amenities */}
           <div>
             <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-2">Amenities</h4>
             <div className="flex flex-wrap gap-2">
@@ -254,7 +248,6 @@ const ViewPropertyModal = ({ property, show, onClose }) => {
             </div>
           </div>
 
-          {/* Description */}
           <div>
             <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-2">Description</h4>
             <p className="text-sm text-[#5A7D78] leading-relaxed bg-[#F5F9F8] rounded-xl p-3">
@@ -263,7 +256,6 @@ const ViewPropertyModal = ({ property, show, onClose }) => {
           </div>
         </div>
 
-        {/* Footer - same as Edit modal */}
         <div className="sticky bottom-0 bg-white pt-3 px-4 pb-4 border-t border-[#E8F0EE] flex items-center justify-end gap-3">
           <button
             onClick={onClose}
@@ -297,7 +289,7 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
         status: property.status || 'pending',
         isFeatured: property.isFeatured || false,
         isVerified: property.isVerified || false,
-        ownerName: property.ownerName || '',
+        builderName: property.builderName || '',
         description: property.description || '',
         amenities: property.amenities ? property.amenities.join(', ') : '',
       });
@@ -358,7 +350,6 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
-        {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] px-5 py-3 rounded-t-2xl z-10 shrink-0 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white">
@@ -377,7 +368,6 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
           </button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-3 bg-white">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="md:col-span-2">
@@ -444,8 +434,8 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
               </select>
             </div>
             <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Owner</label>
-              <input type="text" name="ownerName" value={formData.ownerName} onChange={handleChange}
+              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Builder</label>
+              <input type="text" name="builderName" value={formData.builderName} onChange={handleChange}
                 className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" />
             </div>
           </div>
@@ -489,9 +479,9 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
   );
 };
 
-// ============ ASSIGN LEADS MODAL - UPDATED with property details ============
+// ============ ASSIGN LEADS MODAL - UPDATED ============
 const AssignLeadsModal = ({
-  agent,
+  builder,
   show,
   onClose,
   onAssign,
@@ -504,7 +494,7 @@ const AssignLeadsModal = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (show && agent) {
+    if (show && builder) {
       const mockLeads = [];
       const leadNames = ['Rahul Sharma', 'Priya Patel', 'Amit Singh', 'Sneha Reddy', 'Vikram Kumar', 'Meera Iyer', 'Deepak Jain', 'Kavya Nair', 'Arjun Menon', 'Neha Kapoor'];
       const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur'];
@@ -530,7 +520,7 @@ const AssignLeadsModal = ({
       setSelectedLeads([]);
       setSearchQuery('');
     }
-  }, [show, agent]);
+  }, [show, builder]);
 
   const filteredLeads = useMemo(() => {
     if (!searchQuery) return availableLeads;
@@ -578,7 +568,7 @@ const AssignLeadsModal = ({
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `leads_${(agent?.name || 'agent').replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `leads_${(builder?.name || 'builder').replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
     window.URL.revokeObjectURL(url);
   };
@@ -588,12 +578,12 @@ const AssignLeadsModal = ({
     setIsSubmitting(true);
     const leadObjects = availableLeads.filter(l => selectedLeads.includes(l.id));
     setTimeout(() => {
-      onAssign(agent.id, leadObjects);
+      onAssign(builder.id, leadObjects);
       setIsSubmitting(false);
     }, 500);
   };
 
-  if (!show || !agent) return null;
+  if (!show || !builder) return null;
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
@@ -605,7 +595,7 @@ const AssignLeadsModal = ({
             </div>
             <div>
               <h2 className="text-base font-bold text-white">Assign Leads</h2>
-              <p className="text-white/70 text-[10px]">Assign leads to {agent.name}</p>
+              <p className="text-white/70 text-[10px]">Assign leads to {builder.name}</p>
             </div>
           </div>
           <button onClick={onClose} className="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110">
@@ -657,7 +647,7 @@ const AssignLeadsModal = ({
                     className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300 shrink-0" />
                   <div className="flex items-center justify-between flex-1 min-w-0">
                     <span className="font-semibold text-sm text-[#1A2E2A] whitespace-nowrap">{lead.name}</span>
-                    <div className="flex items-center gap-1.5 text-sm text-[#5A7D78]">
+                    <div className="flex items-center gap-3 text-sm text-[#5A7D78]">
                       <span className="font-medium text-[#00695C] whitespace-nowrap">{lead.propertyType}</span>
                       <span className="text-[#B5C9C5]">·</span>
                       <span className="whitespace-nowrap">{lead.bhk}</span>
@@ -686,8 +676,8 @@ const AssignLeadsModal = ({
 };
 
 // ============ VIEW ASSIGNED LEADS MODAL - UPDATED ============
-const ViewAssignedLeadsModal = ({ agent, leads, show, onClose, onViewLeadProfile }) => {
-  if (!show || !agent) return null;
+const ViewAssignedLeadsModal = ({ builder, leads, show, onClose, onViewLeadProfile }) => {
+  if (!show || !builder) return null;
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
@@ -699,7 +689,7 @@ const ViewAssignedLeadsModal = ({ agent, leads, show, onClose, onViewLeadProfile
             </div>
             <div>
               <h2 className="text-base font-bold text-white">Assigned Leads</h2>
-              <p className="text-white/70 text-[10px]">Leads assigned to {agent.name}</p>
+              <p className="text-white/70 text-[10px]">Leads assigned to {builder.name}</p>
             </div>
           </div>
           <button onClick={onClose} className="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110">
@@ -723,7 +713,10 @@ const ViewAssignedLeadsModal = ({ agent, leads, show, onClose, onViewLeadProfile
             <div className="space-y-2">
               {leads.map((lead, idx) => (
                 <div key={`${lead.id}_${idx}`} className="p-3 rounded-xl border border-[#E8F0EE] bg-[#F5F9F8]">
+                  {/* Name - First Line */}
                   <p className="font-semibold text-sm text-[#1A2E2A]">{lead.name}</p>
+                  
+                  {/* Property Details - Second Line */}
                   <div className="flex items-center gap-1.5 text-sm text-[#5A7D78] mt-0.5">
                     <span className="font-medium text-[#00695C]">{lead.propertyType || 'Apartment'}</span>
                     <span className="text-[#B5C9C5]">·</span>
@@ -734,7 +727,7 @@ const ViewAssignedLeadsModal = ({ agent, leads, show, onClose, onViewLeadProfile
                     <span>{lead.phone || '+91 98765 43210'}</span>
                     {lead.assignedDate && (
                       <>
-                        <span className="text-[#3b3e3d]">·</span>
+                         <span className="text-[#3b3e3d]">·</span>
                         <span className="text-[12px] text-[#7d8583]">
                           {new Date(lead.assignedDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </span>
@@ -756,12 +749,12 @@ const ViewAssignedLeadsModal = ({ agent, leads, show, onClose, onViewLeadProfile
 };
 
 // ============ COMMISSION TRACKING MODAL ============
-const CommissionTrackingModal = ({ agent, show, onClose }) => {
+const CommissionTrackingModal = ({ builder, show, onClose }) => {
   const [commissionData, setCommissionData] = useState([]);
   const [stats, setStats] = useState({ total: 0, paid: 0, pending: 0 });
 
   useEffect(() => {
-    if (show && agent) {
+    if (show && builder) {
       const mockCommissions = [
         { id: 1, property: 'Luxury Villa in Mumbai', price: 45000000, commission: 450000, date: '2026-01-15', status: 'paid' },
         { id: 2, property: 'Modern Apartment in Delhi', price: 12000000, commission: 120000, date: '2026-01-10', status: 'pending' },
@@ -779,7 +772,7 @@ const CommissionTrackingModal = ({ agent, show, onClose }) => {
         pending: mockCommissions.filter(c => c.status === 'pending').reduce((sum, c) => sum + c.commission, 0),
       });
     }
-  }, [show, agent]);
+  }, [show, builder]);
 
   const handleExportCommission = useCallback(() => {
     if (!commissionData.length) return;
@@ -799,12 +792,12 @@ const CommissionTrackingModal = ({ agent, show, onClose }) => {
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `commission_${(agent?.name || 'agent').replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `commission_${(builder?.name || 'builder').replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
     window.URL.revokeObjectURL(url);
-  }, [commissionData, agent]);
+  }, [commissionData, builder]);
 
-  if (!show || !agent) return null;
+  if (!show || !builder) return null;
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
@@ -816,7 +809,7 @@ const CommissionTrackingModal = ({ agent, show, onClose }) => {
             </div>
             <div>
               <h2 className="text-base font-bold text-white">Commission Tracking</h2>
-              <p className="text-white/70 text-[10px]">Commission details for {agent.name}</p>
+              <p className="text-white/70 text-[10px]">Commission details for {builder.name}</p>
             </div>
           </div>
           <button onClick={onClose} className="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110">
@@ -876,13 +869,13 @@ const CommissionTrackingModal = ({ agent, show, onClose }) => {
   );
 };
 
-// ============ PERFORMANCE REPORT MODAL - UPDATED (removed all amount/commission) ============
-const PerformanceReportModal = ({ agent, show, onClose }) => {
-  if (!show || !agent) return null;
+// ============ PERFORMANCE REPORT MODAL ============
+const PerformanceReportModal = ({ builder, show, onClose }) => {
+  if (!show || !builder) return null;
 
   const performanceData = {
-    totalProperties: agent.propertiesCount || 12,
-    totalLeads: agent.leadsCount || 45,
+    totalProperties: builder.propertiesCount || 12,
+    totalLeads: builder.leadsCount || 45,
     conversionRate: 68,
     avgResponseTime: '2.4 hrs',
     totalCommission: 1875000,
@@ -913,7 +906,7 @@ const PerformanceReportModal = ({ agent, show, onClose }) => {
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `performance_${(agent?.name || 'agent').replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `performance_${(builder?.name || 'builder').replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
     window.URL.revokeObjectURL(url);
   };
@@ -928,7 +921,7 @@ const PerformanceReportModal = ({ agent, show, onClose }) => {
             </div>
             <div>
               <h2 className="text-base font-bold text-white">Performance Report</h2>
-              <p className="text-white/70 text-[10px]">Performance metrics for {agent.name}</p>
+              <p className="text-white/70 text-[10px]">Performance metrics for {builder.name}</p>
             </div>
           </div>
           <button onClick={onClose} className="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110">
@@ -1001,9 +994,9 @@ const PerformanceReportModal = ({ agent, show, onClose }) => {
   );
 };
 
-// ============ VIEW AGENT PROPERTIES MODAL ============
-const ViewAgentPropertiesModal = ({
-  agent,
+// ============ VIEW BUILDER PROPERTIES MODAL ============
+const ViewBuilderPropertiesModal = ({
+  builder,
   show,
   onClose,
   showToast,
@@ -1026,7 +1019,7 @@ const ViewAgentPropertiesModal = ({
   });
 
   useEffect(() => {
-    if (show && agent) {
+    if (show && builder) {
       const propertyTypes = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
       const statuses = ['pending', 'approved', 'rejected', 'suspended'];
       const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur'];
@@ -1037,8 +1030,8 @@ const ViewAgentPropertiesModal = ({
       ];
       const amenityList = ['WiFi', 'Swimming Pool', 'AC', 'Parking', 'Gym', 'Security', 'CCTV', 'Garden'];
 
-      const rand = seededRandom(seedFromString(agent.id));
-      const count = Math.min(Math.max(agent.propertiesCount || 4, 1), 12);
+      const rand = seededRandom(seedFromString(builder.id));
+      const count = Math.min(Math.max(builder.propertiesCount || 4, 1), 12);
 
       const generated = Array.from({ length: count }, (_, idx) => {
         const type = propertyTypes[Math.floor(rand() * propertyTypes.length)];
@@ -1049,7 +1042,7 @@ const ViewAgentPropertiesModal = ({
         const amenities = amenityList.filter(() => rand() > 0.5).slice(0, 5);
 
         return {
-          id: `${agent.id}_p${idx + 1}`,
+          id: `${builder.id}_p${idx + 1}`,
           title: `${titles[Math.floor(rand() * titles.length)]} ${idx + 1}`,
           type,
           location: `${city}, India`,
@@ -1063,15 +1056,15 @@ const ViewAgentPropertiesModal = ({
           isVerified: rand() > 0.6,
           views: Math.floor(rand() * 400),
           inquiries: Math.floor(rand() * 30),
-          ownerName: agent.name,
-          description: `${type} managed by ${agent.name} in ${city}. Well-maintained with modern amenities.`,
+          builderName: builder.name,
+          description: `${type} built by ${builder.name} in ${city}. Well-maintained with modern amenities.`,
           amenities,
         };
       });
 
       setProperties(generated);
     }
-  }, [show, agent]);
+  }, [show, builder]);
 
   const showConfirmation = useCallback(({ title, message, confirmText, confirmColor, icon, onConfirm }) => {
     setConfirmationModal({
@@ -1186,7 +1179,7 @@ const ViewAgentPropertiesModal = ({
     });
   };
 
-  if (!show || !agent) return null;
+  if (!show || !builder) return null;
 
   return (
     <>
@@ -1224,8 +1217,8 @@ const ViewAgentPropertiesModal = ({
                 <FiHome className="text-sm" />
               </div>
               <div>
-                <h2 className="text-base font-bold text-white">Agent Properties</h2>
-                <p className="text-white/70 text-[10px]">Properties managed by {agent.name}</p>
+                <h2 className="text-base font-bold text-white">Builder Properties</h2>
+                <p className="text-white/70 text-[10px]">Properties built by {builder.name}</p>
               </div>
             </div>
             <button onClick={onClose} className="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110">
@@ -1237,11 +1230,11 @@ const ViewAgentPropertiesModal = ({
             <div className="flex items-center justify-between p-3 bg-[#F5F9F8] rounded-xl border-l-4 border-l-[#00695C] mb-4">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-12 h-12 rounded-full bg-[#00695C] flex items-center justify-center text-white text-lg font-bold shrink-0">
-                  {agent.name?.charAt(0) || 'A'}
+                  {builder.name?.charAt(0) || 'B'}
                 </div>
                 <div className="min-w-0">
-                  <p className="font-semibold text-[#1A2E2A] truncate">{agent.name}</p>
-                  <p className="text-xs text-[#5A7D78] truncate">{agent.email} · {agent.phone}</p>
+                  <p className="font-semibold text-[#1A2E2A] truncate">{builder.name}</p>
+                  <p className="text-xs text-[#5A7D78] truncate">{builder.email} · {builder.phone}</p>
                   <div className="flex items-center gap-3 mt-0.5">
                     <span className="text-[10px] font-medium text-[#00695C] bg-[#E8F4F2] px-2 py-0.5 rounded-full">
                       {properties.length} Properties
@@ -1253,7 +1246,7 @@ const ViewAgentPropertiesModal = ({
                 </div>
               </div>
               <button
-                onClick={() => onViewProfile && onViewProfile(agent.id)}
+                onClick={() => onViewProfile && onViewProfile(builder.id)}
                 className="px-4 py-2 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-xs font-medium flex items-center gap-2 hover:scale-105 shrink-0"
               >
                 <FiExternalLink className="text-xs" />
@@ -1266,7 +1259,7 @@ const ViewAgentPropertiesModal = ({
                 <div className="w-16 h-16 rounded-full bg-[#F5F9F8] flex items-center justify-center mx-auto mb-3">
                   <FiHome className="text-2xl text-[#B5C9C5]" />
                 </div>
-                <p className="text-sm text-[#5A7D78]">No properties managed by this agent</p>
+                <p className="text-sm text-[#5A7D78]">No properties built by this builder</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -1335,12 +1328,12 @@ const ViewAgentPropertiesModal = ({
 };
 
 // ============ MAIN COMPONENT ============
-const AgentsPropertiesLeads = () => {
+const BuildersPropertiesLeads = () => {
   const navigate = useNavigate();
 
   // ============ STATE ============
-  const [agents, setAgents] = useState([]);
-  const [filteredAgents, setFilteredAgents] = useState([]);
+  const [builders, setBuilders] = useState([]);
+  const [filteredBuilders, setFilteredBuilders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -1350,7 +1343,7 @@ const AgentsPropertiesLeads = () => {
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState('asc');
   const [viewMode, setViewMode] = useState('grid');
-  const [selectedAgents, setSelectedAgents] = useState([]);
+  const [selectedBuilders, setSelectedBuilders] = useState([]);
   const [showStats, setShowStats] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
   const [filterCount, setFilterCount] = useState(0);
@@ -1358,18 +1351,18 @@ const AgentsPropertiesLeads = () => {
   const [actionLoading, setActionLoading] = useState(null);
 
   // Modal states
-  const [assignLeadAgent, setAssignLeadAgent] = useState(null);
+  const [assignLeadBuilder, setAssignLeadBuilder] = useState(null);
   const [showAssignLeadModal, setShowAssignLeadModal] = useState(false);
-  const [commissionAgent, setCommissionAgent] = useState(null);
+  const [commissionBuilder, setCommissionBuilder] = useState(null);
   const [showCommissionModal, setShowCommissionModal] = useState(false);
-  const [performanceAgent, setPerformanceAgent] = useState(null);
+  const [performanceBuilder, setPerformanceBuilder] = useState(null);
   const [showPerformanceModal, setShowPerformanceModal] = useState(false);
-  const [viewPropertiesAgent, setViewPropertiesAgent] = useState(null);
+  const [viewPropertiesBuilder, setViewPropertiesBuilder] = useState(null);
   const [showViewPropertiesModal, setShowViewPropertiesModal] = useState(false);
 
   // Assigned leads tracking
   const [assignedLeadsMap, setAssignedLeadsMap] = useState({});
-  const [assignedLeadsAgent, setAssignedLeadsAgent] = useState(null);
+  const [assignedLeadsBuilder, setAssignedLeadsBuilder] = useState(null);
   const [showAssignedLeadsModal, setShowAssignedLeadsModal] = useState(false);
 
   const searchInputRef = useRef(null);
@@ -1384,7 +1377,7 @@ const AgentsPropertiesLeads = () => {
     confirmColor: 'bg-red-500',
     icon: <FiAlertTriangle className="text-4xl text-red-500" />,
     onConfirm: null,
-    agentId: null,
+    builderId: null,
     action: null,
   });
 
@@ -1406,9 +1399,9 @@ const AgentsPropertiesLeads = () => {
     setTimeout(() => setToast(null), duration);
   }, []);
 
-  // ============ GENERATE MOCK AGENTS ============
-  const generateMockAgents = useCallback(() => {
-    const agentNames = [
+  // ============ GENERATE MOCK BUILDERS ============
+  const generateMockBuilders = useCallback(() => {
+    const builderNames = [
       'Rajesh Kumar', 'Priya Sharma', 'Amit Singh', 'Sneha Patel',
       'Vikram Reddy', 'Deepak Verma', 'Meera Joshi', 'Arjun Nair',
       'Kavya Rao', 'Suresh Gupta', 'Ananya Menon', 'Ravi Desai',
@@ -1419,13 +1412,13 @@ const AgentsPropertiesLeads = () => {
     const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur'];
     const statuses = ['active', 'inactive', 'pending'];
 
-    return agentNames.map((name, i) => {
+    return builderNames.map((name, i) => {
       const status = statuses[Math.floor(Math.random() * statuses.length)];
       const specialty = specialties[Math.floor(Math.random() * specialties.length)];
       const city = cities[Math.floor(Math.random() * cities.length)];
 
       return {
-        id: `agent_${i + 1}`,
+        id: `builder_${i + 1}`,
         name: name,
         email: `${name.toLowerCase().replace(' ', '.')}@realestate.com`,
         phone: `+91 98765${String(43210 + i).padStart(5, '0')}`,
@@ -1444,33 +1437,33 @@ const AgentsPropertiesLeads = () => {
 
   // ============ INITIALIZE DATA ============
   useEffect(() => {
-    const mockAgents = generateMockAgents();
-    setAgents(mockAgents);
-    setFilteredAgents(mockAgents);
-    updateStats(mockAgents);
-  }, [generateMockAgents]);
+    const mockBuilders = generateMockBuilders();
+    setBuilders(mockBuilders);
+    setFilteredBuilders(mockBuilders);
+    updateStats(mockBuilders);
+  }, [generateMockBuilders]);
 
   // ============ UPDATE STATS ============
-  const updateStats = useCallback((agentsList) => {
-    const totalProperties = agentsList.reduce((sum, a) => sum + (a.propertiesCount || 0), 0);
-    const totalLeads = agentsList.reduce((sum, a) => sum + (a.leadsCount || 0), 0);
-    const totalCommission = agentsList.reduce((sum, a) => sum + (a.commission || 0), 0);
+  const updateStats = useCallback((buildersList) => {
+    const totalProperties = buildersList.reduce((sum, a) => sum + (a.propertiesCount || 0), 0);
+    const totalLeads = buildersList.reduce((sum, a) => sum + (a.leadsCount || 0), 0);
+    const totalCommission = buildersList.reduce((sum, a) => sum + (a.commission || 0), 0);
 
     setStats({
-      total: agentsList.length,
-      active: agentsList.filter(a => a.status === 'active').length,
-      inactive: agentsList.filter(a => a.status === 'inactive').length,
-      pending: agentsList.filter(a => a.status === 'pending').length,
-      topPerformers: agentsList.filter(a => (a.rating || 0) >= 4.5).length,
+      total: buildersList.length,
+      active: buildersList.filter(a => a.status === 'active').length,
+      inactive: buildersList.filter(a => a.status === 'inactive').length,
+      pending: buildersList.filter(a => a.status === 'pending').length,
+      topPerformers: buildersList.filter(a => (a.rating || 0) >= 4.5).length,
       totalProperties,
       totalLeads,
       totalCommission,
     });
   }, []);
 
-  // ============ FILTER AGENTS ============
-  const filterAgents = useCallback(() => {
-    let filtered = [...agents];
+  // ============ FILTER BUILDERS ============
+  const filterBuilders = useCallback(() => {
+    let filtered = [...builders];
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -1513,22 +1506,22 @@ const AgentsPropertiesLeads = () => {
       return 0;
     });
 
-    setFilteredAgents(filtered);
+    setFilteredBuilders(filtered);
     setCurrentPage(1);
-  }, [agents, searchQuery, selectedStatus, selectedSpecialty, sortField, sortDirection, activeFilter]);
+  }, [builders, searchQuery, selectedStatus, selectedSpecialty, sortField, sortDirection, activeFilter]);
 
   useEffect(() => {
-    filterAgents();
-  }, [filterAgents]);
+    filterBuilders();
+  }, [filterBuilders]);
 
   // ============ PAGINATION ============
-  const totalPages = Math.ceil(filteredAgents.length / pageSize);
-  const paginatedAgents = useMemo(() =>
-    filteredAgents.slice(
+  const totalPages = Math.ceil(filteredBuilders.length / pageSize);
+  const paginatedBuilders = useMemo(() =>
+    filteredBuilders.slice(
       (currentPage - 1) * pageSize,
       currentPage * pageSize
     )
-  , [filteredAgents, currentPage, pageSize]);
+  , [filteredBuilders, currentPage, pageSize]);
 
   // ============ HANDLE SORT ============
   const handleSort = useCallback((field) => {
@@ -1542,17 +1535,17 @@ const AgentsPropertiesLeads = () => {
 
   // ============ HANDLE SELECT ALL ============
   const handleSelectAll = useCallback(() => {
-    if (selectedAgents.length === paginatedAgents.length) {
-      setSelectedAgents([]);
+    if (selectedBuilders.length === paginatedBuilders.length) {
+      setSelectedBuilders([]);
     } else {
-      setSelectedAgents(paginatedAgents.map(a => a.id));
+      setSelectedBuilders(paginatedBuilders.map(a => a.id));
     }
-  }, [selectedAgents, paginatedAgents]);
+  }, [selectedBuilders, paginatedBuilders]);
 
-  // ============ HANDLE SELECT AGENT ============
-  const handleSelectAgent = useCallback((agentId) => {
-    setSelectedAgents(prev =>
-      prev.includes(agentId) ? prev.filter(id => id !== agentId) : [...prev, agentId]
+  // ============ HANDLE SELECT BUILDER ============
+  const handleSelectBuilder = useCallback((builderId) => {
+    setSelectedBuilders(prev =>
+      prev.includes(builderId) ? prev.filter(id => id !== builderId) : [...prev, builderId]
     );
   }, []);
 
@@ -1600,7 +1593,7 @@ const AgentsPropertiesLeads = () => {
     confirmColor = 'bg-red-500',
     icon = <FiAlertTriangle className="text-4xl text-red-500" />,
     onConfirm,
-    agentId,
+    builderId,
     action,
   }) => {
     setConfirmationModal({
@@ -1612,7 +1605,7 @@ const AgentsPropertiesLeads = () => {
       confirmColor,
       icon,
       onConfirm,
-      agentId,
+      builderId,
       action,
     });
   }, []);
@@ -1624,104 +1617,104 @@ const AgentsPropertiesLeads = () => {
 
   // ============ HANDLE CONFIRM ACTION ============
   const handleConfirmAction = useCallback(async () => {
-    const { onConfirm, agentId, action } = confirmationModal;
+    const { onConfirm, builderId, action } = confirmationModal;
     if (onConfirm) {
-      setActionLoading(`${action}_${agentId}`);
-      await onConfirm(agentId);
+      setActionLoading(`${action}_${builderId}`);
+      await onConfirm(builderId);
       setActionLoading(null);
     }
     closeConfirmation();
   }, [confirmationModal, closeConfirmation]);
 
-  // ============ VIEW AGENT PROPERTIES ============
-  const handleViewAgentProperties = useCallback((agent) => {
-    setViewPropertiesAgent(agent);
+  // ============ VIEW BUILDER PROPERTIES ============
+  const handleViewBuilderProperties = useCallback((builder) => {
+    setViewPropertiesBuilder(builder);
     setShowViewPropertiesModal(true);
   }, []);
 
-  // ============ VIEW AGENT PROFILE ============
-  const handleViewAgentProfile = useCallback((agentId) => {
-    navigate('/profile/agent');
-    showToast('Opening Agent Profile...', 'info');
+  // ============ VIEW BUILDER PROFILE ============
+  const handleViewBuilderProfile = useCallback((builderId) => {
+    navigate('/profile/builder');
+    showToast('Opening Builder Profile...', 'info');
   }, [navigate, showToast]);
 
   // ============ VIEW LEAD PROFILE ============
   const handleViewLeadProfile = useCallback((lead) => {
-    navigate('/profile/agent', { state: { lead } });
+    navigate('/profile/builder', { state: { lead } });
     showToast(`Opening ${lead.name}'s Profile...`, 'info');
   }, [navigate, showToast]);
 
   // ============ ASSIGN LEADS ============
-  const handleAssignLeads = useCallback((agent) => {
-    setAssignLeadAgent(agent);
+  const handleAssignLeads = useCallback((builder) => {
+    setAssignLeadBuilder(builder);
     setShowAssignLeadModal(true);
   }, []);
 
-  const handleAssignLeadsSubmit = useCallback((agentId, leadObjects) => {
-    setActionLoading(`assign_${agentId}`);
+  const handleAssignLeadsSubmit = useCallback((builderId, leadObjects) => {
+    setActionLoading(`assign_${builderId}`);
     setTimeout(() => {
-      setAgents(prev => {
-        const updated = prev.map(agent => {
-          if (agent.id === agentId) {
-            const newLeadsCount = (agent.leadsCount || 0) + leadObjects.length;
-            showToast(`${leadObjects.length} lead(s) assigned to ${agent.name} successfully`, 'success');
-            return { ...agent, leadsCount: newLeadsCount };
+      setBuilders(prev => {
+        const updated = prev.map(builder => {
+          if (builder.id === builderId) {
+            const newLeadsCount = (builder.leadsCount || 0) + leadObjects.length;
+            showToast(`${leadObjects.length} lead(s) assigned to ${builder.name} successfully`, 'success');
+            return { ...builder, leadsCount: newLeadsCount };
           }
-          return agent;
+          return builder;
         });
         updateStats(updated);
         return updated;
       });
 
       setAssignedLeadsMap(prev => {
-        const existing = prev[agentId] || [];
+        const existing = prev[builderId] || [];
         const withDate = leadObjects.map(l => ({ ...l, assignedDate: new Date().toISOString() }));
-        return { ...prev, [agentId]: [...existing, ...withDate] };
+        return { ...prev, [builderId]: [...existing, ...withDate] };
       });
 
       setActionLoading(null);
       setShowAssignLeadModal(false);
-      setAssignLeadAgent(null);
+      setAssignLeadBuilder(null);
     }, 800);
   }, [showToast, updateStats]);
 
   // ============ VIEW ASSIGNED LEADS ============
-  const handleViewAssignedLeads = useCallback((agent) => {
-    setAssignedLeadsAgent(agent);
+  const handleViewAssignedLeads = useCallback((builder) => {
+    setAssignedLeadsBuilder(builder);
     setShowAssignedLeadsModal(true);
   }, []);
 
   // ============ VIEW COMMISSION ============
-  const handleViewCommission = useCallback((agent) => {
-    setCommissionAgent(agent);
+  const handleViewCommission = useCallback((builder) => {
+    setCommissionBuilder(builder);
     setShowCommissionModal(true);
   }, []);
 
   // ============ VIEW PERFORMANCE ============
-  const handleViewPerformance = useCallback((agent) => {
-    setPerformanceAgent(agent);
+  const handleViewPerformance = useCallback((builder) => {
+    setPerformanceBuilder(builder);
     setShowPerformanceModal(true);
   }, []);
 
-  // ============ TOGGLE AGENT STATUS ============
-  const handleToggleStatus = useCallback((agentId) => {
-    const agent = agents.find(a => a.id === agentId);
-    if (!agent) return;
+  // ============ TOGGLE BUILDER STATUS ============
+  const handleToggleStatus = useCallback((builderId) => {
+    const builder = builders.find(a => a.id === builderId);
+    if (!builder) return;
 
-    const isActive = agent.status === 'active';
+    const isActive = builder.status === 'active';
 
     showConfirmation({
-      title: isActive ? 'Deactivate Agent' : 'Activate Agent',
+      title: isActive ? 'Deactivate Builder' : 'Activate Builder',
       message: isActive
-        ? `Are you sure you want to deactivate ${agent.name}? They will no longer be able to manage properties.`
-        : `Are you sure you want to activate ${agent.name}? They will be able to manage properties again.`,
+        ? `Are you sure you want to deactivate ${builder.name}? They will no longer be able to manage properties.`
+        : `Are you sure you want to activate ${builder.name}? They will be able to manage properties again.`,
       confirmText: isActive ? 'Yes, Deactivate' : 'Yes, Activate',
       confirmColor: isActive ? 'bg-red-500' : 'bg-emerald-500',
       icon: isActive ? <FiUserX className="text-4xl text-red-500" /> : <FiUserCheck className="text-4xl text-emerald-500" />,
       onConfirm: (id) => {
         return new Promise((resolve) => {
           setTimeout(() => {
-            setAgents(prev => {
+            setBuilders(prev => {
               const updated = prev.map(a => {
                 if (a.id === id) {
                   const newStatus = a.status === 'active' ? 'inactive' : 'active';
@@ -1737,65 +1730,65 @@ const AgentsPropertiesLeads = () => {
           }, 600);
         });
       },
-      agentId,
+      builderId,
       action: 'toggle_status',
     });
-  }, [agents, showConfirmation, showToast, updateStats]);
+  }, [builders, showConfirmation, showToast, updateStats]);
 
-  // ============ DELETE AGENT ============
-  const handleDeleteAgent = useCallback((agentId) => {
-    const agent = agents.find(a => a.id === agentId);
-    if (!agent) return;
+  // ============ DELETE BUILDER ============
+  const handleDeleteBuilder = useCallback((builderId) => {
+    const builder = builders.find(a => a.id === builderId);
+    if (!builder) return;
 
     showConfirmation({
-      title: 'Delete Agent',
-      message: `Are you sure you want to delete ${agent.name}? This action cannot be undone.`,
+      title: 'Delete Builder',
+      message: `Are you sure you want to delete ${builder.name}? This action cannot be undone.`,
       confirmText: 'Yes, Delete',
       confirmColor: 'bg-red-500',
       icon: <FiTrash2 className="text-4xl text-red-500" />,
       onConfirm: (id) => {
         return new Promise((resolve) => {
           setTimeout(() => {
-            setAgents(prev => {
+            setBuilders(prev => {
               const updated = prev.filter(a => a.id !== id);
               updateStats(updated);
-              showToast(`Agent deleted successfully`, 'error');
+              showToast(`Builder deleted successfully`, 'error');
               return updated;
             });
             resolve();
           }, 600);
         });
       },
-      agentId,
+      builderId,
       action: 'delete',
     });
-  }, [agents, showConfirmation, showToast, updateStats]);
+  }, [builders, showConfirmation, showToast, updateStats]);
 
   // ============ BULK ACTIONS ============
   const handleBulkAction = useCallback((action) => {
-    if (selectedAgents.length === 0) {
-      showToast('Please select agents first', 'warning');
+    if (selectedBuilders.length === 0) {
+      showToast('Please select builders first', 'warning');
       return;
     }
 
     const actionMap = {
       activate: {
-        title: 'Activate Agents',
-        message: `Are you sure you want to activate ${selectedAgents.length} selected agent(s)?`,
+        title: 'Activate Builders',
+        message: `Are you sure you want to activate ${selectedBuilders.length} selected builder(s)?`,
         confirmText: 'Yes, Activate All',
         confirmColor: 'bg-emerald-500',
         icon: <FiUserCheck className="text-4xl text-emerald-500" />,
       },
       deactivate: {
-        title: 'Deactivate Agents',
-        message: `Are you sure you want to deactivate ${selectedAgents.length} selected agent(s)?`,
+        title: 'Deactivate Builders',
+        message: `Are you sure you want to deactivate ${selectedBuilders.length} selected builder(s)?`,
         confirmText: 'Yes, Deactivate All',
         confirmColor: 'bg-red-500',
         icon: <FiUserX className="text-4xl text-red-500" />,
       },
       delete: {
-        title: 'Delete Agents',
-        message: `Are you sure you want to delete ${selectedAgents.length} selected agent(s)? This action cannot be undone.`,
+        title: 'Delete Builders',
+        message: `Are you sure you want to delete ${selectedBuilders.length} selected builder(s)? This action cannot be undone.`,
         confirmText: 'Yes, Delete All',
         confirmColor: 'bg-red-500',
         icon: <FiTrash2 className="text-4xl text-red-500" />,
@@ -1811,10 +1804,10 @@ const AgentsPropertiesLeads = () => {
         return new Promise((resolve) => {
           setActionLoading(action);
           setTimeout(() => {
-            const selectedIds = new Set(selectedAgents);
-            let updatedAgents = [...agents];
+            const selectedIds = new Set(selectedBuilders);
+            let updatedBuilders = [...builders];
 
-            updatedAgents = updatedAgents.map(a => {
+            updatedBuilders = updatedBuilders.map(a => {
               if (selectedIds.has(a.id)) {
                 if (action === 'activate') {
                   return { ...a, status: 'active' };
@@ -1827,36 +1820,36 @@ const AgentsPropertiesLeads = () => {
               return a;
             }).filter(Boolean);
 
-            setAgents(updatedAgents);
-            updateStats(updatedAgents);
-            setSelectedAgents([]);
+            setBuilders(updatedBuilders);
+            updateStats(updatedBuilders);
+            setSelectedBuilders([]);
             setActionLoading(null);
-            showToast(`${selectedAgents.length} agent(s) ${action === 'activate' ? 'activated' : action === 'deactivate' ? 'deactivated' : 'deleted'}`, 'success');
+            showToast(`${selectedBuilders.length} builder(s) ${action === 'activate' ? 'activated' : action === 'deactivate' ? 'deactivated' : 'deleted'}`, 'success');
             resolve();
           }, 800);
         });
       },
-      agentId: 'bulk',
+      builderId: 'bulk',
       action: action,
     });
-  }, [selectedAgents, agents, showConfirmation, showToast, updateStats]);
+  }, [selectedBuilders, builders, showConfirmation, showToast, updateStats]);
 
   // ============ REFRESH DATA ============
   const handleRefresh = useCallback(() => {
     setLoading(true);
     setTimeout(() => {
-      const mockAgents = generateMockAgents();
-      setAgents(mockAgents);
-      setFilteredAgents(mockAgents);
-      updateStats(mockAgents);
+      const mockBuilders = generateMockBuilders();
+      setBuilders(mockBuilders);
+      setFilteredBuilders(mockBuilders);
+      updateStats(mockBuilders);
       setLoading(false);
       showToast('Data refreshed successfully', 'success');
     }, 1000);
-  }, [generateMockAgents, showToast, updateStats]);
+  }, [generateMockBuilders, showToast, updateStats]);
 
-  // ============ EXPORT AGENTS ============
-  const handleExportAgents = useCallback(() => {
-    const data = filteredAgents.map(a => ({
+  // ============ EXPORT BUILDERS ============
+  const handleExportBuilders = useCallback(() => {
+    const data = filteredBuilders.map(a => ({
       Name: a.name,
       Email: a.email,
       Phone: a.phone,
@@ -1880,11 +1873,11 @@ const AgentsPropertiesLeads = () => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `agents_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `builders_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
-    showToast(`${filteredAgents.length} agents exported successfully`, 'success');
-  }, [filteredAgents, showToast]);
+    showToast(`${filteredBuilders.length} builders exported successfully`, 'success');
+  }, [filteredBuilders, showToast]);
 
   // ============ RENDER ============
   return (
@@ -1914,9 +1907,9 @@ const AgentsPropertiesLeads = () => {
 
       {/* Assign Leads Modal */}
       <AssignLeadsModal
-        agent={assignLeadAgent}
+        builder={assignLeadBuilder}
         show={showAssignLeadModal}
-        onClose={() => { setShowAssignLeadModal(false); setAssignLeadAgent(null); }}
+        onClose={() => { setShowAssignLeadModal(false); setAssignLeadBuilder(null); }}
         onAssign={handleAssignLeadsSubmit}
         onViewLeadProfile={handleViewLeadProfile}
         loading={actionLoading !== null}
@@ -1924,34 +1917,34 @@ const AgentsPropertiesLeads = () => {
 
       {/* View Assigned Leads Modal */}
       <ViewAssignedLeadsModal
-        agent={assignedLeadsAgent}
-        leads={assignedLeadsAgent ? (assignedLeadsMap[assignedLeadsAgent.id] || []) : []}
+        builder={assignedLeadsBuilder}
+        leads={assignedLeadsBuilder ? (assignedLeadsMap[assignedLeadsBuilder.id] || []) : []}
         show={showAssignedLeadsModal}
-        onClose={() => { setShowAssignedLeadsModal(false); setAssignedLeadsAgent(null); }}
+        onClose={() => { setShowAssignedLeadsModal(false); setAssignedLeadsBuilder(null); }}
         onViewLeadProfile={handleViewLeadProfile}
       />
 
       {/* Commission Tracking Modal */}
       <CommissionTrackingModal
-        agent={commissionAgent}
+        builder={commissionBuilder}
         show={showCommissionModal}
-        onClose={() => { setShowCommissionModal(false); setCommissionAgent(null); }}
+        onClose={() => { setShowCommissionModal(false); setCommissionBuilder(null); }}
       />
 
       {/* Performance Report Modal */}
       <PerformanceReportModal
-        agent={performanceAgent}
+        builder={performanceBuilder}
         show={showPerformanceModal}
-        onClose={() => { setShowPerformanceModal(false); setPerformanceAgent(null); }}
+        onClose={() => { setShowPerformanceModal(false); setPerformanceBuilder(null); }}
       />
 
-      {/* View Agent Properties Modal */}
-      <ViewAgentPropertiesModal
-        agent={viewPropertiesAgent}
+      {/* View Builder Properties Modal */}
+      <ViewBuilderPropertiesModal
+        builder={viewPropertiesBuilder}
         show={showViewPropertiesModal}
-        onClose={() => { setShowViewPropertiesModal(false); setViewPropertiesAgent(null); }}
+        onClose={() => { setShowViewPropertiesModal(false); setViewPropertiesBuilder(null); }}
         showToast={showToast}
-        onViewProfile={handleViewAgentProfile}
+        onViewProfile={handleViewBuilderProfile}
       />
 
       {/* Header */}
@@ -1963,7 +1956,7 @@ const AgentsPropertiesLeads = () => {
                 Properties & Leads
               </h1>
               <span className="px-3 py-1 bg-[#E8F4F2] text-[#00695C] text-xs font-semibold rounded-full animate-pulse">
-                {filteredAgents.length} Agents
+                {filteredBuilders.length} Builders
               </span>
               {filterCount > 0 && (
                 <span className="px-3 py-1 bg-[#FEF3E2] text-amber-700 text-xs font-semibold rounded-full">
@@ -1972,7 +1965,7 @@ const AgentsPropertiesLeads = () => {
               )}
             </div>
             <p className="text-sm text-[#5A7D78] flex items-center gap-2 flex-wrap">
-              <span>Manage agent listings, assign leads, track performance & commissions</span>
+              <span>Manage builder listings, assign leads, track performance & commissions</span>
               <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
               <span className="text-[#00695C] font-medium">{new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
             </p>
@@ -1995,7 +1988,7 @@ const AgentsPropertiesLeads = () => {
               <span className="hidden sm:inline">{loading ? 'Refreshing...' : 'Refresh'}</span>
             </button>
             <button
-              onClick={handleExportAgents}
+              onClick={handleExportBuilders}
               className="flex items-center gap-2 px-4 py-2 bg-white border border-[#E8F0EE] rounded-xl hover:border-[#00695C]/30 hover:shadow-md transition-all duration-300 text-sm font-medium text-[#1A2E2A] hover:scale-105"
             >
               <FiDownload className="text-sm" />
@@ -2009,10 +2002,10 @@ const AgentsPropertiesLeads = () => {
       {showStats && (
         <div className="relative animate-slide-in">
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               <StatCard
                 icon={<MdOutlineRealEstateAgent className="text-white text-sm" />}
-                title="Total Agents"
+                title="Total Builders"
                 value={stats.total}
                 color="bg-gradient-to-br from-[#00695C] to-[#26A69A]"
                 delay={0}
@@ -2073,7 +2066,6 @@ const AgentsPropertiesLeads = () => {
                 isActive={false}
                 onClick={() => {}}
               />
-            
             </div>
           </div>
         </div>
@@ -2087,7 +2079,7 @@ const AgentsPropertiesLeads = () => {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search agents by name, email, city, or specialty..."
+              placeholder="Search builders by name, email, city, or specialty..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none placeholder:text-[#B5C9C5]"
@@ -2162,10 +2154,10 @@ const AgentsPropertiesLeads = () => {
         </div>
 
         {/* Bulk Actions */}
-        {selectedAgents.length > 0 && (
+        {selectedBuilders.length > 0 && (
           <div className="mt-4 pt-4 border-t border-[#E8F0EE] flex flex-wrap items-center justify-between gap-3 animate-slide-in">
             <span className="text-sm text-[#5A7D78]">
-              <span className="font-semibold text-[#00695C]">{selectedAgents.length}</span> agent(s) selected
+              <span className="font-semibold text-[#00695C]">{selectedBuilders.length}</span> builder(s) selected
             </span>
             <div className="flex flex-wrap items-center gap-2">
               <button
@@ -2193,7 +2185,7 @@ const AgentsPropertiesLeads = () => {
                 Delete
               </button>
               <button
-                onClick={() => setSelectedAgents([])}
+                onClick={() => setSelectedBuilders([])}
                 className="px-4 py-1.5 bg-[#F5F9F8] text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] transition-all duration-300 text-xs font-medium hover:scale-105"
               >
                 Clear
@@ -2203,7 +2195,7 @@ const AgentsPropertiesLeads = () => {
         )}
       </div>
 
-      {/* Agents Grid */}
+      {/* Builders Grid */}
       <div className="relative">
         {loading ? (
           <div className="flex items-center justify-center py-20">
@@ -2211,24 +2203,24 @@ const AgentsPropertiesLeads = () => {
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-            {paginatedAgents.map((agent, index) => {
-              const isSelected = selectedAgents.includes(agent.id);
+            {paginatedBuilders.map((builder, index) => {
+              const isSelected = selectedBuilders.includes(builder.id);
               const statusColors = {
                 active: 'bg-emerald-100 text-emerald-700 border-emerald-200',
                 inactive: 'bg-gray-100 text-gray-700 border-gray-200',
                 pending: 'bg-amber-100 text-amber-700 border-amber-200'
               };
-              const agentBorder = {
+              const builderBorder = {
                 active: 'border-l-emerald-500',
                 inactive: 'border-l-gray-400',
                 pending: 'border-l-amber-500',
               };
-              const assignedCount = (assignedLeadsMap[agent.id] || []).length;
+              const assignedCount = (assignedLeadsMap[builder.id] || []).length;
 
               return (
                 <div
-                  key={agent.id}
-                  className={`relative bg-white rounded-2xl border border-[#E8F0EE] border-l-4 ${agentBorder[agent.status] || 'border-l-[#00695C]'} p-4 hover:shadow-xl hover:-translate-y-1 group animate-slide-in transition-all duration-500 ${isSelected ? 'ring-2 ring-[#00695C] shadow-lg' : ''}`}
+                  key={builder.id}
+                  className={`relative bg-white rounded-2xl border border-[#E8F0EE] border-l-4 ${builderBorder[builder.status] || 'border-l-[#00695C]'} p-4 hover:shadow-xl hover:-translate-y-1 group animate-slide-in transition-all duration-500 ${isSelected ? 'ring-2 ring-[#00695C] shadow-lg' : ''}`}
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <div className="flex items-start justify-between mb-3">
@@ -2236,32 +2228,32 @@ const AgentsPropertiesLeads = () => {
                       <input
                         type="checkbox"
                         checked={isSelected}
-                        onChange={() => handleSelectAgent(agent.id)}
+                        onChange={() => handleSelectBuilder(builder.id)}
                         className="w-4 h-4 shrink-0 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                       />
                       <div className="relative">
                         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white text-xl font-bold shadow-lg">
-                          {agent.name.charAt(0)}
+                          {builder.name.charAt(0)}
                         </div>
-                        {agent.status === 'active' && (
+                        {builder.status === 'active' && (
                           <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white animate-pulse" />
                         )}
                       </div>
                       <div>
-                        <h3 className="font-semibold text-[#1A2E2A] text-sm">{agent.name}</h3>
+                        <h3 className="font-semibold text-[#1A2E2A] text-sm">{builder.name}</h3>
                         <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${statusColors[agent.status] || 'bg-gray-100 text-gray-700'}`}>
-                            {agent.status.charAt(0).toUpperCase() + agent.status.slice(1)}
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${statusColors[builder.status] || 'bg-gray-100 text-gray-700'}`}>
+                            {builder.status.charAt(0).toUpperCase() + builder.status.slice(1)}
                           </span>
                           <div className="flex items-center gap-0.5">
                             <FaStarSolid className="text-amber-400 text-[10px]" />
-                            <span className="text-xs font-medium text-[#1A2E2A]">{agent.rating}</span>
+                            <span className="text-xs font-medium text-[#1A2E2A]">{builder.rating}</span>
                           </div>
                         </div>
                       </div>
                     </div>
                     <button
-                      onClick={() => handleViewAgentProperties(agent)}
+                      onClick={() => handleViewBuilderProperties(builder)}
                       className="w-7 h-7 rounded-xl hover:bg-[#F5F9F8] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
                       title="View Properties"
                     >
@@ -2272,50 +2264,50 @@ const AgentsPropertiesLeads = () => {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiMail className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate">{agent.email}</span>
+                      <span className="truncate">{builder.email}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiPhone className="text-[#00695C] flex-shrink-0" />
-                      <span>{agent.phone}</span>
+                      <span>{builder.phone}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiMapPin className="text-[#00695C] flex-shrink-0" />
-                      <span>{agent.city}</span>
+                      <span>{builder.city}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiTag className="text-[#00695C] flex-shrink-0" />
-                      <span>{agent.specialty}</span>
+                      <span>{builder.specialty}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiCalendar className="text-[#00695C] flex-shrink-0" />
-                      <span>Joined: {new Date(agent.joinedDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                      <span>Joined: {new Date(builder.joinedDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-[#E8F0EE]">
                     <div className="text-center">
-                      <p className="text-sm font-bold text-[#1A2E2A]">{agent.propertiesCount}</p>
+                      <p className="text-sm font-bold text-[#1A2E2A]">{builder.propertiesCount}</p>
                       <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Properties</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm font-bold text-[#1A2E2A]">{agent.leadsCount}</p>
+                      <p className="text-sm font-bold text-[#1A2E2A]">{builder.leadsCount}</p>
                       <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Leads</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm font-bold text-[#00695C]">₹{(agent.commission / 100000).toFixed(1)}L</p>
+                      <p className="text-sm font-bold text-[#00695C]">₹{(builder.commission / 100000).toFixed(1)}L</p>
                       <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Commission</p>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap gap-1 mt-3 pt-3 border-t border-[#E8F0EE]">
                     <button
-                      onClick={() => handleAssignLeads(agent)}
+                      onClick={() => handleAssignLeads(builder)}
                       className="flex-1 py-1.5 text-[10px] font-medium text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                     >
                       <FiUserCheck className="text-[10px]" /> Assign Leads
                     </button>
                     <button
-                      onClick={() => handleViewAssignedLeads(agent)}
+                      onClick={() => handleViewAssignedLeads(builder)}
                       className="flex-1 py-1.5 text-[10px] font-medium text-indigo-600 bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 relative"
                     >
                       <FiEye className="text-[10px]" /> Assigned
@@ -2326,19 +2318,19 @@ const AgentsPropertiesLeads = () => {
                       )}
                     </button>
                     <button
-                      onClick={() => handleViewCommission(agent)}
+                      onClick={() => handleViewCommission(builder)}
                       className="flex-1 py-1.5 text-[10px] font-medium text-amber-600 bg-amber-50 rounded-xl hover:bg-amber-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                     >
                       <FiDollarSign className="text-[10px]" /> Commission
                     </button>
                     <button
-                      onClick={() => handleViewPerformance(agent)}
+                      onClick={() => handleViewPerformance(builder)}
                       className="flex-1 py-1.5 text-[10px] font-medium text-purple-600 bg-purple-50 rounded-xl hover:bg-purple-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                     >
                       <FiBarChart2 className="text-[10px]" /> Performance
                     </button>
                     <button
-                      onClick={() => handleViewAgentProperties(agent)}
+                      onClick={() => handleViewBuilderProperties(builder)}
                       className="flex-1 py-1.5 text-[10px] font-medium text-[#00695C] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                     >
                       <FiHome className="text-[10px]" /> Properties
@@ -2347,37 +2339,37 @@ const AgentsPropertiesLeads = () => {
 
                   <div className="flex flex-wrap gap-1 mt-2">
                     <button
-                      onClick={() => handleViewAgentProfile(agent.id)}
+                      onClick={() => handleViewBuilderProfile(builder.id)}
                       className="flex-1 py-1.5 text-[10px] font-medium text-[#00695C] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                     >
                       <FiExternalLink className="text-[10px]" /> View Profile
                     </button>
                     <button
-                      onClick={() => handleToggleStatus(agent.id)}
-                      disabled={actionLoading === `toggle_status_${agent.id}`}
+                      onClick={() => handleToggleStatus(builder.id)}
+                      disabled={actionLoading === `toggle_status_${builder.id}`}
                       className={`flex-1 py-1.5 text-[10px] font-medium rounded-xl transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 disabled:opacity-50 ${
-                        agent.status === 'active'
+                        builder.status === 'active'
                           ? 'text-red-600 bg-red-50 hover:bg-red-100'
-                          : agent.status === 'inactive'
+                          : builder.status === 'inactive'
                           ? 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100'
                           : 'text-amber-600 bg-amber-50 hover:bg-amber-100'
                       }`}
                     >
-                      {actionLoading === `toggle_status_${agent.id}` ? (
+                      {actionLoading === `toggle_status_${builder.id}` ? (
                         <FiRefreshCw className="text-[10px] animate-spin" />
-                      ) : agent.status === 'active' ? (
+                      ) : builder.status === 'active' ? (
                         <FiUserX className="text-[10px]" />
                       ) : (
                         <FiUserCheck className="text-[10px]" />
                       )}
-                      {agent.status === 'active' ? 'Deactivate' : agent.status === 'inactive' ? 'Activate' : 'Review'}
+                      {builder.status === 'active' ? 'Deactivate' : builder.status === 'inactive' ? 'Activate' : 'Review'}
                     </button>
                     <button
-                      onClick={() => handleDeleteAgent(agent.id)}
-                      disabled={actionLoading === `delete_${agent.id}`}
+                      onClick={() => handleDeleteBuilder(builder.id)}
+                      disabled={actionLoading === `delete_${builder.id}`}
                       className="flex-1 py-1.5 text-[10px] font-medium text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 disabled:opacity-50"
                     >
-                      {actionLoading === `delete_${agent.id}` ? (
+                      {actionLoading === `delete_${builder.id}` ? (
                         <FiRefreshCw className="text-[10px] animate-spin" />
                       ) : (
                         <FiTrash2 className="text-[10px]" />
@@ -2396,7 +2388,7 @@ const AgentsPropertiesLeads = () => {
               <div className="col-span-1 flex items-center gap-2">
                 <input
                   type="checkbox"
-                  checked={selectedAgents.length === paginatedAgents.length && paginatedAgents.length > 0}
+                  checked={selectedBuilders.length === paginatedBuilders.length && paginatedBuilders.length > 0}
                   onChange={handleSelectAll}
                   className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                 />
@@ -2425,14 +2417,14 @@ const AgentsPropertiesLeads = () => {
               <div className="col-span-2 text-right">Actions</div>
             </div>
 
-            {paginatedAgents.map((agent, index) => {
-              const isSelected = selectedAgents.includes(agent.id);
+            {paginatedBuilders.map((builder, index) => {
+              const isSelected = selectedBuilders.includes(builder.id);
               const statusColors = {
                 active: 'bg-emerald-100 text-emerald-700',
                 inactive: 'bg-gray-100 text-gray-700',
                 pending: 'bg-amber-100 text-amber-700'
               };
-              const agentBorder = {
+              const builderBorder = {
                 active: 'border-l-emerald-500',
                 inactive: 'border-l-gray-400',
                 pending: 'border-l-amber-500',
@@ -2440,14 +2432,14 @@ const AgentsPropertiesLeads = () => {
 
               return (
                 <div
-                  key={agent.id}
-                  className={`grid grid-cols-12 gap-2 items-center py-3 px-4 border-b border-[#E8F0EE] border-l-4 ${agentBorder[agent.status] || 'border-l-[#00695C]'} hover:bg-[#F5F9F8] transition-all duration-300 group relative ${isSelected ? 'bg-[#E8F4F2]' : ''}`}
+                  key={builder.id}
+                  className={`grid grid-cols-12 gap-2 items-center py-3 px-4 border-b border-[#E8F0EE] border-l-4 ${builderBorder[builder.status] || 'border-l-[#00695C]'} hover:bg-[#F5F9F8] transition-all duration-300 group relative ${isSelected ? 'bg-[#E8F4F2]' : ''}`}
                 >
                   <div className="col-span-1 flex items-center gap-2">
                     <input
                       type="checkbox"
                       checked={isSelected}
-                      onChange={() => handleSelectAgent(agent.id)}
+                      onChange={() => handleSelectBuilder(builder.id)}
                       className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                     />
                     <span className="text-xs text-[#5A7D78]">{index + 1}</span>
@@ -2456,111 +2448,111 @@ const AgentsPropertiesLeads = () => {
                   <div className="col-span-2">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white text-xs font-bold">
-                        {agent.name.charAt(0)}
+                        {builder.name.charAt(0)}
                       </div>
                       <div>
-                        <p className="font-semibold text-sm text-[#1A2E2A] truncate">{agent.name}</p>
-                        <p className="text-[10px] text-[#5A7D78] truncate">{agent.email}</p>
+                        <p className="font-semibold text-sm text-[#1A2E2A] truncate">{builder.name}</p>
+                        <p className="text-[10px] text-[#5A7D78] truncate">{builder.email}</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="col-span-1">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColors[agent.status] || 'bg-gray-100 text-gray-700'}`}>
-                      {agent.status.charAt(0).toUpperCase() + agent.status.slice(1)}
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColors[builder.status] || 'bg-gray-100 text-gray-700'}`}>
+                      {builder.status.charAt(0).toUpperCase() + builder.status.slice(1)}
                     </span>
                   </div>
 
-                  <div className="col-span-1 text-xs text-[#5A7D78]">{agent.specialty}</div>
+                  <div className="col-span-1 text-xs text-[#5A7D78]">{builder.specialty}</div>
 
-                  <div className="col-span-1 text-xs text-[#5A7D78]">{agent.city}</div>
+                  <div className="col-span-1 text-xs text-[#5A7D78]">{builder.city}</div>
 
-                  <div className="col-span-1 text-center text-sm font-medium text-[#1A2E2A]">{agent.propertiesCount}</div>
+                  <div className="col-span-1 text-center text-sm font-medium text-[#1A2E2A]">{builder.propertiesCount}</div>
 
-                  <div className="col-span-1 text-center text-sm font-medium text-[#1A2E2A]">{agent.leadsCount}</div>
+                  <div className="col-span-1 text-center text-sm font-medium text-[#1A2E2A]">{builder.leadsCount}</div>
 
-                  <div className="col-span-1 text-center text-sm font-semibold text-[#00695C]">₹{(agent.commission / 100000).toFixed(1)}L</div>
+                  <div className="col-span-1 text-center text-sm font-semibold text-[#00695C]">₹{(builder.commission / 100000).toFixed(1)}L</div>
 
                   <div className="col-span-1 text-center flex items-center justify-center gap-0.5">
                     <FaStarSolid className="text-amber-400 text-xs" />
-                    <span className="text-sm font-medium text-[#1A2E2A]">{agent.rating}</span>
+                    <span className="text-sm font-medium text-[#1A2E2A]">{builder.rating}</span>
                   </div>
 
                   <div className="col-span-2 flex items-center justify-end gap-1 flex-wrap">
                     <button
-                      onClick={() => handleAssignLeads(agent)}
+                      onClick={() => handleAssignLeads(builder)}
                       className="p-1.5 rounded-lg hover:bg-blue-50 transition-all duration-300 text-blue-600 hover:scale-110"
                       title="Assign Leads"
                     >
                       <FiUserCheck className="text-sm" />
                     </button>
                     <button
-                      onClick={() => handleViewAssignedLeads(agent)}
+                      onClick={() => handleViewAssignedLeads(builder)}
                       className="p-1.5 rounded-lg hover:bg-indigo-50 transition-all duration-300 text-indigo-600 hover:scale-110 relative"
                       title="View Assigned Leads"
                     >
                       <FiEye className="text-sm" />
-                      {(assignedLeadsMap[agent.id] || []).length > 0 && (
+                      {(assignedLeadsMap[builder.id] || []).length > 0 && (
                         <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-indigo-600 text-white text-[7px] flex items-center justify-center font-semibold">
-                          {(assignedLeadsMap[agent.id] || []).length}
+                          {(assignedLeadsMap[builder.id] || []).length}
                         </span>
                       )}
                     </button>
                     <button
-                      onClick={() => handleViewCommission(agent)}
+                      onClick={() => handleViewCommission(builder)}
                       className="p-1.5 rounded-lg hover:bg-amber-50 transition-all duration-300 text-amber-600 hover:scale-110"
                       title="Commission"
                     >
                       <FiDollarSign className="text-sm" />
                     </button>
                     <button
-                      onClick={() => handleViewPerformance(agent)}
+                      onClick={() => handleViewPerformance(builder)}
                       className="p-1.5 rounded-lg hover:bg-purple-50 transition-all duration-300 text-purple-600 hover:scale-110"
                       title="Performance"
                     >
                       <FiBarChart2 className="text-sm" />
                     </button>
                     <button
-                      onClick={() => handleViewAgentProperties(agent)}
+                      onClick={() => handleViewBuilderProperties(builder)}
                       className="p-1.5 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 text-[#00695C] hover:scale-110"
                       title="Properties"
                     >
                       <FiHome className="text-sm" />
                     </button>
                     <button
-                      onClick={() => handleViewAgentProfile(agent.id)}
+                      onClick={() => handleViewBuilderProfile(builder.id)}
                       className="p-1.5 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 text-[#00695C] hover:scale-110"
                       title="View Profile"
                     >
                       <FiExternalLink className="text-sm" />
                     </button>
                     <button
-                      onClick={() => handleToggleStatus(agent.id)}
-                      disabled={actionLoading === `toggle_status_${agent.id}`}
+                      onClick={() => handleToggleStatus(builder.id)}
+                      disabled={actionLoading === `toggle_status_${builder.id}`}
                       className={`p-1.5 rounded-lg transition-all duration-300 hover:scale-110 disabled:opacity-50 ${
-                        agent.status === 'active'
+                        builder.status === 'active'
                           ? 'text-red-600 hover:bg-red-50'
-                          : agent.status === 'inactive'
+                          : builder.status === 'inactive'
                           ? 'text-emerald-600 hover:bg-emerald-50'
                           : 'text-amber-600 hover:bg-amber-50'
                       }`}
-                      title={agent.status === 'active' ? 'Deactivate' : agent.status === 'inactive' ? 'Activate' : 'Review'}
+                      title={builder.status === 'active' ? 'Deactivate' : builder.status === 'inactive' ? 'Activate' : 'Review'}
                     >
-                      {actionLoading === `toggle_status_${agent.id}` ? (
+                      {actionLoading === `toggle_status_${builder.id}` ? (
                         <FiRefreshCw className="text-sm animate-spin" />
-                      ) : agent.status === 'active' ? (
+                      ) : builder.status === 'active' ? (
                         <FiUserX className="text-sm" />
                       ) : (
                         <FiUserCheck className="text-sm" />
                       )}
                     </button>
                     <button
-                      onClick={() => handleDeleteAgent(agent.id)}
-                      disabled={actionLoading === `delete_${agent.id}`}
+                      onClick={() => handleDeleteBuilder(builder.id)}
+                      disabled={actionLoading === `delete_${builder.id}`}
                       className="p-1.5 rounded-lg hover:bg-red-50 transition-all duration-300 text-red-500 hover:scale-110 disabled:opacity-50"
                       title="Delete"
                     >
-                      {actionLoading === `delete_${agent.id}` ? (
+                      {actionLoading === `delete_${builder.id}` ? (
                         <FiRefreshCw className="text-sm animate-spin" />
                       ) : (
                         <FiTrash2 className="text-sm" />
@@ -2573,14 +2565,14 @@ const AgentsPropertiesLeads = () => {
           </div>
         )}
 
-        {paginatedAgents.length === 0 && !loading && (
+        {paginatedBuilders.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-[#E8F0EE]">
             <div className="w-24 h-24 rounded-full bg-[#F5F9F8] flex items-center justify-center mb-4 animate-float">
               <MdOutlineRealEstateAgent className="text-4xl text-[#B5C9C5]" />
             </div>
-            <h3 className="text-xl font-semibold text-[#1A2E2A]">No agents found</h3>
+            <h3 className="text-xl font-semibold text-[#1A2E2A]">No builders found</h3>
             <p className="text-sm text-[#5A7D78] mt-1">
-              {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No agents match your current view'}
+              {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No builders match your current view'}
             </p>
             {filterCount > 0 && (
               <button
@@ -2600,8 +2592,8 @@ const AgentsPropertiesLeads = () => {
           <div className="flex items-center gap-2 text-sm text-[#5A7D78] flex-wrap">
             <span>
               Showing {(currentPage - 1) * pageSize + 1} to{' '}
-              {Math.min(currentPage * pageSize, filteredAgents.length)} of{' '}
-              {filteredAgents.length} agents
+              {Math.min(currentPage * pageSize, filteredBuilders.length)} of{' '}
+              {filteredBuilders.length} builders
             </span>
             <select
               value={pageSize}
@@ -2698,4 +2690,4 @@ const AgentsPropertiesLeads = () => {
   );
 };
 
-export default AgentsPropertiesLeads;
+export default BuildersPropertiesLeads;

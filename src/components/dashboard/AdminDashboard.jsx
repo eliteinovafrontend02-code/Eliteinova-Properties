@@ -54,6 +54,7 @@ import BuildersRegistration from './admin/Builders/BuildersRegistration';
 import BuildersVerification from './admin/Builders/BuildersVerification';
 import BuildersProjects from './admin/Builders/BuildersProjects';
 import BuildersPropertyControl from './admin/Builders/BuildersPropertyControl';
+import BuildersPropertiesLeads from './admin/Builders/BuildersPropertiesLeads';
 
 // Property Managers
 import PropertyManagersOverview from './admin/PropertyManagers/PropertyManagersOverview';
@@ -61,6 +62,7 @@ import PropertyManagersRegistration from './admin/PropertyManagers/PropertyManag
 import PropertyManagersCompanyManagement from './admin/PropertyManagers/PropertyManagersCompanyManagement';
 import PropertyManagersMaintenance from './admin/PropertyManagers/PropertyManagersMaintenance';
 import PropertyManagersPropertyControl from './admin/PropertyManagers/PropertyManagersPropertyControl';
+import PropertyManagersPropertiesLeads from './admin/PropertyManagers/PropertyManagersPropertiesLeads';
 
 // Buyers & Tenants
 import BuyerTenantsDashboard from './BuyerTenantsDashboard';
@@ -126,6 +128,7 @@ const AdminDashboard = () => {
         { key: '/admin/builders/verification', icon: <FaShieldAlt />, label: 'Builder Verification' },
         { key: '/admin/builders/projects', icon: <FaProjectDiagram />, label: 'Project Management' },
         { key: '/admin/builders/property-control', icon: <FiSettings />, label: 'Property Control' },
+        { key: '/admin/builders/leads', icon: <FiMessageCircle />, label: 'Properties Leads' },
       ],
     },
     {
@@ -138,6 +141,7 @@ const AdminDashboard = () => {
         { key: '/admin/property-managers/companies', icon: <FaBuilding />, label: 'Company Management' },
         { key: '/admin/property-managers/maintenance', icon: <BsTools />, label: 'Maintenance' },
         { key: '/admin/property-managers/property-control', icon: <FiSettings />, label: 'Property Control' },
+        { key: '/admin/property-managers/leads', icon: <FiMessageCircle />, label: 'Properties Leads' },
       ],
     },
     { key: '/admin/buyers-tenants', icon: <HiOutlineUserGroup />, label: 'Buyers & Tenants' },
@@ -481,6 +485,7 @@ const AdminDashboard = () => {
               <Route path="builders/verification" element={<BuildersVerification />} />
               <Route path="builders/projects" element={<BuildersProjects />} />
               <Route path="builders/property-control" element={<BuildersPropertyControl />} />
+              <Route path="builders/leads" element={<BuildersPropertiesLeads />} />
 
               {/* Property Managers */}
               <Route path="property-managers/overview" element={<PropertyManagersOverview />} />
@@ -488,6 +493,7 @@ const AdminDashboard = () => {
               <Route path="property-managers/companies" element={<PropertyManagersCompanyManagement />} />
               <Route path="property-managers/maintenance" element={<PropertyManagersMaintenance />} />
               <Route path="property-managers/property-control" element={<PropertyManagersPropertyControl />} />
+              <Route path="property-managers/leads" element={<PropertyManagersPropertiesLeads />} />
 
                {/* Buyers & Tenants  */}
                {/* <Route path="buyers-tenants/*" element={<BuyerTenantsDashboard />} /> */}
