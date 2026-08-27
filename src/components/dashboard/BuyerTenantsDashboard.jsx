@@ -69,12 +69,12 @@ import SavedWishlistActions from './buyer&tenants/SavedWishlist/SavedWishlistAct
 // Site Visits
 import SiteVisitsOverview from './buyer&tenants/SiteVisits/SiteVisitsOverview';
 import SiteVisitDashboard from './buyer&tenants/SiteVisits/SiteVisitDashboard';
-// import SiteVisitDetails from './buyer&tenants/SiteVisits/SiteVisitDetails';
-// import SiteVisitStatus from './buyer&tenants/SiteVisits/SiteVisitStatus';
-// import SiteVisitActions from './buyer&tenants/SiteVisits/SiteVisitActions';
+import SiteVisitDetails from './buyer&tenants/SiteVisits/SiteVisitDetails';
+import SiteVisitStatus from './buyer&tenants/SiteVisits/SiteVisitStatus';
+import SiteVisitActions from './buyer&tenants/SiteVisits/SiteVisitActions';
 
 // Rental Requests
-// import RentalRequestsOverview from './buyer&tenants/RentalRequests/RentalRequestsOverview';
+import RentalRequestsOverview from './buyer&tenants/RentalRequests/RentalRequestsOverview';
 // import RentalRequestManagement from './buyer&tenants/RentalRequests/RentalRequestManagement';
 // import RentalRequestDetails from './buyer&tenants/RentalRequests/RentalRequestDetails';
 // import RentalRequestStatus from './buyer&tenants/RentalRequests/RentalRequestStatus';
@@ -518,15 +518,15 @@ const BuyerTenantsDashboard = () => {
               {/* Site Visits */}
               <Route path="site-visits/overview" element={<SiteVisitsOverview />} />
               <Route path="site-visits/dashboard" element={<SiteVisitDashboard />} />
-              {/* <Route path="site-visits/details" element={<SiteVisitDetails />} /> */}
-              {/* <Route path="site-visits/status" element={<SiteVisitStatus />} /> */}
-              {/* <Route path="site-visits/actions" element={<SiteVisitActions />} /> */}
+              <Route path="site-visits/details" element={<SiteVisitDetails />} />
+              <Route path="site-visits/status" element={<SiteVisitStatus />} />
+              <Route path="site-visits/actions" element={<SiteVisitActions />} />
 
               {/* Rental Requests */}
-              {/* <Route path="rental/overview" element={<RentalRequestsOverview />} />
-              <Route path="rental/management" element={<RentalRequestManagement />} />
-              <Route path="rental/details" element={<RentalRequestDetails />} />
-              <Route path="rental/status" element={<RentalRequestStatus />} /> */}
+              <Route path="rental/overview" element={<RentalRequestsOverview />} />
+              {/* <Route path="rental/management" element={<RentalRequestManagement />} /> */}
+              {/* <Route path="rental/details" element={<RentalRequestDetails />} /> */}
+              {/* <Route path="rental/status" element={<RentalRequestStatus />} /> */}
 
               {/* Purchase Requests */}
               {/* <Route path="purchase/overview" element={<PurchaseRequestsOverview />} />

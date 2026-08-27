@@ -1,20 +1,22 @@
-// src/components/dashboard/admin/buyer&tenants/SiteVisits/SiteVisitDashboard.jsx
+// src/components/dashboard/admin/buyer&tenants/SiteVisits/SiteVisitDetails.jsx
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  FiUsers, FiHeart, FiHome, FiMapPin, FiDollarSign, FiCalendar,
-  FiClock, FiUser, FiCheckCircle, FiXCircle, FiSearch, FiFilter,
-  FiChevronDown, FiChevronLeft, FiChevronRight, FiEye,
-  FiTrash2, FiRefreshCw, FiPlus, FiDownload, FiAlertTriangle,
+  FiUsers, FiHome, FiMapPin, FiDollarSign, FiCalendar,
+  FiClock, FiUser, FiCheckCircle, FiXCircle, FiSearch,
+  FiChevronDown, FiChevronLeft, FiChevronRight, FiEye, FiEdit,
+  FiTrash2, FiRefreshCw, FiDownload, FiAlertTriangle,
   FiInfo, FiX, FiList, FiGrid as FiGridIcon, FiActivity,
-  FiStar, FiShield, FiBriefcase, FiMail, FiPhone, FiExternalLink,
-  FiTag, FiGrid, FiRepeat, FiNavigation, FiCornerUpRight
+  FiMail, FiPhone, FiExternalLink, FiTag, FiGrid, FiSave,
+  FiClock as FiClockIcon, FiUserCheck, FiBriefcase,
+  FiFileText, FiStar, FiShield, FiTool
 } from 'react-icons/fi';
 import {
-  FaHeart, FaBuilding, FaBed, FaBath, FaCar, FaCheck,
+  FaBuilding, FaBed, FaBath, FaCar, FaCheck,
   FaTimes, FaStar as FaStarSolid, FaUserTie, FaHome as FaHomeSolid,
-  FaImage, FaClipboardCheck
+  FaImage, FaCalendarAlt, FaClock, FaPhoneAlt, FaUserCircle,
+  FaComments, FaClipboardList
 } from 'react-icons/fa';
 
 // ============================================================
@@ -22,7 +24,7 @@ import {
 // ============================================================
 const Toast = ({ toast, setToast }) => {
   if (!toast) return null;
-
+  
   const colors = {
     success: 'bg-emerald-500',
     error: 'bg-red-500',
@@ -51,35 +53,73 @@ const Toast = ({ toast, setToast }) => {
 };
 
 // ============================================================
-// CONFIRMATION MODAL COMPONENT
+// CONFIRMATION MODAL
 // ============================================================
-const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirmText = 'Yes', cancelText = 'No' }) => {
+const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirmText, cancelText, type = 'danger' }) => {
   if (!isOpen) return null;
 
+  const typeStyles = {
+    danger: {
+      icon: 'text-red-600',
+      bg: 'bg-red-50',
+      button: 'bg-red-600 hover:bg-red-700 focus:ring-red-500',
+      border: 'border-red-200'
+    },
+    warning: {
+      icon: 'text-amber-600',
+      bg: 'bg-amber-50',
+      button: 'bg-amber-600 hover:bg-amber-700 focus:ring-amber-500',
+      border: 'border-amber-200'
+    },
+    info: {
+      icon: 'text-blue-600',
+      bg: 'bg-blue-50',
+      button: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500',
+      border: 'border-blue-200'
+    }
+  };
+
+  const style = typeStyles[type] || typeStyles.danger;
+
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl animate-slide-up border border-[#E8F0EE] overflow-hidden">
-        <div className="p-6">
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-              <FiAlertTriangle className="text-4xl text-red-500" />
+        {/* Header */}
+        <div className={`p-6 ${style.bg} border-b ${style.border}`}>
+          <div className="flex items-center gap-3">
+            <div className={`w-12 h-12 rounded-full ${style.bg} flex items-center justify-center border ${style.border}`}>
+              <FiAlertTriangle className={`text-2xl ${style.icon}`} />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-[#1A2E2A]">{title || 'Confirm Action'}</h3>
+              <p className="text-sm text-[#5A7D78]">{message || 'Are you sure you want to proceed?'}</p>
             </div>
           </div>
-          <h3 className="text-xl font-bold text-[#1A2E2A] text-center mb-2">{title}</h3>
-          <p className="text-sm text-[#5A7D78] text-center">{message}</p>
         </div>
-        <div className="flex border-t border-[#E8F0EE]">
+
+        {/* Content */}
+        <div className="p-6">
+          <p className="text-sm text-[#5A7D78] leading-relaxed">
+            This action cannot be undone. Please confirm your decision.
+          </p>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 bg-[#F8FAF9] border-t border-[#E8F0EE] flex items-center gap-3">
           <button
             onClick={onClose}
-            className="flex-1 py-4 text-sm font-medium text-[#5A7D78] hover:bg-[#F5F9F8] transition-colors duration-300 border-r border-[#E8F0EE]"
+            className="flex-1 px-4 py-2.5 bg-white text-[#1A2E2A] rounded-xl hover:bg-[#F5F9F8] transition-all duration-300 text-sm font-medium border border-[#E8F0EE] hover:scale-[1.02]"
           >
-            {cancelText}
+            {cancelText || 'Cancel'}
           </button>
           <button
-            onClick={onConfirm}
-            className="flex-1 py-4 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors duration-300"
+            onClick={() => {
+              onConfirm();
+              onClose();
+            }}
+            className={`flex-1 px-4 py-2.5 text-white rounded-xl transition-all duration-300 text-sm font-medium shadow-lg hover:scale-[1.02] ${style.button}`}
           >
-            {confirmText}
+            {confirmText || 'Confirm'}
           </button>
         </div>
       </div>
@@ -118,56 +158,69 @@ const StatCard = ({ icon, title, value, color, delay = 0, isActive, statsAnimati
 };
 
 // ============================================================
-// VIEW SITE VISIT MODAL
+// VIEW SITE VISIT DETAILS MODAL
 // ============================================================
-const ViewSiteVisitModal = ({ visit, show, onClose, onRemove, onViewProperty }) => {
+const ViewSiteVisitModal = ({ visit, show, onClose, onEdit, onDelete }) => {
   if (!visit || !show) return null;
 
   const statusColors = {
-    pending: 'bg-[#FEF3E2] text-amber-700',
-    confirmed: 'bg-blue-50 text-blue-700',
-    completed: 'bg-[#E8F8F5] text-[#00695C]',
-    cancelled: 'bg-red-50 text-red-700',
-    rescheduled: 'bg-purple-50 text-purple-700'
+    scheduled: 'bg-blue-50 text-blue-700 border-blue-200',
+    completed: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    cancelled: 'bg-red-50 text-red-700 border-red-200',
+    pending: 'bg-amber-50 text-amber-700 border-amber-200',
+    'in-progress': 'bg-purple-50 text-purple-700 border-purple-200'
   };
 
-  const propertyTypeColors = {
-    Individual: 'bg-blue-50 text-blue-700',
-    Apartment: 'bg-purple-50 text-purple-700',
-    Commercial: 'bg-orange-50 text-orange-700',
-    'Land & Plots': 'bg-green-50 text-green-700',
-    Hostel: 'bg-pink-50 text-pink-700'
-  };
-
-  const propertyImages = [
+  const visitImages = [
     'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800',
     'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800',
     'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800',
-    'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800',
-    'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800',
-    'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=800',
-    'https://images.unsplash.com/photo-1574362848149-11496d93a7c7?w=800',
-    'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=800'
+    'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800'
   ];
 
   const getRandomImage = () => {
-    const index = Math.floor(Math.random() * propertyImages.length);
-    return propertyImages[index];
+    const index = Math.floor(Math.random() * visitImages.length);
+    return visitImages[index];
   };
 
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const imageUrl = visit.imageUrl || getRandomImage();
 
-  const handleViewClick = () => {
-    if (onViewProperty) {
-      onViewProperty(visit.id);
+  const getStatusBadge = (status) => {
+    const statusMap = {
+      scheduled: { label: 'Scheduled', color: 'bg-blue-100 text-blue-700' },
+      completed: { label: 'Completed', color: 'bg-emerald-100 text-emerald-700' },
+      cancelled: { label: 'Cancelled', color: 'bg-red-100 text-red-700' },
+      pending: { label: 'Pending', color: 'bg-amber-100 text-amber-700' },
+      'in-progress': { label: 'In Progress', color: 'bg-purple-100 text-purple-700' }
+    };
+    return statusMap[status] || { label: 'Scheduled', color: 'bg-blue-100 text-blue-700' };
+  };
+
+  const handleDeleteClick = () => {
+    if (onDelete) {
+      onDelete(visit.id);
     }
   };
 
+  const handleEditClick = () => {
+    if (onEdit) {
+      onEdit(visit);
+      onClose();
+    }
+  };
+
+  const formattedDate = visit.visitDate ? new Date(visit.visitDate).toLocaleDateString('en-IN', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  }) : 'N/A';
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
+      <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] p-6 rounded-t-3xl z-10 shrink-0">
           <button
@@ -183,13 +236,13 @@ const ViewSiteVisitModal = ({ visit, show, onClose, onRemove, onViewProperty }) 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-white">
           <div className="space-y-6">
-            {/* Status Badges */}
+            {/* Status Badge */}
             <div className="flex items-center gap-3 flex-wrap">
-              <span className={`px-4 py-1.5 rounded-full text-xs font-semibold ${statusColors[visit.status] || statusColors.pending}`}>
-                {visit.status ? visit.status.charAt(0).toUpperCase() + visit.status.slice(1) : 'Pending'}
+              <span className={`px-4 py-1.5 rounded-full text-xs font-semibold ${getStatusBadge(visit.visitStatus).color}`}>
+                {getStatusBadge(visit.visitStatus).label}
               </span>
-              <span className={`px-4 py-1.5 rounded-full text-xs font-semibold ${propertyTypeColors[visit.propertyType]}`}>
-                {visit.propertyType || 'N/A'}
+              <span className="px-4 py-1.5 rounded-full text-xs font-semibold bg-[#F5F9F8] text-[#5A7D78]">
+                {visit.visitType || 'Site Visit'}
               </span>
             </div>
 
@@ -223,44 +276,36 @@ const ViewSiteVisitModal = ({ visit, show, onClose, onRemove, onViewProperty }) 
               )}
             </div>
 
-            {/* Visit Details */}
-            <div className="grid grid-cols-2 gap-4">
-              {/* Buyer Name */}
-              <div className="bg-[#F5F9F8] rounded-2xl p-4 col-span-2">
+            {/* All Details - 10 Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Buyer / Tenant */}
+              <div className="bg-[#F5F9F8] rounded-2xl p-4 md:col-span-2">
                 <div className="flex items-center gap-2 mb-1">
-                  <FiUser className="text-[#00695C] text-sm" />
+                  <FiUsers className="text-[#00695C] text-sm" />
                   <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Buyer / Tenant</h4>
                 </div>
                 <p className="text-sm font-medium text-[#1A2E2A]">{visit.buyerName || 'N/A'}</p>
                 <p className="text-xs text-[#5A7D78]">{visit.buyerEmail || ''}</p>
               </div>
 
-              {/* Property Name */}
+              {/* Property */}
               <div className="bg-[#F5F9F8] rounded-2xl p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <FiHome className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Property Name</h4>
+                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Property</h4>
                 </div>
                 <p className="text-sm font-medium text-[#1A2E2A]">{visit.propertyName || 'N/A'}</p>
+                <p className="text-xs text-[#5A7D78]">{visit.propertyType || ''}</p>
               </div>
 
-              {/* Agent */}
+              {/* Owner / Agent */}
               <div className="bg-[#F5F9F8] rounded-2xl p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <FaUserTie className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Assigned Agent</h4>
+                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Owner / Agent</h4>
                 </div>
-                <p className="text-sm font-medium text-[#1A2E2A]">{visit.agentName || 'N/A'}</p>
-              </div>
-
-              {/* Location */}
-              <div className="bg-[#F5F9F8] rounded-2xl p-4 col-span-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <FiMapPin className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Location</h4>
-                </div>
-                <p className="text-sm font-medium text-[#1A2E2A]">{visit.location || 'N/A'}</p>
-                <p className="text-xs text-[#5A7D78]">{visit.city || ''}, {visit.state || ''}</p>
+                <p className="text-sm font-medium text-[#1A2E2A]">{visit.ownerName || 'N/A'}</p>
+                <p className="text-xs text-[#5A7D78]">{visit.ownerEmail || ''}</p>
               </div>
 
               {/* Visit Date */}
@@ -269,9 +314,7 @@ const ViewSiteVisitModal = ({ visit, show, onClose, onRemove, onViewProperty }) 
                   <FiCalendar className="text-[#00695C] text-sm" />
                   <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Visit Date</h4>
                 </div>
-                <p className="text-sm font-medium text-[#1A2E2A]">
-                  {visit.visitDate ? new Date(visit.visitDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : 'N/A'}
-                </p>
+                <p className="text-sm font-medium text-[#1A2E2A]">{formattedDate}</p>
               </div>
 
               {/* Visit Time */}
@@ -283,43 +326,77 @@ const ViewSiteVisitModal = ({ visit, show, onClose, onRemove, onViewProperty }) 
                 <p className="text-sm font-medium text-[#1A2E2A]">{visit.visitTime || 'N/A'}</p>
               </div>
 
-              {/* Status */}
-              <div className="bg-[#F5F9F8] rounded-2xl p-4 col-span-2">
+              {/* Contact Number */}
+              <div className="bg-[#F5F9F8] rounded-2xl p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <FiPhone className="text-[#00695C] text-sm" />
+                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Contact Number</h4>
+                </div>
+                <p className="text-sm font-medium text-[#1A2E2A]">{visit.contactNumber || 'N/A'}</p>
+              </div>
+
+              {/* Assigned Agent */}
+              <div className="bg-[#F5F9F8] rounded-2xl p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <FiUserCheck className="text-[#00695C] text-sm" />
+                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Assigned Agent</h4>
+                </div>
+                <p className="text-sm font-medium text-[#1A2E2A]">{visit.assignedAgent || 'N/A'}</p>
+                <p className="text-xs text-[#5A7D78]">{visit.agentEmail || ''}</p>
+              </div>
+
+              {/* Visit Status */}
+              <div className="bg-[#F5F9F8] rounded-2xl p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <FiTag className="text-[#00695C] text-sm" />
                   <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Visit Status</h4>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[visit.status] || statusColors.pending}`}>
-                  {visit.status ? visit.status.charAt(0).toUpperCase() + visit.status.slice(1) : 'Pending'}
+                <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(visit.visitStatus).color}`}>
+                  {getStatusBadge(visit.visitStatus).label}
                 </span>
               </div>
+
+              {/* Remarks */}
+              <div className="bg-[#F5F9F8] rounded-2xl p-4 md:col-span-2">
+                <div className="flex items-center gap-2 mb-1">
+                  <FiFileText className="text-[#00695C] text-sm" />
+                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Remarks</h4>
+                </div>
+                <p className="text-sm text-[#1A2E2A] leading-relaxed">{visit.remarks || 'No remarks available'}</p>
+              </div>
             </div>
 
-            {/* Buyer Contact Info */}
+            {/* Additional Information */}
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
               <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <FiUser className="text-[#00695C]" />
-                Contact Information
+                <FiInfo className="text-[#00695C]" />
+                Additional Information
               </h4>
-              <div className="space-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#5A7D78]">Email</span>
-                  <span className="text-sm font-medium text-[#1A2E2A]">{visit.buyerEmail || 'N/A'}</span>
+                  <span className="text-sm text-[#5A7D78]">Visit Type</span>
+                  <span className="text-sm font-medium text-[#1A2E2A]">{visit.visitType || 'N/A'}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#5A7D78]">Phone</span>
-                  <span className="text-sm font-medium text-[#1A2E2A]">{visit.buyerPhone || 'N/A'}</span>
+                  <span className="text-sm text-[#5A7D78]">Duration</span>
+                  <span className="text-sm font-medium text-[#1A2E2A]">{visit.duration || 'N/A'}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-[#5A7D78]">Created By</span>
+                  <span className="text-sm font-medium text-[#1A2E2A]">{visit.createdBy || 'Admin'}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-[#5A7D78]">Created At</span>
+                  <span className="text-sm font-medium text-[#1A2E2A]">
+                    {visit.createdAt ? new Date(visit.createdAt).toLocaleDateString('en-IN', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric'
+                    }) : 'N/A'}
+                  </span>
                 </div>
               </div>
             </div>
-
-            {/* Notes */}
-            {visit.notes && (
-              <div className="bg-[#F5F9F8] rounded-2xl p-4">
-                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-2">Notes</h4>
-                <p className="text-sm text-[#1A2E2A] leading-relaxed">{visit.notes}</p>
-              </div>
-            )}
           </div>
         </div>
 
@@ -333,16 +410,375 @@ const ViewSiteVisitModal = ({ visit, show, onClose, onRemove, onViewProperty }) 
               Close
             </button>
             <button
-              onClick={handleViewClick}
-              className="flex-1 px-4 py-2.5 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-sm font-medium shadow-lg shadow-[#00695C]/30 hover:scale-[1.02]"
+              onClick={handleEditClick}
+              className="flex-1 px-4 py-2.5 bg-[#26A69A] text-white rounded-xl hover:bg-[#1A8A7A] transition-all duration-300 text-sm font-medium shadow-lg shadow-[#26A69A]/30 hover:scale-[1.02]"
             >
-              <FiExternalLink className="inline mr-2" /> View Property
+              <FiEdit className="inline mr-2" /> Edit
             </button>
             <button
-              onClick={() => onRemove && onRemove(visit.id)}
+              onClick={handleDeleteClick}
               className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-300 text-sm font-medium shadow-lg shadow-red-600/30 hover:scale-[1.02]"
             >
-              <FiTrash2 className="inline mr-2" /> Remove
+              <FiTrash2 className="inline mr-2" /> Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================================
+// EDIT SITE VISIT MODAL
+// ============================================================
+const EditSiteVisitModal = ({ visit, show, onClose, onSave }) => {
+  if (!visit || !show) return null;
+
+  const [formData, setFormData] = useState({
+    buyerName: '',
+    buyerEmail: '',
+    propertyName: '',
+    propertyType: '',
+    ownerName: '',
+    ownerEmail: '',
+    visitDate: '',
+    visitTime: '',
+    contactNumber: '',
+    assignedAgent: '',
+    agentEmail: '',
+    visitStatus: '',
+    visitType: '',
+    duration: '',
+    remarks: ''
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  const statusOptions = ['scheduled', 'pending', 'in-progress', 'completed', 'cancelled'];
+  const visitTypeOptions = ['Site Visit', 'Virtual Tour', 'Open House', 'Meeting'];
+  const propertyTypes = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
+
+  useEffect(() => {
+    if (visit) {
+      setFormData({
+        buyerName: visit.buyerName || '',
+        buyerEmail: visit.buyerEmail || '',
+        propertyName: visit.propertyName || '',
+        propertyType: visit.propertyType || '',
+        ownerName: visit.ownerName || '',
+        ownerEmail: visit.ownerEmail || '',
+        visitDate: visit.visitDate || '',
+        visitTime: visit.visitTime || '',
+        contactNumber: visit.contactNumber || '',
+        assignedAgent: visit.assignedAgent || '',
+        agentEmail: visit.agentEmail || '',
+        visitStatus: visit.visitStatus || '',
+        visitType: visit.visitType || '',
+        duration: visit.duration || '',
+        remarks: visit.remarks || ''
+      });
+    }
+  }, [visit]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    setTimeout(() => {
+      const updatedVisit = {
+        ...visit,
+        ...formData
+      };
+      onSave(updatedVisit);
+      setLoading(false);
+      onClose();
+    }, 700);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
+        {/* Header */}
+        <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] p-6 rounded-t-3xl z-10 shrink-0">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110"
+          >
+            <FiX className="text-lg" />
+          </button>
+          <h2 className="text-2xl font-bold text-white">Edit Site Visit</h2>
+          <p className="text-white/80 text-sm">Update site visit information</p>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6 bg-white">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Buyer / Tenant Information */}
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
+                <FiUsers className="text-[#00695C]" />
+                Buyer / Tenant Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Buyer / Tenant Name *</label>
+                  <input
+                    type="text"
+                    name="buyerName"
+                    value={formData.buyerName}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                    placeholder="Enter name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Email</label>
+                  <input
+                    type="email"
+                    name="buyerEmail"
+                    value={formData.buyerEmail}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                    placeholder="buyer@email.com"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Property Information */}
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
+                <FiHome className="text-[#00695C]" />
+                Property Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Property Name *</label>
+                  <input
+                    type="text"
+                    name="propertyName"
+                    value={formData.propertyName}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                    placeholder="Enter property name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Property Type *</label>
+                  <select
+                    name="propertyType"
+                    value={formData.propertyType}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                  >
+                    <option value="">Select Type</option>
+                    {propertyTypes.map(type => (
+                      <option key={type} value={type}>{type}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Owner / Agent Information */}
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
+                <FaUserTie className="text-[#00695C]" />
+                Owner / Agent Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Owner / Agent Name</label>
+                  <input
+                    type="text"
+                    name="ownerName"
+                    value={formData.ownerName}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                    placeholder="Enter owner name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Owner Email</label>
+                  <input
+                    type="email"
+                    name="ownerEmail"
+                    value={formData.ownerEmail}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                    placeholder="owner@email.com"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Visit Details */}
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
+                <FiCalendar className="text-[#00695C]" />
+                Visit Details
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Visit Date *</label>
+                  <input
+                    type="date"
+                    name="visitDate"
+                    value={formData.visitDate}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Visit Time *</label>
+                  <input
+                    type="time"
+                    name="visitTime"
+                    value={formData.visitTime}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Visit Type</label>
+                  <select
+                    name="visitType"
+                    value={formData.visitType}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                  >
+                    <option value="">Select Type</option>
+                    {visitTypeOptions.map(type => (
+                      <option key={type} value={type}>{type}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Duration</label>
+                  <input
+                    type="text"
+                    name="duration"
+                    value={formData.duration}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                    placeholder="e.g., 1 hour"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Contact & Assignment */}
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
+                <FiUserCheck className="text-[#00695C]" />
+                Contact & Assignment
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Contact Number *</label>
+                  <input
+                    type="text"
+                    name="contactNumber"
+                    value={formData.contactNumber}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                    placeholder="+91 9876543210"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Assigned Agent</label>
+                  <input
+                    type="text"
+                    name="assignedAgent"
+                    value={formData.assignedAgent}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                    placeholder="Enter agent name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Agent Email</label>
+                  <input
+                    type="email"
+                    name="agentEmail"
+                    value={formData.agentEmail}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                    placeholder="agent@email.com"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Visit Status *</label>
+                  <select
+                    name="visitStatus"
+                    value={formData.visitStatus}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                  >
+                    <option value="">Select Status</option>
+                    {statusOptions.map(status => (
+                      <option key={status} value={status}>
+                        {status.charAt(0).toUpperCase() + status.slice(1).replace('-', ' ')}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Remarks */}
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
+                <FiFileText className="text-[#00695C]" />
+                Remarks
+              </h3>
+              <textarea
+                name="remarks"
+                value={formData.remarks}
+                onChange={handleChange}
+                rows="3"
+                className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none resize-none"
+                placeholder="Add remarks or notes about this site visit..."
+              />
+            </div>
+          </form>
+        </div>
+
+        {/* Footer */}
+        <div className="sticky bottom-0 px-6 py-4 bg-white border-t border-[#E8F0EE] rounded-b-3xl shrink-0 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onClose}
+              className="flex-1 px-4 py-2.5 bg-[#F5F9F8] text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="flex-1 px-4 py-2.5 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-sm font-medium shadow-lg shadow-[#00695C]/30 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <FiRefreshCw className="animate-spin" />
+              ) : (
+                <FiSave className="inline" />
+              )}
+              {loading ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </div>
@@ -354,7 +790,7 @@ const ViewSiteVisitModal = ({ visit, show, onClose, onRemove, onViewProperty }) 
 // ============================================================
 // MAIN COMPONENT
 // ============================================================
-const SiteVisitDashboard = () => {
+const SiteVisitDetails = () => {
   const navigate = useNavigate();
   const searchInputRef = useRef(null);
 
@@ -363,18 +799,20 @@ const SiteVisitDashboard = () => {
   const [filteredVisits, setFilteredVisits] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPropertyType, setSelectedPropertyType] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
+  const [selectedVisitType, setSelectedVisitType] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState('visitDate');
-  const [sortDirection, setSortDirection] = useState('asc');
+  const [sortDirection, setSortDirection] = useState('desc');
   const [viewMode, setViewMode] = useState('grid');
   const [selectedVisits, setSelectedVisits] = useState([]);
   const [showStats, setShowStats] = useState(true);
   const [statsAnimating, setStatsAnimating] = useState(false);
   const [viewingVisit, setViewingVisit] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
+  const [editingVisit, setEditingVisit] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [toast, setToast] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
   const [filterCount, setFilterCount] = useState(0);
@@ -385,19 +823,21 @@ const SiteVisitDashboard = () => {
     isOpen: false,
     title: '',
     message: '',
+    confirmText: 'Confirm',
+    cancelText: 'Cancel',
+    type: 'danger',
     onConfirm: null,
-    itemId: null,
-    isBulk: false
+    onCancel: null
   });
 
   // ============ STATS ============
   const [stats, setStats] = useState({
     total: 0,
+    scheduled: 0,
     pending: 0,
-    confirmed: 0,
+    'in-progress': 0,
     completed: 0,
-    cancelled: 0,
-    rescheduled: 0
+    cancelled: 0
   });
 
   // ============ COMPUTE STATS ============
@@ -405,59 +845,56 @@ const SiteVisitDashboard = () => {
     if (!list || list.length === 0) {
       setStats({
         total: 0,
+        scheduled: 0,
         pending: 0,
-        confirmed: 0,
+        'in-progress': 0,
         completed: 0,
-        cancelled: 0,
-        rescheduled: 0
+        cancelled: 0
       });
       return;
     }
 
     const total = list.length;
-    const pending = list.filter(v => v.status === 'pending').length;
-    const confirmed = list.filter(v => v.status === 'confirmed').length;
-    const completed = list.filter(v => v.status === 'completed').length;
-    const cancelled = list.filter(v => v.status === 'cancelled').length;
-    const rescheduled = list.filter(v => v.status === 'rescheduled').length;
+    const scheduled = list.filter(v => v.visitStatus === 'scheduled').length;
+    const pending = list.filter(v => v.visitStatus === 'pending').length;
+    const inProgress = list.filter(v => v.visitStatus === 'in-progress').length;
+    const completed = list.filter(v => v.visitStatus === 'completed').length;
+    const cancelled = list.filter(v => v.visitStatus === 'cancelled').length;
 
     setStats({
       total,
+      scheduled,
       pending,
-      confirmed,
+      'in-progress': inProgress,
       completed,
-      cancelled,
-      rescheduled
+      cancelled
     });
   }, []);
 
   // ============ GENERATE MOCK DATA ============
   const generateMockVisits = useCallback(() => {
     const buyerNames = ['Rahul Kumar', 'Anita Sharma', 'Sanjay Singh', 'Divya Patel', 'Karthik Reddy', 'Neha Gupta', 'Manoj Verma', 'Swati Joshi', 'Rohit Malhotra', 'Pallavi Mehta', 'Vivek Nair', 'Shalini Pillai'];
-    const agentNames = ['Arjun Menon', 'Priya Iyer', 'Suresh Rao', 'Kavya Nambiar', 'Deepak Chandran', 'Meera Krishnan'];
     const propertyNames = ['Green Valley Villa', 'Lake View Apartments', 'Sunrise Heights', 'Royal Palm Estate', 'Silver Oak Residency', 'Golden Meadows', 'Cedar Woods', 'Maple Leaf Homes', 'Orchid Garden', 'Tulip Tower', 'Lotus Heights', 'Jasmine Villa'];
-    const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur'];
-    const states = ['Maharashtra', 'Delhi', 'Karnataka', 'Tamil Nadu', 'Telangana', 'Uttar Pradesh', 'Gujarat', 'Rajasthan'];
+    const ownerNames = ['Mr. Sharma', 'Mrs. Patel', 'Dr. Reddy', 'Ms. Gupta', 'Mr. Singh', 'Mrs. Mehta', 'Mr. Kumar', 'Ms. Joshi', 'Mr. Nair', 'Mrs. Pillai'];
+    const agentNames = ['Agent Raj', 'Agent Priya', 'Agent Amit', 'Agent Sneha', 'Agent Vikram', 'Agent Deepa'];
     const propertyTypes = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
-    const statuses = ['pending', 'confirmed', 'completed', 'cancelled', 'rescheduled'];
-    const locations = ['MG Road', 'Banjara Hills', 'Indiranagar', 'Koramangala', 'Whitefield', 'Jubilee Hills', 'Connaught Place', 'Salt Lake', 'Marine Drive', 'Andheri'];
-    const visitTimes = ['09:00 AM', '10:30 AM', '11:00 AM', '12:30 PM', '02:00 PM', '03:30 PM', '04:00 PM', '05:30 PM'];
+    const statuses = ['scheduled', 'pending', 'in-progress', 'completed', 'cancelled'];
+    const visitTypes = ['Site Visit', 'Virtual Tour', 'Open House', 'Meeting'];
+    const durations = ['30 mins', '45 mins', '1 hour', '1.5 hours', '2 hours'];
+    const times = ['09:00', '10:30', '12:00', '14:00', '15:30', '17:00'];
+    const contactPrefixes = ['+91 98', '+91 97', '+91 99', '+91 88'];
 
-    const propertyImages = [
+    const visitImages = [
       'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800',
       'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800',
       'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800',
-      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800',
-      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800',
-      'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=800',
-      'https://images.unsplash.com/photo-1574362848149-11496d93a7c7?w=800',
-      'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=800'
+      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800'
     ];
 
     const visitsList = [];
     const usedNames = new Set();
 
-    for (let i = 1; i <= 60; i++) {
+    for (let i = 1; i <= 50; i++) {
       let propertyName, buyerName;
       let attempts = 0;
       do {
@@ -467,29 +904,37 @@ const SiteVisitDashboard = () => {
       } while (usedNames.has(`${propertyName}_${buyerName}`) && attempts < 50);
       usedNames.add(`${propertyName}_${buyerName}`);
 
-      const city = cities[Math.floor(Math.random() * cities.length)];
-
       const visitDate = new Date();
-      visitDate.setDate(visitDate.getDate() + Math.floor(Math.random() * 60) - 20);
+      visitDate.setDate(visitDate.getDate() + Math.floor(Math.random() * 30 - 15));
+
+      const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+      const randomVisitType = visitTypes[Math.floor(Math.random() * visitTypes.length)];
 
       visitsList.push({
         id: `visit_${i}`,
         buyerName: buyerName,
         buyerEmail: `${buyerName.toLowerCase().replace(' ', '.')}${Math.floor(Math.random() * 100)}@email.com`,
-        buyerPhone: `+91 ${Math.floor(Math.random() * 9000000000 + 1000000000)}`,
         propertyName: propertyName,
         propertyType: propertyTypes[Math.floor(Math.random() * propertyTypes.length)],
-        agentName: agentNames[Math.floor(Math.random() * agentNames.length)],
-        location: locations[Math.floor(Math.random() * locations.length)],
-        city: city,
-        state: states[Math.floor(Math.random() * states.length)],
-        visitDate: visitDate.toISOString(),
-        visitTime: visitTimes[Math.floor(Math.random() * visitTimes.length)],
-        status: statuses[Math.floor(Math.random() * statuses.length)],
-        notes: Math.random() > 0.7 ? 'Buyer requested a second viewing' : '',
-        imageUrl: propertyImages[Math.floor(Math.random() * propertyImages.length)]
+        ownerName: ownerNames[Math.floor(Math.random() * ownerNames.length)],
+        ownerEmail: `owner${Math.floor(Math.random() * 50)}@email.com`,
+        visitDate: visitDate.toISOString().split('T')[0],
+        visitTime: times[Math.floor(Math.random() * times.length)],
+        contactNumber: `${contactPrefixes[Math.floor(Math.random() * contactPrefixes.length)]}${Math.floor(Math.random() * 10000000).toString().padStart(7, '0')}`,
+        assignedAgent: agentNames[Math.floor(Math.random() * agentNames.length)],
+        agentEmail: `agent${Math.floor(Math.random() * 20)}@email.com`,
+        visitStatus: randomStatus,
+        visitType: randomVisitType,
+        duration: durations[Math.floor(Math.random() * durations.length)],
+        remarks: Math.random() > 0.6 ? 'Client requested additional information about the property' : 
+                  Math.random() > 0.3 ? 'Property visit confirmed' : '',
+        createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+        createdBy: ['Admin', 'Manager', 'Agent'][Math.floor(Math.random() * 3)],
+        imageUrl: visitImages[Math.floor(Math.random() * visitImages.length)]
       });
     }
+
+    visitsList.sort((a, b) => new Date(b.visitDate) - new Date(a.visitDate));
 
     computeStats(visitsList);
     return visitsList;
@@ -516,28 +961,26 @@ const SiteVisitDashboard = () => {
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         filtered = filtered.filter(v =>
-          (v.propertyName && v.propertyName.toLowerCase().includes(query)) ||
           (v.buyerName && v.buyerName.toLowerCase().includes(query)) ||
-          (v.buyerEmail && v.buyerEmail.toLowerCase().includes(query)) ||
-          (v.buyerPhone && v.buyerPhone.includes(query)) ||
-          (v.agentName && v.agentName.toLowerCase().includes(query)) ||
-          (v.city && v.city.toLowerCase().includes(query)) ||
-          (v.location && v.location.toLowerCase().includes(query)) ||
-          (v.propertyType && v.propertyType.toLowerCase().includes(query))
+          (v.propertyName && v.propertyName.toLowerCase().includes(query)) ||
+          (v.ownerName && v.ownerName.toLowerCase().includes(query)) ||
+          (v.assignedAgent && v.assignedAgent.toLowerCase().includes(query)) ||
+          (v.visitType && v.visitType.toLowerCase().includes(query)) ||
+          (v.contactNumber && v.contactNumber.includes(query))
         );
       }
 
-      if (selectedPropertyType !== 'all') {
-        filtered = filtered.filter(v => v.propertyType === selectedPropertyType);
+      if (selectedStatus !== 'all') {
+        filtered = filtered.filter(v => v.visitStatus === selectedStatus);
       }
 
-      if (selectedStatus !== 'all') {
-        filtered = filtered.filter(v => v.status === selectedStatus);
+      if (selectedVisitType !== 'all') {
+        filtered = filtered.filter(v => v.visitType === selectedVisitType);
       }
 
       let count = 0;
-      if (selectedPropertyType !== 'all') count++;
       if (selectedStatus !== 'all') count++;
+      if (selectedVisitType !== 'all') count++;
       if (searchQuery) count++;
       setFilterCount(count);
 
@@ -558,7 +1001,7 @@ const SiteVisitDashboard = () => {
     } catch (error) {
       console.error('Error filtering visits:', error);
     }
-  }, [visits, searchQuery, selectedPropertyType, selectedStatus, sortField, sortDirection]);
+  }, [visits, searchQuery, selectedStatus, selectedVisitType, sortField, sortDirection]);
 
   useEffect(() => {
     filterVisits();
@@ -606,51 +1049,54 @@ const SiteVisitDashboard = () => {
     setShowViewModal(true);
   }, []);
 
-  // ============ VIEW PROPERTY DETAILS ============
-  const handleViewPropertyDetails = useCallback((visitId) => {
-    navigate('/properties/details');
-    setToast({ message: 'Opening property details...', type: 'info' });
-  }, [navigate]);
-
-  // ============ SHOW CONFIRMATION MODAL ============
-  const showConfirmation = useCallback((title, message, onConfirm, itemId = null, isBulk = false) => {
-    setConfirmationModal({
-      isOpen: true,
-      title,
-      message,
-      onConfirm: () => {
-        setConfirmationModal(prev => ({ ...prev, isOpen: false }));
-        onConfirm(itemId);
-      },
-      itemId,
-      isBulk
-    });
+  // ============ EDIT VISIT ============
+  const handleEditVisit = useCallback((visit) => {
+    setEditingVisit(visit);
+    setShowEditModal(true);
   }, []);
 
-  // ============ REMOVE VISIT ============
-  const handleRemoveVisit = useCallback((visitId) => {
+  // ============ SAVE EDITED VISIT ============
+  const handleSaveVisit = useCallback((updatedVisit) => {
+    setVisits(prev => {
+      const updated = prev.map(v =>
+        v.id === updatedVisit.id ? updatedVisit : v
+      );
+      computeStats(updated);
+      return updated;
+    });
+    setToast({ message: `Visit for "${updatedVisit.propertyName}" updated successfully`, type: 'success' });
+  }, [computeStats]);
+
+  // ============ DELETE VISIT WITH CONFIRMATION ============
+  const handleDeleteVisit = useCallback((visitId) => {
     const visit = visits.find(v => v.id === visitId);
     if (!visit) return;
 
-    showConfirmation(
-      'Remove Site Visit',
-      `Are you sure you want to remove "${visit.propertyName}" visit? This action cannot be undone.`,
-      (id) => {
-        setActionLoading(id);
+    setConfirmationModal({
+      isOpen: true,
+      title: 'Delete Site Visit',
+      message: `Are you sure you want to delete the site visit for "${visit.propertyName}"?`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      type: 'danger',
+      onConfirm: () => {
+        setActionLoading(visitId);
         setTimeout(() => {
           setVisits(prev => {
-            const updated = prev.filter(v => v.id !== id);
+            const updated = prev.filter(v => v.id !== visitId);
             computeStats(updated);
             return updated;
           });
           setActionLoading(null);
           setShowViewModal(false);
-          setToast({ message: `Visit for "${visit.propertyName}" removed`, type: 'warning' });
+          setToast({ message: `Deleted visit for "${visit.propertyName}"`, type: 'warning' });
         }, 700);
       },
-      visitId
-    );
-  }, [visits, computeStats, showConfirmation]);
+      onCancel: () => {
+        setConfirmationModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
+  }, [visits, computeStats]);
 
   // ============ STAT CLICK HANDLER ============
   const handleStatClick = useCallback((filter) => {
@@ -658,8 +1104,11 @@ const SiteVisitDashboard = () => {
     const nextFilter = activeFilter === filter ? 'all' : filter;
 
     setSelectedStatus('all');
+    setSelectedVisitType('all');
 
-    if (nextFilter === 'pending' || nextFilter === 'confirmed' || nextFilter === 'completed' || nextFilter === 'cancelled' || nextFilter === 'rescheduled') {
+    if (nextFilter === 'scheduled' || nextFilter === 'pending' || 
+        nextFilter === 'in-progress' || nextFilter === 'completed' || 
+        nextFilter === 'cancelled') {
       setSelectedStatus(nextFilter);
     }
 
@@ -672,8 +1121,8 @@ const SiteVisitDashboard = () => {
   // ============ CLEAR ALL FILTERS ============
   const clearAllFilters = useCallback(() => {
     setSearchQuery('');
-    setSelectedPropertyType('all');
     setSelectedStatus('all');
+    setSelectedVisitType('all');
     setActiveFilter('all');
     if (searchInputRef.current) {
       searchInputRef.current.focus();
@@ -711,15 +1160,17 @@ const SiteVisitDashboard = () => {
       const data = filteredVisits.map(v => ({
         'Buyer Name': v.buyerName || '',
         'Buyer Email': v.buyerEmail || '',
-        'Buyer Phone': v.buyerPhone || '',
-        'Property Name': v.propertyName || '',
+        'Property': v.propertyName || '',
         'Property Type': v.propertyType || '',
-        'Agent': v.agentName || '',
-        Location: `${v.location || ''}, ${v.city || ''}, ${v.state || ''}`,
-        'Visit Date': v.visitDate ? new Date(v.visitDate).toLocaleDateString() : '',
+        'Owner/Agent': v.ownerName || '',
+        'Visit Date': v.visitDate || '',
         'Visit Time': v.visitTime || '',
-        Status: v.status ? v.status.charAt(0).toUpperCase() + v.status.slice(1) : '',
-        Notes: v.notes || ''
+        'Contact Number': v.contactNumber || '',
+        'Assigned Agent': v.assignedAgent || '',
+        'Visit Status': v.visitStatus ? v.visitStatus.charAt(0).toUpperCase() + v.visitStatus.slice(1).replace('-', ' ') : '',
+        'Visit Type': v.visitType || '',
+        'Duration': v.duration || '',
+        'Remarks': v.remarks || ''
       }));
 
       const csv = [
@@ -741,88 +1192,97 @@ const SiteVisitDashboard = () => {
     }
   }, [filteredVisits]);
 
-  // ============ BULK ACTIONS ============
+  // ============ BULK ACTIONS WITH CONFIRMATION ============
   const handleBulkAction = useCallback((action) => {
     if (selectedVisits.length === 0) {
       setToast({ message: 'Please select visits first', type: 'warning' });
       return;
     }
 
-    if (action === 'remove') {
-      showConfirmation(
-        'Remove Selected Visits',
-        `Are you sure you want to remove ${selectedVisits.length} selected visit(s)? This action cannot be undone.`,
-        () => {
-          setActionLoading('remove');
-          setTimeout(() => {
-            const selectedIds = new Set(selectedVisits);
-            let count = 0;
+    const actionConfig = {
+      delete: {
+        title: 'Delete Selected Visits',
+        message: `Are you sure you want to delete ${selectedVisits.length} selected visit(s)?`,
+        confirmText: 'Delete All',
+        type: 'danger'
+      },
+      complete: {
+        title: 'Complete Selected Visits',
+        message: `Are you sure you want to mark ${selectedVisits.length} selected visit(s) as completed?`,
+        confirmText: 'Complete All',
+        type: 'info'
+      }
+    };
 
-            setVisits(prev => {
-              const updated = prev.filter(v => {
-                if (!selectedIds.has(v.id)) return true;
+    const config = actionConfig[action];
+    if (!config) return;
+
+    setConfirmationModal({
+      isOpen: true,
+      ...config,
+      onConfirm: () => {
+        setActionLoading(action);
+
+        setTimeout(() => {
+          const selectedIds = new Set(selectedVisits);
+          let count = 0;
+
+          setVisits(prev => {
+            let updated;
+            if (action === 'delete') {
+              count = prev.filter(v => selectedIds.has(v.id)).length;
+              updated = prev.filter(v => !selectedIds.has(v.id));
+            } else {
+              updated = prev.map(v => {
+                if (!selectedIds.has(v.id)) return v;
                 count++;
-                return false;
+                if (action === 'complete') {
+                  return { ...v, visitStatus: 'completed' };
+                }
+                return v;
               });
-              computeStats(updated);
-              return updated;
-            });
+            }
+            computeStats(updated);
+            return updated;
+          });
 
-            setSelectedVisits([]);
-            setActionLoading(null);
-            setToast({ message: `${count} visit(s) removed`, type: 'warning' });
-          }, 800);
-        },
-        null,
-        true
-      );
-      return;
-    }
+          setSelectedVisits([]);
+          setActionLoading(null);
 
-    // For confirm action (no confirmation needed)
-    setActionLoading(action);
-    setTimeout(() => {
-      const selectedIds = new Set(selectedVisits);
-      let count = 0;
-
-      setVisits(prev => {
-        const updated = prev.map(v => {
-          if (!selectedIds.has(v.id)) return v;
-          count++;
-          return { ...v, status: 'confirmed' };
-        });
-        computeStats(updated);
-        return updated;
-      });
-
-      setSelectedVisits([]);
-      setActionLoading(null);
-      setToast({ message: `${count} visit(s) confirmed`, type: 'success' });
-    }, 800);
-  }, [selectedVisits, computeStats, showConfirmation]);
+          if (action === 'delete') {
+            setToast({ message: `${count} visit(s) deleted`, type: 'warning' });
+          } else if (action === 'complete') {
+            setToast({ message: `${count} visit(s) marked as completed`, type: 'success' });
+          }
+        }, 800);
+      },
+      onCancel: () => {
+        setConfirmationModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
+  }, [selectedVisits, computeStats]);
 
   // ============ STATUS COLOR HELPER ============
   const getStatusColor = (status) => {
     const colors = {
-      pending: 'bg-[#FEF3E2] text-amber-700 border-amber-200',
-      confirmed: 'bg-blue-50 text-blue-700 border-blue-200',
-      completed: 'bg-[#E8F8F5] text-[#00695C] border-[#A8D5CD]',
-      cancelled: 'bg-red-50 text-red-700 border-red-200',
-      rescheduled: 'bg-purple-50 text-purple-700 border-purple-200'
+      scheduled: 'bg-blue-50 text-blue-700 border-blue-200',
+      pending: 'bg-amber-50 text-amber-700 border-amber-200',
+      'in-progress': 'bg-purple-50 text-purple-700 border-purple-200',
+      completed: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      cancelled: 'bg-red-50 text-red-700 border-red-200'
     };
-    return colors[status] || colors.pending;
+    return colors[status] || colors.scheduled;
   };
 
-  // ============ PROPERTY TYPE COLOR HELPER ============
-  const getPropertyTypeColor = (type) => {
-    const colors = {
-      Individual: 'bg-blue-50 text-blue-700',
-      Apartment: 'bg-purple-50 text-purple-700',
-      Commercial: 'bg-orange-50 text-orange-700',
-      'Land & Plots': 'bg-green-50 text-green-700',
-      Hostel: 'bg-pink-50 text-pink-700'
+  const getStatusLabel = (status) => {
+    const labels = {
+      scheduled: 'Scheduled',
+      pending: 'Pending',
+      'in-progress': 'In Progress',
+      completed: 'Completed',
+      cancelled: 'Cancelled'
     };
-    return colors[type] || 'bg-gray-50 text-gray-700';
+    return labels[status] || 'Scheduled';
   };
 
   // ============================================================
@@ -842,7 +1302,12 @@ const SiteVisitDashboard = () => {
       {/* Confirmation Modal */}
       <ConfirmationModal
         isOpen={confirmationModal.isOpen}
-        onClose={() => setConfirmationModal(prev => ({ ...prev, isOpen: false }))}
+        onClose={() => {
+          if (confirmationModal.onCancel) {
+            confirmationModal.onCancel();
+          }
+          setConfirmationModal(prev => ({ ...prev, isOpen: false }));
+        }}
         onConfirm={() => {
           if (confirmationModal.onConfirm) {
             confirmationModal.onConfirm();
@@ -850,8 +1315,9 @@ const SiteVisitDashboard = () => {
         }}
         title={confirmationModal.title}
         message={confirmationModal.message}
-        confirmText="Yes"
-        cancelText="No"
+        confirmText={confirmationModal.confirmText}
+        cancelText={confirmationModal.cancelText}
+        type={confirmationModal.type}
       />
 
       {/* View Modal */}
@@ -860,8 +1326,18 @@ const SiteVisitDashboard = () => {
           visit={viewingVisit}
           show={showViewModal}
           onClose={() => { setShowViewModal(false); setViewingVisit(null); }}
-          onRemove={handleRemoveVisit}
-          onViewProperty={handleViewPropertyDetails}
+          onEdit={handleEditVisit}
+          onDelete={handleDeleteVisit}
+        />
+      )}
+
+      {/* Edit Modal */}
+      {showEditModal && editingVisit && (
+        <EditSiteVisitModal
+          visit={editingVisit}
+          show={showEditModal}
+          onClose={() => { setShowEditModal(false); setEditingVisit(null); }}
+          onSave={handleSaveVisit}
         />
       )}
 
@@ -871,7 +1347,7 @@ const SiteVisitDashboard = () => {
           <div>
             <div className="flex items-center gap-3 mb-1 flex-wrap">
               <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
-                Site Visit Dashboard
+                Site Visit Details
               </h1>
               <span className="px-3 py-1 bg-[#E8F4F2] text-[#00695C] text-xs font-semibold rounded-full animate-pulse">
                 {filteredVisits.length} Visits
@@ -883,7 +1359,7 @@ const SiteVisitDashboard = () => {
               )}
             </div>
             <p className="text-sm text-[#5A7D78] flex items-center gap-2 flex-wrap">
-              <span>Manage &amp; Track Site Visits</span>
+              <span>Manage Site Visits</span>
               <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
               <span className="text-[#00695C] font-medium">
                 {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
@@ -917,14 +1393,14 @@ const SiteVisitDashboard = () => {
         </div>
       </div>
 
-      {/* Stats Section - All 6 Stats */}
+      {/* Stats Section */}
       {showStats && (
         <div className="relative animate-slide-in">
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4  gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
               <StatCard
-                icon={<FiNavigation className="text-white text-sm" />}
-                title="Total Site Visits"
+                icon={<FiCalendar className="text-white text-sm" />}
+                title="Total"
                 value={stats.total}
                 color="bg-gradient-to-br from-[#00695C] to-[#26A69A]"
                 delay={0}
@@ -934,53 +1410,43 @@ const SiteVisitDashboard = () => {
               />
               <StatCard
                 icon={<FiClock className="text-white text-sm" />}
+                title="Scheduled"
+                value={stats.scheduled}
+                color="bg-gradient-to-br from-blue-600 to-blue-400"
+                delay={50}
+                isActive={activeFilter === 'scheduled'}
+                statsAnimating={statsAnimating}
+                onClick={() => handleStatClick('scheduled')}
+              />
+              <StatCard
+                icon={<FiAlertTriangle className="text-white text-sm" />}
                 title="Pending"
                 value={stats.pending}
                 color="bg-gradient-to-br from-amber-600 to-amber-400"
-                delay={50}
+                delay={100}
                 isActive={activeFilter === 'pending'}
                 statsAnimating={statsAnimating}
                 onClick={() => handleStatClick('pending')}
               />
               <StatCard
-                icon={<FiCheckCircle className="text-white text-sm" />}
-                title="Confirmed"
-                value={stats.confirmed}
-                color="bg-gradient-to-br from-blue-600 to-blue-400"
-                delay={100}
-                isActive={activeFilter === 'confirmed'}
+                icon={<FiActivity className="text-white text-sm" />}
+                title="In Progress"
+                value={stats['in-progress']}
+                color="bg-gradient-to-br from-purple-600 to-purple-400"
+                delay={150}
+                isActive={activeFilter === 'in-progress'}
                 statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('confirmed')}
+                onClick={() => handleStatClick('in-progress')}
               />
               <StatCard
-                icon={<FaClipboardCheck className="text-white text-sm" />}
+                icon={<FiCheckCircle className="text-white text-sm" />}
                 title="Completed"
                 value={stats.completed}
                 color="bg-gradient-to-br from-emerald-600 to-emerald-400"
-                delay={150}
+                delay={200}
                 isActive={activeFilter === 'completed'}
                 statsAnimating={statsAnimating}
                 onClick={() => handleStatClick('completed')}
-              />
-              <StatCard
-                icon={<FiXCircle className="text-white text-sm" />}
-                title="Cancelled"
-                value={stats.cancelled}
-                color="bg-gradient-to-br from-red-600 to-red-400"
-                delay={200}
-                isActive={activeFilter === 'cancelled'}
-                statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('cancelled')}
-              />
-              <StatCard
-                icon={<FiRepeat className="text-white text-sm" />}
-                title="Rescheduled"
-                value={stats.rescheduled}
-                color="bg-gradient-to-br from-purple-600 to-purple-400"
-                delay={250}
-                isActive={activeFilter === 'rescheduled'}
-                statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('rescheduled')}
               />
             </div>
           </div>
@@ -995,7 +1461,7 @@ const SiteVisitDashboard = () => {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search by buyer name, property name, agent, or location..."
+              placeholder="Search by buyer, property, owner, agent, or visit type..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none placeholder:text-[#B5C9C5]"
@@ -1013,24 +1479,6 @@ const SiteVisitDashboard = () => {
           <div className="flex items-center gap-2 w-full lg:w-auto flex-wrap">
             <div className="relative">
               <select
-                value={selectedPropertyType}
-                onChange={(e) => {
-                  setSelectedPropertyType(e.target.value);
-                }}
-                className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
-              >
-                <option value="all">All Types</option>
-                <option value="Individual">Individual</option>
-                <option value="Apartment">Apartment</option>
-                <option value="Commercial">Commercial</option>
-                <option value="Land & Plots">Land & Plots</option>
-                <option value="Hostel">Hostel</option>
-              </select>
-              <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
-            </div>
-
-            <div className="relative">
-              <select
                 value={selectedStatus}
                 onChange={(e) => {
                   setSelectedStatus(e.target.value);
@@ -1039,11 +1487,26 @@ const SiteVisitDashboard = () => {
                 className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
               >
                 <option value="all">All Status</option>
+                <option value="scheduled">Scheduled</option>
                 <option value="pending">Pending</option>
-                <option value="confirmed">Confirmed</option>
+                <option value="in-progress">In Progress</option>
                 <option value="completed">Completed</option>
                 <option value="cancelled">Cancelled</option>
-                <option value="rescheduled">Rescheduled</option>
+              </select>
+              <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
+            </div>
+
+            <div className="relative">
+              <select
+                value={selectedVisitType}
+                onChange={(e) => setSelectedVisitType(e.target.value)}
+                className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
+              >
+                <option value="all">All Visit Types</option>
+                <option value="Site Visit">Site Visit</option>
+                <option value="Virtual Tour">Virtual Tour</option>
+                <option value="Open House">Open House</option>
+                <option value="Meeting">Meeting</option>
               </select>
               <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
             </div>
@@ -1084,20 +1547,20 @@ const SiteVisitDashboard = () => {
             </span>
             <div className="flex flex-wrap items-center gap-2">
               <button
-                onClick={() => handleBulkAction('confirm')}
-                disabled={actionLoading === 'confirm'}
-                className="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 disabled:opacity-50"
+                onClick={() => handleBulkAction('complete')}
+                disabled={actionLoading === 'complete'}
+                className="px-4 py-1.5 bg-emerald-50 text-emerald-700 rounded-xl hover:bg-emerald-100 transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 disabled:opacity-50"
               >
-                {actionLoading === 'confirm' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiCheckCircle className="text-[10px]" />}
-                Confirm All
+                {actionLoading === 'complete' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiCheckCircle className="text-[10px]" />}
+                Complete
               </button>
               <button
-                onClick={() => handleBulkAction('remove')}
-                disabled={actionLoading === 'remove'}
+                onClick={() => handleBulkAction('delete')}
+                disabled={actionLoading === 'delete'}
                 className="px-4 py-1.5 bg-red-50 text-red-700 rounded-xl hover:bg-red-100 transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 disabled:opacity-50"
               >
-                {actionLoading === 'remove' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiTrash2 className="text-[10px]" />}
-                Remove All
+                {actionLoading === 'delete' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiTrash2 className="text-[10px]" />}
+                Delete All
               </button>
               <button
                 onClick={() => setSelectedVisits([])}
@@ -1125,11 +1588,11 @@ const SiteVisitDashboard = () => {
                 <div
                   key={visit.id}
                   className={`bg-white rounded-2xl border border-[#E8F0EE] p-3.5 hover:shadow-xl hover:-translate-y-1 group animate-slide-in transition-all duration-500 ${isSelected ? 'ring-2 ring-[#00695C] shadow-lg' : ''} ${
-                    visit.status === 'confirmed' ? 'border-l-4 border-l-blue-500' :
-                    visit.status === 'pending' ? 'border-l-4 border-l-amber-500' :
-                    visit.status === 'completed' ? 'border-l-4 border-l-emerald-500' :
-                    visit.status === 'cancelled' ? 'border-l-4 border-l-red-500' :
-                    visit.status === 'rescheduled' ? 'border-l-4 border-l-purple-500' : ''
+                    visit.visitStatus === 'completed' ? 'border-l-4 border-l-emerald-500' :
+                    visit.visitStatus === 'scheduled' ? 'border-l-4 border-l-blue-500' :
+                    visit.visitStatus === 'pending' ? 'border-l-4 border-l-amber-500' :
+                    visit.visitStatus === 'in-progress' ? 'border-l-4 border-l-purple-500' :
+                    visit.visitStatus === 'cancelled' ? 'border-l-4 border-l-red-500' : ''
                   }`}
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
@@ -1142,23 +1605,28 @@ const SiteVisitDashboard = () => {
                         className="w-4 h-4 shrink-0 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                       />
                       <div className="relative shrink-0">
-                        <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white font-bold text-sm shadow-lg">
-                          <FiNavigation className="text-white" />
+                        <div className={`w-9 h-9 rounded-2xl bg-gradient-to-br ${visit.visitStatus === 'completed' ? 'from-emerald-600 to-emerald-400' : visit.visitStatus === 'cancelled' ? 'from-red-600 to-red-400' : 'from-[#00695C] to-[#26A69A]'} flex items-center justify-center text-white font-bold text-sm shadow-lg`}>
+                          <FaCalendarAlt className="text-white" />
                         </div>
                       </div>
                       <div className="min-w-0">
                         <h3 className="font-semibold text-[#1A2E2A] text-sm truncate">{visit.buyerName}</h3>
                         <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap ${getStatusColor(visit.status)}`}>
-                            {visit.status ? visit.status.charAt(0).toUpperCase() + visit.status.slice(1) : 'N/A'}
-                          </span>
-                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap ${getPropertyTypeColor(visit.propertyType)}`}>
-                            {visit.propertyType || 'N/A'}
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap ${getStatusColor(visit.visitStatus)}`}>
+                            {getStatusLabel(visit.visitStatus)}
                           </span>
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        type="button"
+                        className="w-7 h-7 rounded-xl hover:bg-[#F5F9F8] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#26A69A] hover:scale-110"
+                        onClick={() => handleEditVisit(visit)}
+                        title="Edit Visit"
+                      >
+                        <FiEdit className="text-sm" />
+                      </button>
                       <button
                         type="button"
                         className="w-7 h-7 rounded-xl hover:bg-[#F5F9F8] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
@@ -1181,11 +1649,7 @@ const SiteVisitDashboard = () => {
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FaUserTie className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate">{visit.agentName || 'N/A'}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FiMapPin className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate">{visit.location || ''}, {visit.city || ''}</span>
+                      <span className="truncate">{visit.ownerName || 'N/A'}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiCalendar className="text-[#00695C] flex-shrink-0" />
@@ -1196,9 +1660,13 @@ const SiteVisitDashboard = () => {
                       <span>{visit.visitTime || 'N/A'}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
+                      <FiUserCheck className="text-[#00695C] flex-shrink-0" />
+                      <span className="truncate">{visit.assignedAgent || 'N/A'}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiTag className="text-[#00695C] flex-shrink-0" />
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${getStatusColor(visit.status)}`}>
-                        {visit.status ? visit.status.charAt(0).toUpperCase() + visit.status.slice(1) : 'N/A'}
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${getStatusColor(visit.visitStatus)}`}>
+                        {getStatusLabel(visit.visitStatus)}
                       </span>
                     </div>
                   </div>
@@ -1213,19 +1681,19 @@ const SiteVisitDashboard = () => {
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleViewPropertyDetails(visit.id)}
-                      className="flex-1 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
+                      onClick={() => handleEditVisit(visit)}
+                      className="flex-1 py-1.5 text-xs font-medium text-[#26A69A] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                     >
-                      <FiExternalLink className="text-[10px]" /> Details
+                      <FiEdit className="text-[10px]" /> Edit
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleRemoveVisit(visit.id)}
+                      onClick={() => handleDeleteVisit(visit.id)}
                       disabled={actionLoading === visit.id}
                       className="flex-1 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 disabled:opacity-50"
                     >
                       {actionLoading === visit.id ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiTrash2 className="text-[10px]" />}
-                      Remove
+                      Delete
                     </button>
                   </div>
                 </div>
@@ -1245,17 +1713,16 @@ const SiteVisitDashboard = () => {
                 <span>Buyer</span>
               </div>
               <div className="col-span-2 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('propertyName')}>
-                Property Name {sortField === 'propertyName' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+                Property {sortField === 'propertyName' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1">Type</div>
               <div className="col-span-1">Status</div>
-              <div className="col-span-2 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('agentName')}>
-                Agent {sortField === 'agentName' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+              <div className="col-span-1">Type</div>
+              <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('visitDate')}>
+                Date {sortField === 'visitDate' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1 text-center cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('visitDate')}>
-                Visit Date {sortField === 'visitDate' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
-              </div>
-              <div className="col-span-1 text-center">Time</div>
+              <div className="col-span-1">Time</div>
+              <div className="col-span-1">Agent</div>
+              <div className="col-span-1">Contact</div>
               <div className="col-span-2 text-right">Actions</div>
             </div>
 
@@ -1280,48 +1747,46 @@ const SiteVisitDashboard = () => {
                     </div>
                   </div>
 
-                  {/* Buyer Name */}
                   <div className="col-span-2">
-                    <p className="font-semibold text-sm text-[#1A2E2A]">{visit.buyerName || 'N/A'}</p>
-                    <p className="text-[10px] text-[#5A7D78] truncate">{visit.buyerEmail || 'N/A'}</p>
+                    <p className="font-semibold text-sm text-[#1A2E2A] truncate">{visit.buyerName || 'N/A'}</p>
+                    <p className="text-[10px] text-[#5A7D78] truncate">{visit.propertyName || 'N/A'}</p>
                   </div>
 
-                  {/* Property Name */}
                   <div className="col-span-1">
-                    <p className="text-xs font-medium text-[#1A2E2A] truncate">{visit.propertyName || 'N/A'}</p>
-                  </div>
-
-                  {/* Property Type */}
-                  <div className="col-span-1">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${getPropertyTypeColor(visit.propertyType)}`}>
-                      {visit.propertyType || 'N/A'}
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${getStatusColor(visit.visitStatus)}`}>
+                      {getStatusLabel(visit.visitStatus)}
                     </span>
                   </div>
 
-                  {/* Status */}
-                  <div className="col-span-1">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${getStatusColor(visit.status)}`}>
-                      {visit.status ? visit.status.charAt(0).toUpperCase() + visit.status.slice(1) : 'N/A'}
-                    </span>
+                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">
+                    {visit.visitType || 'N/A'}
                   </div>
 
-                  {/* Agent */}
-                  <div className="col-span-2 text-xs text-[#5A7D78] truncate">
-                    {visit.agentName || 'N/A'}
-                  </div>
-
-                  {/* Visit Date */}
-                  <div className="col-span-1 text-center text-[10px] text-[#5A7D78]">
+                  <div className="col-span-1 text-xs text-[#5A7D78]">
                     {visit.visitDate ? new Date(visit.visitDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) : 'N/A'}
                   </div>
 
-                  {/* Visit Time */}
-                  <div className="col-span-1 text-center text-[10px] text-[#5A7D78]">
+                  <div className="col-span-1 text-xs text-[#5A7D78]">
                     {visit.visitTime || 'N/A'}
                   </div>
 
-                  {/* Actions */}
+                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">
+                    {visit.assignedAgent || 'N/A'}
+                  </div>
+
+                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">
+                    {visit.contactNumber || 'N/A'}
+                  </div>
+
                   <div className="col-span-2 flex items-center justify-end gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleEditVisit(visit)}
+                      className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#26A69A] hover:scale-110"
+                      title="Edit"
+                    >
+                      <FiEdit className="text-xs" />
+                    </button>
                     <button
                       type="button"
                       onClick={() => handleViewVisit(visit)}
@@ -1332,18 +1797,10 @@ const SiteVisitDashboard = () => {
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleViewPropertyDetails(visit.id)}
-                      className="w-7 h-7 rounded-lg hover:bg-blue-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-blue-600 hover:scale-110"
-                      title="Property Details"
-                    >
-                      <FiExternalLink className="text-xs" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveVisit(visit.id)}
+                      onClick={() => handleDeleteVisit(visit.id)}
                       disabled={actionLoading === visit.id}
                       className="w-7 h-7 rounded-lg hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-red-600 hover:scale-110 disabled:opacity-50"
-                      title="Remove"
+                      title="Delete"
                     >
                       {actionLoading === visit.id ? <FiRefreshCw className="text-xs animate-spin" /> : <FiTrash2 className="text-xs" />}
                     </button>
@@ -1357,7 +1814,7 @@ const SiteVisitDashboard = () => {
         {paginatedVisits.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-[#E8F0EE]">
             <div className="w-24 h-24 rounded-full bg-[#F5F9F8] flex items-center justify-center mb-4 animate-float">
-              <FiNavigation className="text-4xl text-[#B5C9C5]" />
+              <FiCalendar className="text-4xl text-[#B5C9C5]" />
             </div>
             <h3 className="text-xl font-semibold text-[#1A2E2A]">No site visits found</h3>
             <p className="text-sm text-[#5A7D78] mt-1">
@@ -1480,4 +1937,4 @@ const SiteVisitDashboard = () => {
   );
 };
 
-export default SiteVisitDashboard;
+export default SiteVisitDetails;
