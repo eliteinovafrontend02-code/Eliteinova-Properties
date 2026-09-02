@@ -1,4 +1,4 @@
-// src/components/dashboard/admin/buyer&tenants/RentalRequests/RentalRequestManagement.jsx
+// src/components/dashboard/admin/buyer&tenants/PurchaseRequests/PurchaseRequestManagement.jsx
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -9,15 +9,17 @@ import {
   FiEye, FiEdit, FiTrash2, FiRefreshCw, FiPlus, FiDownload,
   FiAlertTriangle, FiInfo, FiX, FiList, FiGrid as FiGridIcon,
   FiActivity, FiStar, FiShield, FiBriefcase, FiMail, FiPhone,
-  FiExternalLink, FiLock, FiUnlock, FiMoreVertical, FiTag, FiFileText
+  FiExternalLink, FiLock, FiUnlock, FiMoreVertical, FiTag, FiFileText,
+  FiShoppingCart, FiTrendingUp, FiPercent
 } from 'react-icons/fi';
 import {
   FaHome, FaBed, FaCalendarAlt, FaUsers, FaCar, FaPaw,
   FaCheck, FaTimes, FaStar as FaStarSolid, FaUserTie,
   FaBuilding, FaUserCircle, FaFileInvoice, FaHandshake,
-  FaClock, FaRegClock, FaHourglassHalf
+  FaClock, FaRegClock, FaHourglassHalf, FaMoneyBillWave,
+  FaFileContract, FaHandshake as FaHandshakeSolid
 } from 'react-icons/fa';
-import { MdOutlineVerified, MdOutlineFamilyRestroom, MdOutlineRequestPage } from 'react-icons/md';
+import { MdOutlineVerified, MdOutlineFamilyRestroom, MdOutlineRequestPage, MdOutlineRealEstateAgent } from 'react-icons/md';
 import { HiOutlineUserGroup } from 'react-icons/hi2';
 
 /* ============================================================
@@ -123,6 +125,7 @@ const ViewRequestModal = ({ request, show, onClose, onEdit, onDelete, onStatusCh
     pending: 'bg-[#FEF3E2] text-amber-700 border-amber-200',
     approved: 'bg-[#E8F8F5] text-[#00695C] border-[#A8D5CD]',
     rejected: 'bg-red-50 text-red-700 border-red-200',
+    negotiation: 'bg-purple-50 text-purple-700 border-purple-200',
     closed: 'bg-gray-100 text-gray-600 border-gray-200'
   };
 
@@ -153,11 +156,11 @@ const ViewRequestModal = ({ request, show, onClose, onEdit, onDelete, onStatusCh
           </button>
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-              <FaFileInvoice className="text-white text-xl" />
+              <FiShoppingCart className="text-white text-xl" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white">Rental Request</h2>
-              <p className="text-white/80 text-sm">Request #{request.id?.slice(-6) || 'N/A'} · {request.tenantName}</p>
+              <h2 className="text-2xl font-bold text-white">Purchase Request</h2>
+              <p className="text-white/80 text-sm">Request #{request.id?.slice(-6) || 'N/A'} · {request.buyerName}</p>
             </div>
           </div>
         </div>
@@ -176,18 +179,23 @@ const ViewRequestModal = ({ request, show, onClose, onEdit, onDelete, onStatusCh
               <span className={`px-4 py-1.5 rounded-full text-xs font-semibold ${furnishingColors[request.furnishing]}`}>
                 {request.furnishing}
               </span>
+              {request.isUrgent && (
+                <span className="px-4 py-1.5 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200">
+                  🔥 Urgent
+                </span>
+              )}
             </div>
 
-            {/* Tenant Info */}
+            {/* Buyer Info */}
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
               <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
                 <FiUser className="text-[#00695C]" />
-                Tenant Information
+                Buyer Information
               </h3>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <p className="text-xs text-[#5A7D78]">Name</p>
-                  <p className="text-sm font-medium text-[#1A2E2A]">{request.tenantName}</p>
+                  <p className="text-sm font-medium text-[#1A2E2A]">{request.buyerName}</p>
                 </div>
                 <div>
                   <p className="text-xs text-[#5A7D78]">Email</p>
@@ -226,8 +234,12 @@ const ViewRequestModal = ({ request, show, onClose, onEdit, onDelete, onStatusCh
                   <p className="text-sm font-medium text-[#1A2E2A]">{request.bedrooms} BHK</p>
                 </div>
                 <div>
-                  <p className="text-xs text-[#5A7D78]">Rent Amount</p>
-                  <p className="text-sm font-medium text-[#1A2E2A]">₹{request.rentAmount?.toLocaleString()}</p>
+                  <p className="text-xs text-[#5A7D78]">Budget Range</p>
+                  <p className="text-sm font-medium text-[#1A2E2A]">₹{request.minBudget?.toLocaleString()} - ₹{request.maxBudget?.toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-[#5A7D78]">Offer Amount</p>
+                  <p className="text-sm font-medium text-[#1A2E2A]">₹{request.offerAmount?.toLocaleString()}</p>
                 </div>
               </div>
             </div>
@@ -247,27 +259,25 @@ const ViewRequestModal = ({ request, show, onClose, onEdit, onDelete, onStatusCh
               <div className="bg-[#F5F9F8] rounded-2xl p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <FaCalendarAlt className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Move-in Date</h4>
+                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Purchase Timeline</h4>
                 </div>
-                <p className="text-sm font-medium text-[#1A2E2A]">
-                  {new Date(request.moveInDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                </p>
+                <p className="text-sm font-medium text-[#1A2E2A]">{request.purchaseTimeline}</p>
               </div>
 
               <div className="bg-[#F5F9F8] rounded-2xl p-4">
                 <div className="flex items-center gap-2 mb-1">
-                  <FaClock className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Rental Duration</h4>
+                  <FaMoneyBillWave className="text-[#00695C] text-sm" />
+                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Payment Method</h4>
                 </div>
-                <p className="text-sm font-medium text-[#1A2E2A]">{request.rentalDuration}</p>
+                <p className="text-sm font-medium text-[#1A2E2A]">{request.paymentMethod}</p>
               </div>
 
               <div className="bg-[#F5F9F8] rounded-2xl p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <FiUsers className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Tenant Type</h4>
+                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Buyer Type</h4>
                 </div>
-                <p className="text-sm font-medium text-[#1A2E2A]">{request.tenantType}</p>
+                <p className="text-sm font-medium text-[#1A2E2A]">{request.buyerType}</p>
               </div>
 
               <div className="bg-[#F5F9F8] rounded-2xl p-4">
@@ -275,7 +285,7 @@ const ViewRequestModal = ({ request, show, onClose, onEdit, onDelete, onStatusCh
                   <FiClock className="text-[#00695C] text-sm" />
                   <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Status</h4>
                 </div>
-                <p className={`text-sm font-medium ${request.status === 'approved' ? 'text-[#00695C]' : request.status === 'rejected' ? 'text-red-600' : request.status === 'pending' ? 'text-amber-600' : 'text-[#5A7D78]'}`}>
+                <p className={`text-sm font-medium ${request.status === 'approved' ? 'text-[#00695C]' : request.status === 'rejected' ? 'text-red-600' : request.status === 'negotiation' ? 'text-purple-600' : request.status === 'pending' ? 'text-amber-600' : 'text-[#5A7D78]'}`}>
                   {request.status?.charAt(0).toUpperCase() + request.status?.slice(1) || 'Pending'}
                 </p>
               </div>
@@ -311,10 +321,31 @@ const ViewRequestModal = ({ request, show, onClose, onEdit, onDelete, onStatusCh
                   <FiCheckCircle className="text-sm" /> Approve
                 </button>
                 <button
+                  onClick={() => onStatusChange(request.id, 'negotiation')}
+                  className="flex-1 px-4 py-2.5 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-all duration-300 text-sm font-medium shadow-lg shadow-purple-600/30 hover:scale-[1.02] flex items-center justify-center gap-2"
+                >
+                  <FiPercent className="text-sm" /> Negotiate
+                </button>
+                <button
                   onClick={() => onStatusChange(request.id, 'rejected')}
                   className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-300 text-sm font-medium shadow-lg shadow-red-600/30 hover:scale-[1.02] flex items-center justify-center gap-2"
                 >
                   <FiXCircle className="text-sm" /> Reject
+                </button>
+              </>
+            ) : request.status === 'negotiation' ? (
+              <>
+                <button
+                  onClick={() => onStatusChange(request.id, 'approved')}
+                  className="flex-1 px-4 py-2.5 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-sm font-medium shadow-lg shadow-[#00695C]/30 hover:scale-[1.02] flex items-center justify-center gap-2"
+                >
+                  <FiCheckCircle className="text-sm" /> Accept
+                </button>
+                <button
+                  onClick={() => onStatusChange(request.id, 'rejected')}
+                  className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-300 text-sm font-medium shadow-lg shadow-red-600/30 hover:scale-[1.02] flex items-center justify-center gap-2"
+                >
+                  <FiXCircle className="text-sm" /> Reject Offer
                 </button>
               </>
             ) : request.status === 'approved' ? (
@@ -353,7 +384,7 @@ const ViewRequestModal = ({ request, show, onClose, onEdit, onDelete, onStatusCh
 
 const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
   const emptyForm = {
-    tenantName: '',
+    buyerName: '',
     email: '',
     phone: '',
     city: '',
@@ -362,11 +393,14 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
     propertyType: 'Apartment',
     furnishing: 'Semi Furnished',
     bedrooms: 1,
-    rentAmount: 15000,
-    moveInDate: new Date().toISOString().slice(0, 10),
-    rentalDuration: '12 months',
-    tenantType: 'Family',
+    minBudget: 20000,
+    maxBudget: 30000,
+    offerAmount: 25000,
+    purchaseTimeline: 'Within 1 month',
+    paymentMethod: 'Home Loan',
+    buyerType: 'Family',
     status: 'pending',
+    isUrgent: false,
     notes: ''
   };
 
@@ -375,7 +409,7 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
   useEffect(() => {
     if (mode === 'edit' && request) {
       setFormData({
-        tenantName: request.tenantName || '',
+        buyerName: request.buyerName || '',
         email: request.email || '',
         phone: request.phone || '',
         city: request.city || '',
@@ -384,11 +418,14 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
         propertyType: request.propertyType || 'Apartment',
         furnishing: request.furnishing || 'Semi Furnished',
         bedrooms: request.bedrooms || 1,
-        rentAmount: request.rentAmount || 15000,
-        moveInDate: request.moveInDate?.slice(0, 10) || new Date().toISOString().slice(0, 10),
-        rentalDuration: request.rentalDuration || '12 months',
-        tenantType: request.tenantType || 'Family',
+        minBudget: request.minBudget || 20000,
+        maxBudget: request.maxBudget || 30000,
+        offerAmount: request.offerAmount || 25000,
+        purchaseTimeline: request.purchaseTimeline || 'Within 1 month',
+        paymentMethod: request.paymentMethod || 'Home Loan',
+        buyerType: request.buyerType || 'Family',
         status: request.status || 'pending',
+        isUrgent: request.isUrgent || false,
         notes: request.notes || ''
       });
     } else if (mode === 'add') {
@@ -413,9 +450,10 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
 
   const propertyTypes = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
   const furnishingOptions = ['Fully Furnished', 'Semi Furnished', 'Unfurnished'];
-  const rentalDurations = ['6 months', '12 months', '18 months', '24 months', '36 months'];
-  const tenantTypes = ['Family', 'Bachelor', 'Couple', 'Students', 'Working Professionals'];
-  const statusOptions = ['new', 'pending', 'approved', 'rejected', 'closed'];
+  const purchaseTimelines = ['Within 1 month', 'Within 3 months', 'Within 6 months', 'Within 1 year', 'Flexible'];
+  const paymentMethods = ['Home Loan', 'Cash', 'Down Payment', 'Rental Agreement', 'Lease Agreement'];
+  const buyerTypes = ['Family', 'Bachelor', 'Couple', 'Students', 'Working Professionals', 'Investor'];
+  const statusOptions = ['new', 'pending', 'approved', 'rejected', 'negotiation', 'closed'];
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-[#1A2E2A]/50 backdrop-blur-sm animate-fade-in">
@@ -428,28 +466,28 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
           >
             <FiX className="text-lg" />
           </button>
-          <h2 className="text-2xl font-bold text-white">{mode === 'add' ? 'New Rental Request' : 'Edit Rental Request'}</h2>
-          <p className="text-white/80 text-sm">{mode === 'add' ? 'Create a new rental request' : 'Update rental request details'}</p>
+          <h2 className="text-2xl font-bold text-white">{mode === 'add' ? 'New Purchase Request' : 'Edit Purchase Request'}</h2>
+          <p className="text-white/80 text-sm">{mode === 'add' ? 'Create a new purchase request' : 'Update purchase request details'}</p>
         </div>
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-white">
           <form id="request-form" onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              {/* Tenant Info */}
+              {/* Buyer Info */}
               <div className="col-span-2">
                 <h3 className="text-sm font-semibold text-[#1A2E2A] mb-3 flex items-center gap-2">
                   <FiUser className="text-[#00695C]" />
-                  Tenant Information
+                  Buyer Information
                 </h3>
               </div>
 
               <div>
-                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Tenant Name *</label>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Buyer Name *</label>
                 <input
                   type="text"
-                  name="tenantName"
-                  value={formData.tenantName}
+                  name="buyerName"
+                  value={formData.buyerName}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
                   required
@@ -494,6 +532,20 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div className="col-span-2">
+                <label className="flex items-center gap-2 text-sm text-[#1A2E2A] cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="isUrgent"
+                    checked={formData.isUrgent}
+                    onChange={handleChange}
+                    className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
+                  />
+                  <span>Mark as Urgent</span>
+                  <span className="text-xs text-[#5A7D78]">(High priority request)</span>
+                </label>
               </div>
 
               {/* Location */}
@@ -576,7 +628,6 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
                 </select>
               </div>
 
-              {/* Bedrooms - Text Input instead of dropdown */}
               <div>
                 <label className="text-xs font-medium text-[#5A7D78] block mb-1">Bedrooms *</label>
                 <input
@@ -591,12 +642,20 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
                 />
               </div>
 
+              {/* Budget & Offer */}
+              <div className="col-span-2">
+                <h3 className="text-sm font-semibold text-[#1A2E2A] mb-3 flex items-center gap-2">
+                  <FaMoneyBillWave className="text-[#00695C]" />
+                  Budget & Offer
+                </h3>
+              </div>
+
               <div>
-                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Rent Amount (₹) *</label>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Min Budget (₹) *</label>
                 <input
                   type="number"
-                  name="rentAmount"
-                  value={formData.rentAmount}
+                  name="minBudget"
+                  value={formData.minBudget}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
                   min="0"
@@ -605,50 +664,80 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
                 />
               </div>
 
-              {/* Move-in Date & Duration */}
               <div>
-                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Move-in Date *</label>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Max Budget (₹) *</label>
                 <input
-                  type="date"
-                  name="moveInDate"
-                  value={formData.moveInDate}
+                  type="number"
+                  name="maxBudget"
+                  value={formData.maxBudget}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
+                  min="0"
+                  step="1"
                   required
                 />
               </div>
 
               <div>
-                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Rental Duration *</label>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Offer Amount (₹) *</label>
+                <input
+                  type="number"
+                  name="offerAmount"
+                  value={formData.offerAmount}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
+                  min="0"
+                  step="1"
+                  required
+                />
+              </div>
+
+              {/* Purchase Timeline & Payment */}
+              <div>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Purchase Timeline *</label>
                 <select
-                  name="rentalDuration"
-                  value={formData.rentalDuration}
+                  name="purchaseTimeline"
+                  value={formData.purchaseTimeline}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
                 >
-                  {rentalDurations.map(duration => (
-                    <option key={duration} value={duration}>{duration}</option>
+                  {purchaseTimelines.map(timeline => (
+                    <option key={timeline} value={timeline}>{timeline}</option>
                   ))}
                 </select>
               </div>
 
-              {/* Tenant Type */}
+              <div>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Payment Method *</label>
+                <select
+                  name="paymentMethod"
+                  value={formData.paymentMethod}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
+                >
+                  {paymentMethods.map(method => (
+                    <option key={method} value={method}>{method}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Buyer Type */}
               <div className="col-span-2">
                 <h3 className="text-sm font-semibold text-[#1A2E2A] mb-3 flex items-center gap-2">
                   <FiUsers className="text-[#00695C]" />
-                  Tenant Details
+                  Buyer Details
                 </h3>
               </div>
 
               <div className="col-span-2">
-                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Tenant Type *</label>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Buyer Type *</label>
                 <select
-                  name="tenantType"
-                  value={formData.tenantType}
+                  name="buyerType"
+                  value={formData.buyerType}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
                 >
-                  {tenantTypes.map(type => (
+                  {buyerTypes.map(type => (
                     <option key={type} value={type}>{type}</option>
                   ))}
                 </select>
@@ -698,7 +787,7 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
    MAIN COMPONENT
 ============================================================ */
 
-const RentalRequestManagement = () => {
+const PurchaseRequestManagement = () => {
   const navigate = useNavigate();
   const searchInputRef = useRef(null);
 
@@ -710,7 +799,7 @@ const RentalRequestManagement = () => {
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedPropertyType, setSelectedPropertyType] = useState('all');
   const [selectedFurnishing, setSelectedFurnishing] = useState('all');
-  const [selectedTenantType, setSelectedTenantType] = useState('all');
+  const [selectedBuyerType, setSelectedBuyerType] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState('createdAt');
@@ -751,6 +840,7 @@ const RentalRequestManagement = () => {
     pending: 0,
     approved: 0,
     rejected: 0,
+    negotiation: 0,
     closed: 0
   });
 
@@ -761,6 +851,7 @@ const RentalRequestManagement = () => {
     const pending = list.filter(r => r.status === 'pending').length;
     const approved = list.filter(r => r.status === 'approved').length;
     const rejected = list.filter(r => r.status === 'rejected').length;
+    const negotiation = list.filter(r => r.status === 'negotiation').length;
     const closed = list.filter(r => r.status === 'closed').length;
 
     setStats({
@@ -769,6 +860,7 @@ const RentalRequestManagement = () => {
       pending,
       approved,
       rejected,
+      negotiation,
       closed
     });
   }, []);
@@ -781,9 +873,10 @@ const RentalRequestManagement = () => {
     const states = ['Maharashtra', 'Delhi', 'Karnataka', 'Tamil Nadu', 'Telangana', 'Uttar Pradesh', 'Gujarat', 'Rajasthan'];
     const propertyTypes = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
     const furnishingOptions = ['Fully Furnished', 'Semi Furnished', 'Unfurnished'];
-    const statuses = ['new', 'pending', 'approved', 'rejected', 'closed'];
-    const rentalDurations = ['6 months', '12 months', '18 months', '24 months', '36 months'];
-    const tenantTypes = ['Family', 'Bachelor', 'Couple', 'Students', 'Working Professionals'];
+    const statuses = ['new', 'pending', 'approved', 'rejected', 'negotiation', 'closed'];
+    const purchaseTimelines = ['Within 1 month', 'Within 3 months', 'Within 6 months', 'Within 1 year', 'Flexible'];
+    const paymentMethods = ['Home Loan', 'Cash', 'Down Payment', 'Rental Agreement', 'Lease Agreement'];
+    const buyerTypes = ['Family', 'Bachelor', 'Couple', 'Students', 'Working Professionals', 'Investor'];
     const locations = ['MG Road', 'Banjara Hills', 'Indiranagar', 'Koramangala', 'Whitefield', 'Jubilee Hills', 'Connaught Place', 'Salt Lake', 'Marine Drive', 'Andheri', 'Bandra', 'Powai'];
 
     const requests = [];
@@ -800,17 +893,17 @@ const RentalRequestManagement = () => {
       } while (usedNames.has(fullName) && attempts < 50);
       usedNames.add(fullName);
 
-      const rentAmount = Math.floor(Math.random() * 30000 + 10000);
-      const city = cities[Math.floor(Math.random() * cities.length)];
+      const minBudget = Math.floor(Math.random() * 30000 + 10000);
+      const maxBudget = minBudget + Math.floor(Math.random() * 50000 + 10000);
+      const offerAmount = Math.floor((minBudget + maxBudget) / 2) + Math.floor(Math.random() * 10000 - 5000);
 
-      const moveIn = new Date();
-      moveIn.setDate(moveIn.getDate() + Math.floor(Math.random() * 60));
+      const city = cities[Math.floor(Math.random() * cities.length)];
 
       const status = statuses[Math.floor(Math.random() * statuses.length)];
 
       requests.push({
-        id: `req_${i}`,
-        tenantName: fullName,
+        id: `purchase_${i}`,
+        buyerName: fullName,
         email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${Math.floor(Math.random() * 100)}@email.com`,
         phone: `+91 ${Math.floor(Math.random() * 9000000000 + 1000000000)}`,
         city: city,
@@ -819,11 +912,14 @@ const RentalRequestManagement = () => {
         propertyType: propertyTypes[Math.floor(Math.random() * propertyTypes.length)],
         furnishing: furnishingOptions[Math.floor(Math.random() * furnishingOptions.length)],
         bedrooms: Math.floor(Math.random() * 4) + 1,
-        rentAmount: rentAmount,
-        moveInDate: moveIn.toISOString(),
-        rentalDuration: rentalDurations[Math.floor(Math.random() * rentalDurations.length)],
-        tenantType: tenantTypes[Math.floor(Math.random() * tenantTypes.length)],
+        minBudget: minBudget,
+        maxBudget: maxBudget,
+        offerAmount: offerAmount,
+        purchaseTimeline: purchaseTimelines[Math.floor(Math.random() * purchaseTimelines.length)],
+        paymentMethod: paymentMethods[Math.floor(Math.random() * paymentMethods.length)],
+        buyerType: buyerTypes[Math.floor(Math.random() * buyerTypes.length)],
         status: status,
+        isUrgent: Math.random() > 0.8,
         notes: Math.random() > 0.7 ? 'Additional requirements or preferences' : '',
         createdAt: new Date(Date.now() - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000)).toISOString()
       });
@@ -849,7 +945,7 @@ const RentalRequestManagement = () => {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(req =>
-        req.tenantName.toLowerCase().includes(query) ||
+        req.buyerName.toLowerCase().includes(query) ||
         req.email.toLowerCase().includes(query) ||
         req.phone.includes(query) ||
         req.city.toLowerCase().includes(query) ||
@@ -870,15 +966,15 @@ const RentalRequestManagement = () => {
       filtered = filtered.filter(req => req.furnishing === selectedFurnishing);
     }
 
-    if (selectedTenantType !== 'all') {
-      filtered = filtered.filter(req => req.tenantType === selectedTenantType);
+    if (selectedBuyerType !== 'all') {
+      filtered = filtered.filter(req => req.buyerType === selectedBuyerType);
     }
 
     let count = 0;
     if (selectedStatus !== 'all') count++;
     if (selectedPropertyType !== 'all') count++;
     if (selectedFurnishing !== 'all') count++;
-    if (selectedTenantType !== 'all') count++;
+    if (selectedBuyerType !== 'all') count++;
     if (searchQuery) count++;
     setFilterCount(count);
 
@@ -896,7 +992,7 @@ const RentalRequestManagement = () => {
 
     setFilteredRequests(filtered);
     setCurrentPage(1);
-  }, [requests, searchQuery, selectedStatus, selectedPropertyType, selectedFurnishing, selectedTenantType, sortField, sortDirection]);
+  }, [requests, searchQuery, selectedStatus, selectedPropertyType, selectedFurnishing, selectedBuyerType, sortField, sortDirection]);
 
   useEffect(() => {
     filterRequests();
@@ -968,7 +1064,7 @@ const saveForm = useCallback((data) => {
     if (formMode === 'add') {
       const newRequest = {
         ...data,
-        id: `req_${Date.now()}`,
+        id: `purchase_${Date.now()}`,
         createdAt: new Date().toISOString()
       };
       savedRequest = newRequest;
@@ -985,7 +1081,6 @@ const saveForm = useCallback((data) => {
     
     computeStats(updated);
     
-  
     if (savedRequest && viewingRequest && savedRequest.id === viewingRequest.id) {
       setViewingRequest(savedRequest);
     }
@@ -995,7 +1090,7 @@ const saveForm = useCallback((data) => {
 
   setShowFormModal(false);
   setFormRequest(null);
-  showToast(formMode === 'add' ? 'Rental request created successfully' : 'Rental request updated successfully', 'success');
+  showToast(formMode === 'add' ? 'Purchase request created successfully' : 'Purchase request updated successfully', 'success');
 }, [formMode, formRequest, computeStats, showToast, viewingRequest]);
 
   // ============ STATUS CHANGE ============
@@ -1017,7 +1112,16 @@ const saveForm = useCallback((data) => {
       });
       setActionLoading(null);
       setShowViewModal(false);
-      showToast(`Request ${newStatus === 'approved' ? 'approved' : newStatus === 'rejected' ? 'rejected' : 'marked as ' + newStatus} successfully`, newStatus === 'approved' ? 'success' : newStatus === 'rejected' ? 'error' : 'info');
+      const statusMessages = {
+        approved: 'approved',
+        rejected: 'rejected',
+        negotiation: 'moved to negotiation',
+        closed: 'marked as closed'
+      };
+      showToast(`Request ${statusMessages[newStatus] || newStatus} successfully`, 
+        newStatus === 'approved' ? 'success' : 
+        newStatus === 'rejected' ? 'error' : 'info'
+      );
     }, 700);
   }, [requests, computeStats, showToast]);
 
@@ -1028,8 +1132,8 @@ const saveForm = useCallback((data) => {
 
     setConfirmDialog({
       show: true,
-      title: 'Delete Rental Request',
-      message: `Are you sure you want to delete ${req.tenantName}'s rental request? This action cannot be undone.`,
+      title: 'Delete Purchase Request',
+      message: `Are you sure you want to delete ${req.buyerName}'s purchase request? This action cannot be undone.`,
       deleteId: reqId,
       onConfirm: () => {
         setActionLoading(reqId);
@@ -1044,7 +1148,7 @@ const saveForm = useCallback((data) => {
           setActionLoading(null);
           setShowViewModal(false);
           setConfirmDialog({ show: false, title: '', message: '', onConfirm: null, deleteId: null, loading: false });
-          showToast(`${req.tenantName}'s rental request deleted`, 'error');
+          showToast(`${req.buyerName}'s purchase request deleted`, 'error');
         }, 700);
       },
       loading: false
@@ -1064,9 +1168,10 @@ const saveForm = useCallback((data) => {
     setSelectedStatus('all');
     setSelectedPropertyType('all');
     setSelectedFurnishing('all');
-    setSelectedTenantType('all');
+    setSelectedBuyerType('all');
 
-    if (nextFilter === 'new' || nextFilter === 'pending' || nextFilter === 'approved' || nextFilter === 'rejected' || nextFilter === 'closed') {
+    if (nextFilter === 'new' || nextFilter === 'pending' || nextFilter === 'approved' || 
+        nextFilter === 'rejected' || nextFilter === 'negotiation' || nextFilter === 'closed') {
       setSelectedStatus(nextFilter);
     }
 
@@ -1080,7 +1185,7 @@ const saveForm = useCallback((data) => {
     setSelectedStatus('all');
     setSelectedPropertyType('all');
     setSelectedFurnishing('all');
-    setSelectedTenantType('all');
+    setSelectedBuyerType('all');
     setActiveFilter('all');
     searchInputRef.current?.focus();
     showToast('All filters cleared', 'info');
@@ -1109,7 +1214,7 @@ const saveForm = useCallback((data) => {
 
     const data = filteredRequests.map(req => ({
       'Request ID': req.id,
-      'Tenant Name': req.tenantName,
+      'Buyer Name': req.buyerName,
       Email: req.email,
       Phone: req.phone,
       City: req.city,
@@ -1118,11 +1223,14 @@ const saveForm = useCallback((data) => {
       'Property Type': req.propertyType,
       'Furnishing Preference': req.furnishing,
       Bedrooms: req.bedrooms,
-      'Rent Amount (₹)': req.rentAmount,
-      'Move-in Date': new Date(req.moveInDate).toLocaleDateString(),
-      'Rental Duration': req.rentalDuration,
-      'Tenant Type': req.tenantType,
+      'Min Budget (₹)': req.minBudget,
+      'Max Budget (₹)': req.maxBudget,
+      'Offer Amount (₹)': req.offerAmount,
+      'Purchase Timeline': req.purchaseTimeline,
+      'Payment Method': req.paymentMethod,
+      'Buyer Type': req.buyerType,
       Status: req.status,
+      'Urgent': req.isUrgent ? 'Yes' : 'No',
       'Created At': new Date(req.createdAt).toLocaleDateString(),
       Notes: req.notes || ''
     }));
@@ -1136,7 +1244,7 @@ const saveForm = useCallback((data) => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `rental_requests_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `purchase_requests_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
     showToast(`${filteredRequests.length} records exported successfully`, 'success');
@@ -1149,7 +1257,6 @@ const saveForm = useCallback((data) => {
       return;
     }
 
-    // For delete, show custom confirm
     if (action === 'delete') {
       setConfirmDialog({
         show: true,
@@ -1194,6 +1301,7 @@ const saveForm = useCallback((data) => {
           count++;
           if (action === 'approve') return { ...r, status: 'approved' };
           if (action === 'reject') return { ...r, status: 'rejected' };
+          if (action === 'negotiation') return { ...r, status: 'negotiation' };
           if (action === 'close') return { ...r, status: 'closed' };
           return r;
         });
@@ -1206,6 +1314,7 @@ const saveForm = useCallback((data) => {
 
       if (action === 'approve') showToast(`${count} request(s) approved`, 'success');
       else if (action === 'reject') showToast(`${count} request(s) rejected`, 'error');
+      else if (action === 'negotiation') showToast(`${count} request(s) moved to negotiation`, 'info');
       else if (action === 'close') showToast(`${count} request(s) closed`, 'info');
     }, 800);
   }, [selectedRequests, computeStats, showToast]);
@@ -1217,6 +1326,7 @@ const saveForm = useCallback((data) => {
       pending: 'bg-[#FEF3E2] text-amber-700 border-amber-200',
       approved: 'bg-[#E8F8F5] text-[#00695C] border-[#A8D5CD]',
       rejected: 'bg-red-50 text-red-700 border-red-200',
+      negotiation: 'bg-purple-50 text-purple-700 border-purple-200',
       closed: 'bg-gray-100 text-gray-600 border-gray-200'
     };
     return colors[status] || colors.pending;
@@ -1228,6 +1338,7 @@ const saveForm = useCallback((data) => {
       pending: <FaHourglassHalf className="text-amber-500 text-xs" />,
       approved: <FiCheckCircle className="text-[#00695C] text-xs" />,
       rejected: <FaTimes className="text-red-500 text-xs" />,
+      negotiation: <FiPercent className="text-purple-500 text-xs" />,
       closed: <FaClock className="text-gray-500 text-xs" />
     };
     return icons[status] || icons.pending;
@@ -1280,7 +1391,7 @@ const saveForm = useCallback((data) => {
           <div>
             <div className="flex items-center gap-3 mb-1 flex-wrap">
               <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
-                Rental Request Management
+                Purchase Request Management
               </h1>
               <span className="px-3 py-1 bg-[#E8F4F2] text-[#00695C] text-xs font-semibold rounded-full animate-pulse">
                 {filteredRequests.length} Requests
@@ -1292,7 +1403,7 @@ const saveForm = useCallback((data) => {
               )}
             </div>
             <p className="text-sm text-[#5A7D78] flex items-center gap-2 flex-wrap">
-              <span>Manage all rental requests from tenants</span>
+              <span>Manage all property purchase requests from buyers</span>
               <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
               <span className="text-[#00695C] font-medium">{new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
             </p>
@@ -1332,13 +1443,13 @@ const saveForm = useCallback((data) => {
         </div>
       </div>
 
-      {/* Stats Section - 6 Stats */}
+      {/* Stats Section - 7 Stats */}
       {showStats && (
         <div className="relative animate-slide-in">
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               <StatCard
-                icon={<MdOutlineRequestPage className="text-white text-sm" />}
+                icon={<FiShoppingCart className="text-white text-sm" />}
                 title="Total"
                 value={stats.total}
                 color="bg-gradient-to-br from-[#00695C] to-[#26A69A]"
@@ -1388,11 +1499,21 @@ const saveForm = useCallback((data) => {
                 onClick={() => handleStatClick('rejected')}
               />
               <StatCard
+                icon={<FiPercent className="text-white text-sm" />}
+                title="Negotiation"
+                value={stats.negotiation}
+                color="bg-gradient-to-br from-purple-600 to-purple-400"
+                delay={500}
+                isActive={activeFilter === 'negotiation'}
+                statsAnimating={statsAnimating}
+                onClick={() => handleStatClick('negotiation')}
+              />
+              <StatCard
                 icon={<FaClock className="text-white text-sm" />}
                 title="Closed"
                 value={stats.closed}
                 color="bg-gradient-to-br from-gray-600 to-gray-400"
-                delay={500}
+                delay={600}
                 isActive={activeFilter === 'closed'}
                 statsAnimating={statsAnimating}
                 onClick={() => handleStatClick('closed')}
@@ -1410,7 +1531,7 @@ const saveForm = useCallback((data) => {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search by tenant name, email, phone, city, location, or property type..."
+              placeholder="Search by buyer name, email, phone, city, location, or property type..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none placeholder:text-[#B5C9C5]"
@@ -1433,7 +1554,7 @@ const saveForm = useCallback((data) => {
                   setSelectedStatus(e.target.value);
                   setSelectedPropertyType('all');
                   setSelectedFurnishing('all');
-                  setSelectedTenantType('all');
+                  setSelectedBuyerType('all');
                   setActiveFilter(e.target.value === 'all' ? 'all' : e.target.value);
                 }}
                 className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
@@ -1443,6 +1564,7 @@ const saveForm = useCallback((data) => {
                 <option value="pending">Pending</option>
                 <option value="approved">Approved</option>
                 <option value="rejected">Rejected</option>
+                <option value="negotiation">Negotiation</option>
                 <option value="closed">Closed</option>
               </select>
               <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
@@ -1455,7 +1577,7 @@ const saveForm = useCallback((data) => {
                   setSelectedPropertyType(e.target.value);
                   setSelectedStatus('all');
                   setSelectedFurnishing('all');
-                  setSelectedTenantType('all');
+                  setSelectedBuyerType('all');
                   setActiveFilter(e.target.value === 'all' ? 'all' : e.target.value);
                 }}
                 className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
@@ -1477,7 +1599,7 @@ const saveForm = useCallback((data) => {
                   setSelectedFurnishing(e.target.value);
                   setSelectedStatus('all');
                   setSelectedPropertyType('all');
-                  setSelectedTenantType('all');
+                  setSelectedBuyerType('all');
                   setActiveFilter(e.target.value === 'all' ? 'all' : e.target.value);
                 }}
                 className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
@@ -1492,9 +1614,9 @@ const saveForm = useCallback((data) => {
 
             <div className="relative">
               <select
-                value={selectedTenantType}
+                value={selectedBuyerType}
                 onChange={(e) => {
-                  setSelectedTenantType(e.target.value);
+                  setSelectedBuyerType(e.target.value);
                   setSelectedStatus('all');
                   setSelectedPropertyType('all');
                   setSelectedFurnishing('all');
@@ -1502,12 +1624,13 @@ const saveForm = useCallback((data) => {
                 }}
                 className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
               >
-                <option value="all">All Tenant Types</option>
+                <option value="all">All Buyer Types</option>
                 <option value="Family">Family</option>
                 <option value="Bachelor">Bachelor</option>
                 <option value="Couple">Couple</option>
                 <option value="Students">Students</option>
                 <option value="Working Professionals">Working Professionals</option>
+                <option value="Investor">Investor</option>
               </select>
               <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
             </div>
@@ -1564,6 +1687,14 @@ const saveForm = useCallback((data) => {
                 Reject All
               </button>
               <button
+                onClick={() => handleBulkAction('negotiation')}
+                disabled={actionLoading === 'negotiation'}
+                className="px-4 py-1.5 bg-purple-50 text-purple-700 rounded-xl hover:bg-purple-100 transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 disabled:opacity-50"
+              >
+                {actionLoading === 'negotiation' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiPercent className="text-[10px]" />}
+                Negotiate All
+              </button>
+              <button
                 onClick={() => handleBulkAction('close')}
                 disabled={actionLoading === 'close'}
                 className="px-4 py-1.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 disabled:opacity-50"
@@ -1609,8 +1740,9 @@ const saveForm = useCallback((data) => {
                     req.status === 'pending' ? 'border-l-4 border-l-amber-500' :
                     req.status === 'approved' ? 'border-l-4 border-l-emerald-500' :
                     req.status === 'rejected' ? 'border-l-4 border-l-red-500' :
+                    req.status === 'negotiation' ? 'border-l-4 border-l-purple-500' :
                     req.status === 'closed' ? 'border-l-4 border-l-gray-500' : ''
-                  }`}
+                  } ${req.isUrgent ? 'shadow-[0_0_15px_rgba(239,68,68,0.15)]' : ''}`}
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <div className="flex items-start justify-between mb-2 gap-1">
@@ -1623,16 +1755,24 @@ const saveForm = useCallback((data) => {
                       />
                       <div className="relative shrink-0">
                         <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white font-bold text-sm shadow-lg">
-                          {req.tenantName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                          {req.buyerName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
                         </div>
+                        {req.isUrgent && (
+                          <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+                        )}
                       </div>
                       <div className="min-w-0">
-                        <h3 className="font-semibold text-[#1A2E2A] text-sm truncate">{req.tenantName}</h3>
+                        <h3 className="font-semibold text-[#1A2E2A] text-sm truncate">{req.buyerName}</h3>
                         <div className="flex items-center gap-1 mt-0.5 flex-wrap">
                           <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap flex items-center gap-1 ${getStatusColor(req.status)}`}>
                             {getStatusIcon(req.status)}
                             {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
                           </span>
+                          {req.isUrgent && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-medium bg-red-100 text-red-700 border border-red-200">
+                              🔥 Urgent
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -1648,8 +1788,12 @@ const saveForm = useCallback((data) => {
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
+                      <FaMoneyBillWave className="text-[#00695C] flex-shrink-0" />
+                      <span>₹{req.minBudget.toLocaleString()} - ₹{req.maxBudget.toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiDollarSign className="text-[#00695C] flex-shrink-0" />
-                      <span>₹{req.rentAmount.toLocaleString()}</span>
+                      <span>Offer: ₹{req.offerAmount.toLocaleString()}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiMapPin className="text-[#00695C] flex-shrink-0" />
@@ -1669,15 +1813,11 @@ const saveForm = useCallback((data) => {
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FaCalendarAlt className="text-[#00695C] flex-shrink-0" />
-                      <span>Move-in: {new Date(req.moveInDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FiClock className="text-[#00695C] flex-shrink-0" />
-                      <span>{req.rentalDuration}</span>
+                      <span>{req.purchaseTimeline}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiUser className="text-[#00695C] flex-shrink-0" />
-                      <span>{req.tenantType}</span>
+                      <span>{req.buyerType}</span>
                     </div>
                   </div>
 
@@ -1689,7 +1829,6 @@ const saveForm = useCallback((data) => {
                     >
                       <FiEye className="text-[10px]" /> View
                     </button>
-                    {/* Edit button - visible for ALL statuses */}
                     <button
                       type="button"
                       onClick={() => handleEditRequest(req)}
@@ -1721,18 +1860,19 @@ const saveForm = useCallback((data) => {
                   onChange={handleSelectAll}
                   className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                 />
-                <span>Tenant</span>
+                <span>Buyer</span>
               </div>
-              <div className="col-span-2 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('tenantName')}>
-                Name {sortField === 'tenantName' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+              <div className="col-span-2 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('buyerName')}>
+                Name {sortField === 'buyerName' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
               <div className="col-span-1">Status</div>
-              <div className="col-span-1">Rent</div>
+              <div className="col-span-1">Offer</div>
+              <div className="col-span-1">Budget</div>
               <div className="col-span-1">Property</div>
               <div className="col-span-1">Furnishing</div>
               <div className="col-span-1 text-center">BHK</div>
-              <div className="col-span-1 text-center">Tenant Type</div>
-              <div className="col-span-1 text-center">Move-in</div>
+              <div className="col-span-1 text-center">Buyer Type</div>
+              <div className="col-span-1 text-center">Timeline</div>
               <div className="col-span-1 text-right">Actions</div>
             </div>
 
@@ -1742,7 +1882,7 @@ const saveForm = useCallback((data) => {
               return (
                 <div
                   key={req.id}
-                  className={`grid grid-cols-12 gap-2 items-center py-3 px-4 border-b border-[#E8F0EE] hover:bg-[#F5F9F8] transition-all duration-300 group ${isSelected ? 'bg-[#E8F4F2]' : ''} ${req.status === 'new' ? 'bg-blue-50/30' : req.status === 'pending' ? 'bg-amber-50/30' : ''}`}
+                  className={`grid grid-cols-12 gap-2 items-center py-3 px-4 border-b border-[#E8F0EE] hover:bg-[#F5F9F8] transition-all duration-300 group ${isSelected ? 'bg-[#E8F4F2]' : ''} ${req.status === 'new' ? 'bg-blue-50/30' : req.status === 'pending' ? 'bg-amber-50/30' : req.status === 'negotiation' ? 'bg-purple-50/30' : ''}`}
                   style={{ animationDelay: `${index * 30}ms` }}
                 >
                   <div className="col-span-1 flex items-center gap-2">
@@ -1752,13 +1892,21 @@ const saveForm = useCallback((data) => {
                       onChange={() => handleSelectRequest(req.id)}
                       className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                     />
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white font-bold text-xs shadow-md">
-                      {req.tenantName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                    <div className="relative">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white font-bold text-xs shadow-md">
+                        {req.buyerName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                      </div>
+                      {req.isUrgent && (
+                        <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" />
+                      )}
                     </div>
                   </div>
 
                   <div className="col-span-2">
-                    <p className="font-semibold text-sm text-[#1A2E2A]">{req.tenantName}</p>
+                    <p className="font-semibold text-sm text-[#1A2E2A] flex items-center gap-1">
+                      {req.buyerName}
+                      {req.isUrgent && <span className="text-red-500 text-[10px]">🔥</span>}
+                    </p>
                     <p className="text-[10px] text-[#5A7D78] truncate">{req.email}</p>
                   </div>
 
@@ -1770,7 +1918,11 @@ const saveForm = useCallback((data) => {
                   </div>
 
                   <div className="col-span-1 text-xs text-[#5A7D78]">
-                    ₹{Math.floor(req.rentAmount / 1000)}K
+                    ₹{Math.floor(req.offerAmount / 1000)}K
+                  </div>
+
+                  <div className="col-span-1 text-[10px] text-[#5A7D78]">
+                    ₹{Math.floor(req.minBudget / 1000)}K - ₹{Math.floor(req.maxBudget / 1000)}K
                   </div>
 
                   <div className="col-span-1 text-xs text-[#5A7D78] truncate">{req.propertyType}</div>
@@ -1779,10 +1931,10 @@ const saveForm = useCallback((data) => {
 
                   <div className="col-span-1 text-center text-xs text-[#5A7D78]">{req.bedrooms} BHK</div>
 
-                  <div className="col-span-1 text-center text-xs text-[#5A7D78] truncate">{req.tenantType}</div>
+                  <div className="col-span-1 text-center text-[10px] text-[#5A7D78] truncate">{req.buyerType}</div>
 
                   <div className="col-span-1 text-center text-[10px] text-[#5A7D78]">
-                    {new Date(req.moveInDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
+                    {req.purchaseTimeline}
                   </div>
 
                   <div className="col-span-1 flex items-center justify-end gap-1">
@@ -1794,7 +1946,6 @@ const saveForm = useCallback((data) => {
                     >
                       <FiEye className="text-xs" />
                     </button>
-                    {/* Edit button - visible for ALL statuses */}
                     <button
                       type="button"
                       onClick={() => handleEditRequest(req)}
@@ -1822,9 +1973,9 @@ const saveForm = useCallback((data) => {
         {paginatedRequests.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-[#E8F0EE]">
             <div className="w-24 h-24 rounded-full bg-[#F5F9F8] flex items-center justify-center mb-4 animate-float">
-              <FiFileText className="text-4xl text-[#B5C9C5]" />
+              <FiShoppingCart className="text-4xl text-[#B5C9C5]" />
             </div>
-            <h3 className="text-xl font-semibold text-[#1A2E2A]">No rental requests found</h3>
+            <h3 className="text-xl font-semibold text-[#1A2E2A]">No purchase requests found</h3>
             <p className="text-sm text-[#5A7D78] mt-1">
               {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No requests match your current view'}
             </p>
@@ -1840,7 +1991,7 @@ const saveForm = useCallback((data) => {
                 onClick={handleAddRequest}
                 className="mt-4 px-6 py-2.5 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-sm font-medium shadow-lg shadow-[#00695C]/30 hover:scale-105 flex items-center gap-2"
               >
-                <FiPlus className="text-sm" /> New Rental Request
+                <FiPlus className="text-sm" /> New Purchase Request
               </button>
             )}
           </div>
@@ -1952,4 +2103,4 @@ const saveForm = useCallback((data) => {
   );
 };
 
-export default RentalRequestManagement;
+export default PurchaseRequestManagement;

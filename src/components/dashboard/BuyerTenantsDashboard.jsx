@@ -77,18 +77,18 @@ import SiteVisitActions from './buyer&tenants/SiteVisits/SiteVisitActions';
 import RentalRequestsOverview from './buyer&tenants/RentalRequests/RentalRequestsOverview';
 import RentalRequestManagement from './buyer&tenants/RentalRequests/RentalRequestManagement';
 import RentalRequestDetails from './buyer&tenants/RentalRequests/RentalRequestDetails';
-// import RentalRequestStatus from './buyer&tenants/RentalRequests/RentalRequestStatus';
+import RentalRequestStatus from './buyer&tenants/RentalRequests/RentalRequestStatus';
 
 // Purchase Requests
-// import PurchaseRequestsOverview from './buyer&tenants/PurchaseRequests/PurchaseRequestsOverview';
-// import PurchaseRequestManagement from './buyer&tenants/PurchaseRequests/PurchaseRequestManagement';
-// import PurchaseRequestDetails from './buyer&tenants/PurchaseRequests/PurchaseRequestDetails';
-// import PurchaseRequestStatus from './buyer&tenants/PurchaseRequests/PurchaseRequestStatus';
+import PurchaseRequestsOverview from './buyer&tenants/PurchaseRequests/PurchaseRequestsOverview';
+import PurchaseRequestManagement from './buyer&tenants/PurchaseRequests/PurchaseRequestManagement';
+import PurchaseRequestDetails from './buyer&tenants/PurchaseRequests/PurchaseRequestDetails';
+import PurchaseRequestStatus from './buyer&tenants/PurchaseRequests/PurchaseRequestStatus';
 
 // Lead Management
-// import LeadManagementOverview from './buyer&tenants/LeadManagement/LeadManagementOverview';
-// import LeadDashboard from './buyer&tenants/LeadManagement/LeadDashboard';
-// import LeadSources from './buyer&tenants/LeadManagement/LeadSources';
+import LeadManagementOverview from './buyer&tenants/LeadManagement/LeadManagementOverview';
+import LeadDashboard from './buyer&tenants/LeadManagement/LeadDashboard';
+import LeadSources from './buyer&tenants/LeadManagement/LeadSources';
 // import LeadInformation from './buyer&tenants/LeadManagement/LeadInformation';
 // import LeadStatus from './buyer&tenants/LeadManagement/LeadStatus';
 // import LeadActions from './buyer&tenants/LeadManagement/LeadActions';
@@ -526,21 +526,21 @@ const BuyerTenantsDashboard = () => {
               <Route path="rental/overview" element={<RentalRequestsOverview />} />
               <Route path="rental/management" element={<RentalRequestManagement />} />
               <Route path="rental/details" element={<RentalRequestDetails />} />
-              {/* <Route path="rental/status" element={<RentalRequestStatus />} /> */}
+              <Route path="rental/status" element={<RentalRequestStatus />} />
 
               {/* Purchase Requests */}
-              {/* <Route path="purchase/overview" element={<PurchaseRequestsOverview />} />
+              <Route path="purchase/overview" element={<PurchaseRequestsOverview />} />
               <Route path="purchase/management" element={<PurchaseRequestManagement />} />
               <Route path="purchase/details" element={<PurchaseRequestDetails />} />
-              <Route path="purchase/status" element={<PurchaseRequestStatus />} /> */}
+              <Route path="purchase/status" element={<PurchaseRequestStatus />} />
 
               {/* Lead Management */}
-              {/* <Route path="lead/overview" element={<LeadManagementOverview />} />
+              <Route path="lead/overview" element={<LeadManagementOverview />} />
               <Route path="lead/dashboard" element={<LeadDashboard />} />
               <Route path="lead/sources" element={<LeadSources />} />
-              <Route path="lead/information" element={<LeadInformation />} />
-              <Route path="lead/status" element={<LeadStatus />} />
-              <Route path="lead/actions" element={<LeadActions />} /> */}
+              {/* <Route path="lead/information" element={<LeadInformation />} /> */}
+              {/* <Route path="lead/status" element={<LeadStatus />} /> */}
+              {/* <Route path="lead/actions" element={<LeadActions />} /> */}
             </Routes>
           </div>
         </div>

@@ -1,24 +1,68 @@
-// src/components/dashboard/admin/buyer&tenants/RentalRequests/RentalRequestManagement.jsx
+// src/components/dashboard/admin/buyer&tenants/PurchaseRequests/PurchaseRequestStatus.jsx
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  FiUsers, FiDollarSign, FiMapPin, FiHome, FiCalendar,
-  FiClock, FiUser, FiCheckCircle, FiXCircle,
+  FiUsers, FiDollarSign, FiMapPin, FiHome, FiGrid, FiCalendar,
+  FiClock, FiUser, FiUsers as FiFamily, FiCheckCircle, FiXCircle,
   FiSearch, FiFilter, FiChevronDown, FiChevronLeft, FiChevronRight,
   FiEye, FiEdit, FiTrash2, FiRefreshCw, FiPlus, FiDownload,
   FiAlertTriangle, FiInfo, FiX, FiList, FiGrid as FiGridIcon,
   FiActivity, FiStar, FiShield, FiBriefcase, FiMail, FiPhone,
-  FiExternalLink, FiLock, FiUnlock, FiMoreVertical, FiTag, FiFileText
+  FiExternalLink, FiLock, FiUnlock, FiMoreVertical, FiTag,
+  FiFileText, FiUserCheck, FiArrowRight, FiArrowUp, FiArrowDown,
+  FiCheck, FiClock as FiClockIcon, FiEye as FiEyeIcon,
+  FiHome as FiHomeIcon, FiFile, FiUsers as FiUsersIcon,
+  FiCheckCircle as FiCheckCircleIcon, FiXCircle as FiXCircleIcon,
+  FiBook, FiHome as FiHomeSolid, FiFlag, FiTrendingUp, FiAward
 } from 'react-icons/fi';
 import {
   FaHome, FaBed, FaCalendarAlt, FaUsers, FaCar, FaPaw,
   FaCheck, FaTimes, FaStar as FaStarSolid, FaUserTie,
-  FaBuilding, FaUserCircle, FaFileInvoice, FaHandshake,
-  FaClock, FaRegClock, FaHourglassHalf
+  FaBuilding, FaUserCircle, FaMoneyBillWave, FaShieldAlt,
+  FaBriefcase as FaBriefcaseSolid, FaComments, FaArrowRight as FaArrowRightSolid,
+  FaClipboardList, FaEye, FaCheckDouble, FaTimesCircle,
+  FaFileSignature, FaHandshake, FaHome as FaHomeSolidIcon
 } from 'react-icons/fa';
-import { MdOutlineVerified, MdOutlineFamilyRestroom, MdOutlineRequestPage } from 'react-icons/md';
+import { MdOutlineVerified, MdOutlineFamilyRestroom, MdOutlineSecurity, MdOutlineTimeline } from 'react-icons/md';
 import { HiOutlineUserGroup } from 'react-icons/hi2';
+
+/* ============================================================
+   STATUS CONFIG (shared across component)
+============================================================ */
+
+const ALL_STATUSES = ['New', 'Contacted', 'Interested', 'Site Visit', 'Offer Submitted', 'Negotiation', 'Offer Accepted', 'Agreement', 'Sale Completed', 'Closed Lost'];
+
+const STATUS_COLORS = {
+  'New': 'bg-blue-50 text-blue-700 border-blue-200',
+  'Contacted': 'bg-indigo-50 text-indigo-700 border-indigo-200',
+  'Interested': 'bg-violet-50 text-violet-700 border-violet-200',
+  'Site Visit': 'bg-pink-50 text-pink-700 border-pink-200',
+  'Offer Submitted': 'bg-amber-50 text-amber-700 border-amber-200',
+  'Negotiation': 'bg-orange-50 text-orange-700 border-orange-200',
+  'Offer Accepted': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  'Agreement': 'bg-teal-50 text-teal-700 border-teal-200',
+  'Sale Completed': 'bg-[#E8F4F2] text-[#00695C] border-[#A8D5CD]',
+  'Closed Lost': 'bg-red-50 text-red-700 border-red-200'
+};
+
+const STATUS_ICON_MAP = {
+  'New': FiUser,
+  'Contacted': FiPhone,
+  'Interested': FiStar,
+  'Site Visit': FiEyeIcon,
+  'Offer Submitted': FiFile,
+  'Negotiation': FaHandshake,
+  'Offer Accepted': FiCheckCircleIcon,
+  'Agreement': FiBook,
+  'Sale Completed': FiAward,
+  'Closed Lost': FiXCircleIcon
+};
+
+const getStatusIconEl = (status, sizeClass = 'text-xs') => {
+  const Icon = STATUS_ICON_MAP[status] || FiUser;
+  return <Icon className={sizeClass} />;
+};
 
 /* ============================================================
    STANDALONE COMPONENTS
@@ -70,40 +114,246 @@ const StatCard = ({ icon, title, value, color, delay = 0, isActive, statsAnimati
   );
 };
 
-/* ============================================================
-   CUSTOM CONFIRM DIALOG
-============================================================ */
+// Status Timeline Component
+const StatusTimeline = ({ statuses, currentStatus, onStatusClick }) => {
+  const statusColors = {
+    'New': 'bg-blue-500',
+    'Contacted': 'bg-indigo-500',
+    'Interested': 'bg-violet-500',
+    'Site Visit': 'bg-pink-500',
+    'Offer Submitted': 'bg-amber-500',
+    'Negotiation': 'bg-orange-500',
+    'Offer Accepted': 'bg-emerald-500',
+    'Agreement': 'bg-teal-500',
+    'Sale Completed': 'bg-[#00695C]',
+    'Closed Lost': 'bg-red-500'
+  };
 
-const ConfirmDialog = ({ show, title, message, onConfirm, onCancel, loading }) => {
-  if (!show) return null;
+  const currentIndex = statuses.findIndex(s => s === currentStatus);
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl animate-slide-up border border-[#E8F0EE]">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
-            <FiAlertTriangle className="text-red-500 text-2xl" />
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-[#1A2E2A]">{title}</h3>
-            <p className="text-sm text-[#5A7D78]">{message}</p>
+    <div className="relative py-6 px-4">
+      {/* Timeline Line */}
+      <div className="absolute left-8 top-8 bottom-8 w-0.5 bg-[#E8F0EE]">
+        <div 
+          className="absolute top-0 left-0 right-0 bg-gradient-to-b from-[#00695C] to-[#26A69A] transition-all duration-1000"
+          style={{ height: `${Math.max(0, (currentIndex / (statuses.length - 1)) * 100)}%` }}
+        />
+      </div>
+
+      {/* Status Items */}
+      <div className="space-y-6 relative">
+        {statuses.map((status, index) => {
+          const isCompleted = index <= currentIndex;
+          const isCurrent = index === currentIndex;
+          const isLost = status === 'Closed Lost';
+
+          return (
+            <div 
+              key={status}
+              className="flex items-start gap-4 group cursor-pointer"
+              onClick={() => onStatusClick(status)}
+            >
+              {/* Status Circle */}
+              <div className="relative z-10">
+                <div className={`
+                  w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500
+                  ${isCompleted && !isLost ? 'bg-gradient-to-br from-[#00695C] to-[#26A69A] text-white shadow-lg shadow-[#00695C]/30' : ''}
+                  ${isLost ? 'bg-red-500 text-white shadow-lg shadow-red-500/30' : ''}
+                  ${!isCompleted && !isLost ? 'bg-[#F5F9F8] text-[#B5C9C5] border-2 border-[#E8F0EE]' : ''}
+                  ${isCurrent && !isLost ? 'ring-4 ring-[#00695C]/20 scale-110' : ''}
+                  ${isCurrent && isLost ? 'ring-4 ring-red-500/20 scale-110' : ''}
+                  group-hover:scale-110 transition-transform duration-300
+                `}>
+                  {getStatusIconEl(status, 'text-sm')}
+                </div>
+                {isCurrent && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow-md">
+                    <div className="w-2 h-2 bg-[#00695C] rounded-full animate-pulse" />
+                  </div>
+                )}
+              </div>
+
+              {/* Status Content */}
+              <div className="flex-1 pt-1">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div>
+                    <h4 className={`
+                      font-semibold text-sm transition-colors duration-300
+                      ${isCompleted && !isLost ? 'text-[#1A2E2A]' : ''}
+                      ${isLost ? 'text-red-600' : ''}
+                      ${!isCompleted && !isLost ? 'text-[#B5C9C5]' : ''}
+                      group-hover:text-[#00695C]
+                    `}>
+                      {status}
+                    </h4>
+                    {isCurrent && (
+                      <span className="text-[10px] text-[#00695C] font-medium bg-[#E8F4F2] px-2 py-0.5 rounded-full">
+                        Current Status
+                      </span>
+                    )}
+                    {isLost && (
+                      <span className="text-[10px] text-red-600 font-medium bg-red-50 px-2 py-0.5 rounded-full">
+                        Closed Lost
+                      </span>
+                    )}
+                  </div>
+                  {isCompleted && !isLost && !isCurrent && (
+                    <span className="text-[#00695C]">
+                      <FiCheckCircle className="text-sm" />
+                    </span>
+                  )}
+                </div>
+                {isCompleted && !isLost && (
+                  <p className="text-[10px] text-[#5A7D78] mt-0.5">
+                    {isCurrent ? 'In progress...' : 'Completed'}
+                  </p>
+                )}
+                {!isCompleted && !isLost && (
+                  <p className="text-[10px] text-[#B5C9C5] mt-0.5">
+                    Pending
+                  </p>
+                )}
+              </div>
+
+              {/* Arrow connector for non-current items */}
+              {index < statuses.length - 1 && (
+                <div className="hidden sm:block">
+                  <FiArrowRight className="text-[#B5C9C5] text-xs" />
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+/* ============================================================
+   STATUS CHANGE CONFIRMATION MODAL
+============================================================ */
+
+const StatusChangeConfirmModal = ({ 
+  show, 
+  onClose, 
+  onConfirm, 
+  request, 
+  currentStatus, 
+  newStatus,
+  loading 
+}) => {
+  if (!show || !request) return null;
+
+  const isLost = newStatus === 'Closed Lost';
+  const isWon = newStatus === 'Offer Accepted' || newStatus === 'Sale Completed';
+
+  return (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-[#1A2E2A]/50 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl animate-slide-up border border-[#E8F0EE] overflow-hidden">
+        {/* Header */}
+        <div className={`p-6 ${isLost ? 'bg-gradient-to-r from-red-600 to-red-400' : isWon ? 'bg-gradient-to-r from-emerald-600 to-emerald-400' : 'bg-gradient-to-r from-[#00695C] to-[#26A69A]'}`}>
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center text-white">
+              {isLost ? <FiAlertTriangle className="text-2xl" /> : isWon ? <FiCheckCircle className="text-2xl" /> : <FiInfo className="text-2xl" />}
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white">Change Status</h3>
+              <p className="text-white/80 text-sm">Confirm status update</p>
+            </div>
           </div>
         </div>
-        <div className="flex gap-3">
+
+        {/* Content */}
+        <div className="p-6 space-y-4">
+          <div className="bg-[#F5F9F8] rounded-2xl p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-[#5A7D78] uppercase tracking-wider">Buyer</p>
+                <p className="font-semibold text-[#1A2E2A]">{request.buyerName}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-[#5A7D78] uppercase tracking-wider">Property</p>
+                <p className="font-semibold text-[#1A2E2A] text-sm">{request.propertyName}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-center gap-4 py-2">
+            {/* Current Status */}
+            <div className="text-center">
+              <div className="text-xs text-[#5A7D78] uppercase tracking-wider mb-1">Current</div>
+              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold ${STATUS_COLORS[currentStatus] || STATUS_COLORS['New']}`}>
+                {getStatusIconEl(currentStatus, 'text-xl')}
+                {currentStatus}
+              </div>
+            </div>
+
+            {/* Arrow */}
+            <div className="text-[#B5C9C5]">
+              <FiArrowRight className="text-2xl" />
+            </div>
+
+            {/* New Status */}
+            <div className="text-center">
+              <div className="text-xs text-[#5A7D78] uppercase tracking-wider mb-1">New</div>
+              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold ${STATUS_COLORS[newStatus] || STATUS_COLORS['New']}`}>
+                {getStatusIconEl(newStatus, 'text-xl')}
+                {newStatus}
+              </div>
+            </div>
+          </div>
+
+          {isLost && (
+            <div className="bg-red-50 rounded-xl p-3 flex items-start gap-2 border border-red-200">
+              <FiAlertTriangle className="text-red-500 text-sm mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-red-700">This will mark the purchase request as Closed Lost. This action can be reversed later.</p>
+            </div>
+          )}
+
+          {isWon && (
+            <div className="bg-emerald-50 rounded-xl p-3 flex items-start gap-2 border border-emerald-200">
+              <FiCheckCircle className="text-emerald-500 text-sm mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-emerald-700">This will mark the request as {newStatus}. The buyer will be notified.</p>
+            </div>
+          )}
+
+          <p className="text-sm text-[#5A7D78] text-center">
+            Are you sure you want to change the status from <span className="font-semibold text-[#1A2E2A]">{currentStatus}</span> to <span className="font-semibold text-[#1A2E2A]">{newStatus}</span>?
+          </p>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 bg-[#F5F9F8] border-t border-[#E8F0EE] flex items-center gap-3">
           <button
-            onClick={onCancel}
+            onClick={onClose}
             disabled={loading}
-            className="flex-1 px-4 py-2.5 bg-[#F5F9F8] text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium disabled:opacity-50"
+            className="flex-1 px-4 py-2.5 bg-white text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium border border-[#E8F0EE] disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={loading}
-            className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-300 text-sm font-medium shadow-lg shadow-red-600/30 hover:scale-[1.02] disabled:opacity-50 flex items-center justify-center gap-2"
+            className={`flex-1 px-4 py-2.5 text-white rounded-xl transition-all duration-300 text-sm font-medium shadow-lg hover:scale-[1.02] disabled:opacity-50 flex items-center justify-center gap-2 ${
+              isLost 
+                ? 'bg-red-600 hover:bg-red-700 shadow-red-600/30' 
+                : isWon 
+                  ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/30' 
+                  : 'bg-[#00695C] hover:bg-[#004D40] shadow-[#00695C]/30'
+            }`}
           >
-            {loading ? <FiRefreshCw className="text-sm animate-spin" /> : <FiTrash2 className="text-sm" />}
-            Delete
+            {loading ? (
+              <>
+                <FiRefreshCw className="animate-spin text-sm" />
+                Updating...
+              </>
+            ) : (
+              <>
+                <FiCheck className="text-sm" />
+                Confirm
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -112,33 +362,99 @@ const ConfirmDialog = ({ show, title, message, onConfirm, onCancel, loading }) =
 };
 
 /* ============================================================
-   VIEW REQUEST MODAL
+   DELETE CONFIRMATION MODAL
 ============================================================ */
 
-const ViewRequestModal = ({ request, show, onClose, onEdit, onDelete, onStatusChange }) => {
+const DeleteConfirmModal = ({ 
+  show, 
+  onClose, 
+  onConfirm, 
+  request,
+  loading 
+}) => {
+  if (!show || !request) return null;
+
+  return (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-[#1A2E2A]/50 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl animate-slide-up border border-[#E8F0EE] overflow-hidden">
+        {/* Header */}
+        <div className="p-6 bg-gradient-to-r from-red-600 to-red-400">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center text-white">
+              <FiAlertTriangle className="text-2xl" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white">Delete Request</h3>
+              <p className="text-white/80 text-sm">Confirm deletion</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 space-y-4">
+          <div className="bg-[#F5F9F8] rounded-2xl p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-[#5A7D78] uppercase tracking-wider">Buyer</p>
+                <p className="font-semibold text-[#1A2E2A]">{request.buyerName}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-[#5A7D78] uppercase tracking-wider">Property</p>
+                <p className="font-semibold text-[#1A2E2A] text-sm">{request.propertyName}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-red-50 rounded-xl p-3 flex items-start gap-2 border border-red-200">
+            <FiAlertTriangle className="text-red-500 text-sm mt-0.5 flex-shrink-0" />
+            <p className="text-xs text-red-700">
+              This action <span className="font-semibold">cannot be undone</span>. All data related to this purchase request will be permanently deleted.
+            </p>
+          </div>
+
+          <p className="text-sm text-[#5A7D78] text-center">
+            Are you sure you want to delete <span className="font-semibold text-[#1A2E2A]">{request.buyerName}</span>'s purchase request?
+          </p>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 bg-[#F5F9F8] border-t border-[#E8F0EE] flex items-center gap-3">
+          <button
+            onClick={onClose}
+            disabled={loading}
+            className="flex-1 px-4 py-2.5 bg-white text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium border border-[#E8F0EE] disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={loading}
+            className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-300 text-sm font-medium shadow-lg shadow-red-600/30 hover:scale-[1.02] disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {loading ? (
+              <>
+                <FiRefreshCw className="animate-spin text-sm" />
+                Deleting...
+              </>
+            ) : (
+              <>
+                <FiTrash2 className="text-sm" />
+                Delete
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ============================================================
+   VIEW PURCHASE REQUEST STATUS MODAL
+============================================================ */
+
+const ViewPurchaseStatusModal = ({ request, show, onClose, onEdit, onDelete, onStatusChange }) => {
   if (!request || !show) return null;
-
-  const statusColors = {
-    new: 'bg-blue-50 text-blue-700 border-blue-200',
-    pending: 'bg-[#FEF3E2] text-amber-700 border-amber-200',
-    approved: 'bg-[#E8F8F5] text-[#00695C] border-[#A8D5CD]',
-    rejected: 'bg-red-50 text-red-700 border-red-200',
-    closed: 'bg-gray-100 text-gray-600 border-gray-200'
-  };
-
-  const propertyTypeColors = {
-    Individual: 'bg-blue-50 text-blue-700',
-    Apartment: 'bg-purple-50 text-purple-700',
-    Commercial: 'bg-orange-50 text-orange-700',
-    'Land & Plots': 'bg-green-50 text-green-700',
-    Hostel: 'bg-pink-50 text-pink-700'
-  };
-
-  const furnishingColors = {
-    'Fully Furnished': 'bg-emerald-50 text-emerald-700',
-    'Semi Furnished': 'bg-amber-50 text-amber-700',
-    'Unfurnished': 'bg-gray-50 text-gray-700'
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
@@ -151,141 +467,65 @@ const ViewRequestModal = ({ request, show, onClose, onEdit, onDelete, onStatusCh
           >
             <FiX className="text-lg" />
           </button>
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-              <FaFileInvoice className="text-white text-xl" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-white">Rental Request</h2>
-              <p className="text-white/80 text-sm">Request #{request.id?.slice(-6) || 'N/A'} · {request.tenantName}</p>
-            </div>
-          </div>
+          <h2 className="text-2xl font-bold text-white">Request Status</h2>
+          <p className="text-white/80 text-sm">{request.buyerName} · {request.propertyName}</p>
         </div>
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-white">
           <div className="space-y-6">
-            {/* Status Badge */}
+            {/* Current Status Badge */}
             <div className="flex items-center gap-3 flex-wrap">
-              <span className={`px-4 py-1.5 rounded-full text-xs font-semibold ${statusColors[request.status] || statusColors.pending}`}>
-                {request.status?.charAt(0).toUpperCase() + request.status?.slice(1) || 'Pending'}
+              <span className={`px-4 py-1.5 rounded-full text-xs font-semibold border ${STATUS_COLORS[request.status] || STATUS_COLORS['New']}`}>
+                {request.status}
               </span>
-              <span className={`px-4 py-1.5 rounded-full text-xs font-semibold ${propertyTypeColors[request.propertyType]}`}>
-                {request.propertyType}
-              </span>
-              <span className={`px-4 py-1.5 rounded-full text-xs font-semibold ${furnishingColors[request.furnishing]}`}>
-                {request.furnishing}
-              </span>
+              <span className="text-xs text-[#5A7D78]">Last updated: {new Date(request.updatedAt || request.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
             </div>
 
-            {/* Tenant Info */}
+            {/* Buyer & Property Info */}
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
-              <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <FiUser className="text-[#00695C]" />
-                Tenant Information
-              </h3>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-[#5A7D78]">Name</p>
-                  <p className="text-sm font-medium text-[#1A2E2A]">{request.tenantName}</p>
+                  <p className="text-[10px] text-[#5A7D78] uppercase tracking-wider">Buyer</p>
+                  <p className="font-semibold text-[#1A2E2A]">{request.buyerName}</p>
+                  <p className="text-xs text-[#5A7D78]">{request.buyerEmail}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-[#5A7D78]">Email</p>
-                  <p className="text-sm font-medium text-[#1A2E2A]">{request.email}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-[#5A7D78]">Phone</p>
-                  <p className="text-sm font-medium text-[#1A2E2A]">{request.phone}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-[#5A7D78]">Requested On</p>
-                  <p className="text-sm font-medium text-[#1A2E2A]">
-                    {new Date(request.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                  </p>
+                  <p className="text-[10px] text-[#5A7D78] uppercase tracking-wider">Property</p>
+                  <p className="font-semibold text-[#1A2E2A]">{request.propertyName}</p>
+                  <p className="text-xs text-[#5A7D78]">{request.location}</p>
                 </div>
               </div>
             </div>
 
-            {/* Property Details */}
-            <div className="bg-[#F5F9F8] rounded-2xl p-4">
-              <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <FaHome className="text-[#00695C]" />
-                Property Details
-              </h3>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <p className="text-xs text-[#5A7D78]">Property Type</p>
-                  <p className="text-sm font-medium text-[#1A2E2A]">{request.propertyType}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-[#5A7D78]">Furnishing</p>
-                  <p className="text-sm font-medium text-[#1A2E2A]">{request.furnishing}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-[#5A7D78]">Bedrooms</p>
-                  <p className="text-sm font-medium text-[#1A2E2A]">{request.bedrooms} BHK</p>
-                </div>
-                <div>
-                  <p className="text-xs text-[#5A7D78]">Rent Amount</p>
-                  <p className="text-sm font-medium text-[#1A2E2A]">₹{request.rentAmount?.toLocaleString()}</p>
-                </div>
+            {/* Status Timeline */}
+            <div className="bg-white rounded-2xl border border-[#E8F0EE] overflow-hidden">
+              <div className="px-4 py-3 bg-[#F5F9F8] border-b border-[#E8F0EE] flex items-center gap-2">
+                <MdOutlineTimeline className="text-[#00695C] text-lg" />
+                <h3 className="text-xs font-semibold text-[#1A2E2A] uppercase tracking-wider">Status Timeline</h3>
               </div>
+              <StatusTimeline 
+                statuses={ALL_STATUSES} 
+                currentStatus={request.status} 
+                onStatusClick={(status) => onStatusChange(request.id, status)}
+              />
             </div>
 
-            {/* Location */}
-            <div className="bg-[#F5F9F8] rounded-2xl p-4">
-              <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <FiMapPin className="text-[#00695C]" />
-                Location
-              </h3>
-              <p className="text-sm font-medium text-[#1A2E2A]">{request.location}</p>
-              <p className="text-xs text-[#5A7D78]">{request.city}, {request.state}</p>
-            </div>
-
-            {/* Additional Details */}
-            <div className="grid grid-cols-2 gap-4">
+            {/* Status History */}
+            {request.statusHistory && request.statusHistory.length > 0 && (
               <div className="bg-[#F5F9F8] rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <FaCalendarAlt className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Move-in Date</h4>
+                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <FiClock className="text-[#00695C]" />
+                  Status History
+                </h4>
+                <div className="space-y-2">
+                  {request.statusHistory.map((history, index) => (
+                    <div key={index} className="flex items-center justify-between text-sm border-b border-[#E8F0EE] pb-2 last:border-0 last:pb-0">
+                      <span className="font-medium text-[#1A2E2A]">{history.status}</span>
+                      <span className="text-[#5A7D78] text-xs">{new Date(history.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                  ))}
                 </div>
-                <p className="text-sm font-medium text-[#1A2E2A]">
-                  {new Date(request.moveInDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                </p>
-              </div>
-
-              <div className="bg-[#F5F9F8] rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <FaClock className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Rental Duration</h4>
-                </div>
-                <p className="text-sm font-medium text-[#1A2E2A]">{request.rentalDuration}</p>
-              </div>
-
-              <div className="bg-[#F5F9F8] rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <FiUsers className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Tenant Type</h4>
-                </div>
-                <p className="text-sm font-medium text-[#1A2E2A]">{request.tenantType}</p>
-              </div>
-
-              <div className="bg-[#F5F9F8] rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <FiClock className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Status</h4>
-                </div>
-                <p className={`text-sm font-medium ${request.status === 'approved' ? 'text-[#00695C]' : request.status === 'rejected' ? 'text-red-600' : request.status === 'pending' ? 'text-amber-600' : 'text-[#5A7D78]'}`}>
-                  {request.status?.charAt(0).toUpperCase() + request.status?.slice(1) || 'Pending'}
-                </p>
-              </div>
-            </div>
-
-            {/* Notes */}
-            {request.notes && (
-              <div className="bg-[#F5F9F8] rounded-2xl p-4">
-                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-2">Additional Notes</h4>
-                <p className="text-sm text-[#1A2E2A] leading-relaxed">{request.notes}</p>
               </div>
             )}
           </div>
@@ -293,52 +533,24 @@ const ViewRequestModal = ({ request, show, onClose, onEdit, onDelete, onStatusCh
 
         {/* Footer */}
         <div className="sticky bottom-0 px-6 py-4 bg-white border-t border-[#E8F0EE] rounded-b-3xl shrink-0 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-3">
             <button
               onClick={onClose}
               className="flex-1 px-4 py-2.5 bg-[#F5F9F8] text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium"
             >
               Close
             </button>
-            
-            {/* Status Action Buttons */}
-            {request.status === 'pending' || request.status === 'new' ? (
-              <>
-                <button
-                  onClick={() => onStatusChange(request.id, 'approved')}
-                  className="flex-1 px-4 py-2.5 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-sm font-medium shadow-lg shadow-[#00695C]/30 hover:scale-[1.02] flex items-center justify-center gap-2"
-                >
-                  <FiCheckCircle className="text-sm" /> Approve
-                </button>
-                <button
-                  onClick={() => onStatusChange(request.id, 'rejected')}
-                  className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-300 text-sm font-medium shadow-lg shadow-red-600/30 hover:scale-[1.02] flex items-center justify-center gap-2"
-                >
-                  <FiXCircle className="text-sm" /> Reject
-                </button>
-              </>
-            ) : request.status === 'approved' ? (
-              <button
-                onClick={() => onStatusChange(request.id, 'closed')}
-                className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-300 text-sm font-medium shadow-lg shadow-blue-600/30 hover:scale-[1.02] flex items-center justify-center gap-2"
-              >
-                <FiCheckCircle className="text-sm" /> Mark as Closed
-              </button>
-            ) : null}
-
-            {/* Edit button - visible for ALL statuses */}
             <button
               onClick={() => onEdit(request)}
-              className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-300 text-sm font-medium shadow-lg shadow-blue-600/30 hover:scale-[1.02] flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-300 text-sm font-medium shadow-lg shadow-blue-600/30 hover:scale-[1.02]"
             >
-              <FiEdit className="text-sm" /> Edit
+              <FiEdit className="inline mr-2" /> Edit
             </button>
-            
             <button
-              onClick={() => onDelete(request.id)}
-              className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-300 text-sm font-medium shadow-lg shadow-red-600/30 hover:scale-[1.02] flex items-center justify-center gap-2"
+              onClick={() => onDelete(request)}
+              className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-300 text-sm font-medium shadow-lg shadow-red-600/30 hover:scale-[1.02]"
             >
-              <FiTrash2 className="text-sm" /> Delete
+              <FiTrash2 className="inline mr-2" /> Delete
             </button>
           </div>
         </div>
@@ -348,26 +560,30 @@ const ViewRequestModal = ({ request, show, onClose, onEdit, onDelete, onStatusCh
 };
 
 /* ============================================================
-   ADD / EDIT REQUEST MODAL
+   ADD / EDIT PURCHASE REQUEST STATUS MODAL
 ============================================================ */
 
-const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
+const AddEditPurchaseStatusModal = ({ request, show, mode, onClose, onSave }) => {
   const emptyForm = {
-    tenantName: '',
-    email: '',
-    phone: '',
-    city: '',
-    state: '',
+    buyerName: '',
+    buyerEmail: '',
+    buyerPhone: '',
+    propertyName: '',
     location: '',
     propertyType: 'Apartment',
+    bedrooms: '2',
+    askingPrice: 5000000,
+    offerAmount: 4800000,
+    bookingAmount: 200000,
+    preferredPossessionDate: new Date().toISOString().slice(0, 10),
+    paymentMode: 'Home Loan',
     furnishing: 'Semi Furnished',
-    bedrooms: 1,
-    rentAmount: 15000,
-    moveInDate: new Date().toISOString().slice(0, 10),
-    rentalDuration: '12 months',
-    tenantType: 'Family',
-    status: 'pending',
-    notes: ''
+    familySize: 3,
+    employmentType: '',
+    companyName: '',
+    monthlyIncome: 80000,
+    status: 'New',
+    remarks: ''
   };
 
   const [formData, setFormData] = useState(emptyForm);
@@ -375,21 +591,25 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
   useEffect(() => {
     if (mode === 'edit' && request) {
       setFormData({
-        tenantName: request.tenantName || '',
-        email: request.email || '',
-        phone: request.phone || '',
-        city: request.city || '',
-        state: request.state || '',
+        buyerName: request.buyerName || '',
+        buyerEmail: request.buyerEmail || '',
+        buyerPhone: request.buyerPhone || '',
+        propertyName: request.propertyName || '',
         location: request.location || '',
         propertyType: request.propertyType || 'Apartment',
+        bedrooms: request.bedrooms?.toString() || '2',
+        askingPrice: request.askingPrice || 5000000,
+        offerAmount: request.offerAmount || 4800000,
+        bookingAmount: request.bookingAmount || 200000,
+        preferredPossessionDate: request.preferredPossessionDate?.slice(0, 10) || new Date().toISOString().slice(0, 10),
+        paymentMode: request.paymentMode || 'Home Loan',
         furnishing: request.furnishing || 'Semi Furnished',
-        bedrooms: request.bedrooms || 1,
-        rentAmount: request.rentAmount || 15000,
-        moveInDate: request.moveInDate?.slice(0, 10) || new Date().toISOString().slice(0, 10),
-        rentalDuration: request.rentalDuration || '12 months',
-        tenantType: request.tenantType || 'Family',
-        status: request.status || 'pending',
-        notes: request.notes || ''
+        familySize: request.familySize || 3,
+        employmentType: request.employmentType || '',
+        companyName: request.companyName || '',
+        monthlyIncome: request.monthlyIncome || 80000,
+        status: request.status || 'New',
+        remarks: request.remarks || ''
       });
     } else if (mode === 'add') {
       setFormData(emptyForm);
@@ -411,11 +631,10 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
     onSave(formData);
   };
 
-  const propertyTypes = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
+  const propertyTypes = ['Individual House', 'Apartment', 'Villa', 'Commercial', 'Land & Plots'];
   const furnishingOptions = ['Fully Furnished', 'Semi Furnished', 'Unfurnished'];
-  const rentalDurations = ['6 months', '12 months', '18 months', '24 months', '36 months'];
-  const tenantTypes = ['Family', 'Bachelor', 'Couple', 'Students', 'Working Professionals'];
-  const statusOptions = ['new', 'pending', 'approved', 'rejected', 'closed'];
+  const paymentModes = ['Home Loan', 'Cash', 'Loan + Cash', 'Bank Transfer'];
+  const statusOptions = ALL_STATUSES;
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-[#1A2E2A]/50 backdrop-blur-sm animate-fade-in">
@@ -428,28 +647,28 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
           >
             <FiX className="text-lg" />
           </button>
-          <h2 className="text-2xl font-bold text-white">{mode === 'add' ? 'New Rental Request' : 'Edit Rental Request'}</h2>
-          <p className="text-white/80 text-sm">{mode === 'add' ? 'Create a new rental request' : 'Update rental request details'}</p>
+          <h2 className="text-2xl font-bold text-white">{mode === 'add' ? 'Add Purchase Request' : 'Edit Purchase Request'}</h2>
+          <p className="text-white/80 text-sm">{mode === 'add' ? 'Create new purchase request' : 'Update purchase request'}</p>
         </div>
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-white">
-          <form id="request-form" onSubmit={handleSubmit} className="space-y-4">
+          <form id="purchase-status-form" onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              {/* Tenant Info */}
+              {/* Buyer Information */}
               <div className="col-span-2">
                 <h3 className="text-sm font-semibold text-[#1A2E2A] mb-3 flex items-center gap-2">
                   <FiUser className="text-[#00695C]" />
-                  Tenant Information
+                  Buyer Information
                 </h3>
               </div>
 
               <div>
-                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Tenant Name *</label>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Buyer Name *</label>
                 <input
                   type="text"
-                  name="tenantName"
-                  value={formData.tenantName}
+                  name="buyerName"
+                  value={formData.buyerName}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
                   required
@@ -460,8 +679,8 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
                 <label className="text-xs font-medium text-[#5A7D78] block mb-1">Email *</label>
                 <input
                   type="email"
-                  name="email"
-                  value={formData.email}
+                  name="buyerEmail"
+                  value={formData.buyerEmail}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
                   required
@@ -472,8 +691,8 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
                 <label className="text-xs font-medium text-[#5A7D78] block mb-1">Phone *</label>
                 <input
                   type="text"
-                  name="phone"
-                  value={formData.phone}
+                  name="buyerPhone"
+                  value={formData.buyerPhone}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
                   required
@@ -489,39 +708,25 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
                   className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
                 >
                   {statusOptions.map(status => (
-                    <option key={status} value={status}>
-                      {status.charAt(0).toUpperCase() + status.slice(1)}
-                    </option>
+                    <option key={status} value={status}>{status}</option>
                   ))}
                 </select>
               </div>
 
-              {/* Location */}
+              {/* Property Information */}
               <div className="col-span-2">
                 <h3 className="text-sm font-semibold text-[#1A2E2A] mb-3 flex items-center gap-2">
-                  <FiMapPin className="text-[#00695C]" />
-                  Location
+                  <FaHome className="text-[#00695C]" />
+                  Property Information
                 </h3>
               </div>
 
-              <div>
-                <label className="text-xs font-medium text-[#5A7D78] block mb-1">City *</label>
+              <div className="col-span-2">
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Property Name *</label>
                 <input
                   type="text"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-medium text-[#5A7D78] block mb-1">State *</label>
-                <input
-                  type="text"
-                  name="state"
-                  value={formData.state}
+                  name="propertyName"
+                  value={formData.propertyName}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
                   required
@@ -529,23 +734,16 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
               </div>
 
               <div className="col-span-2">
-                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Preferred Location / Area</label>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Location *</label>
                 <input
                   type="text"
                   name="location"
                   value={formData.location}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
-                  placeholder="e.g., Indiranagar, Koramangala, Whitefield"
+                  placeholder="e.g., Indiranagar, Bangalore"
+                  required
                 />
-              </div>
-
-              {/* Property Details */}
-              <div className="col-span-2">
-                <h3 className="text-sm font-semibold text-[#1A2E2A] mb-3 flex items-center gap-2">
-                  <FaHome className="text-[#00695C]" />
-                  Property Details
-                </h3>
               </div>
 
               <div>
@@ -563,7 +761,104 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
               </div>
 
               <div>
-                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Furnishing Preference *</label>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Bedrooms *</label>
+                <input
+                  type="text"
+                  name="bedrooms"
+                  value={formData.bedrooms}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
+                  placeholder="e.g., 1, 2, 3, 4, 5"
+                  required
+                />
+              </div>
+
+              {/* Financial Details */}
+              <div className="col-span-2">
+                <h3 className="text-sm font-semibold text-[#1A2E2A] mb-3 flex items-center gap-2">
+                  <FaMoneyBillWave className="text-[#00695C]" />
+                  Financial Details
+                </h3>
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Asking Price (₹) *</label>
+                <input
+                  type="number"
+                  name="askingPrice"
+                  value={formData.askingPrice}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
+                  min="0"
+                  step="1"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Offer Amount (₹) *</label>
+                <input
+                  type="number"
+                  name="offerAmount"
+                  value={formData.offerAmount}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
+                  min="0"
+                  step="1"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Booking / Token Amount (₹) *</label>
+                <input
+                  type="number"
+                  name="bookingAmount"
+                  value={formData.bookingAmount}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
+                  min="0"
+                  step="1"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Payment Mode *</label>
+                <select
+                  name="paymentMode"
+                  value={formData.paymentMode}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
+                >
+                  {paymentModes.map(mode => (
+                    <option key={mode} value={mode}>{mode}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Purchase Details */}
+              <div className="col-span-2">
+                <h3 className="text-sm font-semibold text-[#1A2E2A] mb-3 flex items-center gap-2">
+                  <FaCalendarAlt className="text-[#00695C]" />
+                  Purchase Details
+                </h3>
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Preferred Possession Date *</label>
+                <input
+                  type="date"
+                  name="preferredPossessionDate"
+                  value={formData.preferredPossessionDate}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Furnishing *</label>
                 <select
                   name="furnishing"
                   value={formData.furnishing}
@@ -576,27 +871,59 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
                 </select>
               </div>
 
-              {/* Bedrooms - Text Input instead of dropdown */}
               <div>
-                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Bedrooms *</label>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Family Size *</label>
                 <input
                   type="number"
-                  name="bedrooms"
-                  value={formData.bedrooms}
+                  name="familySize"
+                  value={formData.familySize}
                   onChange={handleChange}
-                  min="1"
-                  max="10"
                   className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
+                  min="1"
+                  max="20"
+                  required
+                />
+              </div>
+
+              {/* Employment Details */}
+              <div className="col-span-2">
+                <h3 className="text-sm font-semibold text-[#1A2E2A] mb-3 flex items-center gap-2">
+                  <FaBriefcaseSolid className="text-[#00695C]" />
+                  Employment Details
+                </h3>
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Employment Type *</label>
+                <input
+                  type="text"
+                  name="employmentType"
+                  value={formData.employmentType}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
+                  placeholder="e.g., Salaried, Self-Employed, Business Owner, Freelancer, Retired, Student"
                   required
                 />
               </div>
 
               <div>
-                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Rent Amount (₹) *</label>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Company / Organization</label>
+                <input
+                  type="text"
+                  name="companyName"
+                  value={formData.companyName}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
+                  placeholder="Company name"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Monthly Income (₹) *</label>
                 <input
                   type="number"
-                  name="rentAmount"
-                  value={formData.rentAmount}
+                  name="monthlyIncome"
+                  value={formData.monthlyIncome}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
                   min="0"
@@ -605,65 +932,16 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
                 />
               </div>
 
-              {/* Move-in Date & Duration */}
-              <div>
-                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Move-in Date *</label>
-                <input
-                  type="date"
-                  name="moveInDate"
-                  value={formData.moveInDate}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Rental Duration *</label>
-                <select
-                  name="rentalDuration"
-                  value={formData.rentalDuration}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
-                >
-                  {rentalDurations.map(duration => (
-                    <option key={duration} value={duration}>{duration}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Tenant Type */}
+              {/* Remarks */}
               <div className="col-span-2">
-                <h3 className="text-sm font-semibold text-[#1A2E2A] mb-3 flex items-center gap-2">
-                  <FiUsers className="text-[#00695C]" />
-                  Tenant Details
-                </h3>
-              </div>
-
-              <div className="col-span-2">
-                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Tenant Type *</label>
-                <select
-                  name="tenantType"
-                  value={formData.tenantType}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
-                >
-                  {tenantTypes.map(type => (
-                    <option key={type} value={type}>{type}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Notes */}
-              <div className="col-span-2">
-                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Additional Notes</label>
+                <label className="text-xs font-medium text-[#5A7D78] block mb-1">Remarks</label>
                 <textarea
-                  name="notes"
-                  value={formData.notes}
+                  name="remarks"
+                  value={formData.remarks}
                   onChange={handleChange}
                   rows="3"
                   className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none resize-none text-[#1A2E2A]"
-                  placeholder="Any special requirements or preferences..."
+                  placeholder="Any additional remarks or special conditions..."
                 />
               </div>
             </div>
@@ -682,10 +960,10 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
             </button>
             <button
               type="submit"
-              form="request-form"
+              form="purchase-status-form"
               className="flex-1 px-4 py-2.5 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-sm font-medium shadow-lg shadow-[#00695C]/30 hover:scale-[1.02]"
             >
-              {mode === 'add' ? 'Create Request' : 'Save Changes'}
+              {mode === 'add' ? 'Add Purchase Request' : 'Save Changes'}
             </button>
           </div>
         </div>
@@ -698,7 +976,7 @@ const AddEditRequestModal = ({ request, show, mode, onClose, onSave }) => {
    MAIN COMPONENT
 ============================================================ */
 
-const RentalRequestManagement = () => {
+const PurchaseRequestStatus = () => {
   const navigate = useNavigate();
   const searchInputRef = useRef(null);
 
@@ -710,11 +988,10 @@ const RentalRequestManagement = () => {
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedPropertyType, setSelectedPropertyType] = useState('all');
   const [selectedFurnishing, setSelectedFurnishing] = useState('all');
-  const [selectedTenantType, setSelectedTenantType] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [sortField, setSortField] = useState('createdAt');
-  const [sortDirection, setSortDirection] = useState('desc');
+  const [sortField, setSortField] = useState('buyerName');
+  const [sortDirection, setSortDirection] = useState('asc');
   const [viewMode, setViewMode] = useState('grid');
   const [selectedRequests, setSelectedRequests] = useState([]);
   const [showStats, setShowStats] = useState(true);
@@ -728,14 +1005,21 @@ const RentalRequestManagement = () => {
   const [actionLoading, setActionLoading] = useState(null);
   const [filterCount, setFilterCount] = useState(0);
   const [activeFilter, setActiveFilter] = useState('all');
-
-  // ============ CONFIRM DIALOG STATE ============
-  const [confirmDialog, setConfirmDialog] = useState({
+  
+  // Status change modal state
+  const [statusChangeModal, setStatusChangeModal] = useState({
     show: false,
-    title: '',
-    message: '',
-    onConfirm: null,
-    deleteId: null
+    request: null,
+    newStatus: '',
+    currentStatus: '',
+    loading: false
+  });
+
+  // Delete modal state
+  const [deleteModal, setDeleteModal] = useState({
+    show: false,
+    request: null,
+    loading: false
   });
 
   // ============ TOAST FUNCTION ============
@@ -747,44 +1031,40 @@ const RentalRequestManagement = () => {
   // ============ STATS ============
   const [stats, setStats] = useState({
     total: 0,
-    new: 0,
-    pending: 0,
-    approved: 0,
-    rejected: 0,
-    closed: 0
+    New: 0,
+    Contacted: 0,
+    Interested: 0,
+    'Site Visit': 0,
+    'Offer Submitted': 0,
+    Negotiation: 0,
+    'Offer Accepted': 0,
+    Agreement: 0,
+    'Sale Completed': 0,
+    'Closed Lost': 0
   });
 
   // ============ COMPUTE STATS ============
   const computeStats = useCallback((list) => {
     const total = list.length;
-    const newCount = list.filter(r => r.status === 'new').length;
-    const pending = list.filter(r => r.status === 'pending').length;
-    const approved = list.filter(r => r.status === 'approved').length;
-    const rejected = list.filter(r => r.status === 'rejected').length;
-    const closed = list.filter(r => r.status === 'closed').length;
-
-    setStats({
-      total,
-      new: newCount,
-      pending,
-      approved,
-      rejected,
-      closed
+    const counts = {};
+    ALL_STATUSES.forEach(status => {
+      counts[status] = list.filter(r => r.status === status).length;
     });
+
+    setStats({ total, ...counts });
   }, []);
 
   // ============ GENERATE MOCK DATA ============
   const generateMockRequests = useCallback(() => {
     const firstNames = ['Rahul', 'Anita', 'Sanjay', 'Divya', 'Karthik', 'Neha', 'Manoj', 'Swati', 'Rohit', 'Pallavi', 'Vivek', 'Shalini', 'Ajay', 'Bhavana', 'Naveen', 'Radhika', 'Sameer', 'Anjali', 'Harish', 'Preeti'];
     const lastNames = ['Kumar', 'Sharma', 'Singh', 'Patel', 'Reddy', 'Gupta', 'Verma', 'Joshi', 'Malhotra', 'Mehta', 'Nair', 'Pillai', 'Rao', 'Shetty', 'Agarwal', 'Khanna', 'Chopra', 'Saxena', 'Tiwari', 'Desai'];
-    const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur', 'Lucknow', 'Nagpur', 'Kolkata', 'Surat', 'Indore'];
-    const states = ['Maharashtra', 'Delhi', 'Karnataka', 'Tamil Nadu', 'Telangana', 'Uttar Pradesh', 'Gujarat', 'Rajasthan'];
-    const propertyTypes = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
+    const propertyNames = ['Green Valley', 'Lake View', 'Sunset Tower', 'Garden Heights', 'Royal Orchid', 'Palm Grove', 'Silver Oaks', 'Golden Estate', 'Maple Wood', 'Cedar Creek'];
+    const locations = ['MG Road, Bangalore', 'Banjara Hills, Hyderabad', 'Indiranagar, Bangalore', 'Koramangala, Bangalore', 'Whitefield, Bangalore', 'Jubilee Hills, Hyderabad', 'Connaught Place, Delhi', 'Salt Lake, Kolkata', 'Andheri, Mumbai', 'Bandra, Mumbai'];
+    const propertyTypes = ['Individual House', 'Apartment', 'Villa', 'Commercial', 'Land & Plots'];
     const furnishingOptions = ['Fully Furnished', 'Semi Furnished', 'Unfurnished'];
-    const statuses = ['new', 'pending', 'approved', 'rejected', 'closed'];
-    const rentalDurations = ['6 months', '12 months', '18 months', '24 months', '36 months'];
-    const tenantTypes = ['Family', 'Bachelor', 'Couple', 'Students', 'Working Professionals'];
-    const locations = ['MG Road', 'Banjara Hills', 'Indiranagar', 'Koramangala', 'Whitefield', 'Jubilee Hills', 'Connaught Place', 'Salt Lake', 'Marine Drive', 'Andheri', 'Bandra', 'Powai'];
+    const statusOptions = ALL_STATUSES;
+    const paymentModes = ['Home Loan', 'Cash', 'Loan + Cash', 'Bank Transfer'];
+    const employmentTypes = ['Salaried', 'Self-Employed', 'Business Owner', 'Freelancer', 'Retired', 'Student'];
 
     const requests = [];
     const usedNames = new Set();
@@ -800,32 +1080,49 @@ const RentalRequestManagement = () => {
       } while (usedNames.has(fullName) && attempts < 50);
       usedNames.add(fullName);
 
-      const rentAmount = Math.floor(Math.random() * 30000 + 10000);
-      const city = cities[Math.floor(Math.random() * cities.length)];
+      const askingPrice = Math.floor(Math.random() * 18000000 + 2000000);
+      const offerAmount = Math.floor(askingPrice * (0.88 + Math.random() * 0.1));
+      const bookingAmount = Math.floor(Math.random() * 400000 + 100000);
 
-      const moveIn = new Date();
-      moveIn.setDate(moveIn.getDate() + Math.floor(Math.random() * 60));
+      const possession = new Date();
+      possession.setDate(possession.getDate() + Math.floor(Math.random() * 180));
 
-      const status = statuses[Math.floor(Math.random() * statuses.length)];
+      const status = statusOptions[Math.floor(Math.random() * statusOptions.length)];
+      const statusHistory = [];
+      const statusIndex = statusOptions.indexOf(status);
+      for (let j = 0; j <= statusIndex; j++) {
+        const date = new Date();
+        date.setDate(date.getDate() - (statusIndex - j) * Math.floor(Math.random() * 3 + 1));
+        statusHistory.push({
+          status: statusOptions[j],
+          date: date.toISOString()
+        });
+      }
 
       requests.push({
-        id: `req_${i}`,
-        tenantName: fullName,
-        email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${Math.floor(Math.random() * 100)}@email.com`,
-        phone: `+91 ${Math.floor(Math.random() * 9000000000 + 1000000000)}`,
-        city: city,
-        state: states[Math.floor(Math.random() * states.length)],
+        id: `purchase_status_${i}`,
+        buyerName: fullName,
+        buyerEmail: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${Math.floor(Math.random() * 100)}@email.com`,
+        buyerPhone: `+91 ${Math.floor(Math.random() * 9000000000 + 1000000000)}`,
+        propertyName: propertyNames[Math.floor(Math.random() * propertyNames.length)],
         location: locations[Math.floor(Math.random() * locations.length)],
         propertyType: propertyTypes[Math.floor(Math.random() * propertyTypes.length)],
-        furnishing: furnishingOptions[Math.floor(Math.random() * furnishingOptions.length)],
         bedrooms: Math.floor(Math.random() * 4) + 1,
-        rentAmount: rentAmount,
-        moveInDate: moveIn.toISOString(),
-        rentalDuration: rentalDurations[Math.floor(Math.random() * rentalDurations.length)],
-        tenantType: tenantTypes[Math.floor(Math.random() * tenantTypes.length)],
+        askingPrice: askingPrice,
+        offerAmount: offerAmount,
+        bookingAmount: bookingAmount,
+        preferredPossessionDate: possession.toISOString(),
+        paymentMode: paymentModes[Math.floor(Math.random() * paymentModes.length)],
+        furnishing: furnishingOptions[Math.floor(Math.random() * furnishingOptions.length)],
+        familySize: Math.floor(Math.random() * 4) + 1,
+        employmentType: employmentTypes[Math.floor(Math.random() * employmentTypes.length)],
+        companyName: `${firstName}'s ${['Tech', 'Solutions', 'Enterprises', 'Associates', 'Group'][Math.floor(Math.random() * 5)]}`,
+        monthlyIncome: Math.floor(askingPrice / 60) + Math.floor(Math.random() * 30000),
         status: status,
-        notes: Math.random() > 0.7 ? 'Additional requirements or preferences' : '',
-        createdAt: new Date(Date.now() - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000)).toISOString()
+        statusHistory: statusHistory,
+        remarks: Math.random() > 0.7 ? `Buyer prefers early possession. Loan pre-approved.` : '',
+        createdAt: new Date(Date.now() - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000)).toISOString(),
+        updatedAt: new Date().toISOString()
       });
     }
 
@@ -849,10 +1146,10 @@ const RentalRequestManagement = () => {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(req =>
-        req.tenantName.toLowerCase().includes(query) ||
-        req.email.toLowerCase().includes(query) ||
-        req.phone.includes(query) ||
-        req.city.toLowerCase().includes(query) ||
+        req.buyerName.toLowerCase().includes(query) ||
+        req.buyerEmail.toLowerCase().includes(query) ||
+        req.buyerPhone.includes(query) ||
+        req.propertyName.toLowerCase().includes(query) ||
         req.location.toLowerCase().includes(query) ||
         req.propertyType.toLowerCase().includes(query)
       );
@@ -870,15 +1167,10 @@ const RentalRequestManagement = () => {
       filtered = filtered.filter(req => req.furnishing === selectedFurnishing);
     }
 
-    if (selectedTenantType !== 'all') {
-      filtered = filtered.filter(req => req.tenantType === selectedTenantType);
-    }
-
     let count = 0;
     if (selectedStatus !== 'all') count++;
     if (selectedPropertyType !== 'all') count++;
     if (selectedFurnishing !== 'all') count++;
-    if (selectedTenantType !== 'all') count++;
     if (searchQuery) count++;
     setFilterCount(count);
 
@@ -896,7 +1188,7 @@ const RentalRequestManagement = () => {
 
     setFilteredRequests(filtered);
     setCurrentPage(1);
-  }, [requests, searchQuery, selectedStatus, selectedPropertyType, selectedFurnishing, selectedTenantType, sortField, sortDirection]);
+  }, [requests, searchQuery, selectedStatus, selectedPropertyType, selectedFurnishing, sortField, sortDirection]);
 
   useEffect(() => {
     filterRequests();
@@ -959,102 +1251,148 @@ const RentalRequestManagement = () => {
     setShowFormModal(true);
   }, []);
 
-// ============ SAVE FORM ============
-const saveForm = useCallback((data) => {
-  setRequests(prev => {
-    let updated;
-    let savedRequest = null;
-    
-    if (formMode === 'add') {
-      const newRequest = {
-        ...data,
-        id: `req_${Date.now()}`,
-        createdAt: new Date().toISOString()
-      };
-      savedRequest = newRequest;
-      updated = [newRequest, ...prev];
-    } else {
-      updated = prev.map(r => {
-        if (r.id === formRequest.id) {
-          savedRequest = { ...r, ...data };
-          return savedRequest;
-        }
-        return r;
-      });
-    }
-    
-    computeStats(updated);
-    
-  
-    if (savedRequest && viewingRequest && savedRequest.id === viewingRequest.id) {
-      setViewingRequest(savedRequest);
-    }
-    
-    return updated;
-  });
+  // ============ SAVE FORM ============
+  const saveForm = useCallback((data) => {
+    let savedRecord = null;
 
-  setShowFormModal(false);
-  setFormRequest(null);
-  showToast(formMode === 'add' ? 'Rental request created successfully' : 'Rental request updated successfully', 'success');
-}, [formMode, formRequest, computeStats, showToast, viewingRequest]);
+    setRequests(prev => {
+      let updated;
+      if (formMode === 'add') {
+        const newRequest = {
+          ...data,
+          bedrooms: parseInt(data.bedrooms) || 1,
+          id: `purchase_status_${Date.now()}`,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          statusHistory: [{ status: data.status || 'New', date: new Date().toISOString() }]
+        };
+        updated = [newRequest, ...prev];
+        savedRecord = newRequest;
+      } else {
+        updated = prev.map(r => {
+          if (r.id === formRequest.id) {
+            const updatedStatusHistory = [...(r.statusHistory || [])];
+            if (data.status !== r.status) {
+              updatedStatusHistory.push({ status: data.status, date: new Date().toISOString() });
+            }
+            const updatedRecord = { 
+              ...r, 
+              ...data, 
+              bedrooms: parseInt(data.bedrooms) || 1,
+              statusHistory: updatedStatusHistory,
+              updatedAt: new Date().toISOString()
+            };
+            savedRecord = updatedRecord;
+            return updatedRecord;
+          }
+          return r;
+        });
+      }
+      computeStats(updated);
+      return updated;
+    });
+
+    // Keep the View modal (if open behind the form) in sync with the saved data
+    setViewingRequest(prev => (prev && savedRecord && prev.id === savedRecord.id) ? savedRecord : prev);
+
+    setShowFormModal(false);
+    setFormRequest(null);
+    showToast(formMode === 'add' ? 'Purchase request added successfully' : 'Purchase request updated successfully', 'success');
+  }, [formMode, formRequest, computeStats, showToast]);
 
   // ============ STATUS CHANGE ============
   const handleStatusChange = useCallback((reqId, newStatus) => {
-    const req = requests.find(r => r.id === reqId);
-    if (!req) return;
+    const request = requests.find(r => r.id === reqId);
+    if (!request) return;
 
-    setActionLoading(reqId);
+    setStatusChangeModal({
+      show: true,
+      request: request,
+      newStatus: newStatus,
+      currentStatus: request.status,
+      loading: false
+    });
+  }, [requests]);
+
+  // ============ CONFIRM STATUS CHANGE ============
+  const confirmStatusChange = useCallback(() => {
+    const { request, newStatus, currentStatus } = statusChangeModal;
+    
+    setStatusChangeModal(prev => ({ ...prev, loading: true }));
+
     setTimeout(() => {
       setRequests(prev => {
         const updated = prev.map(r => {
-          if (r.id === reqId) {
-            return { ...r, status: newStatus };
+          if (r.id === request.id) {
+            const updatedStatusHistory = [...(r.statusHistory || [])];
+            updatedStatusHistory.push({ 
+              status: newStatus, 
+              date: new Date().toISOString() 
+            });
+            return { 
+              ...r, 
+              status: newStatus,
+              statusHistory: updatedStatusHistory,
+              updatedAt: new Date().toISOString()
+            };
           }
           return r;
         });
         computeStats(updated);
         return updated;
       });
-      setActionLoading(null);
+      
+      // Close both modals
+      setStatusChangeModal({ 
+        show: false, 
+        request: null, 
+        newStatus: '', 
+        currentStatus: '',
+        loading: false 
+      });
       setShowViewModal(false);
-      showToast(`Request ${newStatus === 'approved' ? 'approved' : newStatus === 'rejected' ? 'rejected' : 'marked as ' + newStatus} successfully`, newStatus === 'approved' ? 'success' : newStatus === 'rejected' ? 'error' : 'info');
+      setViewingRequest(null);
+      
+      showToast(`Status updated from "${currentStatus}" to "${newStatus}"`, 'success');
     }, 700);
-  }, [requests, computeStats, showToast]);
+  }, [statusChangeModal, computeStats, showToast]);
 
-  // ============ DELETE REQUEST WITH CUSTOM CONFIRM ============
-  const handleDeleteRequest = useCallback((reqId) => {
-    const req = requests.find(r => r.id === reqId);
-    if (!req) return;
-
-    setConfirmDialog({
+  // ============ DELETE REQUEST ============
+  const handleDeleteRequest = useCallback((request) => {
+    if (!request) return;
+    
+    setDeleteModal({
       show: true,
-      title: 'Delete Rental Request',
-      message: `Are you sure you want to delete ${req.tenantName}'s rental request? This action cannot be undone.`,
-      deleteId: reqId,
-      onConfirm: () => {
-        setActionLoading(reqId);
-        setConfirmDialog(prev => ({ ...prev, loading: true }));
-
-        setTimeout(() => {
-          setRequests(prev => {
-            const updated = prev.filter(r => r.id !== reqId);
-            computeStats(updated);
-            return updated;
-          });
-          setActionLoading(null);
-          setShowViewModal(false);
-          setConfirmDialog({ show: false, title: '', message: '', onConfirm: null, deleteId: null, loading: false });
-          showToast(`${req.tenantName}'s rental request deleted`, 'error');
-        }, 700);
-      },
+      request: request,
       loading: false
     });
-  }, [requests, computeStats, showToast]);
-
-  // ============ CLOSE CONFIRM DIALOG ============
-  const closeConfirmDialog = useCallback(() => {
-    setConfirmDialog({ show: false, title: '', message: '', onConfirm: null, deleteId: null, loading: false });
   }, []);
+
+  // ============ CONFIRM DELETE ============
+  const confirmDelete = useCallback(() => {
+    const { request } = deleteModal;
+    if (!request) return;
+
+    setDeleteModal(prev => ({ ...prev, loading: true }));
+
+    setTimeout(() => {
+      setRequests(prev => {
+        const updated = prev.filter(r => r.id !== request.id);
+        computeStats(updated);
+        return updated;
+      });
+      
+      setDeleteModal({ 
+        show: false, 
+        request: null, 
+        loading: false 
+      });
+      setShowViewModal(false);
+      setViewingRequest(null);
+      
+      showToast(`${request.buyerName}'s purchase request deleted`, 'error');
+    }, 700);
+  }, [deleteModal, computeStats, showToast]);
 
   // ============ STAT CLICK HANDLER ============
   const handleStatClick = useCallback((filter) => {
@@ -1064,9 +1402,8 @@ const saveForm = useCallback((data) => {
     setSelectedStatus('all');
     setSelectedPropertyType('all');
     setSelectedFurnishing('all');
-    setSelectedTenantType('all');
 
-    if (nextFilter === 'new' || nextFilter === 'pending' || nextFilter === 'approved' || nextFilter === 'rejected' || nextFilter === 'closed') {
+    if (nextFilter !== 'all') {
       setSelectedStatus(nextFilter);
     }
 
@@ -1080,7 +1417,6 @@ const saveForm = useCallback((data) => {
     setSelectedStatus('all');
     setSelectedPropertyType('all');
     setSelectedFurnishing('all');
-    setSelectedTenantType('all');
     setActiveFilter('all');
     searchInputRef.current?.focus();
     showToast('All filters cleared', 'info');
@@ -1108,23 +1444,27 @@ const saveForm = useCallback((data) => {
     }
 
     const data = filteredRequests.map(req => ({
-      'Request ID': req.id,
-      'Tenant Name': req.tenantName,
-      Email: req.email,
-      Phone: req.phone,
-      City: req.city,
-      State: req.state,
-      'Preferred Location': req.location,
+      'Buyer Name': req.buyerName,
+      'Email': req.buyerEmail,
+      'Phone': req.buyerPhone,
+      'Property Name': req.propertyName,
+      'Location': req.location,
       'Property Type': req.propertyType,
-      'Furnishing Preference': req.furnishing,
-      Bedrooms: req.bedrooms,
-      'Rent Amount (₹)': req.rentAmount,
-      'Move-in Date': new Date(req.moveInDate).toLocaleDateString(),
-      'Rental Duration': req.rentalDuration,
-      'Tenant Type': req.tenantType,
-      Status: req.status,
+      'Bedrooms': req.bedrooms,
+      'Asking Price (₹)': req.askingPrice,
+      'Offer Amount (₹)': req.offerAmount,
+      'Booking Amount (₹)': req.bookingAmount,
+      'Preferred Possession': new Date(req.preferredPossessionDate).toLocaleDateString(),
+      'Payment Mode': req.paymentMode,
+      'Furnishing': req.furnishing,
+      'Family Size': req.familySize,
+      'Employment Type': req.employmentType,
+      'Company': req.companyName,
+      'Monthly Income (₹)': req.monthlyIncome,
+      'Status': req.status,
       'Created At': new Date(req.createdAt).toLocaleDateString(),
-      Notes: req.notes || ''
+      'Updated At': new Date(req.updatedAt || req.createdAt).toLocaleDateString(),
+      'Remarks': req.remarks || ''
     }));
 
     const csv = [
@@ -1136,7 +1476,7 @@ const saveForm = useCallback((data) => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `rental_requests_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `purchase_status_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
     showToast(`${filteredRequests.length} records exported successfully`, 'success');
@@ -1149,39 +1489,6 @@ const saveForm = useCallback((data) => {
       return;
     }
 
-    // For delete, show custom confirm
-    if (action === 'delete') {
-      setConfirmDialog({
-        show: true,
-        title: 'Delete Selected Requests',
-        message: `Are you sure you want to delete ${selectedRequests.length} selected request(s)? This action cannot be undone.`,
-        deleteId: 'bulk',
-        onConfirm: () => {
-          setActionLoading('bulk-delete');
-          setConfirmDialog(prev => ({ ...prev, loading: true }));
-
-          setTimeout(() => {
-            const selectedIds = new Set(selectedRequests);
-            let count = 0;
-
-            setRequests(prev => {
-              count = prev.filter(r => selectedIds.has(r.id)).length;
-              const updated = prev.filter(r => !selectedIds.has(r.id));
-              computeStats(updated);
-              return updated;
-            });
-
-            setSelectedRequests([]);
-            setActionLoading(null);
-            setConfirmDialog({ show: false, title: '', message: '', onConfirm: null, deleteId: null, loading: false });
-            showToast(`${count} request(s) deleted`, 'error');
-          }, 800);
-        },
-        loading: false
-      });
-      return;
-    }
-
     setActionLoading(action);
 
     setTimeout(() => {
@@ -1189,14 +1496,24 @@ const saveForm = useCallback((data) => {
       let count = 0;
 
       setRequests(prev => {
-        let updated = prev.map(r => {
-          if (!selectedIds.has(r.id)) return r;
-          count++;
-          if (action === 'approve') return { ...r, status: 'approved' };
-          if (action === 'reject') return { ...r, status: 'rejected' };
-          if (action === 'close') return { ...r, status: 'closed' };
-          return r;
-        });
+        let updated;
+        if (action === 'delete') {
+          count = prev.filter(r => selectedIds.has(r.id)).length;
+          updated = prev.filter(r => !selectedIds.has(r.id));
+        } else {
+          updated = prev.map(r => {
+            if (!selectedIds.has(r.id)) return r;
+            count++;
+            const updatedStatusHistory = [...(r.statusHistory || [])];
+            updatedStatusHistory.push({ status: action, date: new Date().toISOString() });
+            return { 
+              ...r, 
+              status: action,
+              statusHistory: updatedStatusHistory,
+              updatedAt: new Date().toISOString()
+            };
+          });
+        }
         computeStats(updated);
         return updated;
       });
@@ -1204,33 +1521,23 @@ const saveForm = useCallback((data) => {
       setSelectedRequests([]);
       setActionLoading(null);
 
-      if (action === 'approve') showToast(`${count} request(s) approved`, 'success');
-      else if (action === 'reject') showToast(`${count} request(s) rejected`, 'error');
-      else if (action === 'close') showToast(`${count} request(s) closed`, 'info');
+      if (action === 'delete') {
+        showToast(`${count} request(s) deleted`, 'error');
+      } else {
+        showToast(`${count} request(s) moved to "${action}"`, 'success');
+      }
     }, 800);
   }, [selectedRequests, computeStats, showToast]);
 
-  // ============ STATUS COLOR HELPER ============
-  const getStatusColor = (status) => {
-    const colors = {
-      new: 'bg-blue-50 text-blue-700 border-blue-200',
-      pending: 'bg-[#FEF3E2] text-amber-700 border-amber-200',
-      approved: 'bg-[#E8F8F5] text-[#00695C] border-[#A8D5CD]',
-      rejected: 'bg-red-50 text-red-700 border-red-200',
-      closed: 'bg-gray-100 text-gray-600 border-gray-200'
-    };
-    return colors[status] || colors.pending;
-  };
+  // ============ STATUS COLOR / ICON HELPERS ============
+  const getStatusColor = (status) => STATUS_COLORS[status] || STATUS_COLORS['New'];
+  const getStatusIcon = (status) => getStatusIconEl(status, 'text-xs');
 
-  const getStatusIcon = (status) => {
-    const icons = {
-      new: <FaRegClock className="text-blue-500 text-xs" />,
-      pending: <FaHourglassHalf className="text-amber-500 text-xs" />,
-      approved: <FiCheckCircle className="text-[#00695C] text-xs" />,
-      rejected: <FaTimes className="text-red-500 text-xs" />,
-      closed: <FaClock className="text-gray-500 text-xs" />
-    };
-    return icons[status] || icons.pending;
+  // ============ PRICE FORMAT HELPER ============
+  const formatPrice = (value) => {
+    if (value >= 10000000) return `₹${(value / 10000000).toFixed(2)} Cr`;
+    if (value >= 100000) return `₹${(value / 100000).toFixed(1)} L`;
+    return `₹${value.toLocaleString()}`;
   };
 
   // ============ RENDER ============
@@ -1245,18 +1552,8 @@ const saveForm = useCallback((data) => {
       {/* Toast */}
       <Toast toast={toast} />
 
-      {/* Confirm Dialog */}
-      <ConfirmDialog
-        show={confirmDialog.show}
-        title={confirmDialog.title}
-        message={confirmDialog.message}
-        onConfirm={confirmDialog.onConfirm}
-        onCancel={closeConfirmDialog}
-        loading={confirmDialog.loading}
-      />
-
       {/* Add/Edit Modal */}
-      <AddEditRequestModal
+      <AddEditPurchaseStatusModal
         request={formRequest}
         mode={formMode}
         show={showFormModal}
@@ -1265,7 +1562,7 @@ const saveForm = useCallback((data) => {
       />
 
       {/* View Modal */}
-      <ViewRequestModal
+      <ViewPurchaseStatusModal
         request={viewingRequest}
         show={showViewModal}
         onClose={() => { setShowViewModal(false); setViewingRequest(null); }}
@@ -1274,13 +1571,39 @@ const saveForm = useCallback((data) => {
         onStatusChange={handleStatusChange}
       />
 
+      {/* Status Change Confirmation Modal */}
+      <StatusChangeConfirmModal
+        show={statusChangeModal.show}
+        onClose={() => setStatusChangeModal({ 
+          show: false, 
+          request: null, 
+          newStatus: '', 
+          currentStatus: '',
+          loading: false 
+        })}
+        onConfirm={confirmStatusChange}
+        request={statusChangeModal.request}
+        currentStatus={statusChangeModal.currentStatus}
+        newStatus={statusChangeModal.newStatus}
+        loading={statusChangeModal.loading}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        show={deleteModal.show}
+        onClose={() => setDeleteModal({ show: false, request: null, loading: false })}
+        onConfirm={confirmDelete}
+        request={deleteModal.request}
+        loading={deleteModal.loading}
+      />
+
       {/* Header */}
       <div className="relative animate-fade-in">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-1 flex-wrap">
               <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
-                Rental Request Management
+                Purchase Request Status
               </h1>
               <span className="px-3 py-1 bg-[#E8F4F2] text-[#00695C] text-xs font-semibold rounded-full animate-pulse">
                 {filteredRequests.length} Requests
@@ -1292,7 +1615,7 @@ const saveForm = useCallback((data) => {
               )}
             </div>
             <p className="text-sm text-[#5A7D78] flex items-center gap-2 flex-wrap">
-              <span>Manage all rental requests from tenants</span>
+              <span>Track purchase request status and progress</span>
               <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
               <span className="text-[#00695C] font-medium">{new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
             </p>
@@ -1326,19 +1649,19 @@ const saveForm = useCallback((data) => {
             >
               <span className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
               <FiPlus className="text-sm" />
-              <span>New Request</span>
+              <span>Add Request</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Stats Section - 6 Stats */}
+      {/* Stats Section */}
       {showStats && (
         <div className="relative animate-slide-in">
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
               <StatCard
-                icon={<MdOutlineRequestPage className="text-white text-sm" />}
+                icon={<FiUsers className="text-white text-sm" />}
                 title="Total"
                 value={stats.total}
                 color="bg-gradient-to-br from-[#00695C] to-[#26A69A]"
@@ -1348,54 +1671,104 @@ const saveForm = useCallback((data) => {
                 onClick={() => handleStatClick('all')}
               />
               <StatCard
-                icon={<FaRegClock className="text-white text-sm" />}
+                icon={<FiUser className="text-white text-sm" />}
                 title="New"
-                value={stats.new}
+                value={stats.New}
                 color="bg-gradient-to-br from-blue-600 to-blue-400"
                 delay={100}
-                isActive={activeFilter === 'new'}
+                isActive={activeFilter === 'New'}
                 statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('new')}
+                onClick={() => handleStatClick('New')}
               />
               <StatCard
-                icon={<FaHourglassHalf className="text-white text-sm" />}
-                title="Pending"
-                value={stats.pending}
-                color="bg-gradient-to-br from-amber-600 to-amber-400"
+                icon={<FiPhone className="text-white text-sm" />}
+                title="Contacted"
+                value={stats.Contacted}
+                color="bg-gradient-to-br from-indigo-600 to-indigo-400"
                 delay={200}
-                isActive={activeFilter === 'pending'}
+                isActive={activeFilter === 'Contacted'}
                 statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('pending')}
+                onClick={() => handleStatClick('Contacted')}
               />
               <StatCard
-                icon={<FiCheckCircle className="text-white text-sm" />}
-                title="Approved"
-                value={stats.approved}
-                color="bg-gradient-to-br from-emerald-600 to-emerald-400"
+                icon={<FiStar className="text-white text-sm" />}
+                title="Interested"
+                value={stats.Interested}
+                color="bg-gradient-to-br from-violet-600 to-violet-400"
                 delay={300}
-                isActive={activeFilter === 'approved'}
+                isActive={activeFilter === 'Interested'}
                 statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('approved')}
+                onClick={() => handleStatClick('Interested')}
               />
               <StatCard
-                icon={<FaTimes className="text-white text-sm" />}
-                title="Rejected"
-                value={stats.rejected}
-                color="bg-gradient-to-br from-red-600 to-red-400"
+                icon={<FiEyeIcon className="text-white text-sm" />}
+                title="Site Visit"
+                value={stats['Site Visit']}
+                color="bg-gradient-to-br from-pink-600 to-pink-400"
                 delay={400}
-                isActive={activeFilter === 'rejected'}
+                isActive={activeFilter === 'Site Visit'}
                 statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('rejected')}
+                onClick={() => handleStatClick('Site Visit')}
               />
               <StatCard
-                icon={<FaClock className="text-white text-sm" />}
-                title="Closed"
-                value={stats.closed}
-                color="bg-gradient-to-br from-gray-600 to-gray-400"
+                icon={<FiFile className="text-white text-sm" />}
+                title="Offer Submitted"
+                value={stats['Offer Submitted']}
+                color="bg-gradient-to-br from-amber-600 to-amber-400"
                 delay={500}
-                isActive={activeFilter === 'closed'}
+                isActive={activeFilter === 'Offer Submitted'}
                 statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('closed')}
+                onClick={() => handleStatClick('Offer Submitted')}
+              />
+              <StatCard
+                icon={<FaHandshake className="text-white text-sm" />}
+                title="Negotiation"
+                value={stats.Negotiation}
+                color="bg-gradient-to-br from-orange-600 to-orange-400"
+                delay={600}
+                isActive={activeFilter === 'Negotiation'}
+                statsAnimating={statsAnimating}
+                onClick={() => handleStatClick('Negotiation')}
+              />
+              <StatCard
+                icon={<FiCheckCircleIcon className="text-white text-sm" />}
+                title="Offer Accepted"
+                value={stats['Offer Accepted']}
+                color="bg-gradient-to-br from-emerald-600 to-emerald-400"
+                delay={700}
+                isActive={activeFilter === 'Offer Accepted'}
+                statsAnimating={statsAnimating}
+                onClick={() => handleStatClick('Offer Accepted')}
+              />
+              <StatCard
+                icon={<FiBook className="text-white text-sm" />}
+                title="Agreement"
+                value={stats.Agreement}
+                color="bg-gradient-to-br from-teal-600 to-teal-400"
+                delay={800}
+                isActive={activeFilter === 'Agreement'}
+                statsAnimating={statsAnimating}
+                onClick={() => handleStatClick('Agreement')}
+              />
+              <StatCard
+                icon={<FiAward className="text-white text-sm" />}
+                title="Sale Completed"
+                value={stats['Sale Completed']}
+                color="bg-gradient-to-br from-[#00695C] to-[#26A69A]"
+                delay={900}
+                isActive={activeFilter === 'Sale Completed'}
+                statsAnimating={statsAnimating}
+                onClick={() => handleStatClick('Sale Completed')}
+              />
+              <StatCard
+                icon={<FiXCircleIcon className="text-white text-sm" />}
+                title="Closed Lost"
+                value={stats['Closed Lost']}
+                color="bg-gradient-to-br from-red-600 to-red-400"
+                delay={1000}
+                isActive={activeFilter === 'Closed Lost'}
+                statsAnimating={statsAnimating}
+                onClick={() => handleStatClick('Closed Lost')}
               />
             </div>
           </div>
@@ -1410,7 +1783,7 @@ const saveForm = useCallback((data) => {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search by tenant name, email, phone, city, location, or property type..."
+              placeholder="Search by buyer name, email, phone, property, location..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none placeholder:text-[#B5C9C5]"
@@ -1433,17 +1806,14 @@ const saveForm = useCallback((data) => {
                   setSelectedStatus(e.target.value);
                   setSelectedPropertyType('all');
                   setSelectedFurnishing('all');
-                  setSelectedTenantType('all');
                   setActiveFilter(e.target.value === 'all' ? 'all' : e.target.value);
                 }}
                 className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
               >
                 <option value="all">All Status</option>
-                <option value="new">New</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-                <option value="closed">Closed</option>
+                {ALL_STATUSES.map(status => (
+                  <option key={status} value={status}>{status}</option>
+                ))}
               </select>
               <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
             </div>
@@ -1455,17 +1825,16 @@ const saveForm = useCallback((data) => {
                   setSelectedPropertyType(e.target.value);
                   setSelectedStatus('all');
                   setSelectedFurnishing('all');
-                  setSelectedTenantType('all');
                   setActiveFilter(e.target.value === 'all' ? 'all' : e.target.value);
                 }}
                 className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
               >
                 <option value="all">All Types</option>
-                <option value="Individual">Individual</option>
+                <option value="Individual House">Individual House</option>
                 <option value="Apartment">Apartment</option>
+                <option value="Villa">Villa</option>
                 <option value="Commercial">Commercial</option>
                 <option value="Land & Plots">Land & Plots</option>
-                <option value="Hostel">Hostel</option>
               </select>
               <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
             </div>
@@ -1477,7 +1846,6 @@ const saveForm = useCallback((data) => {
                   setSelectedFurnishing(e.target.value);
                   setSelectedStatus('all');
                   setSelectedPropertyType('all');
-                  setSelectedTenantType('all');
                   setActiveFilter(e.target.value === 'all' ? 'all' : e.target.value);
                 }}
                 className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
@@ -1486,28 +1854,6 @@ const saveForm = useCallback((data) => {
                 <option value="Fully Furnished">Fully Furnished</option>
                 <option value="Semi Furnished">Semi Furnished</option>
                 <option value="Unfurnished">Unfurnished</option>
-              </select>
-              <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
-            </div>
-
-            <div className="relative">
-              <select
-                value={selectedTenantType}
-                onChange={(e) => {
-                  setSelectedTenantType(e.target.value);
-                  setSelectedStatus('all');
-                  setSelectedPropertyType('all');
-                  setSelectedFurnishing('all');
-                  setActiveFilter(e.target.value === 'all' ? 'all' : e.target.value);
-                }}
-                className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
-              >
-                <option value="all">All Tenant Types</option>
-                <option value="Family">Family</option>
-                <option value="Bachelor">Bachelor</option>
-                <option value="Couple">Couple</option>
-                <option value="Students">Students</option>
-                <option value="Working Professionals">Working Professionals</option>
               </select>
               <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
             </div>
@@ -1548,35 +1894,43 @@ const saveForm = useCallback((data) => {
             </span>
             <div className="flex flex-wrap items-center gap-2">
               <button
-                onClick={() => handleBulkAction('approve')}
-                disabled={actionLoading === 'approve'}
+                onClick={() => handleBulkAction('Offer Accepted')}
+                disabled={actionLoading === 'Offer Accepted'}
                 className="px-4 py-1.5 bg-[#E8F8F5] text-[#00695C] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 disabled:opacity-50"
               >
-                {actionLoading === 'approve' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiCheckCircle className="text-[10px]" />}
-                Approve All
+                {actionLoading === 'Offer Accepted' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiCheckCircle className="text-[10px]" />}
+                Accept Offer
               </button>
               <button
-                onClick={() => handleBulkAction('reject')}
-                disabled={actionLoading === 'reject'}
+                onClick={() => handleBulkAction('Closed Lost')}
+                disabled={actionLoading === 'Closed Lost'}
                 className="px-4 py-1.5 bg-red-50 text-red-700 rounded-xl hover:bg-red-100 transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 disabled:opacity-50"
               >
-                {actionLoading === 'reject' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiXCircle className="text-[10px]" />}
-                Reject All
+                {actionLoading === 'Closed Lost' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiXCircle className="text-[10px]" />}
+                Close Lost
               </button>
               <button
-                onClick={() => handleBulkAction('close')}
-                disabled={actionLoading === 'close'}
-                className="px-4 py-1.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 disabled:opacity-50"
+                onClick={() => handleBulkAction('Site Visit')}
+                disabled={actionLoading === 'Site Visit'}
+                className="px-4 py-1.5 bg-pink-50 text-pink-700 rounded-xl hover:bg-pink-100 transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 disabled:opacity-50"
               >
-                {actionLoading === 'close' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiCheckCircle className="text-[10px]" />}
-                Close All
+                {actionLoading === 'Site Visit' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiEye className="text-[10px]" />}
+                Site Visit
+              </button>
+              <button
+                onClick={() => handleBulkAction('Agreement')}
+                disabled={actionLoading === 'Agreement'}
+                className="px-4 py-1.5 bg-teal-50 text-teal-700 rounded-xl hover:bg-teal-100 transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 disabled:opacity-50"
+              >
+                {actionLoading === 'Agreement' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiBook className="text-[10px]" />}
+                Agreement
               </button>
               <button
                 onClick={() => handleBulkAction('delete')}
-                disabled={actionLoading === 'bulk-delete'}
+                disabled={actionLoading === 'delete'}
                 className="px-4 py-1.5 bg-red-50 text-red-700 rounded-xl hover:bg-red-100 transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 disabled:opacity-50"
               >
-                {actionLoading === 'bulk-delete' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiTrash2 className="text-[10px]" />}
+                {actionLoading === 'delete' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiTrash2 className="text-[10px]" />}
                 Delete All
               </button>
               <button
@@ -1605,11 +1959,15 @@ const saveForm = useCallback((data) => {
                 <div
                   key={req.id}
                   className={`bg-white rounded-2xl border border-[#E8F0EE] p-3.5 hover:shadow-xl hover:-translate-y-1 group animate-slide-in transition-all duration-500 ${isSelected ? 'ring-2 ring-[#00695C] shadow-lg' : ''} ${
-                    req.status === 'new' ? 'border-l-4 border-l-blue-500' :
-                    req.status === 'pending' ? 'border-l-4 border-l-amber-500' :
-                    req.status === 'approved' ? 'border-l-4 border-l-emerald-500' :
-                    req.status === 'rejected' ? 'border-l-4 border-l-red-500' :
-                    req.status === 'closed' ? 'border-l-4 border-l-gray-500' : ''
+                    req.status === 'Closed Lost' ? 'border-l-4 border-l-red-500' :
+                    req.status === 'Offer Accepted' || req.status === 'Sale Completed' ? 'border-l-4 border-l-emerald-500' :
+                    req.status === 'Agreement' ? 'border-l-4 border-l-teal-500' :
+                    req.status === 'New' ? 'border-l-4 border-l-blue-500' :
+                    req.status === 'Site Visit' ? 'border-l-4 border-l-pink-500' :
+                    req.status === 'Negotiation' ? 'border-l-4 border-l-orange-500' :
+                    req.status === 'Offer Submitted' ? 'border-l-4 border-l-amber-500' :
+                    req.status === 'Contacted' ? 'border-l-4 border-l-indigo-500' :
+                    req.status === 'Interested' ? 'border-l-4 border-l-violet-500' : ''
                   }`}
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
@@ -1623,15 +1981,15 @@ const saveForm = useCallback((data) => {
                       />
                       <div className="relative shrink-0">
                         <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white font-bold text-sm shadow-lg">
-                          {req.tenantName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                          {req.buyerName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
                         </div>
                       </div>
                       <div className="min-w-0">
-                        <h3 className="font-semibold text-[#1A2E2A] text-sm truncate">{req.tenantName}</h3>
+                        <h3 className="font-semibold text-[#1A2E2A] text-sm truncate">{req.buyerName}</h3>
                         <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap flex items-center gap-1 ${getStatusColor(req.status)}`}>
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap flex items-center gap-0.5 ${getStatusColor(req.status)}`}>
                             {getStatusIcon(req.status)}
-                            {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
+                            {req.status}
                           </span>
                         </div>
                       </div>
@@ -1648,36 +2006,45 @@ const saveForm = useCallback((data) => {
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FiDollarSign className="text-[#00695C] flex-shrink-0" />
-                      <span>₹{req.rentAmount.toLocaleString()}</span>
+                      <FaHome className="text-[#00695C] flex-shrink-0" />
+                      <span className="truncate">{req.propertyName}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiMapPin className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate">{req.location}, {req.city}</span>
+                      <span className="truncate">{req.location}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FaHome className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate">{req.propertyType}</span>
+                      <FaMoneyBillWave className="text-[#00695C] flex-shrink-0" />
+                      <span>Asking {formatPrice(req.askingPrice)}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FiTag className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate">{req.furnishing}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FaBed className="text-[#00695C] flex-shrink-0" />
-                      <span>{req.bedrooms} BHK</span>
+                      <FiTrendingUp className="text-[#00695C] flex-shrink-0" />
+                      <span>Offer {formatPrice(req.offerAmount)}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FaCalendarAlt className="text-[#00695C] flex-shrink-0" />
-                      <span>Move-in: {new Date(req.moveInDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}</span>
+                      <span>Possession: {new Date(req.preferredPossessionDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FiClock className="text-[#00695C] flex-shrink-0" />
-                      <span>{req.rentalDuration}</span>
+                  </div>
+
+                  {/* Progress Indicator */}
+                  <div className="mt-2.5 pt-2.5 border-t border-[#E8F0EE]">
+                    <div className="flex items-center justify-between text-[9px] text-[#5A7D78]">
+                      <span>Progress</span>
+                      <span className="font-medium text-[#00695C]">
+                        {Math.round((ALL_STATUSES.indexOf(req.status) + 1) / ALL_STATUSES.length * 100)}%
+                      </span>
                     </div>
-                    <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FiUser className="text-[#00695C] flex-shrink-0" />
-                      <span>{req.tenantType}</span>
+                    <div className="w-full h-1.5 bg-[#F5F9F8] rounded-full overflow-hidden mt-1">
+                      <div 
+                        className={`h-full rounded-full transition-all duration-1000 ${
+                          req.status === 'Closed Lost' ? 'bg-red-500' :
+                          req.status === 'Offer Accepted' || req.status === 'Sale Completed' ? 'bg-emerald-500' :
+                          req.status === 'Agreement' ? 'bg-teal-500' :
+                          'bg-[#00695C]'
+                        }`}
+                        style={{ width: `${Math.round((ALL_STATUSES.indexOf(req.status) + 1) / ALL_STATUSES.length * 100)}%` }}
+                      />
                     </div>
                   </div>
 
@@ -1689,7 +2056,6 @@ const saveForm = useCallback((data) => {
                     >
                       <FiEye className="text-[10px]" /> View
                     </button>
-                    {/* Edit button - visible for ALL statuses */}
                     <button
                       type="button"
                       onClick={() => handleEditRequest(req)}
@@ -1699,7 +2065,7 @@ const saveForm = useCallback((data) => {
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleDeleteRequest(req.id)}
+                      onClick={() => handleDeleteRequest(req)}
                       disabled={actionLoading === req.id}
                       className="flex-1 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 disabled:opacity-50"
                     >
@@ -1721,18 +2087,18 @@ const saveForm = useCallback((data) => {
                   onChange={handleSelectAll}
                   className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                 />
-                <span>Tenant</span>
+                <span>Buyer</span>
               </div>
-              <div className="col-span-2 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('tenantName')}>
-                Name {sortField === 'tenantName' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+              <div className="col-span-2 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('buyerName')}>
+                Name {sortField === 'buyerName' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
               <div className="col-span-1">Status</div>
-              <div className="col-span-1">Rent</div>
+              <div className="col-span-1">Asking</div>
               <div className="col-span-1">Property</div>
-              <div className="col-span-1">Furnishing</div>
+              <div className="col-span-1">Type</div>
               <div className="col-span-1 text-center">BHK</div>
-              <div className="col-span-1 text-center">Tenant Type</div>
-              <div className="col-span-1 text-center">Move-in</div>
+              <div className="col-span-1 text-center">Possession</div>
+              <div className="col-span-1 text-center">Progress</div>
               <div className="col-span-1 text-right">Actions</div>
             </div>
 
@@ -1742,7 +2108,7 @@ const saveForm = useCallback((data) => {
               return (
                 <div
                   key={req.id}
-                  className={`grid grid-cols-12 gap-2 items-center py-3 px-4 border-b border-[#E8F0EE] hover:bg-[#F5F9F8] transition-all duration-300 group ${isSelected ? 'bg-[#E8F4F2]' : ''} ${req.status === 'new' ? 'bg-blue-50/30' : req.status === 'pending' ? 'bg-amber-50/30' : ''}`}
+                  className={`grid grid-cols-12 gap-2 items-center py-3 px-4 border-b border-[#E8F0EE] hover:bg-[#F5F9F8] transition-all duration-300 group ${isSelected ? 'bg-[#E8F4F2]' : ''}`}
                   style={{ animationDelay: `${index * 30}ms` }}
                 >
                   <div className="col-span-1 flex items-center gap-2">
@@ -1753,36 +2119,53 @@ const saveForm = useCallback((data) => {
                       className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                     />
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white font-bold text-xs shadow-md">
-                      {req.tenantName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                      {req.buyerName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
                     </div>
                   </div>
 
                   <div className="col-span-2">
-                    <p className="font-semibold text-sm text-[#1A2E2A]">{req.tenantName}</p>
-                    <p className="text-[10px] text-[#5A7D78] truncate">{req.email}</p>
+                    <p className="font-semibold text-sm text-[#1A2E2A]">{req.buyerName}</p>
+                    <p className="text-[10px] text-[#5A7D78] truncate">{req.buyerEmail}</p>
                   </div>
 
                   <div className="col-span-1">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium flex items-center gap-1 ${getStatusColor(req.status)}`}>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium flex items-center gap-0.5 ${getStatusColor(req.status)}`}>
                       {getStatusIcon(req.status)}
-                      {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
+                      {req.status}
                     </span>
                   </div>
 
                   <div className="col-span-1 text-xs text-[#5A7D78]">
-                    ₹{Math.floor(req.rentAmount / 1000)}K
+                    {formatPrice(req.askingPrice)}
                   </div>
+
+                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">{req.propertyName}</div>
 
                   <div className="col-span-1 text-xs text-[#5A7D78] truncate">{req.propertyType}</div>
 
-                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">{req.furnishing}</div>
-
                   <div className="col-span-1 text-center text-xs text-[#5A7D78]">{req.bedrooms} BHK</div>
 
-                  <div className="col-span-1 text-center text-xs text-[#5A7D78] truncate">{req.tenantType}</div>
-
                   <div className="col-span-1 text-center text-[10px] text-[#5A7D78]">
-                    {new Date(req.moveInDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
+                    {new Date(req.preferredPossessionDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
+                  </div>
+
+                  <div className="col-span-1">
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-1.5 bg-[#F5F9F8] rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full rounded-full transition-all duration-1000 ${
+                            req.status === 'Closed Lost' ? 'bg-red-500' :
+                            req.status === 'Offer Accepted' || req.status === 'Sale Completed' ? 'bg-emerald-500' :
+                            req.status === 'Agreement' ? 'bg-teal-500' :
+                            'bg-[#00695C]'
+                          }`}
+                          style={{ width: `${Math.round((ALL_STATUSES.indexOf(req.status) + 1) / ALL_STATUSES.length * 100)}%` }}
+                        />
+                      </div>
+                      <span className="text-[8px] text-[#5A7D78] font-medium">
+                        {Math.round((ALL_STATUSES.indexOf(req.status) + 1) / ALL_STATUSES.length * 100)}%
+                      </span>
+                    </div>
                   </div>
 
                   <div className="col-span-1 flex items-center justify-end gap-1">
@@ -1794,7 +2177,6 @@ const saveForm = useCallback((data) => {
                     >
                       <FiEye className="text-xs" />
                     </button>
-                    {/* Edit button - visible for ALL statuses */}
                     <button
                       type="button"
                       onClick={() => handleEditRequest(req)}
@@ -1805,7 +2187,7 @@ const saveForm = useCallback((data) => {
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleDeleteRequest(req.id)}
+                      onClick={() => handleDeleteRequest(req)}
                       disabled={actionLoading === req.id}
                       className="w-7 h-7 rounded-lg hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-red-600 hover:scale-110 disabled:opacity-50"
                       title="Delete"
@@ -1822,11 +2204,11 @@ const saveForm = useCallback((data) => {
         {paginatedRequests.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-[#E8F0EE]">
             <div className="w-24 h-24 rounded-full bg-[#F5F9F8] flex items-center justify-center mb-4 animate-float">
-              <FiFileText className="text-4xl text-[#B5C9C5]" />
+              <FiHome className="text-4xl text-[#B5C9C5]" />
             </div>
-            <h3 className="text-xl font-semibold text-[#1A2E2A]">No rental requests found</h3>
+            <h3 className="text-xl font-semibold text-[#1A2E2A]">No purchase requests found</h3>
             <p className="text-sm text-[#5A7D78] mt-1">
-              {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No requests match your current view'}
+              {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No purchase requests match your current view'}
             </p>
             {filterCount > 0 ? (
               <button
@@ -1840,7 +2222,7 @@ const saveForm = useCallback((data) => {
                 onClick={handleAddRequest}
                 className="mt-4 px-6 py-2.5 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-sm font-medium shadow-lg shadow-[#00695C]/30 hover:scale-105 flex items-center gap-2"
               >
-                <FiPlus className="text-sm" /> New Rental Request
+                <FiPlus className="text-sm" /> Add Request
               </button>
             )}
           </div>
@@ -1952,4 +2334,4 @@ const saveForm = useCallback((data) => {
   );
 };
 
-export default RentalRequestManagement;
+export default PurchaseRequestStatus;
