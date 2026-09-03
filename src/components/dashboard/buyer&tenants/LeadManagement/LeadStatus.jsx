@@ -1,24 +1,111 @@
-// src/components/dashboard/admin/buyer&tenants/LeadManagement/LeadDashboard.jsx
+// src/components/dashboard/admin/buyer&tenants/LeadManagement/LeadStatus.jsx
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  FiUsers, FiHome, FiMapPin, FiDollarSign, FiCalendar,
-  FiClock, FiUser, FiCheckCircle, FiXCircle, FiSearch,
+  FiUsers, FiUser, FiMail, FiPhone, FiCalendar,
+  FiClock, FiUserCheck, FiCheckCircle, FiXCircle, FiSearch,
   FiChevronDown, FiChevronLeft, FiChevronRight, FiEye, FiEdit,
-  FiTrash2, FiRefreshCw, FiDownload, FiAlertTriangle,
+  FiTrash2, FiRefreshCw, FiDownload, FiAlertTriangle, FiAlertCircle,
   FiInfo, FiX, FiList, FiGrid as FiGridIcon, FiActivity,
-  FiMail, FiPhone, FiExternalLink, FiTag, FiGrid, FiSave,
-  FiClock as FiClockIcon, FiUserCheck, FiBriefcase,
-  FiFileText, FiStar, FiShield, FiTool, FiTrendingUp,
-  FiUserPlus, FiPhoneCall, FiThumbsUp, FiThumbsDown, FiTarget
+  FiTag, FiSave, FiUserPlus, FiMessageCircle, FiStar,
+  FiTrendingUp, FiDollarSign, FiBriefcase, FiFlag, FiTarget,
+  FiArrowRight,FiSend  
 } from 'react-icons/fi';
 import {
-  FaBuilding, FaBed, FaBath, FaCar, FaCheck,
-  FaTimes, FaStar as FaStarSolid, FaUserTie, FaHome as FaHomeSolid,
-  FaImage, FaCalendarAlt, FaClock, FaPhoneAlt, FaUserCircle,
-  FaComments, FaClipboardList, FaHandshake
+  FaUserTie, FaCalendarAlt, FaHome, FaBuilding,
+  FaClipboardList, FaHandshake, FaChartLine, FaUserCheck as FaUserCheckSolid
 } from 'react-icons/fa';
+
+// ============================================================
+// STATUS CONFIG — single source of truth for the workflow
+// ============================================================
+const STATUS_FLOW = ['new', 'contacted', 'interested', 'follow_up', 'site_visit', 'negotiation', 'closed_won', 'closed_lost'];
+
+const STATUS_CONFIG = {
+  new: {
+    label: 'New',
+    short: 'New',
+    badge: 'bg-blue-50 text-blue-700 border-blue-200',
+    dot: 'bg-blue-500',
+    gradient: 'from-blue-600 to-blue-400',
+    icon: FiUserPlus,
+    description: 'New lead has been captured. Initial contact pending.',
+    stage: 0
+  },
+  contacted: {
+    label: 'Contacted',
+    short: 'Contacted',
+    badge: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+    dot: 'bg-indigo-500',
+    gradient: 'from-indigo-600 to-indigo-400',
+    icon: FiMessageCircle,
+    description: 'Initial outreach made. Awaiting response.',
+    stage: 1
+  },
+  interested: {
+    label: 'Interested',
+    short: 'Interested',
+    badge: 'bg-amber-50 text-amber-700 border-amber-200',
+    dot: 'bg-amber-500',
+    gradient: 'from-amber-600 to-amber-400',
+    icon: FiStar,
+    description: 'Lead has shown interest. Qualifying further.',
+    stage: 2
+  },
+  follow_up: {
+    label: 'Follow-up',
+    short: 'Follow-up',
+    badge: 'bg-purple-50 text-purple-700 border-purple-200',
+    dot: 'bg-purple-500',
+    gradient: 'from-purple-600 to-purple-400',
+    icon: FiRefreshCw,
+    description: 'Scheduled follow-up. Keeping engagement active.',
+    stage: 3
+  },
+  site_visit: {
+    label: 'Site Visit',
+    short: 'Site Visit',
+    badge: 'bg-teal-50 text-teal-700 border-teal-200',
+    dot: 'bg-teal-500',
+    gradient: 'from-teal-600 to-teal-400',
+    icon: FaHome,
+    description: 'Site visit scheduled or completed.',
+    stage: 4
+  },
+  negotiation: {
+    label: 'Negotiation',
+    short: 'Negotiation',
+    badge: 'bg-orange-50 text-orange-700 border-orange-200',
+    dot: 'bg-orange-500',
+    gradient: 'from-orange-600 to-orange-400',
+    icon: FiTrendingUp,
+    description: 'In price/value negotiation phase.',
+    stage: 5
+  },
+  closed_won: {
+    label: 'Closed Won',
+    short: 'Won',
+    badge: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    dot: 'bg-emerald-500',
+    gradient: 'from-emerald-600 to-emerald-400',
+    icon: FiCheckCircle,
+    description: 'Deal successfully closed. Lead converted.',
+    stage: 6
+  },
+  closed_lost: {
+    label: 'Closed Lost',
+    short: 'Lost',
+    badge: 'bg-red-50 text-red-700 border-red-200',
+    dot: 'bg-red-500',
+    gradient: 'from-red-600 to-red-400',
+    icon: FiXCircle,
+    description: 'Deal closed but lost to competition or other reasons.',
+    stage: 7
+  }
+};
+
+const STATUS_KEYS = Object.keys(STATUS_CONFIG);
 
 // ============================================================
 // TOAST COMPONENT
@@ -35,9 +122,7 @@ const Toast = ({ toast, setToast }) => {
 
   useEffect(() => {
     if (toast) {
-      const timer = setTimeout(() => {
-        setToast(null);
-      }, 3000);
+      const timer = setTimeout(() => setToast(null), 3000);
       return () => clearTimeout(timer);
     }
   }, [toast, setToast]);
@@ -60,24 +145,9 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
   if (!isOpen) return null;
 
   const typeStyles = {
-    danger: {
-      icon: 'text-red-600',
-      bg: 'bg-red-50',
-      button: 'bg-red-600 hover:bg-red-700 focus:ring-red-500',
-      border: 'border-red-200'
-    },
-    warning: {
-      icon: 'text-amber-600',
-      bg: 'bg-amber-50',
-      button: 'bg-amber-600 hover:bg-amber-700 focus:ring-amber-500',
-      border: 'border-amber-200'
-    },
-    info: {
-      icon: 'text-blue-600',
-      bg: 'bg-blue-50',
-      button: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500',
-      border: 'border-blue-200'
-    }
+    danger: { icon: 'text-red-600', bg: 'bg-red-50', button: 'bg-red-600 hover:bg-red-700 focus:ring-red-500', border: 'border-red-200' },
+    warning: { icon: 'text-amber-600', bg: 'bg-amber-50', button: 'bg-amber-600 hover:bg-amber-700 focus:ring-amber-500', border: 'border-amber-200' },
+    info: { icon: 'text-blue-600', bg: 'bg-blue-50', button: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500', border: 'border-blue-200' }
   };
 
   const style = typeStyles[type] || typeStyles.danger;
@@ -96,13 +166,11 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
             </div>
           </div>
         </div>
-
         <div className="p-6">
           <p className="text-sm text-[#5A7D78] leading-relaxed">
             This action cannot be undone. Please confirm your decision.
           </p>
         </div>
-
         <div className="px-6 py-4 bg-[#F8FAF9] border-t border-[#E8F0EE] flex items-center gap-3">
           <button
             onClick={onClose}
@@ -111,10 +179,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
             {cancelText || 'Cancel'}
           </button>
           <button
-            onClick={() => {
-              onConfirm();
-              onClose();
-            }}
+            onClick={() => { onConfirm(); onClose(); }}
             className={`flex-1 px-4 py-2.5 text-white rounded-xl transition-all duration-300 text-sm font-medium shadow-lg hover:scale-[1.02] ${style.button}`}
           >
             {confirmText || 'Confirm'}
@@ -131,7 +196,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
 const StatCard = ({ icon, title, value, color, delay = 0, isActive, statsAnimating, onClick }) => {
   return (
     <div
-      className={`bg-white rounded-2xl p-3 shadow-sm hover:shadow-lg transition-all duration-500 border group cursor-pointer transform hover:-translate-y-1 ${statsAnimating ? 'animate-pulse-once' : ''} ${isActive ? 'ring-2 ring-[#00695C] shadow-lg bg-[#F5F9F8]' : 'border-[#E8F0EE]'}`}
+      className={`bg-white rounded-2xl p-1 shadow-sm hover:shadow-lg transition-all duration-500 border group cursor-pointer transform hover:-translate-y-1 ${statsAnimating ? 'animate-pulse-once' : ''} ${isActive ? 'ring-2 ring-[#00695C] shadow-lg bg-[#F5F9F8]' : 'border-[#E8F0EE]'}`}
       style={{ animationDelay: `${delay}ms` }}
       onClick={() => onClick && onClick()}
     >
@@ -140,7 +205,7 @@ const StatCard = ({ icon, title, value, color, delay = 0, isActive, statsAnimati
           {icon}
         </div>
         <div className="min-w-0">
-          <p className="text-[10px] font-semibold text-[#5A7D78] uppercase tracking-wider truncate">{title}</p>
+          <p className="text-[11px] font-semibold text-[#5A7D79] uppercase tracking-wider truncate">{title}</p>
           <p className={`text-lg font-bold text-[#1A2E2A] group-hover:text-[#00695C] transition-colors duration-300 ${isActive ? 'text-[#00695C]' : ''}`}>
             {typeof value === 'number' ? value.toLocaleString() : value}
           </p>
@@ -156,41 +221,104 @@ const StatCard = ({ icon, title, value, color, delay = 0, isActive, statsAnimati
 };
 
 // ============================================================
+// STATUS TIMELINE — horizontal stepper
+// ============================================================
+const StatusTimeline = ({ currentStatus, history }) => {
+  const isTerminal = currentStatus === 'closed_won' || currentStatus === 'closed_lost';
+  const activeIndex = STATUS_FLOW.indexOf(currentStatus);
+  const terminalIndex = STATUS_FLOW.indexOf('closed_won');
+
+  return (
+    <div className="bg-[#F5F9F8] rounded-2xl p-4">
+      <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-4 flex items-center gap-2">
+        <FiActivity className="text-[#00695C]" />
+        Lead Journey
+      </h4>
+
+      {/* Main flow */}
+      <div className="flex items-center overflow-x-auto pb-2">
+        {STATUS_FLOW.map((key, idx) => {
+          const cfg = STATUS_CONFIG[key];
+          const Icon = cfg.icon;
+          const isTerminalStatus = key === 'closed_won' || key === 'closed_lost';
+          const reached = !isTerminal ? activeIndex >= idx : (activeIndex >= terminalIndex && idx <= terminalIndex);
+          const isCurrent = activeIndex === idx;
+          const active = reached || isCurrent;
+
+          // For terminal states, we show both but only one is active
+          const isActiveTerminal = key === currentStatus && isTerminal;
+          const isOtherTerminal = isTerminal && key !== currentStatus && key !== 'closed_won' && key !== 'closed_lost';
+
+          return (
+            <React.Fragment key={key}>
+              <div className="flex flex-col items-center gap-1.5 min-w-[56px] flex-shrink-0">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all duration-500 ${
+                    active || isActiveTerminal
+                      ? `bg-gradient-to-br ${cfg.gradient} text-white scale-100`
+                      : 'bg-white border-2 border-[#E8F0EE] text-[#B5C9C5]'
+                  } ${isCurrent ? 'ring-4 ring-[#00695C]/20' : ''}`}
+                >
+                  <Icon className="text-xs" />
+                </div>
+                <span className={`text-[8px] font-medium text-center leading-tight ${active || isActiveTerminal ? 'text-[#1A2E2A]' : 'text-[#B5C9C5]'}`}>
+                  {cfg.short}
+                </span>
+              </div>
+              {idx < STATUS_FLOW.length - 1 && (
+                <div className={`flex-1 h-0.5 mb-4 rounded-full transition-all duration-500 min-w-[12px] ${
+                  (active && idx < activeIndex) || (isTerminal && idx < terminalIndex)
+                    ? 'bg-gradient-to-r from-[#00695C] to-[#26A69A]'
+                    : 'bg-[#E8F0EE]'
+                }`} />
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
+
+      {/* Branch outcome badge */}
+      {isTerminal && (
+        <div className="mt-4 pt-4 border-t border-dashed border-[#E8F0EE] flex items-center gap-2">
+          <FiFlag className="text-[#5A7D78] text-sm" />
+          <span className="text-xs text-[#5A7D78]">Deal</span>
+          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${STATUS_CONFIG[currentStatus].badge}`}>
+            {STATUS_CONFIG[currentStatus].label}
+          </span>
+        </div>
+      )}
+
+      {/* History trail */}
+      {history && history.length > 0 && (
+        <div className="mt-4 pt-4 border-t border-[#E8F0EE] space-y-2">
+          {history.map((h, i) => (
+            <div key={i} className="flex items-center gap-2 text-[11px]">
+              <span className={`w-1.5 h-1.5 rounded-full ${STATUS_CONFIG[h.status]?.dot || 'bg-slate-400'}`} />
+              <span className="text-[#1A2E2A] font-medium">{STATUS_CONFIG[h.status]?.label || h.status}</span>
+              <span className="text-[#B5C9C5]">·</span>
+              <span className="text-[#5A7D78]">{h.date}</span>
+              {h.note && <span className="text-[#5A7D78] italic truncate">— {h.note}</span>}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================================
 // VIEW LEAD DETAILS MODAL
 // ============================================================
 const ViewLeadModal = ({ lead, show, onClose, onEdit, onDelete }) => {
   if (!lead || !show) return null;
 
-  const getStatusBadge = (status) => {
-    const statusMap = {
-      new: { label: 'New', color: 'bg-blue-100 text-blue-700' },
-      'follow-up': { label: 'Follow-up', color: 'bg-amber-100 text-amber-700' },
-      'site-visit': { label: 'Site Visit', color: 'bg-purple-100 text-purple-700' },
-      negotiation: { label: 'Negotiation', color: 'bg-orange-100 text-orange-700' },
-      won: { label: 'Won', color: 'bg-emerald-100 text-emerald-700' },
-      lost: { label: 'Lost', color: 'bg-red-100 text-red-700' }
-    };
-    return statusMap[status] || { label: 'New', color: 'bg-blue-100 text-blue-700' };
-  };
+  const cfg = STATUS_CONFIG[lead.leadStatus] || STATUS_CONFIG.new;
 
-  const handleDeleteClick = () => {
-    if (onDelete) {
-      onDelete(lead.id);
-    }
-  };
-
-  const handleEditClick = () => {
-    if (onEdit) {
-      onEdit(lead);
-      onClose();
-    }
-  };
+  const handleDeleteClick = () => onDelete && onDelete(lead.id);
+  const handleEditClick = () => { onEdit && onEdit(lead); onClose(); };
 
   const formattedDate = lead.createdAt ? new Date(lead.createdAt).toLocaleDateString('en-IN', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
   }) : 'N/A';
 
   return (
@@ -211,61 +339,59 @@ const ViewLeadModal = ({ lead, show, onClose, onEdit, onDelete }) => {
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-white">
           <div className="space-y-6">
-            {/* Status Badges */}
             <div className="flex items-center gap-3 flex-wrap">
-              <span className={`px-4 py-1.5 rounded-full text-xs font-semibold ${getStatusBadge(lead.leadStatus).color}`}>
-                {getStatusBadge(lead.leadStatus).label}
+              <span className={`px-4 py-1.5 rounded-full text-xs font-semibold border ${cfg.badge}`}>
+                {cfg.label}
               </span>
               <span className="px-4 py-1.5 rounded-full text-xs font-semibold bg-[#F5F9F8] text-[#5A7D78]">
                 {lead.leadSource || 'Direct'}
               </span>
-              <span className="px-4 py-1.5 rounded-full text-xs font-semibold bg-[#FEF3E2] text-amber-700">
-                {lead.priority || 'Medium'} Priority
+              <span className="px-4 py-1.5 rounded-full text-xs font-semibold bg-[#F5F9F8] text-[#5A7D78]">
+                {lead.leadType || 'Buyer'}
               </span>
             </div>
 
-            {/* Avatar Banner */}
-            <div className="bg-gradient-to-br from-[#00695C]/10 to-[#26A69A]/10 rounded-2xl p-6 flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0">
-                {lead.leadName ? lead.leadName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() : 'NA'}
-              </div>
-              <div className="min-w-0">
-                <h3 className="text-lg font-bold text-[#1A2E2A] truncate">{lead.leadName}</h3>
-                <p className="text-sm text-[#5A7D78] truncate">{lead.email}</p>
-              </div>
-            </div>
+            <p className="text-sm text-[#5A7D78] bg-[#F5F9F8] rounded-2xl p-4 leading-relaxed">
+              {cfg.description}
+            </p>
 
-            {/* All Details */}
+            {/* Status Timeline */}
+            <StatusTimeline currentStatus={lead.leadStatus} history={lead.statusHistory} />
+
+            {/* Detail Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Contact */}
-              <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <div className="bg-[#F5F9F8] rounded-2xl p-4 md:col-span-2">
                 <div className="flex items-center gap-2 mb-1">
-                  <FiPhone className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Contact Number</h4>
+                  <FiUser className="text-[#00695C] text-sm" />
+                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Lead Name</h4>
                 </div>
-                <p className="text-sm font-medium text-[#1A2E2A]">{lead.phone || 'N/A'}</p>
+                <p className="text-sm font-medium text-[#1A2E2A]">{lead.leadName || 'N/A'}</p>
               </div>
 
-              {/* Email */}
               <div className="bg-[#F5F9F8] rounded-2xl p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <FiMail className="text-[#00695C] text-sm" />
                   <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Email</h4>
                 </div>
-                <p className="text-sm font-medium text-[#1A2E2A] truncate">{lead.email || 'N/A'}</p>
+                <p className="text-sm font-medium text-[#1A2E2A] break-all">{lead.leadEmail || 'N/A'}</p>
               </div>
 
-              {/* Property Interest */}
               <div className="bg-[#F5F9F8] rounded-2xl p-4">
                 <div className="flex items-center gap-2 mb-1">
-                  <FiHome className="text-[#00695C] text-sm" />
+                  <FiPhone className="text-[#00695C] text-sm" />
+                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Phone</h4>
+                </div>
+                <p className="text-sm font-medium text-[#1A2E2A]">{lead.contactNumber || 'N/A'}</p>
+              </div>
+
+              <div className="bg-[#F5F9F8] rounded-2xl p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <FaHome className="text-[#00695C] text-sm" />
                   <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Property Interest</h4>
                 </div>
                 <p className="text-sm font-medium text-[#1A2E2A]">{lead.propertyInterest || 'N/A'}</p>
-                <p className="text-xs text-[#5A7D78]">{lead.propertyType || ''}</p>
               </div>
 
-              {/* Budget */}
               <div className="bg-[#F5F9F8] rounded-2xl p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <FiDollarSign className="text-[#00695C] text-sm" />
@@ -274,82 +400,28 @@ const ViewLeadModal = ({ lead, show, onClose, onEdit, onDelete }) => {
                 <p className="text-sm font-medium text-[#1A2E2A]">{lead.budget || 'N/A'}</p>
               </div>
 
-              {/* Lead Source */}
               <div className="bg-[#F5F9F8] rounded-2xl p-4">
                 <div className="flex items-center gap-2 mb-1">
-                  <FiTarget className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Lead Source</h4>
+                  <FaUserTie className="text-[#00695C] text-sm" />
+                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Assigned To</h4>
                 </div>
-                <p className="text-sm font-medium text-[#1A2E2A]">{lead.leadSource || 'N/A'}</p>
+                <p className="text-sm font-medium text-[#1A2E2A]">{lead.assignedAgent || 'Unassigned'}</p>
               </div>
 
-              {/* Assigned Agent */}
-              <div className="bg-[#F5F9F8] rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <FiUserCheck className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Assigned Agent</h4>
-                </div>
-                <p className="text-sm font-medium text-[#1A2E2A]">{lead.assignedAgent || 'N/A'}</p>
-                <p className="text-xs text-[#5A7D78]">{lead.agentEmail || ''}</p>
-              </div>
-
-              {/* Lead Status */}
-              <div className="bg-[#F5F9F8] rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <FiTag className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Lead Status</h4>
-                </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(lead.leadStatus).color}`}>
-                  {getStatusBadge(lead.leadStatus).label}
-                </span>
-              </div>
-
-              {/* Next Follow-up */}
-              <div className="bg-[#F5F9F8] rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <FiCalendar className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Next Follow-up</h4>
-                </div>
-                <p className="text-sm font-medium text-[#1A2E2A]">
-                  {lead.nextFollowUp ? new Date(lead.nextFollowUp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
-                </p>
-              </div>
-
-              {/* Notes */}
               <div className="bg-[#F5F9F8] rounded-2xl p-4 md:col-span-2">
                 <div className="flex items-center gap-2 mb-1">
-                  <FiFileText className="text-[#00695C] text-sm" />
+                  <FiCalendar className="text-[#00695C] text-sm" />
+                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Lead Created</h4>
+                </div>
+                <p className="text-sm font-medium text-[#1A2E2A]">{formattedDate}</p>
+              </div>
+
+              <div className="bg-[#F5F9F8] rounded-2xl p-4 md:col-span-2">
+                <div className="flex items-center gap-2 mb-1">
+                  <FaClipboardList className="text-[#00695C] text-sm" />
                   <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Notes</h4>
                 </div>
                 <p className="text-sm text-[#1A2E2A] leading-relaxed">{lead.notes || 'No notes available'}</p>
-              </div>
-            </div>
-
-            {/* Additional Information */}
-            <div className="bg-[#F5F9F8] rounded-2xl p-4">
-              <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <FiInfo className="text-[#00695C]" />
-                Additional Information
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#5A7D78]">Priority</span>
-                  <span className="text-sm font-medium text-[#1A2E2A]">{lead.priority || 'Medium'}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#5A7D78]">Last Contacted</span>
-                  <span className="text-sm font-medium text-[#1A2E2A]">
-                    {lead.lastContacted ? new Date(lead.lastContacted).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#5A7D78]">Created By</span>
-                  <span className="text-sm font-medium text-[#1A2E2A]">{lead.createdBy || 'Admin'}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#5A7D78]">Created At</span>
-                  <span className="text-sm font-medium text-[#1A2E2A]">{formattedDate}</span>
-                </div>
               </div>
             </div>
           </div>
@@ -358,22 +430,13 @@ const ViewLeadModal = ({ lead, show, onClose, onEdit, onDelete }) => {
         {/* Footer */}
         <div className="sticky bottom-0 px-6 py-4 bg-white border-t border-[#E8F0EE] rounded-b-3xl shrink-0 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
           <div className="flex items-center gap-3">
-            <button
-              onClick={onClose}
-              className="flex-1 px-4 py-2.5 bg-[#F5F9F8] text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium"
-            >
+            <button onClick={onClose} className="flex-1 px-4 py-2.5 bg-[#F5F9F8] text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium">
               Close
             </button>
-            <button
-              onClick={handleEditClick}
-              className="flex-1 px-4 py-2.5 bg-[#26A69A] text-white rounded-xl hover:bg-[#1A8A7A] transition-all duration-300 text-sm font-medium shadow-lg shadow-[#26A69A]/30 hover:scale-[1.02]"
-            >
-              <FiEdit className="inline mr-2" /> Edit
+            <button onClick={handleEditClick} className="flex-1 px-4 py-2.5 bg-[#26A69A] text-white rounded-xl hover:bg-[#1A8A7A] transition-all duration-300 text-sm font-medium shadow-lg shadow-[#26A69A]/30 hover:scale-[1.02]">
+              <FiEdit className="inline mr-2" /> Update Status
             </button>
-            <button
-              onClick={handleDeleteClick}
-              className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-300 text-sm font-medium shadow-lg shadow-red-600/30 hover:scale-[1.02]"
-            >
+            <button onClick={handleDeleteClick} className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-300 text-sm font-medium shadow-lg shadow-red-600/30 hover:scale-[1.02]">
               <FiTrash2 className="inline mr-2" /> Delete
             </button>
           </div>
@@ -384,60 +447,47 @@ const ViewLeadModal = ({ lead, show, onClose, onEdit, onDelete }) => {
 };
 
 // ============================================================
-// EDIT LEAD MODAL
+// EDIT / UPDATE STATUS MODAL
 // ============================================================
 const EditLeadModal = ({ lead, show, onClose, onSave }) => {
   if (!lead || !show) return null;
 
   const [formData, setFormData] = useState({
+    leadStatus: '',
     leadName: '',
-    email: '',
-    phone: '',
+    leadEmail: '',
+    contactNumber: '',
     propertyInterest: '',
-    propertyType: '',
     budget: '',
     leadSource: '',
+    leadType: '',
     assignedAgent: '',
-    agentEmail: '',
-    leadStatus: '',
-    priority: '',
-    nextFollowUp: '',
-    notes: ''
+    notes: '',
+    statusNote: ''
   });
-
   const [loading, setLoading] = useState(false);
-
-  const statusOptions = ['new', 'follow-up', 'site-visit', 'negotiation', 'won', 'lost'];
-  const sourceOptions = ['Website', 'Referral', 'Walk-in', 'Social Media', 'Advertisement', 'Cold Call'];
-  const propertyTypes = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
-  const priorityOptions = ['Low', 'Medium', 'High'];
 
   useEffect(() => {
     if (lead) {
       setFormData({
+        leadStatus: lead.leadStatus || 'new',
         leadName: lead.leadName || '',
-        email: lead.email || '',
-        phone: lead.phone || '',
+        leadEmail: lead.leadEmail || '',
+        contactNumber: lead.contactNumber || '',
         propertyInterest: lead.propertyInterest || '',
-        propertyType: lead.propertyType || '',
         budget: lead.budget || '',
-        leadSource: lead.leadSource || '',
+        leadSource: lead.leadSource || 'Direct',
+        leadType: lead.leadType || 'Buyer',
         assignedAgent: lead.assignedAgent || '',
-        agentEmail: lead.agentEmail || '',
-        leadStatus: lead.leadStatus || '',
-        priority: lead.priority || '',
-        nextFollowUp: lead.nextFollowUp || '',
-        notes: lead.notes || ''
+        notes: lead.notes || '',
+        statusNote: ''
       });
     }
   }, [lead]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
@@ -445,9 +495,29 @@ const EditLeadModal = ({ lead, show, onClose, onSave }) => {
     setLoading(true);
 
     setTimeout(() => {
+      const statusChanged = formData.leadStatus !== lead.leadStatus;
       const updatedLead = {
         ...lead,
-        ...formData
+        leadStatus: formData.leadStatus,
+        leadName: formData.leadName,
+        leadEmail: formData.leadEmail,
+        contactNumber: formData.contactNumber,
+        propertyInterest: formData.propertyInterest,
+        budget: formData.budget,
+        leadSource: formData.leadSource,
+        leadType: formData.leadType,
+        assignedAgent: formData.assignedAgent,
+        notes: formData.notes,
+        statusHistory: statusChanged
+          ? [
+              {
+                status: formData.leadStatus,
+                date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+                note: formData.statusNote || undefined
+              },
+              ...(lead.statusHistory || [])
+            ]
+          : lead.statusHistory
       };
       onSave(updatedLead);
       setLoading(false);
@@ -457,7 +527,7 @@ const EditLeadModal = ({ lead, show, onClose, onSave }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
+      <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] p-6 rounded-t-3xl z-10 shrink-0">
           <button
@@ -466,14 +536,44 @@ const EditLeadModal = ({ lead, show, onClose, onSave }) => {
           >
             <FiX className="text-lg" />
           </button>
-          <h2 className="text-2xl font-bold text-white">Edit Lead</h2>
-          <p className="text-white/80 text-sm">Update lead information</p>
+          <h2 className="text-2xl font-bold text-white">Update Lead</h2>
+          <p className="text-white/80 text-sm">{lead.leadName || 'New Lead'}</p>
         </div>
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-white">
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Lead Information */}
+            {/* Status picker */}
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
+                <FiTag className="text-[#00695C]" />
+                Lead Status
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {STATUS_KEYS.map(key => {
+                  const cfg = STATUS_CONFIG[key];
+                  const Icon = cfg.icon;
+                  const selected = formData.leadStatus === key;
+                  return (
+                    <button
+                      type="button"
+                      key={key}
+                      onClick={() => setFormData(prev => ({ ...prev, leadStatus: key }))}
+                      className={`flex items-center gap-1.5 px-2 py-2 rounded-xl border text-[12px] font-medium transition-all duration-300 hover:scale-[1.02] ${
+                        selected
+                          ? `bg-gradient-to-br ${cfg.gradient} text-white border-transparent shadow-md`
+                          : 'bg-white text-[#5A7D78] border-[#E8F0EE] hover:border-[#00695C]/30'
+                      }`}
+                    >
+                      <Icon className="text-sm shrink-0" />
+                      <span className="truncate">{cfg.short}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Lead Info */}
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
               <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
                 <FiUser className="text-[#00695C]" />
@@ -489,30 +589,46 @@ const EditLeadModal = ({ lead, show, onClose, onSave }) => {
                     onChange={handleChange}
                     required
                     className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                    placeholder="Enter name"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-[#5A7D78] mb-1">Email</label>
                   <input
                     type="email"
-                    name="email"
-                    value={formData.email}
+                    name="leadEmail"
+                    value={formData.leadEmail}
                     onChange={handleChange}
                     className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                    placeholder="lead@email.com"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Contact Number *</label>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Phone</label>
                   <input
                     type="text"
-                    name="phone"
-                    value={formData.phone}
+                    name="contactNumber"
+                    value={formData.contactNumber}
                     onChange={handleChange}
-                    required
                     className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                    placeholder="+91 9876543210"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Property Interest</label>
+                  <input
+                    type="text"
+                    name="propertyInterest"
+                    value={formData.propertyInterest}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Budget</label>
+                  <input
+                    type="text"
+                    name="budget"
+                    value={formData.budget}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
                   />
                 </div>
                 <div>
@@ -523,69 +639,29 @@ const EditLeadModal = ({ lead, show, onClose, onSave }) => {
                     onChange={handleChange}
                     className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
                   >
-                    <option value="">Select Source</option>
-                    {sourceOptions.map(src => (
-                      <option key={src} value={src}>{src}</option>
-                    ))}
+                    <option value="Direct">Direct</option>
+                    <option value="Referral">Referral</option>
+                    <option value="Website">Website</option>
+                    <option value="Social Media">Social Media</option>
+                    <option value="Email">Email</option>
+                    <option value="Phone">Phone</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
-              </div>
-            </div>
-
-            {/* Property Interest */}
-            <div className="bg-[#F5F9F8] rounded-2xl p-4">
-              <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <FiHome className="text-[#00695C]" />
-                Property Interest
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Property Interest *</label>
-                  <input
-                    type="text"
-                    name="propertyInterest"
-                    value={formData.propertyInterest}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                    placeholder="Enter property name"
-                  />
-                </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Property Type</label>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Lead Type</label>
                   <select
-                    name="propertyType"
-                    value={formData.propertyType}
+                    name="leadType"
+                    value={formData.leadType}
                     onChange={handleChange}
                     className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
                   >
-                    <option value="">Select Type</option>
-                    {propertyTypes.map(type => (
-                      <option key={type} value={type}>{type}</option>
-                    ))}
+                    <option value="Buyer">Buyer</option>
+                    <option value="Tenant">Tenant</option>
+                    <option value="Investor">Investor</option>
+                    <option value="Seller">Seller</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Budget</label>
-                  <input
-                    type="text"
-                    name="budget"
-                    value={formData.budget}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                    placeholder="e.g., ₹50L - ₹75L"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Assignment */}
-            <div className="bg-[#F5F9F8] rounded-2xl p-4">
-              <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <FiUserCheck className="text-[#00695C]" />
-                Assignment & Status
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-[#5A7D78] mb-1">Assigned Agent</label>
                   <input
@@ -594,68 +670,32 @@ const EditLeadModal = ({ lead, show, onClose, onSave }) => {
                     value={formData.assignedAgent}
                     onChange={handleChange}
                     className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                    placeholder="Enter agent name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Agent Email</label>
-                  <input
-                    type="email"
-                    name="agentEmail"
-                    value={formData.agentEmail}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                    placeholder="agent@email.com"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Lead Status *</label>
-                  <select
-                    name="leadStatus"
-                    value={formData.leadStatus}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                  >
-                    <option value="">Select Status</option>
-                    {statusOptions.map(status => (
-                      <option key={status} value={status}>
-                        {status.charAt(0).toUpperCase() + status.slice(1).replace('-', ' ')}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Priority</label>
-                  <select
-                    name="priority"
-                    value={formData.priority}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                  >
-                    <option value="">Select Priority</option>
-                    {priorityOptions.map(p => (
-                      <option key={p} value={p}>{p}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Next Follow-up</label>
-                  <input
-                    type="date"
-                    name="nextFollowUp"
-                    value={formData.nextFollowUp}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                    placeholder="Agent name"
                   />
                 </div>
               </div>
             </div>
 
+            {/* Status Note */}
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
+                <FiSend className="text-[#00695C]" />
+                Status Update Note
+              </h3>
+              <textarea
+                name="statusNote"
+                value={formData.statusNote}
+                onChange={handleChange}
+                rows="2"
+                className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none resize-none"
+                placeholder="e.g., Lead responded with interest in 3BHK units"
+              />
+            </div>
+
             {/* Notes */}
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
               <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <FiFileText className="text-[#00695C]" />
+                <FaClipboardList className="text-[#00695C]" />
                 Notes
               </h3>
               <textarea
@@ -673,10 +713,7 @@ const EditLeadModal = ({ lead, show, onClose, onSave }) => {
         {/* Footer */}
         <div className="sticky bottom-0 px-6 py-4 bg-white border-t border-[#E8F0EE] rounded-b-3xl shrink-0 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
           <div className="flex items-center gap-3">
-            <button
-              onClick={onClose}
-              className="flex-1 px-4 py-2.5 bg-[#F5F9F8] text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium"
-            >
+            <button onClick={onClose} className="flex-1 px-4 py-2.5 bg-[#F5F9F8] text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium">
               Cancel
             </button>
             <button
@@ -684,12 +721,8 @@ const EditLeadModal = ({ lead, show, onClose, onSave }) => {
               disabled={loading}
               className="flex-1 px-4 py-2.5 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-sm font-medium shadow-lg shadow-[#00695C]/30 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              {loading ? (
-                <FiRefreshCw className="animate-spin" />
-              ) : (
-                <FiSave className="inline" />
-              )}
-              {loading ? 'Saving...' : 'Save Changes'}
+              {loading ? <FiRefreshCw className="animate-spin" /> : <FiSave className="inline" />}
+              {loading ? 'Saving...' : 'Save Lead'}
             </button>
           </div>
         </div>
@@ -701,7 +734,7 @@ const EditLeadModal = ({ lead, show, onClose, onSave }) => {
 // ============================================================
 // MAIN COMPONENT
 // ============================================================
-const LeadDashboard = () => {
+const LeadStatus = () => {
   const navigate = useNavigate();
   const searchInputRef = useRef(null);
 
@@ -711,7 +744,8 @@ const LeadDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
-  const [selectedSource, setSelectedSource] = useState('all');
+  const [selectedLeadType, setSelectedLeadType] = useState('all');
+  const [selectedLeadSource, setSelectedLeadSource] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState('createdAt');
@@ -729,116 +763,101 @@ const LeadDashboard = () => {
   const [filterCount, setFilterCount] = useState(0);
   const [activeFilter, setActiveFilter] = useState('all');
 
-  // ============ CONFIRMATION MODAL STATE ============
   const [confirmationModal, setConfirmationModal] = useState({
-    isOpen: false,
-    title: '',
-    message: '',
-    confirmText: 'Confirm',
-    cancelText: 'Cancel',
-    type: 'danger',
-    onConfirm: null,
-    onCancel: null
+    isOpen: false, title: '', message: '', confirmText: 'Confirm', cancelText: 'Cancel', type: 'danger', onConfirm: null, onCancel: null
   });
 
   // ============ STATS ============
-  const [stats, setStats] = useState({
-    total: 0,
-    new: 0,
-    today: 0,
-    'follow-up': 0,
-    'site-visit': 0,
-    negotiation: 0,
-    won: 0,
-    lost: 0
-  });
+  const emptyStats = useMemo(() => {
+    const base = { total: 0 };
+    STATUS_KEYS.forEach(k => { base[k] = 0; });
+    return base;
+  }, []);
+  const [stats, setStats] = useState(emptyStats);
 
-  // ============ COMPUTE STATS ============
   const computeStats = useCallback((list) => {
     if (!list || list.length === 0) {
-      setStats({
-        total: 0, new: 0, today: 0, 'follow-up': 0,
-        'site-visit': 0, negotiation: 0, won: 0, lost: 0
-      });
+      setStats(emptyStats);
       return;
     }
-
-    const todayStr = new Date().toISOString().split('T')[0];
-
-    const total = list.length;
-    const newLeads = list.filter(l => l.leadStatus === 'new').length;
-    const todayLeads = list.filter(l => (l.createdAt || '').split('T')[0] === todayStr).length;
-    const followUp = list.filter(l => l.leadStatus === 'follow-up').length;
-    const siteVisit = list.filter(l => l.leadStatus === 'site-visit').length;
-    const negotiation = list.filter(l => l.leadStatus === 'negotiation').length;
-    const won = list.filter(l => l.leadStatus === 'won').length;
-    const lost = list.filter(l => l.leadStatus === 'lost').length;
-
-    setStats({
-      total,
-      new: newLeads,
-      today: todayLeads,
-      'follow-up': followUp,
-      'site-visit': siteVisit,
-      negotiation,
-      won,
-      lost
+    const next = { total: list.length };
+    STATUS_KEYS.forEach(k => {
+      next[k] = list.filter(v => v.leadStatus === k).length;
     });
-  }, []);
+    setStats(next);
+  }, [emptyStats]);
 
   // ============ GENERATE MOCK DATA ============
   const generateMockLeads = useCallback(() => {
-    const leadNames = ['Rahul Kumar', 'Anita Sharma', 'Sanjay Singh', 'Divya Patel', 'Karthik Reddy', 'Neha Gupta', 'Manoj Verma', 'Swati Joshi', 'Rohit Malhotra', 'Pallavi Mehta', 'Vivek Nair', 'Shalini Pillai', 'Arjun Rao', 'Meera Iyer'];
-    const propertyNames = ['Green Valley Villa', 'Lake View Apartments', 'Sunrise Heights', 'Royal Palm Estate', 'Silver Oak Residency', 'Golden Meadows', 'Cedar Woods', 'Maple Leaf Homes', 'Orchid Garden', 'Tulip Tower', 'Lotus Heights', 'Jasmine Villa'];
-    const agentNames = ['Agent Raj', 'Agent Priya', 'Agent Amit', 'Agent Sneha', 'Agent Vikram', 'Agent Deepa'];
-    const propertyTypes = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
-    const statuses = ['new', 'follow-up', 'site-visit', 'negotiation', 'won', 'lost'];
-    const sources = ['Website', 'Referral', 'Walk-in', 'Social Media', 'Advertisement', 'Cold Call'];
-    const priorities = ['Low', 'Medium', 'High'];
-    const budgets = ['₹20L - ₹35L', '₹35L - ₹50L', '₹50L - ₹75L', '₹75L - ₹1Cr', '₹1Cr - ₹1.5Cr', '₹1.5Cr+'];
-    const contactPrefixes = ['+91 98', '+91 97', '+91 99', '+91 88'];
+    const leadNames = ['Rajesh Kumar', 'Priya Sharma', 'Amit Singh', 'Sneha Patel', 'Vikram Reddy', 'Ananya Gupta', 'Manoj Verma', 'Divya Joshi', 'Rohit Malhotra', 'Pallavi Mehta', 'Vivek Nair', 'Shalini Pillai', 'Karthik Iyer', 'Meera Nair', 'Suresh Babu', 'Lakshmi Narayan', 'Ganesh Rao', 'Sita Menon', 'Ravi Desai', 'Kavya Krishnan'];
+    const properties = ['Green Valley Villa', 'Lake View Apartments', 'Sunrise Heights', 'Royal Palm Estate', 'Silver Oak Residency', 'Golden Meadows', 'Cedar Woods', 'Maple Leaf Homes', 'Orchid Garden', 'Tulip Tower', 'Lotus Heights', 'Jasmine Villa', 'Palm Grove', 'Coconut Bay', 'Saffron Square'];
+    const agents = ['Agent Raj', 'Agent Priya', 'Agent Amit', 'Agent Sneha', 'Agent Vikram', 'Agent Deepa', 'Agent Kumar', 'Agent Nisha'];
+    const sources = ['Direct', 'Referral', 'Website', 'Social Media', 'Email', 'Phone', 'Other'];
+    const leadTypes = ['Buyer', 'Tenant', 'Investor', 'Seller'];
+    const budgets = ['₹50L - ₹1Cr', '₹1Cr - ₹2Cr', '₹2Cr - ₹5Cr', '₹5Cr+', '₹30L - ₹50L', 'Flexible'];
+    const contactPrefixes = ['+91 98', '+91 97', '+91 99', '+91 88', '+91 96'];
+    const statusNotes = {
+      new: 'Fresh lead captured from inquiry.',
+      contacted: 'Initial call made, waiting for callback.',
+      interested: 'Lead showed strong interest in property.',
+      follow_up: 'Follow-up scheduled for next week.',
+      site_visit: 'Site visit booked or completed.',
+      negotiation: 'Negotiating on price and terms.',
+      closed_won: 'Deal closed successfully.',
+      closed_lost: 'Lead closed - moved to other property.'
+    };
 
     const leadsList = [];
+    const usedNames = new Set();
 
-    for (let i = 1; i <= 60; i++) {
-      const leadName = leadNames[Math.floor(Math.random() * leadNames.length)];
-      const propertyName = propertyNames[Math.floor(Math.random() * propertyNames.length)];
-      const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+    for (let i = 1; i <= 50; i++) {
+      let leadName, propertyInterest;
+      let attempts = 0;
+      do {
+        leadName = leadNames[Math.floor(Math.random() * leadNames.length)];
+        propertyInterest = properties[Math.floor(Math.random() * properties.length)];
+        attempts++;
+      } while (usedNames.has(`${leadName}_${propertyInterest}`) && attempts < 50);
+      usedNames.add(`${leadName}_${propertyInterest}`);
 
-      const daysAgo = Math.floor(Math.random() * 20);
-      const createdDate = new Date();
-      createdDate.setDate(createdDate.getDate() - daysAgo);
-      if (i <= 4) {
-        createdDate.setTime(Date.now() - Math.floor(Math.random() * 6) * 60 * 60 * 1000);
+      const randomStatus = STATUS_KEYS[Math.floor(Math.random() * STATUS_KEYS.length)];
+      const randomLeadType = leadTypes[Math.floor(Math.random() * leadTypes.length)];
+      const randomSource = sources[Math.floor(Math.random() * sources.length)];
+
+      const historyLength = Math.floor(Math.random() * 3) + 1;
+      const statusHistory = [];
+      const historyPool = [randomStatus, 'contacted', 'new'].filter((v, idx, arr) => arr.indexOf(v) === idx);
+      for (let h = 0; h < Math.min(historyLength, historyPool.length); h++) {
+        const d = new Date(Date.now() - h * 3 * 24 * 60 * 60 * 1000);
+        statusHistory.push({
+          status: historyPool[h],
+          date: d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+          note: statusNotes[historyPool[h]]
+        });
       }
 
-      const followUpDate = new Date();
-      followUpDate.setDate(followUpDate.getDate() + Math.floor(Math.random() * 10 - 2));
+      const createdAt = new Date(Date.now() - Math.random() * 45 * 24 * 60 * 60 * 1000);
 
       leadsList.push({
         id: `lead_${i}`,
         leadName,
-        email: `${leadName.toLowerCase().replace(' ', '.')}${Math.floor(Math.random() * 100)}@email.com`,
-        phone: `${contactPrefixes[Math.floor(Math.random() * contactPrefixes.length)]}${Math.floor(Math.random() * 10000000).toString().padStart(7, '0')}`,
-        propertyInterest: propertyName,
-        propertyType: propertyTypes[Math.floor(Math.random() * propertyTypes.length)],
+        leadEmail: `${leadName.toLowerCase().replace(' ', '.')}${Math.floor(Math.random() * 100)}@email.com`,
+        contactNumber: `${contactPrefixes[Math.floor(Math.random() * contactPrefixes.length)]}${Math.floor(Math.random() * 10000000).toString().padStart(7, '0')}`,
+        propertyInterest,
         budget: budgets[Math.floor(Math.random() * budgets.length)],
-        leadSource: sources[Math.floor(Math.random() * sources.length)],
-        assignedAgent: agentNames[Math.floor(Math.random() * agentNames.length)],
-        agentEmail: `agent${Math.floor(Math.random() * 20)}@email.com`,
+        leadSource: randomSource,
+        leadType: randomLeadType,
+        assignedAgent: agents[Math.floor(Math.random() * agents.length)],
         leadStatus: randomStatus,
-        priority: priorities[Math.floor(Math.random() * priorities.length)],
-        nextFollowUp: followUpDate.toISOString().split('T')[0],
-        lastContacted: new Date(Date.now() - Math.random() * 10 * 24 * 60 * 60 * 1000).toISOString(),
-        notes: Math.random() > 0.6 ? 'Client is actively comparing multiple properties' :
-                Math.random() > 0.3 ? 'Interested, awaiting budget confirmation' : '',
-        createdAt: createdDate.toISOString(),
+        notes: Math.random() > 0.5 ? 'Lead is actively looking for properties in this area.' :
+                Math.random() > 0.3 ? 'Following up on previous conversation.' : '',
+        statusHistory,
+        createdAt: createdAt.toISOString(),
         createdBy: ['Admin', 'Manager', 'Agent'][Math.floor(Math.random() * 3)]
       });
     }
 
     leadsList.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
     computeStats(leadsList);
     return leadsList;
   }, [computeStats]);
@@ -863,42 +882,41 @@ const LeadDashboard = () => {
 
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
-        filtered = filtered.filter(l =>
-          (l.leadName && l.leadName.toLowerCase().includes(query)) ||
-          (l.propertyInterest && l.propertyInterest.toLowerCase().includes(query)) ||
-          (l.assignedAgent && l.assignedAgent.toLowerCase().includes(query)) ||
-          (l.leadSource && l.leadSource.toLowerCase().includes(query)) ||
-          (l.email && l.email.toLowerCase().includes(query)) ||
-          (l.phone && l.phone.includes(query))
+        filtered = filtered.filter(v =>
+          (v.leadName && v.leadName.toLowerCase().includes(query)) ||
+          (v.propertyInterest && v.propertyInterest.toLowerCase().includes(query)) ||
+          (v.assignedAgent && v.assignedAgent.toLowerCase().includes(query)) ||
+          (v.leadType && v.leadType.toLowerCase().includes(query)) ||
+          (v.leadSource && v.leadSource.toLowerCase().includes(query)) ||
+          (v.contactNumber && v.contactNumber.includes(query)) ||
+          (v.leadEmail && v.leadEmail.toLowerCase().includes(query))
         );
       }
 
       if (selectedStatus !== 'all') {
-        if (selectedStatus === 'today') {
-          const todayStr = new Date().toISOString().split('T')[0];
-          filtered = filtered.filter(l => (l.createdAt || '').split('T')[0] === todayStr);
-        } else {
-          filtered = filtered.filter(l => l.leadStatus === selectedStatus);
-        }
+        filtered = filtered.filter(v => v.leadStatus === selectedStatus);
       }
 
-      if (selectedSource !== 'all') {
-        filtered = filtered.filter(l => l.leadSource === selectedSource);
+      if (selectedLeadType !== 'all') {
+        filtered = filtered.filter(v => v.leadType === selectedLeadType);
+      }
+
+      if (selectedLeadSource !== 'all') {
+        filtered = filtered.filter(v => v.leadSource === selectedLeadSource);
       }
 
       let count = 0;
       if (selectedStatus !== 'all') count++;
-      if (selectedSource !== 'all') count++;
+      if (selectedLeadType !== 'all') count++;
+      if (selectedLeadSource !== 'all') count++;
       if (searchQuery) count++;
       setFilterCount(count);
 
       filtered.sort((a, b) => {
         let aVal = a[sortField] || '';
         let bVal = b[sortField] || '';
-
         if (typeof aVal === 'string') aVal = aVal.toLowerCase();
         if (typeof bVal === 'string') bVal = bVal.toLowerCase();
-
         if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
         if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
         return 0;
@@ -909,11 +927,9 @@ const LeadDashboard = () => {
     } catch (error) {
       console.error('Error filtering leads:', error);
     }
-  }, [leads, searchQuery, selectedStatus, selectedSource, sortField, sortDirection]);
+  }, [leads, searchQuery, selectedStatus, selectedLeadType, selectedLeadSource, sortField, sortDirection]);
 
-  useEffect(() => {
-    filterLeads();
-  }, [filterLeads]);
+  useEffect(() => { filterLeads(); }, [filterLeads]);
 
   // ============ PAGINATION ============
   const totalPages = Math.max(1, Math.ceil(filteredLeads.length / pageSize));
@@ -938,46 +954,38 @@ const LeadDashboard = () => {
     if (selectedLeads.length === paginatedLeads.length && paginatedLeads.length > 0) {
       setSelectedLeads([]);
     } else {
-      setSelectedLeads(paginatedLeads.map(l => l.id));
+      setSelectedLeads(paginatedLeads.map(v => v.id));
     }
   }, [selectedLeads, paginatedLeads]);
 
   // ============ HANDLE SELECT LEAD ============
   const handleSelectLead = useCallback((leadId) => {
-    setSelectedLeads(prev =>
-      prev.includes(leadId)
-        ? prev.filter(id => id !== leadId)
-        : [...prev, leadId]
-    );
+    setSelectedLeads(prev => prev.includes(leadId) ? prev.filter(id => id !== leadId) : [...prev, leadId]);
   }, []);
 
-  // ============ VIEW LEAD ============
+  // ============ VIEW / EDIT ============
   const handleViewLead = useCallback((lead) => {
     setViewingLead(lead);
     setShowViewModal(true);
   }, []);
 
-  // ============ EDIT LEAD ============
   const handleEditLead = useCallback((lead) => {
     setEditingLead(lead);
     setShowEditModal(true);
   }, []);
 
-  // ============ SAVE EDITED LEAD ============
   const handleSaveLead = useCallback((updatedLead) => {
     setLeads(prev => {
-      const updated = prev.map(l =>
-        l.id === updatedLead.id ? updatedLead : l
-      );
+      const updated = prev.map(v => v.id === updatedLead.id ? updatedLead : v);
       computeStats(updated);
       return updated;
     });
-    setToast({ message: `Lead "${updatedLead.leadName}" updated successfully`, type: 'success' });
+    setToast({ message: `Lead "${updatedLead.leadName}" updated to ${STATUS_CONFIG[updatedLead.leadStatus]?.label}`, type: 'success' });
   }, [computeStats]);
 
-  // ============ DELETE LEAD WITH CONFIRMATION ============
+  // ============ DELETE ============
   const handleDeleteLead = useCallback((leadId) => {
-    const lead = leads.find(l => l.id === leadId);
+    const lead = leads.find(v => v.id === leadId);
     if (!lead) return;
 
     setConfirmationModal({
@@ -991,7 +999,7 @@ const LeadDashboard = () => {
         setActionLoading(leadId);
         setTimeout(() => {
           setLeads(prev => {
-            const updated = prev.filter(l => l.id !== leadId);
+            const updated = prev.filter(v => v.id !== leadId);
             computeStats(updated);
             return updated;
           });
@@ -1000,43 +1008,33 @@ const LeadDashboard = () => {
           setToast({ message: `Deleted lead "${lead.leadName}"`, type: 'warning' });
         }, 700);
       },
-      onCancel: () => {
-        setConfirmationModal(prev => ({ ...prev, isOpen: false }));
-      }
+      onCancel: () => setConfirmationModal(prev => ({ ...prev, isOpen: false }))
     });
   }, [leads, computeStats]);
 
-  // ============ STAT CLICK HANDLER ============
+  // ============ STAT CLICK ============
   const handleStatClick = useCallback((filter) => {
-    setActiveFilter(prev => (prev === filter ? 'all' : filter));
     const nextFilter = activeFilter === filter ? 'all' : filter;
-
-    setSelectedStatus('all');
-    setSelectedSource('all');
-
-    if (nextFilter !== 'all') {
-      setSelectedStatus(nextFilter);
-    }
-
+    setActiveFilter(nextFilter);
+    setSelectedStatus(STATUS_KEYS.includes(nextFilter) ? nextFilter : 'all');
+    setSelectedLeadType('all');
+    setSelectedLeadSource('all');
     setSearchQuery('');
-    if (searchInputRef.current) {
-      searchInputRef.current.focus();
-    }
+    if (searchInputRef.current) searchInputRef.current.focus();
   }, [activeFilter]);
 
-  // ============ CLEAR ALL FILTERS ============
+  // ============ CLEAR FILTERS ============
   const clearAllFilters = useCallback(() => {
     setSearchQuery('');
     setSelectedStatus('all');
-    setSelectedSource('all');
+    setSelectedLeadType('all');
+    setSelectedLeadSource('all');
     setActiveFilter('all');
-    if (searchInputRef.current) {
-      searchInputRef.current.focus();
-    }
+    if (searchInputRef.current) searchInputRef.current.focus();
     setToast({ message: 'All filters cleared', type: 'info' });
   }, []);
 
-  // ============ REFRESH DATA ============
+  // ============ REFRESH ============
   const handleRefresh = useCallback(() => {
     setLoading(true);
     setTimeout(() => {
@@ -1055,34 +1053,30 @@ const LeadDashboard = () => {
     }, 1000);
   }, [generateMockLeads]);
 
-  // ============ EXPORT DATA ============
+  // ============ EXPORT ============
   const handleExport = useCallback(() => {
     if (filteredLeads.length === 0) {
       setToast({ message: 'No data to export', type: 'warning' });
       return;
     }
-
     try {
-      const data = filteredLeads.map(l => ({
-        'Lead Name': l.leadName || '',
-        'Email': l.email || '',
-        'Phone': l.phone || '',
-        'Property Interest': l.propertyInterest || '',
-        'Property Type': l.propertyType || '',
-        'Budget': l.budget || '',
-        'Lead Source': l.leadSource || '',
-        'Assigned Agent': l.assignedAgent || '',
-        'Lead Status': l.leadStatus ? l.leadStatus.charAt(0).toUpperCase() + l.leadStatus.slice(1).replace('-', ' ') : '',
-        'Priority': l.priority || '',
-        'Next Follow-up': l.nextFollowUp || '',
-        'Notes': l.notes || ''
+      const data = filteredLeads.map(v => ({
+        'Lead Name': v.leadName || '',
+        'Email': v.leadEmail || '',
+        'Phone': v.contactNumber || '',
+        'Property Interest': v.propertyInterest || '',
+        'Budget': v.budget || '',
+        'Lead Type': v.leadType || '',
+        'Lead Source': v.leadSource || '',
+        'Assigned Agent': v.assignedAgent || '',
+        'Status': STATUS_CONFIG[v.leadStatus]?.label || v.leadStatus || '',
+        'Created': new Date(v.createdAt).toLocaleDateString('en-IN') || '',
+        'Notes': v.notes || ''
       }));
-
       const csv = [
         Object.keys(data[0]).join(','),
         ...data.map(row => Object.values(row).join(','))
       ].join('\n');
-
       const blob = new Blob([csv], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -1090,14 +1084,14 @@ const LeadDashboard = () => {
       a.download = `leads_${new Date().toISOString().split('T')[0]}.csv`;
       a.click();
       window.URL.revokeObjectURL(url);
-      setToast({ message: `${filteredLeads.length} records exported successfully`, type: 'success' });
+      setToast({ message: `${filteredLeads.length} leads exported successfully`, type: 'success' });
     } catch (error) {
       console.error('Error exporting data:', error);
       setToast({ message: 'Error exporting data', type: 'error' });
     }
   }, [filteredLeads]);
 
-  // ============ BULK ACTIONS WITH CONFIRMATION ============
+  // ============ BULK ACTIONS ============
   const handleBulkAction = useCallback((action) => {
     if (selectedLeads.length === 0) {
       setToast({ message: 'Please select leads first', type: 'warning' });
@@ -1111,92 +1105,75 @@ const LeadDashboard = () => {
         confirmText: 'Delete All',
         type: 'danger'
       },
-      won: {
-        title: 'Mark Selected as Won',
-        message: `Are you sure you want to mark ${selectedLeads.length} selected lead(s) as won?`,
-        confirmText: 'Mark Won',
+      interested: {
+        title: 'Mark as Interested',
+        message: `Mark ${selectedLeads.length} selected lead(s) as Interested?`,
+        confirmText: 'Confirm',
         type: 'info'
+      },
+      site_visit: {
+        title: 'Mark for Site Visit',
+        message: `Mark ${selectedLeads.length} selected lead(s) for Site Visit?`,
+        confirmText: 'Confirm',
+        type: 'info'
+      },
+      closed_won: {
+        title: 'Mark as Closed Won',
+        message: `Mark ${selectedLeads.length} selected lead(s) as Closed Won?`,
+        confirmText: 'Confirm',
+        type: 'info'
+      },
+      closed_lost: {
+        title: 'Mark as Closed Lost',
+        message: `Mark ${selectedLeads.length} selected lead(s) as Closed Lost?`,
+        confirmText: 'Confirm',
+        type: 'warning'
       }
     };
 
     const config = actionConfig[action];
     if (!config) return;
 
+    const statusMap = { interested: 'interested', site_visit: 'site_visit', closed_won: 'closed_won', closed_lost: 'closed_lost' };
+
     setConfirmationModal({
       isOpen: true,
       ...config,
       onConfirm: () => {
         setActionLoading(action);
-
         setTimeout(() => {
-          // Compute the affected leads and the count synchronously from the
-          // current `leads` state BEFORE calling setLeads. React 18 batches
-          // state updates (even inside setTimeout), so a functional updater
-          // passed to setLeads is not guaranteed to run before the next line
-          // of this callback executes. Mutating a local `count` variable
-          // inside that updater and then reading it immediately after was
-          // the source of the wrong/stale count in the toast.
           const selectedIds = new Set(selectedLeads);
-          const affectedLeads = leads.filter(l => selectedIds.has(l.id));
-          const count = affectedLeads.length;
+          let count = 0;
 
-          let updated;
-          if (action === 'delete') {
-            updated = leads.filter(l => !selectedIds.has(l.id));
-          } else {
-            updated = leads.map(l => {
-              if (!selectedIds.has(l.id)) return l;
-              if (action === 'won') {
-                return { ...l, leadStatus: 'won' };
-              }
-              return l;
-            });
-          }
+          setLeads(prev => {
+            let updated;
+            if (action === 'delete') {
+              count = prev.filter(v => selectedIds.has(v.id)).length;
+              updated = prev.filter(v => !selectedIds.has(v.id));
+            } else {
+              updated = prev.map(v => {
+                if (!selectedIds.has(v.id)) return v;
+                count++;
+                return { ...v, leadStatus: statusMap[action] };
+              });
+            }
+            computeStats(updated);
+            return updated;
+          });
 
-          setLeads(updated);
-          computeStats(updated);
           setSelectedLeads([]);
           setActionLoading(null);
 
-          if (count === 0) {
-            setToast({ message: 'No matching leads were found to update', type: 'warning' });
-          } else if (action === 'delete') {
+          if (action === 'delete') {
             setToast({ message: `${count} lead(s) deleted`, type: 'warning' });
-          } else if (action === 'won') {
-            setToast({ message: `${count} lead(s) marked as won`, type: 'success' });
+          } else {
+            setToast({ message: `${count} lead(s) marked as ${STATUS_CONFIG[statusMap[action]].label}`, type: 'success' });
           }
         }, 800);
       },
-      onCancel: () => {
-        setConfirmationModal(prev => ({ ...prev, isOpen: false }));
-      }
+      onCancel: () => setConfirmationModal(prev => ({ ...prev, isOpen: false }))
     });
-  }, [selectedLeads, leads, computeStats]);
-
-  // ============ STATUS COLOR HELPER ============
-  const getStatusColor = (status) => {
-    const colors = {
-      new: 'bg-blue-50 text-blue-700 border-blue-200',
-      'follow-up': 'bg-amber-50 text-amber-700 border-amber-200',
-      'site-visit': 'bg-purple-50 text-purple-700 border-purple-200',
-      negotiation: 'bg-orange-50 text-orange-700 border-orange-200',
-      won: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-      lost: 'bg-red-50 text-red-700 border-red-200'
-    };
-    return colors[status] || colors.new;
-  };
-
-  const getStatusLabel = (status) => {
-    const labels = {
-      new: 'New',
-      'follow-up': 'Follow-up',
-      'site-visit': 'Site Visit',
-      negotiation: 'Negotiation',
-      won: 'Won',
-      lost: 'Lost'
-    };
-    return labels[status] || 'New';
-  };
+  }, [selectedLeads, computeStats]);
 
   // ============================================================
   // RENDER
@@ -1209,23 +1186,15 @@ const LeadDashboard = () => {
         <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-[#26A69A]/5 rounded-full blur-3xl animate-float-delayed" />
       </div>
 
-      {/* Toast */}
       <Toast toast={toast} setToast={setToast} />
 
-      {/* Confirmation Modal */}
       <ConfirmationModal
         isOpen={confirmationModal.isOpen}
         onClose={() => {
-          if (confirmationModal.onCancel) {
-            confirmationModal.onCancel();
-          }
+          if (confirmationModal.onCancel) confirmationModal.onCancel();
           setConfirmationModal(prev => ({ ...prev, isOpen: false }));
         }}
-        onConfirm={() => {
-          if (confirmationModal.onConfirm) {
-            confirmationModal.onConfirm();
-          }
-        }}
+        onConfirm={() => { if (confirmationModal.onConfirm) confirmationModal.onConfirm(); }}
         title={confirmationModal.title}
         message={confirmationModal.message}
         confirmText={confirmationModal.confirmText}
@@ -1233,7 +1202,6 @@ const LeadDashboard = () => {
         type={confirmationModal.type}
       />
 
-      {/* View Modal */}
       {showViewModal && viewingLead && (
         <ViewLeadModal
           lead={viewingLead}
@@ -1244,7 +1212,6 @@ const LeadDashboard = () => {
         />
       )}
 
-      {/* Edit Modal */}
       {showEditModal && editingLead && (
         <EditLeadModal
           lead={editingLead}
@@ -1260,7 +1227,7 @@ const LeadDashboard = () => {
           <div>
             <div className="flex items-center gap-3 mb-1 flex-wrap">
               <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
-                Lead Dashboard
+                Lead Management
               </h1>
               <span className="px-3 py-1 bg-[#E8F4F2] text-[#00695C] text-xs font-semibold rounded-full animate-pulse">
                 {filteredLeads.length} Leads
@@ -1272,7 +1239,7 @@ const LeadDashboard = () => {
               )}
             </div>
             <p className="text-sm text-[#5A7D78] flex items-center gap-2 flex-wrap">
-              <span>Manage Leads</span>
+              <span>Track leads through the full sales pipeline</span>
               <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
               <span className="text-[#00695C] font-medium">
                 {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
@@ -1306,14 +1273,14 @@ const LeadDashboard = () => {
         </div>
       </div>
 
-      {/* Stats Section */}
+      {/* Stats Section — one card per status */}
       {showStats && (
         <div className="relative animate-slide-in">
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               <StatCard
                 icon={<FiUsers className="text-white text-sm" />}
-                title="Total Leads"
+                title="Total"
                 value={stats.total}
                 color="bg-gradient-to-br from-[#00695C] to-[#26A69A]"
                 delay={0}
@@ -1321,76 +1288,23 @@ const LeadDashboard = () => {
                 statsAnimating={statsAnimating}
                 onClick={() => handleStatClick('all')}
               />
-              <StatCard
-                icon={<FiUserPlus className="text-white text-sm" />}
-                title="New Leads"
-                value={stats.new}
-                color="bg-gradient-to-br from-blue-600 to-blue-400"
-                delay={50}
-                isActive={activeFilter === 'new'}
-                statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('new')}
-              />
-              <StatCard
-                icon={<FiCalendar className="text-white text-sm" />}
-                title="Today's Leads"
-                value={stats.today}
-                color="bg-gradient-to-br from-teal-600 to-teal-400"
-                delay={100}
-                isActive={activeFilter === 'today'}
-                statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('today')}
-              />
-              <StatCard
-                icon={<FiPhoneCall className="text-white text-sm" />}
-                title="Follow-ups"
-                value={stats['follow-up']}
-                color="bg-gradient-to-br from-amber-600 to-amber-400"
-                delay={150}
-                isActive={activeFilter === 'follow-up'}
-                statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('follow-up')}
-              />
-              <StatCard
-                icon={<FiMapPin className="text-white text-sm" />}
-                title="Site Visits"
-                value={stats['site-visit']}
-                color="bg-gradient-to-br from-purple-600 to-purple-400"
-                delay={200}
-                isActive={activeFilter === 'site-visit'}
-                statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('site-visit')}
-              />
-              <StatCard
-                icon={<FaHandshake className="text-white text-sm" />}
-                title="Negotiations"
-                value={stats.negotiation}
-                color="bg-gradient-to-br from-orange-600 to-orange-400"
-                delay={250}
-                isActive={activeFilter === 'negotiation'}
-                statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('negotiation')}
-              />
-              <StatCard
-                icon={<FiThumbsUp className="text-white text-sm" />}
-                title="Won"
-                value={stats.won}
-                color="bg-gradient-to-br from-emerald-600 to-emerald-400"
-                delay={300}
-                isActive={activeFilter === 'won'}
-                statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('won')}
-              />
-              <StatCard
-                icon={<FiThumbsDown className="text-white text-sm" />}
-                title="Lost"
-                value={stats.lost}
-                color="bg-gradient-to-br from-red-600 to-red-400"
-                delay={350}
-                isActive={activeFilter === 'lost'}
-                statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('lost')}
-              />
+              {STATUS_KEYS.map((key, idx) => {
+                const cfg = STATUS_CONFIG[key];
+                const Icon = cfg.icon;
+                return (
+                  <StatCard
+                    key={key}
+                    icon={<Icon className="text-white text-sm" />}
+                    title={cfg.short}
+                    value={stats[key]}
+                    color={`bg-gradient-to-br ${cfg.gradient}`}
+                    delay={(idx + 1) * 50}
+                    isActive={activeFilter === key}
+                    statsAnimating={statsAnimating}
+                    onClick={() => handleStatClick(key)}
+                  />
+                );
+              })}
             </div>
           </div>
         </div>
@@ -1404,7 +1318,7 @@ const LeadDashboard = () => {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search by name, property, agent, source, email or phone..."
+              placeholder="Search by name, property, agent, type, source..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none placeholder:text-[#B5C9C5]"
@@ -1430,29 +1344,42 @@ const LeadDashboard = () => {
                 className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
               >
                 <option value="all">All Status</option>
-                <option value="new">New</option>
-                <option value="follow-up">Follow-up</option>
-                <option value="site-visit">Site Visit</option>
-                <option value="negotiation">Negotiation</option>
-                <option value="won">Won</option>
-                <option value="lost">Lost</option>
+                {STATUS_KEYS.map(key => (
+                  <option key={key} value={key}>{STATUS_CONFIG[key].label}</option>
+                ))}
               </select>
               <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
             </div>
 
             <div className="relative">
               <select
-                value={selectedSource}
-                onChange={(e) => setSelectedSource(e.target.value)}
+                value={selectedLeadType}
+                onChange={(e) => setSelectedLeadType(e.target.value)}
+                className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
+              >
+                <option value="all">All Types</option>
+                <option value="Buyer">Buyer</option>
+                <option value="Tenant">Tenant</option>
+                <option value="Investor">Investor</option>
+                <option value="Seller">Seller</option>
+              </select>
+              <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
+            </div>
+
+            <div className="relative">
+              <select
+                value={selectedLeadSource}
+                onChange={(e) => setSelectedLeadSource(e.target.value)}
                 className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
               >
                 <option value="all">All Sources</option>
-                <option value="Website">Website</option>
+                <option value="Direct">Direct</option>
                 <option value="Referral">Referral</option>
-                <option value="Walk-in">Walk-in</option>
+                <option value="Website">Website</option>
                 <option value="Social Media">Social Media</option>
-                <option value="Advertisement">Advertisement</option>
-                <option value="Cold Call">Cold Call</option>
+                <option value="Email">Email</option>
+                <option value="Phone">Phone</option>
+                <option value="Other">Other</option>
               </select>
               <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
             </div>
@@ -1493,12 +1420,36 @@ const LeadDashboard = () => {
             </span>
             <div className="flex flex-wrap items-center gap-2">
               <button
-                onClick={() => handleBulkAction('won')}
-                disabled={actionLoading === 'won'}
+                onClick={() => handleBulkAction('interested')}
+                disabled={actionLoading === 'interested'}
+                className="px-4 py-1.5 bg-amber-50 text-amber-700 rounded-xl hover:bg-amber-100 transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 disabled:opacity-50"
+              >
+                {actionLoading === 'interested' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiStar className="text-[10px]" />}
+                Interested
+              </button>
+              <button
+                onClick={() => handleBulkAction('site_visit')}
+                disabled={actionLoading === 'site_visit'}
+                className="px-4 py-1.5 bg-teal-50 text-teal-700 rounded-xl hover:bg-teal-100 transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 disabled:opacity-50"
+              >
+                {actionLoading === 'site_visit' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FaHome className="text-[10px]" />}
+                Site Visit
+              </button>
+              <button
+                onClick={() => handleBulkAction('closed_won')}
+                disabled={actionLoading === 'closed_won'}
                 className="px-4 py-1.5 bg-emerald-50 text-emerald-700 rounded-xl hover:bg-emerald-100 transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 disabled:opacity-50"
               >
-                {actionLoading === 'won' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiThumbsUp className="text-[10px]" />}
-                Mark Won
+                {actionLoading === 'closed_won' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiCheckCircle className="text-[10px]" />}
+                Won
+              </button>
+              <button
+                onClick={() => handleBulkAction('closed_lost')}
+                disabled={actionLoading === 'closed_lost'}
+                className="px-4 py-1.5 bg-red-50 text-red-700 rounded-xl hover:bg-red-100 transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 disabled:opacity-50"
+              >
+                {actionLoading === 'closed_lost' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiXCircle className="text-[10px]" />}
+                Lost
               </button>
               <button
                 onClick={() => handleBulkAction('delete')}
@@ -1529,18 +1480,23 @@ const LeadDashboard = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
             {paginatedLeads.map((lead, index) => {
               const isSelected = selectedLeads.includes(lead.id);
+              const cfg = STATUS_CONFIG[lead.leadStatus] || STATUS_CONFIG.new;
+              const StatusIcon = cfg.icon;
+              const borderLeftClass = {
+                new: 'border-l-blue-500',
+                contacted: 'border-l-indigo-500',
+                interested: 'border-l-amber-500',
+                follow_up: 'border-l-purple-500',
+                site_visit: 'border-l-teal-500',
+                negotiation: 'border-l-orange-500',
+                closed_won: 'border-l-emerald-500',
+                closed_lost: 'border-l-red-500'
+              }[lead.leadStatus] || 'border-l-slate-500';
 
               return (
                 <div
                   key={lead.id}
-                  className={`bg-white rounded-2xl border border-[#E8F0EE] p-3.5 hover:shadow-xl hover:-translate-y-1 group animate-slide-in transition-all duration-500 ${isSelected ? 'ring-2 ring-[#00695C] shadow-lg' : ''} ${
-                    lead.leadStatus === 'won' ? 'border-l-4 border-l-emerald-500' :
-                    lead.leadStatus === 'new' ? 'border-l-4 border-l-blue-500' :
-                    lead.leadStatus === 'follow-up' ? 'border-l-4 border-l-amber-500' :
-                    lead.leadStatus === 'site-visit' ? 'border-l-4 border-l-purple-500' :
-                    lead.leadStatus === 'negotiation' ? 'border-l-4 border-l-orange-500' :
-                    lead.leadStatus === 'lost' ? 'border-l-4 border-l-red-500' : ''
-                  }`}
+                  className={`bg-white rounded-2xl border border-[#E8F0EE] p-3.5 hover:shadow-xl hover:-translate-y-1 group animate-slide-in transition-all duration-500 border-l-4 ${borderLeftClass} ${isSelected ? 'ring-2 ring-[#00695C] shadow-lg' : ''}`}
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <div className="flex items-start justify-between mb-2 gap-1">
@@ -1552,15 +1508,15 @@ const LeadDashboard = () => {
                         className="w-4 h-4 shrink-0 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                       />
                       <div className="relative shrink-0">
-                        <div className={`w-9 h-9 rounded-2xl bg-gradient-to-br ${lead.leadStatus === 'won' ? 'from-emerald-600 to-emerald-400' : lead.leadStatus === 'lost' ? 'from-red-600 to-red-400' : 'from-[#00695C] to-[#26A69A]'} flex items-center justify-center text-white font-bold text-sm shadow-lg`}>
+                        <div className={`w-9 h-9 rounded-2xl bg-gradient-to-br ${cfg.gradient} flex items-center justify-center text-white font-bold text-sm shadow-lg`}>
                           {lead.leadName ? lead.leadName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() : 'NA'}
                         </div>
                       </div>
                       <div className="min-w-0">
                         <h3 className="font-semibold text-[#1A2E2A] text-sm truncate">{lead.leadName}</h3>
                         <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap ${getStatusColor(lead.leadStatus)}`}>
-                            {getStatusLabel(lead.leadStatus)}
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap border ${cfg.badge}`}>
+                            {cfg.short}
                           </span>
                         </div>
                       </div>
@@ -1570,7 +1526,7 @@ const LeadDashboard = () => {
                         type="button"
                         className="w-7 h-7 rounded-xl hover:bg-[#F5F9F8] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#26A69A] hover:scale-110"
                         onClick={() => handleEditLead(lead)}
-                        title="Edit Lead"
+                        title="Update Lead"
                       >
                         <FiEdit className="text-sm" />
                       </button>
@@ -1587,11 +1543,15 @@ const LeadDashboard = () => {
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FiPhone className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate font-medium text-[#1A2E2A]">{lead.phone || 'N/A'}</span>
+                      <FiMail className="text-[#00695C] flex-shrink-0" />
+                      <span className="truncate">{lead.leadEmail || 'N/A'}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FiHome className="text-[#00695C] flex-shrink-0" />
+                      <FiPhone className="text-[#00695C] flex-shrink-0" />
+                      <span className="truncate">{lead.contactNumber || 'N/A'}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
+                      <FaHome className="text-[#00695C] flex-shrink-0" />
                       <span className="truncate">{lead.propertyInterest || 'N/A'}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
@@ -1599,18 +1559,14 @@ const LeadDashboard = () => {
                       <span className="truncate">{lead.budget || 'N/A'}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FiTarget className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate">{lead.leadSource || 'N/A'}</span>
+                      <FiTag className="text-[#00695C] flex-shrink-0" />
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-medium border bg-[#F5F9F8] text-[#5A7D78]">
+                        {lead.leadType || 'N/A'}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiUserCheck className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate">{lead.assignedAgent || 'N/A'}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FiTag className="text-[#00695C] flex-shrink-0" />
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${getStatusColor(lead.leadStatus)}`}>
-                        {getStatusLabel(lead.leadStatus)}
-                      </span>
+                      <span className="truncate">{lead.assignedAgent || 'Unassigned'}</span>
                     </div>
                   </div>
 
@@ -1627,7 +1583,7 @@ const LeadDashboard = () => {
                       onClick={() => handleEditLead(lead)}
                       className="flex-1 py-1.5 text-xs font-medium text-[#26A69A] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                     >
-                      <FiEdit className="text-[10px]" /> Edit
+                      <FiArrowRight className="text-[10px]" /> Update
                     </button>
                     <button
                       type="button"
@@ -1653,24 +1609,25 @@ const LeadDashboard = () => {
                   onChange={handleSelectAll}
                   className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                 />
-                <span>Lead</span>
+                <span>Name</span>
               </div>
               <div className="col-span-2 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('propertyInterest')}>
                 Property {sortField === 'propertyInterest' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1">Status</div>
+              <div className="col-span-2">Status</div>
+              <div className="col-span-1">Type</div>
               <div className="col-span-1">Source</div>
               <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('createdAt')}>
                 Created {sortField === 'createdAt' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1">Budget</div>
               <div className="col-span-1">Agent</div>
-              <div className="col-span-1">Contact</div>
+              <div className="col-span-1">Budget</div>
               <div className="col-span-2 text-right">Actions</div>
             </div>
 
             {paginatedLeads.map((lead, index) => {
               const isSelected = selectedLeads.includes(lead.id);
+              const cfg = STATUS_CONFIG[lead.leadStatus] || STATUS_CONFIG.new;
 
               return (
                 <div
@@ -1685,41 +1642,29 @@ const LeadDashboard = () => {
                       onChange={() => handleSelectLead(lead.id)}
                       className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                     />
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white font-bold text-xs shadow-md">
+                    <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${cfg.gradient} flex items-center justify-center text-white font-bold text-xs shadow-md`}>
                       {lead.leadName ? lead.leadName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() : 'NA'}
                     </div>
                   </div>
 
                   <div className="col-span-2">
                     <p className="font-semibold text-sm text-[#1A2E2A] truncate">{lead.leadName || 'N/A'}</p>
-                    <p className="text-[10px] text-[#5A7D78] truncate">{lead.propertyInterest || 'N/A'}</p>
+                    <p className="text-[10px] text-[#5A7D78] truncate">{lead.leadEmail || ''}</p>
                   </div>
 
-                  <div className="col-span-1">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${getStatusColor(lead.leadStatus)}`}>
-                      {getStatusLabel(lead.leadStatus)}
+                  <div className="col-span-2">
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium border ${cfg.badge}`}>
+                      {cfg.label}
                     </span>
                   </div>
 
-                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">
-                    {lead.leadSource || 'N/A'}
-                  </div>
-
+                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">{lead.leadType || 'N/A'}</div>
+                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">{lead.leadSource || 'N/A'}</div>
                   <div className="col-span-1 text-xs text-[#5A7D78]">
                     {lead.createdAt ? new Date(lead.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) : 'N/A'}
                   </div>
-
-                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">
-                    {lead.budget || 'N/A'}
-                  </div>
-
-                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">
-                    {lead.assignedAgent || 'N/A'}
-                  </div>
-
-                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">
-                    {lead.phone || 'N/A'}
-                  </div>
+                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">{lead.assignedAgent || 'N/A'}</div>
+                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">{lead.budget || 'N/A'}</div>
 
                   <div className="col-span-2 flex items-center justify-end gap-1">
 
@@ -1735,7 +1680,7 @@ const LeadDashboard = () => {
                       type="button"
                       onClick={() => handleEditLead(lead)}
                       className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#26A69A] hover:scale-110"
-                      title="Edit"
+                      title="Update"
                     >
                       <FiEdit className="text-xs" />
                     </button>
@@ -1763,7 +1708,7 @@ const LeadDashboard = () => {
             </div>
             <h3 className="text-xl font-semibold text-[#1A2E2A]">No leads found</h3>
             <p className="text-sm text-[#5A7D78] mt-1">
-              {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No leads have been added yet'}
+              {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No leads have been captured yet'}
             </p>
             {filterCount > 0 && (
               <button
@@ -1788,10 +1733,7 @@ const LeadDashboard = () => {
             </span>
             <select
               value={pageSize}
-              onChange={(e) => {
-                setPageSize(Number(e.target.value));
-                setCurrentPage(1);
-              }}
+              onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}
               className="ml-2 px-2 py-1 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] text-sm text-[#1A2E2A] outline-none focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300"
             >
               <option value={5}>5</option>
@@ -1810,15 +1752,10 @@ const LeadDashboard = () => {
             </button>
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               let pageNum;
-              if (totalPages <= 5) {
-                pageNum = i + 1;
-              } else if (currentPage <= 3) {
-                pageNum = i + 1;
-              } else if (currentPage >= totalPages - 2) {
-                pageNum = totalPages - 4 + i;
-              } else {
-                pageNum = currentPage - 2 + i;
-              }
+              if (totalPages <= 5) pageNum = i + 1;
+              else if (currentPage <= 3) pageNum = i + 1;
+              else if (currentPage >= totalPages - 2) pageNum = totalPages - 4 + i;
+              else pageNum = currentPage - 2 + i;
               return (
                 <button
                   key={pageNum}
@@ -1846,31 +1783,12 @@ const LeadDashboard = () => {
 
       {/* CSS Animations */}
       <style>{`
-        @keyframes fade-in {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slide-in {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slide-up {
-          from { opacity: 0; transform: translateY(50px) scale(0.95); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
-        }
-        @keyframes float-delayed {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(10px); }
-        }
-        @keyframes pulse-once {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.02); }
-          100% { transform: scale(1); }
-        }
+        @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slide-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slide-up { from { opacity: 0; transform: translateY(50px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes float-delayed { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(10px); } }
+        @keyframes pulse-once { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
         .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
         .animate-slide-in { animation: slide-in 0.4s ease-out forwards; opacity: 0; }
         .animate-slide-up { animation: slide-up 0.3s ease-out forwards; }
@@ -1882,4 +1800,4 @@ const LeadDashboard = () => {
   );
 };
 
-export default LeadDashboard;
+export default LeadStatus;

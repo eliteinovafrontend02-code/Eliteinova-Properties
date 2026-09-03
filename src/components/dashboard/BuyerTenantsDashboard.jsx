@@ -89,9 +89,9 @@ import PurchaseRequestStatus from './buyer&tenants/PurchaseRequests/PurchaseRequ
 import LeadManagementOverview from './buyer&tenants/LeadManagement/LeadManagementOverview';
 import LeadDashboard from './buyer&tenants/LeadManagement/LeadDashboard';
 import LeadSources from './buyer&tenants/LeadManagement/LeadSources';
-// import LeadInformation from './buyer&tenants/LeadManagement/LeadInformation';
-// import LeadStatus from './buyer&tenants/LeadManagement/LeadStatus';
-// import LeadActions from './buyer&tenants/LeadManagement/LeadActions';
+import LeadInformation from './buyer&tenants/LeadManagement/LeadInformation';
+import LeadStatus from './buyer&tenants/LeadManagement/LeadStatus';
+import LeadActions from './buyer&tenants/LeadManagement/LeadActions';
 
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 
@@ -538,9 +538,9 @@ const BuyerTenantsDashboard = () => {
               <Route path="lead/overview" element={<LeadManagementOverview />} />
               <Route path="lead/dashboard" element={<LeadDashboard />} />
               <Route path="lead/sources" element={<LeadSources />} />
-              {/* <Route path="lead/information" element={<LeadInformation />} /> */}
-              {/* <Route path="lead/status" element={<LeadStatus />} /> */}
-              {/* <Route path="lead/actions" element={<LeadActions />} /> */}
+              <Route path="lead/information" element={<LeadInformation />} />
+              <Route path="lead/status" element={<LeadStatus />} />
+              <Route path="lead/actions" element={<LeadActions />} />
             </Routes>
           </div>
         </div>

@@ -1,4 +1,4 @@
-// src/components/dashboard/admin/buyer&tenants/LeadManagement/LeadDashboard.jsx
+// src/components/dashboard/admin/buyer&tenants/LeadManagement/LeadInformation.jsx
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -11,14 +11,104 @@ import {
   FiMail, FiPhone, FiExternalLink, FiTag, FiGrid, FiSave,
   FiClock as FiClockIcon, FiUserCheck, FiBriefcase,
   FiFileText, FiStar, FiShield, FiTool, FiTrendingUp,
-  FiUserPlus, FiPhoneCall, FiThumbsUp, FiThumbsDown, FiTarget
+  FiUserPlus, FiPhoneCall, FiThumbsUp, FiThumbsDown, FiTarget,
+  FiGlobe, FiSmartphone, FiRadio, FiShare2, FiHash, FiBookmark,
+  FiFilter
 } from 'react-icons/fi';
 import {
   FaBuilding, FaBed, FaBath, FaCar, FaCheck,
   FaTimes, FaStar as FaStarSolid, FaUserTie, FaHome as FaHomeSolid,
   FaImage, FaCalendarAlt, FaClock, FaPhoneAlt, FaUserCircle,
-  FaComments, FaClipboardList, FaHandshake
+  FaComments, FaClipboardList, FaHandshake, FaWhatsapp, FaGoogle,
+  FaUser, FaEnvelope, FaPhone, FaTag as FaTagSolid, FaCity,
+  FaBuilding as FaBuildingSolid, FaUserCog, FaCalendarDay,
+  FaUserCheck as FaUserCheckSolid, FaMapMarkerAlt, FaUserFriends,
+  FaRegUser, FaRegBuilding, FaUserGraduate
 } from 'react-icons/fa';
+
+// ============================================================
+// PERSON TYPE LOGOS
+// ============================================================
+const PersonLogos = {
+  'Buyer': {
+    icon: FaUserCheckSolid,
+    color: 'from-blue-600 to-blue-400',
+    bg: 'bg-blue-50',
+    text: 'text-blue-700',
+    border: 'border-blue-200',
+    label: 'Buyer'
+  },
+  'Tenant': {
+    icon: FaUser,
+    color: 'from-purple-600 to-purple-400',
+    bg: 'bg-purple-50',
+    text: 'text-purple-700',
+    border: 'border-purple-200',
+    label: 'Tenant'
+  },
+  'Both': {
+    icon: FaUserFriends,
+    color: 'from-emerald-600 to-emerald-400',
+    bg: 'bg-emerald-50',
+    text: 'text-emerald-700',
+    border: 'border-emerald-200',
+    label: 'Both'
+  },
+  'Property Owner': {
+    icon: FaUserTie,
+    color: 'from-amber-600 to-amber-400',
+    bg: 'bg-amber-50',
+    text: 'text-amber-700',
+    border: 'border-amber-200',
+    label: 'Owner'
+  },
+  'Agent': {
+    icon: FaUserCog,
+    color: 'from-rose-600 to-rose-400',
+    bg: 'bg-rose-50',
+    text: 'text-rose-700',
+    border: 'border-rose-200',
+    label: 'Agent'
+  },
+  'Builder': {
+    icon: FaBuildingSolid,
+    color: 'from-indigo-600 to-indigo-400',
+    bg: 'bg-indigo-50',
+    text: 'text-indigo-700',
+    border: 'border-indigo-200',
+    label: 'Builder'
+  },
+  'Customer': {
+    icon: FaRegUser,
+    color: 'from-cyan-600 to-cyan-400',
+    bg: 'bg-cyan-50',
+    text: 'text-cyan-700',
+    border: 'border-cyan-200',
+    label: 'Customer'
+  }
+};
+
+// ============================================================
+// LEAD SOURCE CONFIG
+// ============================================================
+const SOURCE_CONFIG = {
+  'Website': { icon: FiGlobe, color: 'from-blue-600 to-blue-400', badge: 'bg-blue-50 text-blue-700 border-blue-200' },
+  'Mobile App': { icon: FiSmartphone, color: 'from-indigo-600 to-indigo-400', badge: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
+  'Property Enquiry': { icon: FiHome, color: 'from-teal-600 to-teal-400', badge: 'bg-teal-50 text-teal-700 border-teal-200' },
+  'Phone': { icon: FiPhoneCall, color: 'from-cyan-600 to-cyan-400', badge: 'bg-cyan-50 text-cyan-700 border-cyan-200' },
+  'WhatsApp': { icon: FaWhatsapp, color: 'from-green-600 to-green-400', badge: 'bg-green-50 text-green-700 border-green-200' },
+  'Advertisement': { icon: FiRadio, color: 'from-amber-600 to-amber-400', badge: 'bg-amber-50 text-amber-700 border-amber-200' },
+  'Google': { icon: FaGoogle, color: 'from-red-600 to-red-400', badge: 'bg-red-50 text-red-700 border-red-200' },
+  'Social Media': { icon: FiShare2, color: 'from-purple-600 to-purple-400', badge: 'bg-purple-50 text-purple-700 border-purple-200' },
+  'Referral': { icon: FiUserPlus, color: 'from-pink-600 to-pink-400', badge: 'bg-pink-50 text-pink-700 border-pink-200' },
+  'Direct Registration': { icon: FiUserCheck, color: 'from-emerald-600 to-emerald-400', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200' }
+};
+
+const SOURCES = Object.keys(SOURCE_CONFIG);
+
+const getSourceMeta = (source) => SOURCE_CONFIG[source] || {
+  icon: FiTag, color: 'from-[#00695C] to-[#26A69A]', badge: 'bg-[#F5F9F8] text-[#5A7D78] border-[#E8F0EE]'
+};
 
 // ============================================================
 // TOAST COMPONENT
@@ -126,231 +216,172 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
 };
 
 // ============================================================
-// STAT CARD COMPONENT
+// VIEW LEAD DETAIL MODAL
 // ============================================================
-const StatCard = ({ icon, title, value, color, delay = 0, isActive, statsAnimating, onClick }) => {
-  return (
-    <div
-      className={`bg-white rounded-2xl p-3 shadow-sm hover:shadow-lg transition-all duration-500 border group cursor-pointer transform hover:-translate-y-1 ${statsAnimating ? 'animate-pulse-once' : ''} ${isActive ? 'ring-2 ring-[#00695C] shadow-lg bg-[#F5F9F8]' : 'border-[#E8F0EE]'}`}
-      style={{ animationDelay: `${delay}ms` }}
-      onClick={() => onClick && onClick()}
-    >
-      <div className="flex items-center gap-3">
-        <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}>
-          {icon}
-        </div>
-        <div className="min-w-0">
-          <p className="text-[10px] font-semibold text-[#5A7D78] uppercase tracking-wider truncate">{title}</p>
-          <p className={`text-lg font-bold text-[#1A2E2A] group-hover:text-[#00695C] transition-colors duration-300 ${isActive ? 'text-[#00695C]' : ''}`}>
-            {typeof value === 'number' ? value.toLocaleString() : value}
-          </p>
-        </div>
-      </div>
-      {isActive && (
-        <div className="mt-1 flex items-center gap-1">
-          <span className="text-[7px] text-[#00695C] font-medium bg-[#E8F4F2] px-2 py-0.5 rounded-full">Active</span>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// ============================================================
-// VIEW LEAD DETAILS MODAL
-// ============================================================
-const ViewLeadModal = ({ lead, show, onClose, onEdit, onDelete }) => {
+const ViewLeadDetailModal = ({ lead, show, onClose, onEdit, onDelete }) => {
   if (!lead || !show) return null;
 
-  const getStatusBadge = (status) => {
-    const statusMap = {
-      new: { label: 'New', color: 'bg-blue-100 text-blue-700' },
-      'follow-up': { label: 'Follow-up', color: 'bg-amber-100 text-amber-700' },
-      'site-visit': { label: 'Site Visit', color: 'bg-purple-100 text-purple-700' },
-      negotiation: { label: 'Negotiation', color: 'bg-orange-100 text-orange-700' },
-      won: { label: 'Won', color: 'bg-emerald-100 text-emerald-700' },
-      lost: { label: 'Lost', color: 'bg-red-100 text-red-700' }
-    };
-    return statusMap[status] || { label: 'New', color: 'bg-blue-100 text-blue-700' };
-  };
-
-  const handleDeleteClick = () => {
-    if (onDelete) {
-      onDelete(lead.id);
-    }
-  };
-
-  const handleEditClick = () => {
-    if (onEdit) {
-      onEdit(lead);
-      onClose();
-    }
-  };
-
-  const formattedDate = lead.createdAt ? new Date(lead.createdAt).toLocaleDateString('en-IN', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  }) : 'N/A';
+  const sourceMeta = getSourceMeta(lead.leadSource);
+  const SourceIcon = sourceMeta.icon;
+  
+  const personType = lead.buyerTenant || 'Customer';
+  const personLogo = PersonLogos[personType] || PersonLogos['Customer'];
+  const PersonIcon = personLogo.icon;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
+      <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] p-6 rounded-t-3xl z-10 shrink-0">
+        <div className={`sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] p-6 rounded-t-3xl z-10 shrink-0`}>
           <button
             onClick={onClose}
             className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110"
           >
             <FiX className="text-lg" />
           </button>
-          <h2 className="text-2xl font-bold text-white">Lead Details</h2>
-          <p className="text-white/80 text-sm">{lead.leadName} · {lead.propertyInterest}</p>
+          <div className="flex items-center gap-3 mb-2">
+            <div className={`w-14 h-14 rounded-2xl ${personLogo.bg}  border-2 border-white/30 flex items-center justify-center text-2xl ${personLogo.text} shadow-lg`}>
+              <PersonIcon />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-white">{lead.customerName}</h2>
+              <p className="text-white/80 text-sm flex items-center gap-2">
+                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${personLogo.bg} ${personLogo.text} border ${personLogo.border}`}>
+                  {personLogo.label}
+                </span>
+                <span className="w-1 h-1 bg-white/40 rounded-full"></span>
+                <span>ID: {lead.leadId}</span>
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 bg-white/20 text-white border border-white/30`}>
+              <SourceIcon className="text-xs" /> {lead.leadSource || 'Unknown'}
+            </span>
+          </div>
         </div>
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-white">
-          <div className="space-y-6">
-            {/* Status Badges */}
-            <div className="flex items-center gap-3 flex-wrap">
-              <span className={`px-4 py-1.5 rounded-full text-xs font-semibold ${getStatusBadge(lead.leadStatus).color}`}>
-                {getStatusBadge(lead.leadStatus).label}
-              </span>
-              <span className="px-4 py-1.5 rounded-full text-xs font-semibold bg-[#F5F9F8] text-[#5A7D78]">
-                {lead.leadSource || 'Direct'}
-              </span>
-              <span className="px-4 py-1.5 rounded-full text-xs font-semibold bg-[#FEF3E2] text-amber-700">
-                {lead.priority || 'Medium'} Priority
-              </span>
-            </div>
-
-            {/* Avatar Banner */}
-            <div className="bg-gradient-to-br from-[#00695C]/10 to-[#26A69A]/10 rounded-2xl p-6 flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0">
-                {lead.leadName ? lead.leadName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() : 'NA'}
-              </div>
-              <div className="min-w-0">
-                <h3 className="text-lg font-bold text-[#1A2E2A] truncate">{lead.leadName}</h3>
-                <p className="text-sm text-[#5A7D78] truncate">{lead.email}</p>
-              </div>
-            </div>
-
-            {/* All Details */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Contact */}
-              <div className="bg-[#F5F9F8] rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <FiPhone className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Contact Number</h4>
-                </div>
-                <p className="text-sm font-medium text-[#1A2E2A]">{lead.phone || 'N/A'}</p>
-              </div>
-
-              {/* Email */}
-              <div className="bg-[#F5F9F8] rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <FiMail className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Email</h4>
-                </div>
-                <p className="text-sm font-medium text-[#1A2E2A] truncate">{lead.email || 'N/A'}</p>
-              </div>
-
-              {/* Property Interest */}
-              <div className="bg-[#F5F9F8] rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <FiHome className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Property Interest</h4>
-                </div>
-                <p className="text-sm font-medium text-[#1A2E2A]">{lead.propertyInterest || 'N/A'}</p>
-                <p className="text-xs text-[#5A7D78]">{lead.propertyType || ''}</p>
-              </div>
-
-              {/* Budget */}
-              <div className="bg-[#F5F9F8] rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <FiDollarSign className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Budget</h4>
-                </div>
-                <p className="text-sm font-medium text-[#1A2E2A]">{lead.budget || 'N/A'}</p>
-              </div>
-
-              {/* Lead Source */}
-              <div className="bg-[#F5F9F8] rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <FiTarget className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Lead Source</h4>
-                </div>
-                <p className="text-sm font-medium text-[#1A2E2A]">{lead.leadSource || 'N/A'}</p>
-              </div>
-
-              {/* Assigned Agent */}
-              <div className="bg-[#F5F9F8] rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <FiUserCheck className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Assigned Agent</h4>
-                </div>
-                <p className="text-sm font-medium text-[#1A2E2A]">{lead.assignedAgent || 'N/A'}</p>
-                <p className="text-xs text-[#5A7D78]">{lead.agentEmail || ''}</p>
-              </div>
-
-              {/* Lead Status */}
-              <div className="bg-[#F5F9F8] rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <FiTag className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Lead Status</h4>
-                </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(lead.leadStatus).color}`}>
-                  {getStatusBadge(lead.leadStatus).label}
-                </span>
-              </div>
-
-              {/* Next Follow-up */}
-              <div className="bg-[#F5F9F8] rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <FiCalendar className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Next Follow-up</h4>
-                </div>
-                <p className="text-sm font-medium text-[#1A2E2A]">
-                  {lead.nextFollowUp ? new Date(lead.nextFollowUp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
-                </p>
-              </div>
-
-              {/* Notes */}
-              <div className="bg-[#F5F9F8] rounded-2xl p-4 md:col-span-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <FiFileText className="text-[#00695C] text-sm" />
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Notes</h4>
-                </div>
-                <p className="text-sm text-[#1A2E2A] leading-relaxed">{lead.notes || 'No notes available'}</p>
-              </div>
-            </div>
-
-            {/* Additional Information */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
-              <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <FiInfo className="text-[#00695C]" />
-                Additional Information
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#5A7D78]">Priority</span>
-                  <span className="text-sm font-medium text-[#1A2E2A]">{lead.priority || 'Medium'}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#5A7D78]">Last Contacted</span>
-                  <span className="text-sm font-medium text-[#1A2E2A]">
-                    {lead.lastContacted ? new Date(lead.lastContacted).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#5A7D78]">Created By</span>
-                  <span className="text-sm font-medium text-[#1A2E2A]">{lead.createdBy || 'Admin'}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#5A7D78]">Created At</span>
-                  <span className="text-sm font-medium text-[#1A2E2A]">{formattedDate}</span>
-                </div>
+              <div className="flex items-center gap-2 mb-1">
+                <FiHash className="text-[#00695C] text-sm" />
+                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Lead ID</h4>
               </div>
+              <p className="text-sm font-bold text-[#1A2E2A]">{lead.leadId}</p>
+            </div>
+
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <FaUser className="text-[#00695C] text-sm" />
+                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Customer Name</h4>
+              </div>
+              <p className="text-sm font-bold text-[#1A2E2A]">{lead.customerName}</p>
+            </div>
+
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <FaPhone className="text-[#00695C] text-sm" />
+                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Mobile</h4>
+              </div>
+              <p className="text-sm font-bold text-[#1A2E2A]">{lead.mobile}</p>
+            </div>
+
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <FaEnvelope className="text-[#00695C] text-sm" />
+                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Email</h4>
+              </div>
+              <p className="text-sm font-bold text-[#1A2E2A] truncate">{lead.email}</p>
+            </div>
+
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <FaUserCheckSolid className="text-[#00695C] text-sm" />
+                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Buyer / Tenant</h4>
+              </div>
+              <p className="text-sm font-bold text-[#1A2E2A]">{lead.buyerTenant}</p>
+            </div>
+
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <FaHomeSolid className="text-[#00695C] text-sm" />
+                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Property</h4>
+              </div>
+              <p className="text-sm font-bold text-[#1A2E2A]">{lead.property}</p>
+            </div>
+
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <FaUserTie className="text-[#00695C] text-sm" />
+                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Property Owner</h4>
+              </div>
+              <p className="text-sm font-bold text-[#1A2E2A]">{lead.propertyOwner}</p>
+            </div>
+
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <FaUserCog className="text-[#00695C] text-sm" />
+                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Agent</h4>
+              </div>
+              <p className="text-sm font-bold text-[#1A2E2A]">{lead.agent}</p>
+            </div>
+
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <FaBuildingSolid className="text-[#00695C] text-sm" />
+                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Builder</h4>
+              </div>
+              <p className="text-sm font-bold text-[#1A2E2A]">{lead.builder}</p>
+            </div>
+
+            <div className="bg-[#F5F9F8] rounded-2xl p-4 md:col-span-2">
+              <div className="flex items-center gap-2 mb-1">
+                <FiFileText className="text-[#00695C] text-sm" />
+                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Requirement</h4>
+              </div>
+              <p className="text-sm font-bold text-[#1A2E2A]">{lead.requirement}</p>
+            </div>
+
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <FiDollarSign className="text-[#00695C] text-sm" />
+                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Budget</h4>
+              </div>
+              <p className="text-sm font-bold text-[#1A2E2A]">{lead.budget}</p>
+            </div>
+
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <FaMapMarkerAlt className="text-[#00695C] text-sm" />
+                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Location</h4>
+              </div>
+              <p className="text-sm font-bold text-[#1A2E2A]">{lead.location}</p>
+            </div>
+
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <FaTagSolid className="text-[#00695C] text-sm" />
+                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Lead Source</h4>
+              </div>
+              <p className="text-sm font-bold text-[#1A2E2A]">{lead.leadSource}</p>
+            </div>
+
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <FaCalendarDay className="text-[#00695C] text-sm" />
+                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Created Date</h4>
+              </div>
+              <p className="text-sm font-bold text-[#1A2E2A]">{lead.createdDate}</p>
+            </div>
+
+            <div className="bg-[#F5F9F8] rounded-2xl p-4 md:col-span-2">
+              <div className="flex items-center gap-2 mb-1">
+                <FiUserCheck className="text-[#00695C] text-sm" />
+                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Assigned To</h4>
+              </div>
+              <p className="text-sm font-bold text-[#1A2E2A]">{lead.assignedTo}</p>
             </div>
           </div>
         </div>
@@ -365,13 +396,13 @@ const ViewLeadModal = ({ lead, show, onClose, onEdit, onDelete }) => {
               Close
             </button>
             <button
-              onClick={handleEditClick}
+              onClick={() => { if (onEdit) { onEdit(lead); onClose(); } }}
               className="flex-1 px-4 py-2.5 bg-[#26A69A] text-white rounded-xl hover:bg-[#1A8A7A] transition-all duration-300 text-sm font-medium shadow-lg shadow-[#26A69A]/30 hover:scale-[1.02]"
             >
               <FiEdit className="inline mr-2" /> Edit
             </button>
             <button
-              onClick={handleDeleteClick}
+              onClick={() => { if (onDelete) { onDelete(lead.id); } }}
               className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-300 text-sm font-medium shadow-lg shadow-red-600/30 hover:scale-[1.02]"
             >
               <FiTrash2 className="inline mr-2" /> Delete
@@ -390,44 +421,45 @@ const EditLeadModal = ({ lead, show, onClose, onSave }) => {
   if (!lead || !show) return null;
 
   const [formData, setFormData] = useState({
-    leadName: '',
+    leadId: '',
+    customerName: '',
+    mobile: '',
     email: '',
-    phone: '',
-    propertyInterest: '',
-    propertyType: '',
+    buyerTenant: '',
+    property: '',
+    propertyOwner: '',
+    agent: '',
+    builder: '',
+    requirement: '',
     budget: '',
+    location: '',
     leadSource: '',
-    assignedAgent: '',
-    agentEmail: '',
-    leadStatus: '',
-    priority: '',
-    nextFollowUp: '',
-    notes: ''
+    createdDate: '',
+    assignedTo: ''
   });
 
   const [loading, setLoading] = useState(false);
 
-  const statusOptions = ['new', 'follow-up', 'site-visit', 'negotiation', 'won', 'lost'];
-  const sourceOptions = ['Website', 'Referral', 'Walk-in', 'Social Media', 'Advertisement', 'Cold Call'];
-  const propertyTypes = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
-  const priorityOptions = ['Low', 'Medium', 'High'];
+  const buyerTenantOptions = ['Buyer', 'Tenant', 'Both'];
 
   useEffect(() => {
     if (lead) {
       setFormData({
-        leadName: lead.leadName || '',
+        leadId: lead.leadId || '',
+        customerName: lead.customerName || '',
+        mobile: lead.mobile || '',
         email: lead.email || '',
-        phone: lead.phone || '',
-        propertyInterest: lead.propertyInterest || '',
-        propertyType: lead.propertyType || '',
+        buyerTenant: lead.buyerTenant || '',
+        property: lead.property || '',
+        propertyOwner: lead.propertyOwner || '',
+        agent: lead.agent || '',
+        builder: lead.builder || '',
+        requirement: lead.requirement || '',
         budget: lead.budget || '',
+        location: lead.location || '',
         leadSource: lead.leadSource || '',
-        assignedAgent: lead.assignedAgent || '',
-        agentEmail: lead.agentEmail || '',
-        leadStatus: lead.leadStatus || '',
-        priority: lead.priority || '',
-        nextFollowUp: lead.nextFollowUp || '',
-        notes: lead.notes || ''
+        createdDate: lead.createdDate || '',
+        assignedTo: lead.assignedTo || ''
       });
     }
   }, [lead]);
@@ -466,30 +498,52 @@ const EditLeadModal = ({ lead, show, onClose, onSave }) => {
           >
             <FiX className="text-lg" />
           </button>
-          <h2 className="text-2xl font-bold text-white">Edit Lead</h2>
-          <p className="text-white/80 text-sm">Update lead information</p>
+          <h2 className="text-2xl font-bold text-white">Edit Lead Information</h2>
+          <p className="text-white/80 text-sm">Update lead details</p>
         </div>
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-white">
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Lead Information */}
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
               <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <FiUser className="text-[#00695C]" />
-                Lead Information
+                <FaUser className="text-[#00695C]" />
+                Personal Information
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Lead Name *</label>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Lead ID</label>
                   <input
                     type="text"
-                    name="leadName"
-                    value={formData.leadName}
+                    name="leadId"
+                    value={formData.leadId}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                    placeholder="LEAD-001"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Customer Name *</label>
+                  <input
+                    type="text"
+                    name="customerName"
+                    value={formData.customerName}
                     onChange={handleChange}
                     required
                     className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                    placeholder="Enter name"
+                    placeholder="Enter customer name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Mobile *</label>
+                  <input
+                    type="text"
+                    name="mobile"
+                    value={formData.mobile}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                    placeholder="+91 9876543210"
                   />
                 </div>
                 <div>
@@ -500,51 +554,38 @@ const EditLeadModal = ({ lead, show, onClose, onSave }) => {
                     value={formData.email}
                     onChange={handleChange}
                     className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                    placeholder="lead@email.com"
+                    placeholder="customer@email.com"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Contact Number *</label>
-                  <input
-                    type="text"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                    placeholder="+91 9876543210"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Lead Source</label>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Buyer / Tenant</label>
                   <select
-                    name="leadSource"
-                    value={formData.leadSource}
+                    name="buyerTenant"
+                    value={formData.buyerTenant}
                     onChange={handleChange}
                     className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
                   >
-                    <option value="">Select Source</option>
-                    {sourceOptions.map(src => (
-                      <option key={src} value={src}>{src}</option>
+                    <option value="">Select Type</option>
+                    {buyerTenantOptions.map(type => (
+                      <option key={type} value={type}>{type}</option>
                     ))}
                   </select>
                 </div>
               </div>
             </div>
 
-            {/* Property Interest */}
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
               <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <FiHome className="text-[#00695C]" />
-                Property Interest
+                <FaHomeSolid className="text-[#00695C]" />
+                Property Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Property Interest *</label>
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Property *</label>
                   <input
                     type="text"
-                    name="propertyInterest"
-                    value={formData.propertyInterest}
+                    name="property"
+                    value={formData.property}
                     onChange={handleChange}
                     required
                     className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
@@ -552,18 +593,57 @@ const EditLeadModal = ({ lead, show, onClose, onSave }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Property Type</label>
-                  <select
-                    name="propertyType"
-                    value={formData.propertyType}
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Property Owner</label>
+                  <input
+                    type="text"
+                    name="propertyOwner"
+                    value={formData.propertyOwner}
                     onChange={handleChange}
                     className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                  >
-                    <option value="">Select Type</option>
-                    {propertyTypes.map(type => (
-                      <option key={type} value={type}>{type}</option>
-                    ))}
-                  </select>
+                    placeholder="Enter property owner name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Agent</label>
+                  <input
+                    type="text"
+                    name="agent"
+                    value={formData.agent}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                    placeholder="Enter agent name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Builder</label>
+                  <input
+                    type="text"
+                    name="builder"
+                    value={formData.builder}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                    placeholder="Enter builder name"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-[#F5F9F8] rounded-2xl p-4">
+              <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
+                <FiFileText className="text-[#00695C]" />
+                Requirements & Details
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Requirement</label>
+                  <textarea
+                    name="requirement"
+                    value={formData.requirement}
+                    onChange={handleChange}
+                    rows="2"
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none resize-none"
+                    placeholder="Describe the customer's requirement..."
+                  />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-[#5A7D78] mb-1">Budget</label>
@@ -573,99 +653,65 @@ const EditLeadModal = ({ lead, show, onClose, onSave }) => {
                     value={formData.budget}
                     onChange={handleChange}
                     className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                    placeholder="e.g., ₹50L - ₹75L"
+                    placeholder="₹50L - ₹75L"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Location</label>
+                  <input
+                    type="text"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                    placeholder="City, Area"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Assignment */}
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
               <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <FiUserCheck className="text-[#00695C]" />
-                Assignment & Status
+                <FiBookmark className="text-[#00695C]" />
+                Lead Information
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Assigned Agent</label>
-                  <input
-                    type="text"
-                    name="assignedAgent"
-                    value={formData.assignedAgent}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                    placeholder="Enter agent name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Agent Email</label>
-                  <input
-                    type="email"
-                    name="agentEmail"
-                    value={formData.agentEmail}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                    placeholder="agent@email.com"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Lead Status *</label>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Lead Source</label>
                   <select
-                    name="leadStatus"
-                    value={formData.leadStatus}
+                    name="leadSource"
+                    value={formData.leadSource}
                     onChange={handleChange}
-                    required
                     className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
                   >
-                    <option value="">Select Status</option>
-                    {statusOptions.map(status => (
-                      <option key={status} value={status}>
-                        {status.charAt(0).toUpperCase() + status.slice(1).replace('-', ' ')}
-                      </option>
+                    <option value="">Select Source</option>
+                    {SOURCES.map(src => (
+                      <option key={src} value={src}>{src}</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Priority</label>
-                  <select
-                    name="priority"
-                    value={formData.priority}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                  >
-                    <option value="">Select Priority</option>
-                    {priorityOptions.map(p => (
-                      <option key={p} value={p}>{p}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Next Follow-up</label>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Created Date</label>
                   <input
                     type="date"
-                    name="nextFollowUp"
-                    value={formData.nextFollowUp}
+                    name="createdDate"
+                    value={formData.createdDate}
                     onChange={handleChange}
                     className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Assigned To</label>
+                  <input
+                    type="text"
+                    name="assignedTo"
+                    value={formData.assignedTo}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                    placeholder="Enter assignee name"
                   />
                 </div>
               </div>
-            </div>
-
-            {/* Notes */}
-            <div className="bg-[#F5F9F8] rounded-2xl p-4">
-              <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <FiFileText className="text-[#00695C]" />
-                Notes
-              </h3>
-              <textarea
-                name="notes"
-                value={formData.notes}
-                onChange={handleChange}
-                rows="3"
-                className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none resize-none"
-                placeholder="Add notes about this lead..."
-              />
             </div>
           </form>
         </div>
@@ -699,9 +745,112 @@ const EditLeadModal = ({ lead, show, onClose, onSave }) => {
 };
 
 // ============================================================
+// STAT CARD COMPONENT
+// ============================================================
+const StatCard = ({ icon, title, value, color, delay = 0, isActive, onClick }) => {
+  return (
+    <div
+      className={`bg-white rounded-2xl p-3 shadow-sm hover:shadow-lg transition-all duration-500 border group cursor-pointer transform hover:-translate-y-1 animate-slide-in ${isActive ? 'ring-2 ring-[#00695C] shadow-lg bg-[#F5F9F8]' : 'border-[#E8F0EE]'}`}
+      style={{ animationDelay: `${delay}ms` }}
+      onClick={() => onClick && onClick()}
+    >
+      <div className="flex items-center gap-3">
+        <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}>
+          {icon}
+        </div>
+        <div className="min-w-0">
+          <p className="text-[10px] font-semibold text-[#5A7D78] uppercase tracking-wider truncate">{title}</p>
+          <p className={`text-lg font-bold text-[#1A2E2A] group-hover:text-[#00695C] transition-colors duration-300 ${isActive ? 'text-[#00695C]' : ''}`}>
+            {typeof value === 'number' ? value.toLocaleString() : value}
+          </p>
+          
+        </div>
+      </div>
+      {isActive && (
+        <div className="mt-1 flex items-center gap-1">
+          <span className="text-[7px] text-[#00695C] font-medium bg-[#E8F4F2] px-2 py-0.5 rounded-full">Active Filter</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================================
+// FILTER DROPDOWN COMPONENT
+// ============================================================
+const FilterDropdown = ({ label, options, value, onChange, icon: Icon, allLabel = 'All' }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectedOption = options.find(opt => opt.value === value);
+  const displayLabel = selectedOption ? selectedOption.label : allLabel;
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex items-center gap-2 px-4 py-2.5 bg-white rounded-xl border transition-all duration-300 text-sm font-medium text-[#1A2E2A] hover:shadow-md ${
+          value !== 'all' 
+            ? 'border-[#00695C] ring-2 ring-[#00695C]/20 bg-[#F5F9F8]' 
+            : 'border-[#E8F0EE] hover:border-[#00695C]/30'
+        }`}
+      >
+        {Icon && <Icon className="text-sm text-[#5A7D78]" />}
+        <span className="whitespace-nowrap">{label}:</span>
+        <span className="font-semibold text-[#00695C]">{displayLabel}</span>
+        <FiChevronDown className={`text-sm text-[#5A7D78] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-[#E8F0EE] py-2 z-50 max-h-64 overflow-y-auto animate-slide-down">
+          <button
+            onClick={() => {
+              onChange('all');
+              setIsOpen(false);
+            }}
+            className={`w-full px-4 py-2.5 text-left text-sm transition-all duration-200 flex items-center gap-2 hover:bg-[#F5F9F8] ${
+              value === 'all' ? 'bg-[#E8F4F2] text-[#00695C] font-semibold' : 'text-[#1A2E2A]'
+            }`}
+          >
+            <span className="w-4">{value === 'all' && <FiCheckCircle className="text-[#00695C] text-sm" />}</span>
+            <span>All {label}s</span>
+          </button>
+          {options.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => {
+                onChange(option.value);
+                setIsOpen(false);
+              }}
+              className={`w-full px-4 py-2.5 text-left text-sm transition-all duration-200 flex items-center gap-2 hover:bg-[#F5F9F8] ${
+                value === option.value ? 'bg-[#E8F4F2] text-[#00695C] font-semibold' : 'text-[#1A2E2A]'
+              }`}
+            >
+              <span className="w-4">{value === option.value && <FiCheckCircle className="text-[#00695C] text-sm" />}</span>
+              {option.icon && <span className="text-sm">{option.icon}</span>}
+              <span>{option.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================================
 // MAIN COMPONENT
 // ============================================================
-const LeadDashboard = () => {
+const LeadInformation = () => {
   const navigate = useNavigate();
   const searchInputRef = useRef(null);
 
@@ -710,16 +859,12 @@ const LeadDashboard = () => {
   const [filteredLeads, setFilteredLeads] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('all');
-  const [selectedSource, setSelectedSource] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [sortField, setSortField] = useState('createdAt');
+  const [sortField, setSortField] = useState('createdDate');
   const [sortDirection, setSortDirection] = useState('desc');
   const [viewMode, setViewMode] = useState('grid');
   const [selectedLeads, setSelectedLeads] = useState([]);
-  const [showStats, setShowStats] = useState(true);
-  const [statsAnimating, setStatsAnimating] = useState(false);
   const [viewingLead, setViewingLead] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [editingLead, setEditingLead] = useState(null);
@@ -727,7 +872,8 @@ const LeadDashboard = () => {
   const [toast, setToast] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
   const [filterCount, setFilterCount] = useState(0);
-  const [activeFilter, setActiveFilter] = useState('all');
+  const [activeSource, setActiveSource] = useState('all');
+  const [activeType, setActiveType] = useState('all');
 
   // ============ CONFIRMATION MODAL STATE ============
   const [confirmationModal, setConfirmationModal] = useState({
@@ -744,100 +890,77 @@ const LeadDashboard = () => {
   // ============ STATS ============
   const [stats, setStats] = useState({
     total: 0,
-    new: 0,
-    today: 0,
-    'follow-up': 0,
-    'site-visit': 0,
-    negotiation: 0,
-    won: 0,
-    lost: 0
+    buyers: 0,
+    tenants: 0,
+    both: 0,
+    sources: {}
   });
 
   // ============ COMPUTE STATS ============
   const computeStats = useCallback((list) => {
     if (!list || list.length === 0) {
-      setStats({
-        total: 0, new: 0, today: 0, 'follow-up': 0,
-        'site-visit': 0, negotiation: 0, won: 0, lost: 0
-      });
+      setStats({ total: 0, buyers: 0, tenants: 0, both: 0, sources: {} });
       return;
     }
 
-    const todayStr = new Date().toISOString().split('T')[0];
-
     const total = list.length;
-    const newLeads = list.filter(l => l.leadStatus === 'new').length;
-    const todayLeads = list.filter(l => (l.createdAt || '').split('T')[0] === todayStr).length;
-    const followUp = list.filter(l => l.leadStatus === 'follow-up').length;
-    const siteVisit = list.filter(l => l.leadStatus === 'site-visit').length;
-    const negotiation = list.filter(l => l.leadStatus === 'negotiation').length;
-    const won = list.filter(l => l.leadStatus === 'won').length;
-    const lost = list.filter(l => l.leadStatus === 'lost').length;
+    const buyers = list.filter(l => l.buyerTenant === 'Buyer').length;
+    const tenants = list.filter(l => l.buyerTenant === 'Tenant').length;
+    const both = list.filter(l => l.buyerTenant === 'Both').length;
 
-    setStats({
-      total,
-      new: newLeads,
-      today: todayLeads,
-      'follow-up': followUp,
-      'site-visit': siteVisit,
-      negotiation,
-      won,
-      lost
+    const sources = {};
+    list.forEach(l => {
+      if (l.leadSource) {
+        sources[l.leadSource] = (sources[l.leadSource] || 0) + 1;
+      }
     });
+
+    setStats({ total, buyers, tenants, both, sources });
   }, []);
 
   // ============ GENERATE MOCK DATA ============
   const generateMockLeads = useCallback(() => {
-    const leadNames = ['Rahul Kumar', 'Anita Sharma', 'Sanjay Singh', 'Divya Patel', 'Karthik Reddy', 'Neha Gupta', 'Manoj Verma', 'Swati Joshi', 'Rohit Malhotra', 'Pallavi Mehta', 'Vivek Nair', 'Shalini Pillai', 'Arjun Rao', 'Meera Iyer'];
-    const propertyNames = ['Green Valley Villa', 'Lake View Apartments', 'Sunrise Heights', 'Royal Palm Estate', 'Silver Oak Residency', 'Golden Meadows', 'Cedar Woods', 'Maple Leaf Homes', 'Orchid Garden', 'Tulip Tower', 'Lotus Heights', 'Jasmine Villa'];
-    const agentNames = ['Agent Raj', 'Agent Priya', 'Agent Amit', 'Agent Sneha', 'Agent Vikram', 'Agent Deepa'];
-    const propertyTypes = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
-    const statuses = ['new', 'follow-up', 'site-visit', 'negotiation', 'won', 'lost'];
-    const sources = ['Website', 'Referral', 'Walk-in', 'Social Media', 'Advertisement', 'Cold Call'];
-    const priorities = ['Low', 'Medium', 'High'];
+    const customerNames = ['Rahul Kumar', 'Anita Sharma', 'Sanjay Singh', 'Divya Patel', 'Karthik Reddy', 'Neha Gupta', 'Manoj Verma', 'Swati Joshi', 'Rohit Malhotra', 'Pallavi Mehta', 'Vivek Nair', 'Shalini Pillai', 'Arjun Rao', 'Meera Iyer'];
+    const properties = ['Green Valley Villa', 'Lake View Apartments', 'Sunrise Heights', 'Royal Palm Estate', 'Silver Oak Residency', 'Golden Meadows', 'Cedar Woods', 'Maple Leaf Homes', 'Orchid Garden', 'Tulip Tower', 'Lotus Heights', 'Jasmine Villa'];
+    const propertyOwners = ['Mr. Sharma', 'Mrs. Patel', 'Mr. Reddy', 'Ms. Joshi', 'Mr. Singh', 'Mrs. Gupta'];
+    const agentOptions = ['Agent Raj', 'Agent Priya', 'Agent Amit', 'Agent Sneha', 'Agent Vikram', 'Agent Deepa'];
+    const builderOptions = ['BuildWell Constructions', 'GreenHome Developers', 'UrbanSpace Builders', 'EcoLiving Projects', 'SkyHigh Infrastructure', 'PrimeLand Developers'];
+    const buyerTenantOptions = ['Buyer', 'Tenant', 'Both'];
     const budgets = ['₹20L - ₹35L', '₹35L - ₹50L', '₹50L - ₹75L', '₹75L - ₹1Cr', '₹1Cr - ₹1.5Cr', '₹1.5Cr+'];
-    const contactPrefixes = ['+91 98', '+91 97', '+91 99', '+91 88'];
+    const locations = ['Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Pune', 'Chennai', 'Kolkata', 'Ahmedabad'];
+    const requirements = ['3BHK apartment with garden', 'Independent villa with pool', 'Commercial space for office', '2BHK near school', 'Luxury penthouse', 'Budget-friendly 1BHK', 'Plots for investment'];
 
     const leadsList = [];
 
-    for (let i = 1; i <= 60; i++) {
-      const leadName = leadNames[Math.floor(Math.random() * leadNames.length)];
-      const propertyName = propertyNames[Math.floor(Math.random() * propertyNames.length)];
-      const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+    for (let i = 1; i <= 50; i++) {
+      const customerName = customerNames[Math.floor(Math.random() * customerNames.length)];
+      const randomSource = SOURCES[Math.floor(Math.random() * SOURCES.length)];
 
-      const daysAgo = Math.floor(Math.random() * 20);
+      const daysAgo = Math.floor(Math.random() * 30);
       const createdDate = new Date();
       createdDate.setDate(createdDate.getDate() - daysAgo);
-      if (i <= 4) {
-        createdDate.setTime(Date.now() - Math.floor(Math.random() * 6) * 60 * 60 * 1000);
-      }
-
-      const followUpDate = new Date();
-      followUpDate.setDate(followUpDate.getDate() + Math.floor(Math.random() * 10 - 2));
 
       leadsList.push({
         id: `lead_${i}`,
-        leadName,
-        email: `${leadName.toLowerCase().replace(' ', '.')}${Math.floor(Math.random() * 100)}@email.com`,
-        phone: `${contactPrefixes[Math.floor(Math.random() * contactPrefixes.length)]}${Math.floor(Math.random() * 10000000).toString().padStart(7, '0')}`,
-        propertyInterest: propertyName,
-        propertyType: propertyTypes[Math.floor(Math.random() * propertyTypes.length)],
+        leadId: `LEAD-${String(i).padStart(4, '0')}`,
+        customerName,
+        mobile: `+91 98${Math.floor(Math.random() * 10000000).toString().padStart(7, '0')}`,
+        email: `${customerName.toLowerCase().replace(' ', '.')}${Math.floor(Math.random() * 100)}@email.com`,
+        buyerTenant: buyerTenantOptions[Math.floor(Math.random() * buyerTenantOptions.length)],
+        property: properties[Math.floor(Math.random() * properties.length)],
+        propertyOwner: propertyOwners[Math.floor(Math.random() * propertyOwners.length)],
+        agent: agentOptions[Math.floor(Math.random() * agentOptions.length)],
+        builder: builderOptions[Math.floor(Math.random() * builderOptions.length)],
+        requirement: requirements[Math.floor(Math.random() * requirements.length)],
         budget: budgets[Math.floor(Math.random() * budgets.length)],
-        leadSource: sources[Math.floor(Math.random() * sources.length)],
-        assignedAgent: agentNames[Math.floor(Math.random() * agentNames.length)],
-        agentEmail: `agent${Math.floor(Math.random() * 20)}@email.com`,
-        leadStatus: randomStatus,
-        priority: priorities[Math.floor(Math.random() * priorities.length)],
-        nextFollowUp: followUpDate.toISOString().split('T')[0],
-        lastContacted: new Date(Date.now() - Math.random() * 10 * 24 * 60 * 60 * 1000).toISOString(),
-        notes: Math.random() > 0.6 ? 'Client is actively comparing multiple properties' :
-                Math.random() > 0.3 ? 'Interested, awaiting budget confirmation' : '',
-        createdAt: createdDate.toISOString(),
-        createdBy: ['Admin', 'Manager', 'Agent'][Math.floor(Math.random() * 3)]
+        location: locations[Math.floor(Math.random() * locations.length)],
+        leadSource: randomSource,
+        createdDate: createdDate.toISOString().split('T')[0],
+        assignedTo: agentOptions[Math.floor(Math.random() * agentOptions.length)]
       });
     }
 
-    leadsList.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    leadsList.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
 
     computeStats(leadsList);
     return leadsList;
@@ -849,8 +972,6 @@ const LeadDashboard = () => {
       const mockLeads = generateMockLeads();
       setLeads(mockLeads);
       setFilteredLeads(mockLeads);
-      setStatsAnimating(true);
-      setTimeout(() => setStatsAnimating(false), 1000);
     } catch (error) {
       console.error('Error generating mock leads:', error);
     }
@@ -864,31 +985,31 @@ const LeadDashboard = () => {
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         filtered = filtered.filter(l =>
-          (l.leadName && l.leadName.toLowerCase().includes(query)) ||
-          (l.propertyInterest && l.propertyInterest.toLowerCase().includes(query)) ||
-          (l.assignedAgent && l.assignedAgent.toLowerCase().includes(query)) ||
+          (l.customerName && l.customerName.toLowerCase().includes(query)) ||
+          (l.leadId && l.leadId.toLowerCase().includes(query)) ||
+          (l.property && l.property.toLowerCase().includes(query)) ||
           (l.leadSource && l.leadSource.toLowerCase().includes(query)) ||
           (l.email && l.email.toLowerCase().includes(query)) ||
-          (l.phone && l.phone.includes(query))
+          (l.mobile && l.mobile.includes(query)) ||
+          (l.location && l.location.toLowerCase().includes(query)) ||
+          (l.assignedTo && l.assignedTo.toLowerCase().includes(query)) ||
+          (l.agent && l.agent.toLowerCase().includes(query)) ||
+          (l.builder && l.builder.toLowerCase().includes(query)) ||
+          (l.propertyOwner && l.propertyOwner.toLowerCase().includes(query))
         );
       }
 
-      if (selectedStatus !== 'all') {
-        if (selectedStatus === 'today') {
-          const todayStr = new Date().toISOString().split('T')[0];
-          filtered = filtered.filter(l => (l.createdAt || '').split('T')[0] === todayStr);
-        } else {
-          filtered = filtered.filter(l => l.leadStatus === selectedStatus);
-        }
+      if (activeSource !== 'all') {
+        filtered = filtered.filter(l => l.leadSource === activeSource);
       }
 
-      if (selectedSource !== 'all') {
-        filtered = filtered.filter(l => l.leadSource === selectedSource);
+      if (activeType !== 'all') {
+        filtered = filtered.filter(l => l.buyerTenant === activeType);
       }
 
       let count = 0;
-      if (selectedStatus !== 'all') count++;
-      if (selectedSource !== 'all') count++;
+      if (activeSource !== 'all') count++;
+      if (activeType !== 'all') count++;
       if (searchQuery) count++;
       setFilterCount(count);
 
@@ -909,7 +1030,7 @@ const LeadDashboard = () => {
     } catch (error) {
       console.error('Error filtering leads:', error);
     }
-  }, [leads, searchQuery, selectedStatus, selectedSource, sortField, sortDirection]);
+  }, [leads, searchQuery, activeSource, activeType, sortField, sortDirection]);
 
   useEffect(() => {
     filterLeads();
@@ -972,7 +1093,7 @@ const LeadDashboard = () => {
       computeStats(updated);
       return updated;
     });
-    setToast({ message: `Lead "${updatedLead.leadName}" updated successfully`, type: 'success' });
+    setToast({ message: `Lead "${updatedLead.customerName}" updated successfully`, type: 'success' });
   }, [computeStats]);
 
   // ============ DELETE LEAD WITH CONFIRMATION ============
@@ -983,7 +1104,7 @@ const LeadDashboard = () => {
     setConfirmationModal({
       isOpen: true,
       title: 'Delete Lead',
-      message: `Are you sure you want to delete the lead "${lead.leadName}"?`,
+      message: `Are you sure you want to delete lead "${lead.customerName}" (${lead.leadId})?`,
       confirmText: 'Delete',
       cancelText: 'Cancel',
       type: 'danger',
@@ -997,7 +1118,7 @@ const LeadDashboard = () => {
           });
           setActionLoading(null);
           setShowViewModal(false);
-          setToast({ message: `Deleted lead "${lead.leadName}"`, type: 'warning' });
+          setToast({ message: `Deleted lead "${lead.customerName}"`, type: 'warning' });
         }, 700);
       },
       onCancel: () => {
@@ -1006,30 +1127,35 @@ const LeadDashboard = () => {
     });
   }, [leads, computeStats]);
 
-  // ============ STAT CLICK HANDLER ============
-  const handleStatClick = useCallback((filter) => {
-    setActiveFilter(prev => (prev === filter ? 'all' : filter));
-    const nextFilter = activeFilter === filter ? 'all' : filter;
-
-    setSelectedStatus('all');
-    setSelectedSource('all');
-
-    if (nextFilter !== 'all') {
-      setSelectedStatus(nextFilter);
+  // ============ STAT CLICK HANDLERS ============
+  const handleSourceClick = useCallback((source) => {
+    setActiveSource(prev => (prev === source ? 'all' : source));
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
     }
+  }, []);
 
+  const handleTypeClick = useCallback((type) => {
+    setActiveType(prev => (prev === type ? 'all' : type));
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, []);
+
+  const handleTotalClick = useCallback(() => {
+    setActiveSource('all');
+    setActiveType('all');
     setSearchQuery('');
     if (searchInputRef.current) {
       searchInputRef.current.focus();
     }
-  }, [activeFilter]);
+  }, []);
 
   // ============ CLEAR ALL FILTERS ============
   const clearAllFilters = useCallback(() => {
     setSearchQuery('');
-    setSelectedStatus('all');
-    setSelectedSource('all');
-    setActiveFilter('all');
+    setActiveSource('all');
+    setActiveType('all');
     if (searchInputRef.current) {
       searchInputRef.current.focus();
     }
@@ -1044,8 +1170,6 @@ const LeadDashboard = () => {
         const mockLeads = generateMockLeads();
         setLeads(mockLeads);
         setFilteredLeads(mockLeads);
-        setStatsAnimating(true);
-        setTimeout(() => setStatsAnimating(false), 1000);
         setToast({ message: 'Data refreshed successfully', type: 'success' });
       } catch (error) {
         console.error('Error refreshing data:', error);
@@ -1064,18 +1188,21 @@ const LeadDashboard = () => {
 
     try {
       const data = filteredLeads.map(l => ({
-        'Lead Name': l.leadName || '',
+        'Lead ID': l.leadId || '',
+        'Customer Name': l.customerName || '',
+        'Mobile': l.mobile || '',
         'Email': l.email || '',
-        'Phone': l.phone || '',
-        'Property Interest': l.propertyInterest || '',
-        'Property Type': l.propertyType || '',
+        'Buyer/Tenant': l.buyerTenant || '',
+        'Property': l.property || '',
+        'Property Owner': l.propertyOwner || '',
+        'Agent': l.agent || '',
+        'Builder': l.builder || '',
+        'Requirement': l.requirement || '',
         'Budget': l.budget || '',
+        'Location': l.location || '',
         'Lead Source': l.leadSource || '',
-        'Assigned Agent': l.assignedAgent || '',
-        'Lead Status': l.leadStatus ? l.leadStatus.charAt(0).toUpperCase() + l.leadStatus.slice(1).replace('-', ' ') : '',
-        'Priority': l.priority || '',
-        'Next Follow-up': l.nextFollowUp || '',
-        'Notes': l.notes || ''
+        'Created Date': l.createdDate || '',
+        'Assigned To': l.assignedTo || ''
       }));
 
       const csv = [
@@ -1087,7 +1214,7 @@ const LeadDashboard = () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `leads_${new Date().toISOString().split('T')[0]}.csv`;
+      a.download = `lead_information_${new Date().toISOString().split('T')[0]}.csv`;
       a.click();
       window.URL.revokeObjectURL(url);
       setToast({ message: `${filteredLeads.length} records exported successfully`, type: 'success' });
@@ -1097,74 +1224,33 @@ const LeadDashboard = () => {
     }
   }, [filteredLeads]);
 
-  // ============ BULK ACTIONS WITH CONFIRMATION ============
-  const handleBulkAction = useCallback((action) => {
+  // ============ BULK DELETE ============
+  const handleBulkDelete = useCallback(() => {
     if (selectedLeads.length === 0) {
       setToast({ message: 'Please select leads first', type: 'warning' });
       return;
     }
 
-    const actionConfig = {
-      delete: {
-        title: 'Delete Selected Leads',
-        message: `Are you sure you want to delete ${selectedLeads.length} selected lead(s)?`,
-        confirmText: 'Delete All',
-        type: 'danger'
-      },
-      won: {
-        title: 'Mark Selected as Won',
-        message: `Are you sure you want to mark ${selectedLeads.length} selected lead(s) as won?`,
-        confirmText: 'Mark Won',
-        type: 'info'
-      }
-    };
-
-    const config = actionConfig[action];
-    if (!config) return;
-
     setConfirmationModal({
       isOpen: true,
-      ...config,
+      title: 'Delete Selected Leads',
+      message: `Are you sure you want to delete ${selectedLeads.length} selected lead(s)?`,
+      confirmText: 'Delete All',
+      cancelText: 'Cancel',
+      type: 'danger',
       onConfirm: () => {
-        setActionLoading(action);
+        setActionLoading('bulk-delete');
 
         setTimeout(() => {
-          // Compute the affected leads and the count synchronously from the
-          // current `leads` state BEFORE calling setLeads. React 18 batches
-          // state updates (even inside setTimeout), so a functional updater
-          // passed to setLeads is not guaranteed to run before the next line
-          // of this callback executes. Mutating a local `count` variable
-          // inside that updater and then reading it immediately after was
-          // the source of the wrong/stale count in the toast.
           const selectedIds = new Set(selectedLeads);
-          const affectedLeads = leads.filter(l => selectedIds.has(l.id));
-          const count = affectedLeads.length;
+          const count = leads.filter(l => selectedIds.has(l.id)).length;
 
-          let updated;
-          if (action === 'delete') {
-            updated = leads.filter(l => !selectedIds.has(l.id));
-          } else {
-            updated = leads.map(l => {
-              if (!selectedIds.has(l.id)) return l;
-              if (action === 'won') {
-                return { ...l, leadStatus: 'won' };
-              }
-              return l;
-            });
-          }
-
+          const updated = leads.filter(l => !selectedIds.has(l.id));
           setLeads(updated);
           computeStats(updated);
           setSelectedLeads([]);
           setActionLoading(null);
-
-          if (count === 0) {
-            setToast({ message: 'No matching leads were found to update', type: 'warning' });
-          } else if (action === 'delete') {
-            setToast({ message: `${count} lead(s) deleted`, type: 'warning' });
-          } else if (action === 'won') {
-            setToast({ message: `${count} lead(s) marked as won`, type: 'success' });
-          }
+          setToast({ message: `${count} lead(s) deleted`, type: 'warning' });
         }, 800);
       },
       onCancel: () => {
@@ -1173,30 +1259,18 @@ const LeadDashboard = () => {
     });
   }, [selectedLeads, leads, computeStats]);
 
-  // ============ STATUS COLOR HELPER ============
-  const getStatusColor = (status) => {
-    const colors = {
-      new: 'bg-blue-50 text-blue-700 border-blue-200',
-      'follow-up': 'bg-amber-50 text-amber-700 border-amber-200',
-      'site-visit': 'bg-purple-50 text-purple-700 border-purple-200',
-      negotiation: 'bg-orange-50 text-orange-700 border-orange-200',
-      won: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-      lost: 'bg-red-50 text-red-700 border-red-200'
-    };
-    return colors[status] || colors.new;
-  };
+  // ============ FILTER OPTIONS ============
+  const sourceOptions = SOURCES.map(src => ({
+    value: src,
+    label: src,
+    icon: getSourceMeta(src).icon
+  }));
 
-  const getStatusLabel = (status) => {
-    const labels = {
-      new: 'New',
-      'follow-up': 'Follow-up',
-      'site-visit': 'Site Visit',
-      negotiation: 'Negotiation',
-      won: 'Won',
-      lost: 'Lost'
-    };
-    return labels[status] || 'New';
-  };
+  const typeOptions = [
+    { value: 'Buyer', label: 'Buyers', icon: <FaUserCheckSolid className="text-blue-600" /> },
+    { value: 'Tenant', label: 'Tenants', icon: <FaUser className="text-purple-600" /> },
+    { value: 'Both', label: 'Both', icon: <FaUserFriends className="text-emerald-600" /> }
+  ];
 
   // ============================================================
   // RENDER
@@ -1235,7 +1309,7 @@ const LeadDashboard = () => {
 
       {/* View Modal */}
       {showViewModal && viewingLead && (
-        <ViewLeadModal
+        <ViewLeadDetailModal
           lead={viewingLead}
           show={showViewModal}
           onClose={() => { setShowViewModal(false); setViewingLead(null); }}
@@ -1260,7 +1334,7 @@ const LeadDashboard = () => {
           <div>
             <div className="flex items-center gap-3 mb-1 flex-wrap">
               <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
-                Lead Dashboard
+                Lead Information
               </h1>
               <span className="px-3 py-1 bg-[#E8F4F2] text-[#00695C] text-xs font-semibold rounded-full animate-pulse">
                 {filteredLeads.length} Leads
@@ -1272,7 +1346,7 @@ const LeadDashboard = () => {
               )}
             </div>
             <p className="text-sm text-[#5A7D78] flex items-center gap-2 flex-wrap">
-              <span>Manage Leads</span>
+              <span>Complete lead details and management</span>
               <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
               <span className="text-[#00695C] font-medium">
                 {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
@@ -1280,13 +1354,6 @@ const LeadDashboard = () => {
             </p>
           </div>
           <div className="flex items-center gap-2 w-full lg:w-auto flex-wrap">
-            <button
-              onClick={() => setShowStats(!showStats)}
-              className="flex items-center gap-2 px-3 py-2 bg-white border border-[#E8F0EE] rounded-xl hover:border-[#00695C]/30 hover:shadow-md transition-all duration-300 text-sm font-medium text-[#1A2E2A] hover:scale-105"
-            >
-              <FiActivity className={`text-sm transition-transform duration-300 ${showStats ? 'rotate-0' : 'rotate-180'}`} />
-              <span className="hidden sm:inline">{showStats ? 'Hide Stats' : 'Show Stats'}</span>
-            </button>
             <button
               onClick={handleRefresh}
               disabled={loading}
@@ -1306,105 +1373,60 @@ const LeadDashboard = () => {
         </div>
       </div>
 
-      {/* Stats Section */}
-      {showStats && (
-        <div className="relative animate-slide-in">
-          <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              <StatCard
-                icon={<FiUsers className="text-white text-sm" />}
-                title="Total Leads"
-                value={stats.total}
-                color="bg-gradient-to-br from-[#00695C] to-[#26A69A]"
-                delay={0}
-                isActive={activeFilter === 'all'}
-                statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('all')}
-              />
-              <StatCard
-                icon={<FiUserPlus className="text-white text-sm" />}
-                title="New Leads"
-                value={stats.new}
-                color="bg-gradient-to-br from-blue-600 to-blue-400"
-                delay={50}
-                isActive={activeFilter === 'new'}
-                statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('new')}
-              />
-              <StatCard
-                icon={<FiCalendar className="text-white text-sm" />}
-                title="Today's Leads"
-                value={stats.today}
-                color="bg-gradient-to-br from-teal-600 to-teal-400"
-                delay={100}
-                isActive={activeFilter === 'today'}
-                statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('today')}
-              />
-              <StatCard
-                icon={<FiPhoneCall className="text-white text-sm" />}
-                title="Follow-ups"
-                value={stats['follow-up']}
-                color="bg-gradient-to-br from-amber-600 to-amber-400"
-                delay={150}
-                isActive={activeFilter === 'follow-up'}
-                statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('follow-up')}
-              />
-              <StatCard
-                icon={<FiMapPin className="text-white text-sm" />}
-                title="Site Visits"
-                value={stats['site-visit']}
-                color="bg-gradient-to-br from-purple-600 to-purple-400"
-                delay={200}
-                isActive={activeFilter === 'site-visit'}
-                statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('site-visit')}
-              />
-              <StatCard
-                icon={<FaHandshake className="text-white text-sm" />}
-                title="Negotiations"
-                value={stats.negotiation}
-                color="bg-gradient-to-br from-orange-600 to-orange-400"
-                delay={250}
-                isActive={activeFilter === 'negotiation'}
-                statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('negotiation')}
-              />
-              <StatCard
-                icon={<FiThumbsUp className="text-white text-sm" />}
-                title="Won"
-                value={stats.won}
-                color="bg-gradient-to-br from-emerald-600 to-emerald-400"
-                delay={300}
-                isActive={activeFilter === 'won'}
-                statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('won')}
-              />
-              <StatCard
-                icon={<FiThumbsDown className="text-white text-sm" />}
-                title="Lost"
-                value={stats.lost}
-                color="bg-gradient-to-br from-red-600 to-red-400"
-                delay={350}
-                isActive={activeFilter === 'lost'}
-                statsAnimating={statsAnimating}
-                onClick={() => handleStatClick('lost')}
-              />
-            </div>
+      {/* Stats Section with Filter Clicks */}
+      <div className="relative animate-slide-in">
+        <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <StatCard
+              icon={<FiUsers className="text-white text-sm" />}
+              title="Total Leads"
+              value={stats.total}
+              color="bg-gradient-to-br from-[#00695C] to-[#26A69A]"
+              delay={0}
+              isActive={activeSource === 'all' && activeType === 'all' && !searchQuery}
+              onClick={handleTotalClick}
+            />
+            <StatCard
+              icon={<FaUserCheckSolid className="text-white text-sm" />}
+              title="Buyers"
+              value={stats.buyers}
+              color="bg-gradient-to-br from-blue-600 to-blue-400"
+              delay={100}
+              isActive={activeType === 'Buyer'}
+              onClick={() => handleTypeClick('Buyer')}
+            />
+            <StatCard
+              icon={<FaUser className="text-white text-sm" />}
+              title="Tenants"
+              value={stats.tenants}
+              color="bg-gradient-to-br from-purple-600 to-purple-400"
+              delay={200}
+              isActive={activeType === 'Tenant'}
+              onClick={() => handleTypeClick('Tenant')}
+            />
+            <StatCard
+              icon={<FaUserFriends className="text-white text-sm" />}
+              title="Both"
+              value={stats.both}
+              color="bg-gradient-to-br from-emerald-600 to-emerald-400"
+              delay={300}
+              isActive={activeType === 'Both'}
+              onClick={() => handleTypeClick('Both')}
+            />
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Search and Filters */}
+      {/* Search and Filter Dropdowns */}
       <div className="relative bg-white rounded-2xl p-4 shadow-sm border border-[#E8F0EE] hover:shadow-md transition-all duration-300">
         <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4">
-          <div className="flex-1 w-full lg:w-auto relative">
+          {/* Search */}
+          <div className="flex-1 w-full relative">
             <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm" />
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search by name, property, agent, source, email or phone..."
+              placeholder="Search by name, ID, property, location, agent..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none placeholder:text-[#B5C9C5]"
@@ -1419,48 +1441,30 @@ const LeadDashboard = () => {
             )}
           </div>
 
+          {/* Filter Dropdowns */}
           <div className="flex items-center gap-2 w-full lg:w-auto flex-wrap">
-            <div className="relative">
-              <select
-                value={selectedStatus}
-                onChange={(e) => {
-                  setSelectedStatus(e.target.value);
-                  setActiveFilter(e.target.value === 'all' ? 'all' : e.target.value);
-                }}
-                className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
-              >
-                <option value="all">All Status</option>
-                <option value="new">New</option>
-                <option value="follow-up">Follow-up</option>
-                <option value="site-visit">Site Visit</option>
-                <option value="negotiation">Negotiation</option>
-                <option value="won">Won</option>
-                <option value="lost">Lost</option>
-              </select>
-              <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
-            </div>
+            <FilterDropdown
+              label="Source"
+              options={sourceOptions}
+              value={activeSource}
+              onChange={setActiveSource}
+              icon={FiFilter}
+              allLabel="All Sources"
+            />
 
-            <div className="relative">
-              <select
-                value={selectedSource}
-                onChange={(e) => setSelectedSource(e.target.value)}
-                className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
-              >
-                <option value="all">All Sources</option>
-                <option value="Website">Website</option>
-                <option value="Referral">Referral</option>
-                <option value="Walk-in">Walk-in</option>
-                <option value="Social Media">Social Media</option>
-                <option value="Advertisement">Advertisement</option>
-                <option value="Cold Call">Cold Call</option>
-              </select>
-              <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
-            </div>
+            <FilterDropdown
+              label="Type"
+              options={typeOptions}
+              value={activeType}
+              onChange={setActiveType}
+              icon={FaUser}
+              allLabel="All Types"
+            />
 
-            {filterCount > 0 && (
+            {(activeSource !== 'all' || activeType !== 'all' || searchQuery) && (
               <button
                 onClick={clearAllFilters}
-                className="px-3 py-2.5 bg-[#FEF3E2] text-amber-700 rounded-xl hover:bg-[#FEE6C5] transition-all duration-300 text-sm font-medium flex items-center gap-1 hover:scale-105"
+                className="px-4 py-2.5 bg-red-50 text-red-700 rounded-xl hover:bg-red-100 transition-all duration-300 text-sm font-medium flex items-center gap-1 hover:scale-105"
               >
                 <FiX className="text-sm" /> Clear
               </button>
@@ -1493,19 +1497,11 @@ const LeadDashboard = () => {
             </span>
             <div className="flex flex-wrap items-center gap-2">
               <button
-                onClick={() => handleBulkAction('won')}
-                disabled={actionLoading === 'won'}
-                className="px-4 py-1.5 bg-emerald-50 text-emerald-700 rounded-xl hover:bg-emerald-100 transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 disabled:opacity-50"
-              >
-                {actionLoading === 'won' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiThumbsUp className="text-[10px]" />}
-                Mark Won
-              </button>
-              <button
-                onClick={() => handleBulkAction('delete')}
-                disabled={actionLoading === 'delete'}
+                onClick={handleBulkDelete}
+                disabled={actionLoading === 'bulk-delete'}
                 className="px-4 py-1.5 bg-red-50 text-red-700 rounded-xl hover:bg-red-100 transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 disabled:opacity-50"
               >
-                {actionLoading === 'delete' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiTrash2 className="text-[10px]" />}
+                {actionLoading === 'bulk-delete' ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiTrash2 className="text-[10px]" />}
                 Delete All
               </button>
               <button
@@ -1529,18 +1525,16 @@ const LeadDashboard = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
             {paginatedLeads.map((lead, index) => {
               const isSelected = selectedLeads.includes(lead.id);
+              const sourceMeta = getSourceMeta(lead.leadSource);
+              const SourceIcon = sourceMeta.icon;
+              const personType = lead.buyerTenant || 'Customer';
+              const personLogo = PersonLogos[personType] || PersonLogos['Customer'];
+              const PersonIcon = personLogo.icon;
 
               return (
                 <div
                   key={lead.id}
-                  className={`bg-white rounded-2xl border border-[#E8F0EE] p-3.5 hover:shadow-xl hover:-translate-y-1 group animate-slide-in transition-all duration-500 ${isSelected ? 'ring-2 ring-[#00695C] shadow-lg' : ''} ${
-                    lead.leadStatus === 'won' ? 'border-l-4 border-l-emerald-500' :
-                    lead.leadStatus === 'new' ? 'border-l-4 border-l-blue-500' :
-                    lead.leadStatus === 'follow-up' ? 'border-l-4 border-l-amber-500' :
-                    lead.leadStatus === 'site-visit' ? 'border-l-4 border-l-purple-500' :
-                    lead.leadStatus === 'negotiation' ? 'border-l-4 border-l-orange-500' :
-                    lead.leadStatus === 'lost' ? 'border-l-4 border-l-red-500' : ''
-                  }`}
+                  className={`bg-white rounded-2xl border border-[#E8F0EE] p-3.5 hover:shadow-xl hover:-translate-y-1 group animate-slide-in transition-all duration-500 ${isSelected ? 'ring-2 ring-[#00695C] shadow-lg' : ''}`}
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <div className="flex items-start justify-between mb-2 gap-1">
@@ -1551,18 +1545,12 @@ const LeadDashboard = () => {
                         onChange={() => handleSelectLead(lead.id)}
                         className="w-4 h-4 shrink-0 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                       />
-                      <div className="relative shrink-0">
-                        <div className={`w-9 h-9 rounded-2xl bg-gradient-to-br ${lead.leadStatus === 'won' ? 'from-emerald-600 to-emerald-400' : lead.leadStatus === 'lost' ? 'from-red-600 to-red-400' : 'from-[#00695C] to-[#26A69A]'} flex items-center justify-center text-white font-bold text-sm shadow-lg`}>
-                          {lead.leadName ? lead.leadName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() : 'NA'}
-                        </div>
+                      <div className={`w-9 h-9 rounded-2xl bg-gradient-to-br ${personLogo.color} flex items-center justify-center text-white shadow-lg flex-shrink-0`}>
+                        <PersonIcon className="text-sm" />
                       </div>
                       <div className="min-w-0">
-                        <h3 className="font-semibold text-[#1A2E2A] text-sm truncate">{lead.leadName}</h3>
-                        <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap ${getStatusColor(lead.leadStatus)}`}>
-                            {getStatusLabel(lead.leadStatus)}
-                          </span>
-                        </div>
+                        <h3 className="font-bold text-sm text-[#1A2E2A] truncate">{lead.customerName}</h3>
+                        <p className="text-[10px] font-medium text-[#5A7D78]">{lead.leadId}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
@@ -1588,29 +1576,27 @@ const LeadDashboard = () => {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiPhone className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate font-medium text-[#1A2E2A]">{lead.phone || 'N/A'}</span>
+                      <span className="truncate font-semibold text-[#1A2E2A]">{lead.mobile}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FiHome className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate">{lead.propertyInterest || 'N/A'}</span>
+                      <FiMail className="text-[#00695C] flex-shrink-0" />
+                      <span className="truncate font-medium">{lead.email}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FiDollarSign className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate">{lead.budget || 'N/A'}</span>
+                      <FaHomeSolid className="text-[#00695C] flex-shrink-0" />
+                      <span className="truncate font-medium">{lead.property}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FiTarget className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate">{lead.leadSource || 'N/A'}</span>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${personLogo.bg} ${personLogo.text} border ${personLogo.border}`}>
+                        {personLogo.label}
+                      </span>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${sourceMeta.badge}`}>
+                        {lead.leadSource}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiUserCheck className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate">{lead.assignedAgent || 'N/A'}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FiTag className="text-[#00695C] flex-shrink-0" />
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${getStatusColor(lead.leadStatus)}`}>
-                        {getStatusLabel(lead.leadStatus)}
-                      </span>
+                      <span className="truncate font-medium">{lead.assignedTo}</span>
                     </div>
                   </div>
 
@@ -1618,14 +1604,14 @@ const LeadDashboard = () => {
                     <button
                       type="button"
                       onClick={() => handleViewLead(lead)}
-                      className="flex-1 py-1.5 text-xs font-medium text-[#00695C] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
+                      className="flex-1 py-1.5 text-xs font-semibold text-[#00695C] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                     >
                       <FiEye className="text-[10px]" /> View
                     </button>
                     <button
                       type="button"
                       onClick={() => handleEditLead(lead)}
-                      className="flex-1 py-1.5 text-xs font-medium text-[#26A69A] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
+                      className="flex-1 py-1.5 text-xs font-semibold text-[#26A69A] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                     >
                       <FiEdit className="text-[10px]" /> Edit
                     </button>
@@ -1633,7 +1619,7 @@ const LeadDashboard = () => {
                       type="button"
                       onClick={() => handleDeleteLead(lead.id)}
                       disabled={actionLoading === lead.id}
-                      className="flex-1 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 disabled:opacity-50"
+                      className="flex-1 py-1.5 text-xs font-semibold text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 disabled:opacity-50"
                     >
                       {actionLoading === lead.id ? <FiRefreshCw className="text-[10px] animate-spin" /> : <FiTrash2 className="text-[10px]" />}
                       Delete
@@ -1645,7 +1631,7 @@ const LeadDashboard = () => {
           </div>
         ) : (
           <div className="bg-white rounded-2xl border border-[#E8F0EE] shadow-sm overflow-hidden">
-            <div className="grid grid-cols-12 gap-2 items-center px-4 py-3 bg-[#F5F9F8] border-b border-[#E8F0EE] text-xs font-medium text-[#5A7D78] uppercase tracking-wider">
+            <div className="grid grid-cols-12 gap-2 items-center px-4 py-3 bg-[#F5F9F8] border-b border-[#E8F0EE] text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">
               <div className="col-span-1 flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -1653,24 +1639,35 @@ const LeadDashboard = () => {
                   onChange={handleSelectAll}
                   className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                 />
-                <span>Lead</span>
+                <span>ID</span>
               </div>
-              <div className="col-span-2 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('propertyInterest')}>
-                Property {sortField === 'propertyInterest' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+              <div className="col-span-2 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('customerName')}>
+                Customer {sortField === 'customerName' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1">Status</div>
-              <div className="col-span-1">Source</div>
-              <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('createdAt')}>
-                Created {sortField === 'createdAt' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+              <div className="col-span-1">Mobile</div>
+              <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('buyerTenant')}>
+                Type {sortField === 'buyerTenant' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1">Budget</div>
-              <div className="col-span-1">Agent</div>
-              <div className="col-span-1">Contact</div>
+              <div className="col-span-2 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('property')}>
+                Property {sortField === 'property' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+              </div>
+              <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('leadSource')}>
+                Source {sortField === 'leadSource' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+              </div>
+              <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('createdDate')}>
+                Created {sortField === 'createdDate' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+              </div>
+              <div className="col-span-1">Assigned To</div>
               <div className="col-span-2 text-right">Actions</div>
             </div>
 
             {paginatedLeads.map((lead, index) => {
               const isSelected = selectedLeads.includes(lead.id);
+              const sourceMeta = getSourceMeta(lead.leadSource);
+              const SourceIcon = sourceMeta.icon;
+              const personType = lead.buyerTenant || 'Customer';
+              const personLogo = PersonLogos[personType] || PersonLogos['Customer'];
+              const PersonIcon = personLogo.icon;
 
               return (
                 <div
@@ -1685,52 +1682,46 @@ const LeadDashboard = () => {
                       onChange={() => handleSelectLead(lead.id)}
                       className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                     />
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white font-bold text-xs shadow-md">
-                      {lead.leadName ? lead.leadName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() : 'NA'}
+                    <div className={`w-7 h-7 rounded-full bg-gradient-to-br ${personLogo.color} flex items-center justify-center text-white shadow-md flex-shrink-0`}>
+                      <PersonIcon className="text-[10px]" />
                     </div>
+                    <span className="text-xs font-bold text-[#00695C]">{lead.leadId}</span>
                   </div>
 
                   <div className="col-span-2">
-                    <p className="font-semibold text-sm text-[#1A2E2A] truncate">{lead.leadName || 'N/A'}</p>
-                    <p className="text-[10px] text-[#5A7D78] truncate">{lead.propertyInterest || 'N/A'}</p>
+                    <p className="font-bold text-sm text-[#1A2E2A] truncate">{lead.customerName}</p>
+                    <p className="text-[10px] font-medium text-[#5A7D78] truncate">{lead.email}</p>
+                  </div>
+
+                  <div className="col-span-1 text-xs font-medium text-[#5A7D78] truncate">
+                    {lead.mobile}
                   </div>
 
                   <div className="col-span-1">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${getStatusColor(lead.leadStatus)}`}>
-                      {getStatusLabel(lead.leadStatus)}
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${personLogo.bg} ${personLogo.text} border ${personLogo.border}`}>
+                      {personLogo.label}
                     </span>
                   </div>
 
-                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">
-                    {lead.leadSource || 'N/A'}
+                  <div className="col-span-2 text-xs font-medium text-[#5A7D78] truncate">
+                    {lead.property}
                   </div>
 
-                  <div className="col-span-1 text-xs text-[#5A7D78]">
-                    {lead.createdAt ? new Date(lead.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) : 'N/A'}
+                  <div className="col-span-1">
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold border ${sourceMeta.badge}`}>
+                      {lead.leadSource}
+                    </span>
                   </div>
 
-                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">
-                    {lead.budget || 'N/A'}
+                  <div className="col-span-1 text-xs font-medium text-[#5A7D78]">
+                    {lead.createdDate}
                   </div>
 
-                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">
-                    {lead.assignedAgent || 'N/A'}
-                  </div>
-
-                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">
-                    {lead.phone || 'N/A'}
+                  <div className="col-span-1 text-xs font-medium text-[#5A7D78] truncate">
+                    {lead.assignedTo}
                   </div>
 
                   <div className="col-span-2 flex items-center justify-end gap-1">
-
-                     <button
-                      type="button"
-                      onClick={() => handleViewLead(lead)}
-                      className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
-                      title="View"
-                    >
-                      <FiEye className="text-xs" />
-                    </button>
                     <button
                       type="button"
                       onClick={() => handleEditLead(lead)}
@@ -1739,7 +1730,14 @@ const LeadDashboard = () => {
                     >
                       <FiEdit className="text-xs" />
                     </button>
-                   
+                    <button
+                      type="button"
+                      onClick={() => handleViewLead(lead)}
+                      className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
+                      title="View"
+                    >
+                      <FiEye className="text-xs" />
+                    </button>
                     <button
                       type="button"
                       onClick={() => handleDeleteLead(lead.id)}
@@ -1761,14 +1759,14 @@ const LeadDashboard = () => {
             <div className="w-24 h-24 rounded-full bg-[#F5F9F8] flex items-center justify-center mb-4 animate-float">
               <FiUsers className="text-4xl text-[#B5C9C5]" />
             </div>
-            <h3 className="text-xl font-semibold text-[#1A2E2A]">No leads found</h3>
+            <h3 className="text-xl font-bold text-[#1A2E2A]">No leads found</h3>
             <p className="text-sm text-[#5A7D78] mt-1">
               {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No leads have been added yet'}
             </p>
             {filterCount > 0 && (
               <button
                 onClick={clearAllFilters}
-                className="mt-4 px-6 py-2.5 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-sm font-medium shadow-lg shadow-[#00695C]/30 hover:scale-105"
+                className="mt-4 px-6 py-2.5 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-sm font-bold shadow-lg shadow-[#00695C]/30 hover:scale-105"
               >
                 Clear All Filters
               </button>
@@ -1781,7 +1779,7 @@ const LeadDashboard = () => {
       {totalPages > 1 && (
         <div className="flex flex-wrap items-center justify-between bg-white rounded-2xl px-4 py-3 border border-[#E8F0EE] shadow-sm gap-3">
           <div className="flex items-center gap-2 text-sm text-[#5A7D78] flex-wrap">
-            <span>
+            <span className="font-medium">
               Showing {(currentPage - 1) * pageSize + 1} to{' '}
               {Math.min(currentPage * pageSize, filteredLeads.length)} of{' '}
               {filteredLeads.length} leads
@@ -1792,7 +1790,7 @@ const LeadDashboard = () => {
                 setPageSize(Number(e.target.value));
                 setCurrentPage(1);
               }}
-              className="ml-2 px-2 py-1 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] text-sm text-[#1A2E2A] outline-none focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300"
+              className="ml-2 px-2 py-1 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] text-sm text-[#1A2E2A] outline-none focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 font-medium"
             >
               <option value={5}>5</option>
               <option value={10}>10</option>
@@ -1823,7 +1821,7 @@ const LeadDashboard = () => {
                 <button
                   key={pageNum}
                   onClick={() => setCurrentPage(pageNum)}
-                  className={`w-9 h-9 rounded-xl transition-all duration-300 text-sm font-medium hover:scale-110 ${
+                  className={`w-9 h-9 rounded-xl transition-all duration-300 text-sm font-bold hover:scale-110 ${
                     currentPage === pageNum
                       ? 'bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white shadow-lg shadow-[#00695C]/30'
                       : 'text-[#1A2E2A] hover:bg-[#F5F9F8]'
@@ -1858,6 +1856,10 @@ const LeadDashboard = () => {
           from { opacity: 0; transform: translateY(50px) scale(0.95); }
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
+        @keyframes slide-down {
+          from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
         @keyframes float {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-10px); }
@@ -1866,20 +1868,15 @@ const LeadDashboard = () => {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(10px); }
         }
-        @keyframes pulse-once {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.02); }
-          100% { transform: scale(1); }
-        }
         .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
         .animate-slide-in { animation: slide-in 0.4s ease-out forwards; opacity: 0; }
         .animate-slide-up { animation: slide-up 0.3s ease-out forwards; }
+        .animate-slide-down { animation: slide-down 0.3s ease-out forwards; }
         .animate-float { animation: float 6s ease-in-out infinite; }
         .animate-float-delayed { animation: float-delayed 8s ease-in-out infinite; }
-        .animate-pulse-once { animation: pulse-once 1s ease-out; }
       `}</style>
     </div>
   );
 };
 
-export default LeadDashboard;
+export default LeadInformation;
