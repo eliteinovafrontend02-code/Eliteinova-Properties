@@ -1632,33 +1632,33 @@ const LeadInformation = () => {
         ) : (
           <div className="bg-white rounded-2xl border border-[#E8F0EE] shadow-sm overflow-hidden">
             <div className="grid grid-cols-12 gap-2 items-center px-4 py-3 bg-[#F5F9F8] border-b border-[#E8F0EE] text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">
-              <div className="col-span-1 flex items-center gap-2">
+              <div className="col-span-1 flex items-center gap-2 min-w-0">
                 <input
                   type="checkbox"
                   checked={selectedLeads.length === paginatedLeads.length && paginatedLeads.length > 0}
                   onChange={handleSelectAll}
-                  className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
+                  className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300 flex-shrink-0"
                 />
-                <span>ID</span>
+                <span className="truncate">ID</span>
               </div>
-              <div className="col-span-2 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('customerName')}>
+              <div className="col-span-2 min-w-0 cursor-pointer hover:text-[#00695C] transition-colors truncate" onClick={() => handleSort('customerName')}>
                 Customer {sortField === 'customerName' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1">Mobile</div>
-              <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('buyerTenant')}>
+              <div className="col-span-1 min-w-0 truncate">Mobile</div>
+              <div className="col-span-1 min-w-0 truncate cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('buyerTenant')}>
                 Type {sortField === 'buyerTenant' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-2 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('property')}>
+              <div className="col-span-2 min-w-0 truncate cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('property')}>
                 Property {sortField === 'property' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('leadSource')}>
+              <div className="col-span-1 min-w-0 truncate cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('leadSource')}>
                 Source {sortField === 'leadSource' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('createdDate')}>
+              <div className="col-span-1 min-w-0 truncate cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('createdDate')}>
                 Created {sortField === 'createdDate' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1">Assigned To</div>
-              <div className="col-span-2 text-right">Actions</div>
+              <div className="col-span-1 min-w-0 truncate">Assigned To</div>
+              <div className="col-span-2 min-w-0 text-right">Actions</div>
             </div>
 
             {paginatedLeads.map((lead, index) => {
@@ -1675,57 +1675,57 @@ const LeadInformation = () => {
                   className={`grid grid-cols-12 gap-2 items-center py-3 px-4 border-b border-[#E8F0EE] hover:bg-[#F5F9F8] transition-all duration-300 group ${isSelected ? 'bg-[#E8F4F2]' : ''}`}
                   style={{ animationDelay: `${index * 30}ms` }}
                 >
-                  <div className="col-span-1 flex items-center gap-2">
+                  <div className="col-span-1 flex items-center gap-2 min-w-0">
                     <input
                       type="checkbox"
                       checked={isSelected}
                       onChange={() => handleSelectLead(lead.id)}
-                      className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
+                      className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300 flex-shrink-0"
                     />
                     <div className={`w-7 h-7 rounded-full bg-gradient-to-br ${personLogo.color} flex items-center justify-center text-white shadow-md flex-shrink-0`}>
                       <PersonIcon className="text-[10px]" />
                     </div>
-                    <span className="text-xs font-bold text-[#00695C]">{lead.leadId}</span>
+                    <span className="text-xs font-bold text-[#00695C] truncate">{lead.leadId}</span>
                   </div>
 
-                  <div className="col-span-2">
+                  <div className="col-span-2 min-w-0">
                     <p className="font-bold text-sm text-[#1A2E2A] truncate">{lead.customerName}</p>
                     <p className="text-[10px] font-medium text-[#5A7D78] truncate">{lead.email}</p>
                   </div>
 
-                  <div className="col-span-1 text-xs font-medium text-[#5A7D78] truncate">
+                  <div className="col-span-1 min-w-0 text-xs font-medium text-[#5A7D78] truncate">
                     {lead.mobile}
                   </div>
 
-                  <div className="col-span-1">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${personLogo.bg} ${personLogo.text} border ${personLogo.border}`}>
+                  <div className="col-span-1 min-w-0">
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${personLogo.bg} ${personLogo.text} border ${personLogo.border} truncate inline-block max-w-full`}>
                       {personLogo.label}
                     </span>
                   </div>
 
-                  <div className="col-span-2 text-xs font-medium text-[#5A7D78] truncate">
+                  <div className="col-span-2 min-w-0 text-xs font-medium text-[#5A7D78] truncate">
                     {lead.property}
                   </div>
 
-                  <div className="col-span-1">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold border ${sourceMeta.badge}`}>
+                  <div className="col-span-1 min-w-0">
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold border ${sourceMeta.badge} truncate inline-block max-w-full`}>
                       {lead.leadSource}
                     </span>
                   </div>
 
-                  <div className="col-span-1 text-xs font-medium text-[#5A7D78]">
+                  <div className="col-span-1 min-w-0 text-xs font-medium text-[#5A7D78] truncate">
                     {lead.createdDate}
                   </div>
 
-                  <div className="col-span-1 text-xs font-medium text-[#5A7D78] truncate">
+                  <div className="col-span-1 min-w-0 text-xs font-medium text-[#5A7D78] truncate">
                     {lead.assignedTo}
                   </div>
 
-                  <div className="col-span-2 flex items-center justify-end gap-1">
+                  <div className="col-span-2 min-w-0 flex items-center justify-end gap-1">
                     <button
                       type="button"
                       onClick={() => handleEditLead(lead)}
-                      className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#26A69A] hover:scale-110"
+                      className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#26A69A] hover:scale-110 flex-shrink-0"
                       title="Edit"
                     >
                       <FiEdit className="text-xs" />
@@ -1733,7 +1733,7 @@ const LeadInformation = () => {
                     <button
                       type="button"
                       onClick={() => handleViewLead(lead)}
-                      className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
+                      className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110 flex-shrink-0"
                       title="View"
                     >
                       <FiEye className="text-xs" />
@@ -1742,7 +1742,7 @@ const LeadInformation = () => {
                       type="button"
                       onClick={() => handleDeleteLead(lead.id)}
                       disabled={actionLoading === lead.id}
-                      className="w-7 h-7 rounded-lg hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-red-600 hover:scale-110 disabled:opacity-50"
+                      className="w-7 h-7 rounded-lg hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-red-600 hover:scale-110 disabled:opacity-50 flex-shrink-0"
                       title="Delete"
                     >
                       {actionLoading === lead.id ? <FiRefreshCw className="text-xs animate-spin" /> : <FiTrash2 className="text-xs" />}

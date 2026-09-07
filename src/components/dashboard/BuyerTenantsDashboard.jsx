@@ -424,7 +424,7 @@ const BuyerTenantsDashboard = () => {
               </div>
             </div>
 
-            {/* Right - Dashboard Navigation Links - FIXED PROPERTIES CHECK */}
+            {/* Right - Dashboard Navigation Links  */}
             <div className="flex items-center gap-2">
               {/* Admin Dashboard */}
               <button
@@ -452,7 +452,7 @@ const BuyerTenantsDashboard = () => {
                 Buyers & Tenants
               </button>
 
-              {/* Properties Dashboard - FIXED: Only highlight when in /admin/properties path */}
+              {/* Properties Dashboard  */}
               <button
                 onClick={() => navigate('/admin/properties/overview')}
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 ${

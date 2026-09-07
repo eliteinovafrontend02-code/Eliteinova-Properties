@@ -68,7 +68,7 @@ import PropertyManagersPropertiesLeads from './admin/PropertyManagers/PropertyMa
 import BuyerTenantsDashboard from './BuyerTenantsDashboard';
 
 // Properties
-// import Properties from './admin/Properties';
+import PropertiesDashboard from './PropertiesDashboard';
 
 // Other modules
 // import LeadManagement from './admin/LeadManagement';
@@ -192,6 +192,10 @@ const AdminDashboard = () => {
 
    if (location.pathname.startsWith('/admin/buyers-tenants')) {
     return <BuyerTenantsDashboard />;
+  }
+
+  if (location.pathname.startsWith('/admin/properties')) {
+    return <PropertiesDashboard />;
   }
 
   
@@ -495,11 +499,9 @@ const AdminDashboard = () => {
               <Route path="property-managers/property-control" element={<PropertyManagersPropertyControl />} />
               <Route path="property-managers/leads" element={<PropertyManagersPropertiesLeads />} />
 
-               {/* Buyers & Tenants  */}
-               {/* <Route path="buyers-tenants/*" element={<BuyerTenantsDashboard />} /> */}
+               {/* Buyers & Tenants — handled by the early return above, no Route needed here */}
 
-              {/* Properties */}
-              {/* <Route path="properties" element={<Properties />} /> */}
+              {/* Properties — handled by the early return above, no Route needed here */}
 
               {/* Other routes */}
               {/* <Route path="leads" element={<LeadManagement />} /> */}

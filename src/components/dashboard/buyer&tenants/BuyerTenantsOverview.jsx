@@ -404,89 +404,7 @@ const BuyerTenantsOverview = () => {
     return (value / maxValue) * chartHeight;
   };
 
-  // ============ QUICK ACTIONS ============
-  const quickActions = [
-    { 
-      icon: <FiUserPlus />, 
-      label: 'Add Buyer', 
-      color: 'bg-[#00695C]', 
-      lightColor: 'bg-teal-100',
-      textColor: 'text-[#00695C]',
-      path: '/admin/buyers-tenants/buyer/registration',
-      actionName: 'Add Buyer',
-      notification: '📝 Opening Add Buyer form...'
-    },
-    { 
-      icon: <FiUserPlus />, 
-      label: 'Add Tenant', 
-      color: 'bg-[#26A69A]',
-      lightColor: 'bg-green-100', 
-      textColor: 'text-[#26A69A]',
-      path: '/admin/buyers-tenants/tenant/registration',
-      actionName: 'Add Tenant',
-      notification: '📝 Opening Add Tenant form...'
-    },
-    { 
-      icon: <FiHeart />, 
-      label: 'View Wishlist', 
-      color: 'bg-[#E91E63]',
-      lightColor: 'bg-pink-100', 
-      textColor: 'text-[#E91E63]',
-      path: '/admin/buyers-tenants/saved/wishlist',
-      actionName: 'Wishlist',
-      notification: '❤️ Viewing Wishlist...'
-    },
-    { 
-      icon: <FiMapPin />, 
-      label: 'Site Visits', 
-      color: 'bg-[#FF9800]',
-      lightColor: 'bg-orange-100', 
-      textColor: 'text-[#FF9800]',
-      path: '/admin/buyers-tenants/site-visits/dashboard',
-      actionName: 'Site Visits',
-      notification: '📍 Navigating to Site Visits...'
-    },
-    { 
-      icon: <FaHandshake />, 
-      label: 'Purchase Requests', 
-      color: 'bg-[#4CAF50]',
-      lightColor: 'bg-emerald-100', 
-      textColor: 'text-[#4CAF50]',
-      path: '/admin/buyers-tenants/purchase/overview',
-      actionName: 'Purchase Requests',
-      notification: '🤝 Viewing Purchase Requests...'
-    },
-    { 
-      icon: <FaClipboardList />, 
-      label: 'Rental Requests', 
-      color: 'bg-[#2196F3]',
-      lightColor: 'bg-blue-100', 
-      textColor: 'text-[#2196F3]',
-      path: '/admin/buyers-tenants/rental/overview',
-      actionName: 'Rental Requests',
-      notification: '📋 Viewing Rental Requests...'
-    },
-    { 
-      icon: <MdOutlinePeople />, 
-      label: 'Lead Management', 
-      color: 'bg-[#9C27B0]',
-      lightColor: 'bg-purple-100', 
-      textColor: 'text-[#9C27B0]',
-      path: '/admin/buyers-tenants/lead/overview',
-      actionName: 'Lead Management',
-      notification: '👥 Opening Lead Management...'
-    },
-    { 
-      icon: <FaChartLine />, 
-      label: 'Reports', 
-      color: 'bg-[#607D8B]',
-      lightColor: 'bg-slate-100', 
-      textColor: 'text-[#607D8B]',
-      path: '/admin/reports',
-      actionName: 'Reports',
-      notification: '📊 Generating Reports...'
-    }
-  ];
+  
 
   // ============ LEAD STATUS DATA ============
   const leadStatusData = [
@@ -1078,34 +996,6 @@ const BuyerTenantsOverview = () => {
               ))}
             </div>
           </div>
-
-          {/* Quick Actions */}
-          <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in-up">
-            <h3 className="font-semibold text-gray-800 flex items-center gap-2 text-base mb-3">
-              <FiGrid className="text-[#00695C] animate-pulse-soft" />
-              Quick Actions
-            </h3>
-            <div className="grid grid-cols-4 gap-2">
-              {quickActions.map((action, index) => (
-                <div
-                  key={index}
-                  onClick={() => {
-                    handleQuickAction(action.path, action.actionName);
-                    showToast(action.notification, 'info');
-                  }}
-                  className="group flex flex-col items-center gap-1.5 p-2 rounded-xl bg-gray-50 hover:bg-white hover:shadow-md border border-transparent hover:border-gray-200 transition-all duration-300 cursor-pointer animate-fade-in-up"
-                  style={{ animationDelay: `${index * 0.03}s` }}
-                >
-                  <div className={`w-9 h-9 rounded-lg ${action.color} flex items-center justify-center text-white group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-md`}>
-                    {action.icon}
-                  </div>
-                  <span className="text-xs text-gray-600 text-center font-medium leading-tight group-hover:text-[#00695C] transition-colors duration-300">
-                    {action.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* Right Column (1/3) */}
@@ -1203,37 +1093,10 @@ const BuyerTenantsOverview = () => {
             </div>
           </div>
 
-          {/* Notifications / Alerts - Theme Color */}
-          <div 
-            className="bg-gradient-to-br from-[#00695C]/5 to-[#26A69A]/5 rounded-2xl p-4 border border-[#00695C]/20 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in-up cursor-pointer"
-            onClick={() => {
-              navigate('/admin/buyers-tenants/buyer/registration');
-              showToast('🔔 Viewing pending verifications...', 'info');
-            }}
-          >
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-[#00695C]/10 flex items-center justify-center flex-shrink-0 animate-pulse-soft">
-                <FiBell className="text-[#00695C] text-base" />
-              </div>
-              <div>
-                <h4 className="text-sm font-semibold text-gray-800">Pending Verifications</h4>
-                <p className="text-xs text-gray-500 mt-0.5">12 buyers and 8 tenants require KYC verification</p>
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate('/admin/buyers-tenants/buyer/registration');
-                    showToast('🔔 Reviewing pending verifications...', 'info');
-                  }}
-                  className="mt-1.5 text-xs text-[#00695C] font-medium hover:underline flex items-center gap-1 hover:gap-2 transition-all duration-300"
-                >
-                  Review Now <FiArrowUp className="rotate-90 text-xs transition-transform duration-300" />
-                </button>
-              </div>
-            </div>
-          </div>
+         
 
           {/* Quick Stats - Theme Color */}
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2 ">
             <div 
               className="bg-white rounded-2xl p-3 border border-gray-200 shadow-sm text-center cursor-pointer hover:shadow-md hover:scale-[1.02] transition-all duration-300 animate-fade-in-up"
               onClick={() => {
