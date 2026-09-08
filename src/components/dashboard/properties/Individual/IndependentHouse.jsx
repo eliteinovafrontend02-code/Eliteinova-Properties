@@ -24,6 +24,7 @@ const HOUSE_TYPE = {
 
 // ============================================================
 // LISTING TYPE CONFIG — the varying dimension on this page
+// ---- 'Sell' removed: only Buy, Rent, Lease are valid listing types ----
 // ============================================================
 const LISTING_TYPES = {
   'Buy': {
@@ -41,14 +42,6 @@ const LISTING_TYPES = {
     text: 'text-purple-700',
     border: 'border-purple-200',
     label: 'Rent'
-  },
-  'Sell': {
-    icon: FiTag,
-    color: 'from-emerald-600 to-emerald-400',
-    bg: 'bg-emerald-50',
-    text: 'text-emerald-700',
-    border: 'border-emerald-200',
-    label: 'Sell'
   },
   'Lease': {
     icon: FiFileText,
@@ -340,7 +333,10 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
       setFormData({
         propertyId: property.propertyId || '',
         propertyTitle: property.propertyTitle || '',
-        listingType: property.listingType || '',
+        // Normalize any legacy 'Sell' value coming from an existing record
+        listingType: property.listingType && property.listingType.toLowerCase() === 'sell'
+          ? 'Buy'
+          : (property.listingType || ''),
         description: property.description || '',
         state: property.state || '',
         district: property.district || '',
@@ -667,19 +663,34 @@ const IndependentHouse = () => {
   });
 
   // ============ STATS ============
-  const [stats, setStats] = useState({ total: 0, buy: 0, rent: 0, sell: 0, lease: 0 });
+  // ---- 'sell' removed: only total, buy, rent, lease ----
+  const [stats, setStats] = useState({ total: 0, buy: 0, rent: 0, lease: 0 });
+
+  // ============ NORMALIZE LEGACY DATA ============
+  // Converts any legacy 'Sell' listingType (case-insensitive) into 'Buy'.
+  // Only Buy, Rent, Lease are valid listing types going forward.
+  const normalizeListingType = useCallback((property) => {
+    if (property && property.listingType && property.listingType.toLowerCase() === 'sell') {
+      return { ...property, listingType: 'Buy' };
+    }
+    return property;
+  }, []);
+
+  const normalizeProperties = useCallback((list) => {
+    if (!list) return list;
+    return list.map(normalizeListingType);
+  }, [normalizeListingType]);
 
   const computeStats = useCallback((list) => {
     if (!list || list.length === 0) {
-      setStats({ total: 0, buy: 0, rent: 0, sell: 0, lease: 0 });
+      setStats({ total: 0, buy: 0, rent: 0, lease: 0 });
       return;
     }
     const total = list.length;
     const buy = list.filter(p => p.listingType === 'Buy').length;
     const rent = list.filter(p => p.listingType === 'Rent').length;
-    const sell = list.filter(p => p.listingType === 'Sell').length;
     const lease = list.filter(p => p.listingType === 'Lease').length;
-    setStats({ total, buy, rent, sell, lease });
+    setStats({ total, buy, rent, lease });
   }, []);
 
   // ============ GENERATE MOCK DATA ============
@@ -729,13 +740,13 @@ const IndependentHouse = () => {
   // ============ INITIALIZE DATA ============
   useEffect(() => {
     try {
-      const mockProperties = generateMockProperties();
+      const mockProperties = normalizeProperties(generateMockProperties());
       setProperties(mockProperties);
       setFilteredProperties(mockProperties);
     } catch (error) {
       console.error('Error generating mock properties:', error);
     }
-  }, [generateMockProperties]);
+  }, [generateMockProperties, normalizeProperties]);
 
   // ============ FILTER PROPERTIES ============
   const filterProperties = useCallback(() => {
@@ -829,13 +840,14 @@ const IndependentHouse = () => {
   }, []);
 
   const handleSaveProperty = useCallback((updatedProperty) => {
+    const normalized = normalizeListingType(updatedProperty);
     setProperties(prev => {
-      const updated = prev.map(p => p.id === updatedProperty.id ? updatedProperty : p);
+      const updated = prev.map(p => p.id === normalized.id ? normalized : p);
       computeStats(updated);
       return updated;
     });
-    setToast({ message: `Property "${updatedProperty.propertyTitle}" updated successfully`, type: 'success' });
-  }, [computeStats]);
+    setToast({ message: `Property "${normalized.propertyTitle}" updated successfully`, type: 'success' });
+  }, [computeStats, normalizeListingType]);
 
   // ============ DELETE PROPERTY WITH CONFIRMATION ============
   const handleDeleteProperty = useCallback((propertyId) => {
@@ -891,7 +903,7 @@ const IndependentHouse = () => {
     setLoading(true);
     setTimeout(() => {
       try {
-        const mockProperties = generateMockProperties();
+        const mockProperties = normalizeProperties(generateMockProperties());
         setProperties(mockProperties);
         setFilteredProperties(mockProperties);
         setToast({ message: 'Data refreshed successfully', type: 'success' });
@@ -901,7 +913,7 @@ const IndependentHouse = () => {
       }
       setLoading(false);
     }, 1000);
-  }, [generateMockProperties]);
+  }, [generateMockProperties, normalizeProperties]);
 
   // ============ EXPORT DATA ============
   const handleExport = useCallback(() => {
@@ -1042,7 +1054,7 @@ const IndependentHouse = () => {
               )}
             </div>
             <p className="text-sm text-[#5A7D78] flex items-center gap-2 flex-wrap">
-              <span>All Independent House listings across Buy, Rent, Sell &amp; Lease</span>
+              <span>All Independent House listings across Buy, Rent &amp; Lease</span>
               <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
               <span className="text-[#00695C] font-medium">
                 {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
@@ -1080,7 +1092,7 @@ const IndependentHouse = () => {
       {showStats && (
         <div className="relative animate-slide-in">
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <StatCard
                 icon={<FiHome className="text-white text-sm" />}
                 title="Total Properties"
@@ -1109,20 +1121,11 @@ const IndependentHouse = () => {
                 onClick={() => handleListingClick('Rent')}
               />
               <StatCard
-                icon={<FiTag className="text-white text-sm" />}
-                title="Sell"
-                value={stats.sell}
-                color="bg-gradient-to-br from-emerald-600 to-emerald-400"
-                delay={300}
-                isActive={activeListingType === 'Sell'}
-                onClick={() => handleListingClick('Sell')}
-              />
-              <StatCard
                 icon={<FiFileText className="text-white text-sm" />}
                 title="Lease"
                 value={stats.lease}
                 color="bg-gradient-to-br from-amber-600 to-amber-400"
-                delay={400}
+                delay={300}
                 isActive={activeListingType === 'Lease'}
                 onClick={() => handleListingClick('Lease')}
               />
@@ -1257,24 +1260,7 @@ const IndependentHouse = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 shrink-0">
-                      <button
-                        type="button"
-                        className="w-7 h-7 rounded-xl hover:bg-[#F5F9F8] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#26A69A] hover:scale-110"
-                        onClick={() => handleEditProperty(property)}
-                        title="Edit Property"
-                      >
-                        <FiEdit className="text-sm" />
-                      </button>
-                      <button
-                        type="button"
-                        className="w-7 h-7 rounded-xl hover:bg-[#F5F9F8] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
-                        onClick={() => handleViewProperty(property)}
-                        title="View Details"
-                      >
-                        <FiEye className="text-sm" />
-                      </button>
-                    </div>
+                   
                   </div>
 
                   <div className="space-y-1">

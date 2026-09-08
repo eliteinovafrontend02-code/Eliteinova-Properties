@@ -577,7 +577,8 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
   const [loading, setLoading] = useState(false);
 
   const categoryOptions = Object.keys(PROPERTY_CATEGORIES);
-  const listingTypeOptions = ['Buy', 'sell', 'Rent', 'Lease'];
+  // ---- 'sell' removed: only Buy, Rent, Lease ----
+  const listingTypeOptions = ['Buy', 'Rent', 'Lease'];
   const statusOptions = ['Active', 'Inactive', 'Pending', 'Sold', 'Rented', 'Expired', 'Rejected'];
   const verificationOptions = ['Verified', 'Pending', 'Rejected', 'Not Verified'];
 
@@ -588,7 +589,10 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
         propertyName: property.propertyName || '',
         category: property.category || '',
         subcategory: property.subcategory || '',
-        listingType: property.listingType || '',
+        // Normalize any legacy 'sell' value coming from an existing record
+        listingType: property.listingType && property.listingType.toLowerCase() === 'sell'
+          ? 'Buy'
+          : (property.listingType || ''),
         location: property.location || '',
         district: property.district || '',
         city: property.city || '',
@@ -1098,6 +1102,21 @@ const AllProperties = () => {
     verified: 0
   });
 
+  // ============ NORMALIZE LEGACY DATA ============
+  // Converts any legacy 'sell' listingType (case-insensitive) into 'Buy'.
+  // Only Buy, Rent, Lease are valid listing types going forward.
+  const normalizeListingType = useCallback((property) => {
+    if (property && property.listingType && property.listingType.toLowerCase() === 'sell') {
+      return { ...property, listingType: 'Buy' };
+    }
+    return property;
+  }, []);
+
+  const normalizeProperties = useCallback((list) => {
+    if (!list) return list;
+    return list.map(normalizeListingType);
+  }, [normalizeListingType]);
+
   // ============ COMPUTE STATS ============
   const computeStats = useCallback((list) => {
     if (!list || list.length === 0) {
@@ -1137,7 +1156,8 @@ const AllProperties = () => {
     const statuses = ['Active', 'Inactive', 'Pending', 'Sold', 'Rented', 'Expired', 'Rejected'];
     const verificationStatuses = ['Verified', 'Pending', 'Rejected', 'Not Verified'];
     const categories = Object.keys(PROPERTY_CATEGORIES);
-    const listingTypes = ['Buy', 'sell', 'Rent', 'Lease'];
+    // ---- 'sell' removed: only Buy, Rent, Lease ----
+    const listingTypes = ['Buy', 'Rent', 'Lease'];
 
     const propertiesList = [];
 
@@ -1183,13 +1203,13 @@ const AllProperties = () => {
   // ============ INITIALIZE DATA ============
   useEffect(() => {
     try {
-      const mockProperties = generateMockProperties();
+      const mockProperties = normalizeProperties(generateMockProperties());
       setProperties(mockProperties);
       setFilteredProperties(mockProperties);
     } catch (error) {
       console.error('Error generating mock properties:', error);
     }
-  }, [generateMockProperties]);
+  }, [generateMockProperties, normalizeProperties]);
 
   // ============ FILTER PROPERTIES ============
   const filterProperties = useCallback(() => {
@@ -1310,15 +1330,16 @@ const AllProperties = () => {
 
   // ============ SAVE EDITED PROPERTY ============
   const handleSaveProperty = useCallback((updatedProperty) => {
+    const normalized = normalizeListingType(updatedProperty);
     setProperties(prev => {
       const updated = prev.map(p =>
-        p.id === updatedProperty.id ? updatedProperty : p
+        p.id === normalized.id ? normalized : p
       );
       computeStats(updated);
       return updated;
     });
-    setToast({ message: `Property "${updatedProperty.propertyName}" updated successfully`, type: 'success' });
-  }, [computeStats]);
+    setToast({ message: `Property "${normalized.propertyName}" updated successfully`, type: 'success' });
+  }, [computeStats, normalizeListingType]);
 
   // ============ ACTION HANDLERS ============
   const handleApprove = useCallback((propertyId) => {
@@ -1514,7 +1535,7 @@ const AllProperties = () => {
     setLoading(true);
     setTimeout(() => {
       try {
-        const mockProperties = generateMockProperties();
+        const mockProperties = normalizeProperties(generateMockProperties());
         setProperties(mockProperties);
         setFilteredProperties(mockProperties);
         setToast({ message: 'Data refreshed successfully', type: 'success' });
@@ -1524,7 +1545,7 @@ const AllProperties = () => {
       }
       setLoading(false);
     }, 1000);
-  }, [generateMockProperties]);
+  }, [generateMockProperties, normalizeProperties]);
 
   // ============ EXPORT DATA ============
   const handleExport = useCallback(() => {
@@ -1624,9 +1645,9 @@ const AllProperties = () => {
     { value: 'Verified', label: 'Verified' }
   ];
 
+  // ---- 'sell' removed: only Buy, Rent, Lease ----
   const listingTypeOptions = [
     { value: 'Buy', label: 'Buy' },
-    { value: 'sell', label: 'sell' },
     { value: 'Rent', label: 'Rent' },
     { value: 'Lease', label: 'Lease' }
   ];

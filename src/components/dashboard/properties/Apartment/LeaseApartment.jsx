@@ -1,56 +1,36 @@
-// src/components/dashboard/properties/Individual/IndependentVilla.jsx
+// src/components/dashboard/properties/Apartment/LeaseApartment.jsx
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
-  FiSearch, FiChevronDown, FiChevronLeft, FiChevronRight, FiEye, FiEdit,
+  FiSearch, FiChevronLeft, FiChevronRight, FiEye, FiEdit,
   FiTrash2, FiRefreshCw, FiDownload, FiAlertTriangle, FiInfo, FiX, FiList,
   FiGrid as FiGridIcon, FiMapPin, FiTag, FiSave, FiFileText, FiHash,
-  FiChevronUp, FiCheckCircle, FiXCircle, FiHome, FiBriefcase, FiGlobe,
-  FiMap, FiActivity, FiDollarSign, FiKey
+  FiCheckCircle, FiXCircle, FiHome, FiBriefcase, FiGlobe, FiMap
 } from 'react-icons/fi';
-import { FaHome, FaCity } from 'react-icons/fa';
+import { FaBuilding, FaCity } from 'react-icons/fa';
 
 // ============================================================
-// FIXED PROPERTY TYPE — this page only handles Independent Villa
+// FIXED PROPERTY TYPE — this page only handles Lease Apartment
 // ============================================================
-const VILLA_TYPE = {
-  icon: FiHome,
-  color: 'from-purple-600 to-purple-400',
-  bg: 'bg-purple-50',
-  text: 'text-purple-700',
-  border: 'border-purple-200',
-  label: 'Independent Villa (Individual)'
+const APARTMENT_TYPE = {
+  icon: FaBuilding,
+  color: 'from-teal-600 to-teal-400',
+  bg: 'bg-teal-50',
+  text: 'text-teal-700',
+  border: 'border-teal-200',
+  label: 'Lease Apartment'
 };
 
 // ============================================================
-// LISTING TYPE CONFIG — the varying dimension on this page
-// ---- 'Sell' removed: only Buy, Rent, Lease are valid listing types ----
+// FIXED LISTING TYPE — this page only handles Lease
 // ============================================================
-const LISTING_TYPES = {
-  'Buy': {
-    icon: FiDollarSign,
-    color: 'from-blue-600 to-blue-400',
-    bg: 'bg-blue-50',
-    text: 'text-blue-700',
-    border: 'border-blue-200',
-    label: 'Buy'
-  },
-  'Rent': {
-    icon: FiKey,
-    color: 'from-purple-600 to-purple-400',
-    bg: 'bg-purple-50',
-    text: 'text-purple-700',
-    border: 'border-purple-200',
-    label: 'Rent'
-  },
-  'Lease': {
-    icon: FiFileText,
-    color: 'from-amber-600 to-amber-400',
-    bg: 'bg-amber-50',
-    text: 'text-amber-700',
-    border: 'border-amber-200',
-    label: 'Lease'
-  }
+const LEASE_TYPE = {
+  icon: FiFileText,
+  color: 'from-amber-600 to-amber-400',
+  bg: 'bg-amber-50',
+  text: 'text-amber-700',
+  border: 'border-amber-200',
+  label: 'Lease'
 };
 
 // ============================================================
@@ -140,9 +120,6 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
 const ViewPropertyDetailModal = ({ property, show, onClose, onEdit, onDelete }) => {
   if (!property || !show) return null;
 
-  const listingConfig = LISTING_TYPES[property.listingType] || LISTING_TYPES['Buy'];
-  const ListingIcon = listingConfig.icon;
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
@@ -155,14 +132,14 @@ const ViewPropertyDetailModal = ({ property, show, onClose, onEdit, onDelete }) 
             <FiX className="text-lg" />
           </button>
           <div className="flex items-center gap-3 mb-2">
-            <div className={`w-14 h-14 rounded-2xl ${listingConfig.bg} border-2 border-white/30 flex items-center justify-center text-2xl ${listingConfig.text} shadow-lg`}>
-              <ListingIcon />
+            <div className={`w-14 h-14 rounded-2xl ${LEASE_TYPE.bg} border-2 border-white/30 flex items-center justify-center text-2xl ${LEASE_TYPE.text} shadow-lg`}>
+              <FiFileText />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-white">{property.propertyTitle}</h2>
               <p className="text-white/80 text-sm flex items-center gap-2">
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${listingConfig.bg} ${listingConfig.text} border ${listingConfig.border}`}>
-                  {listingConfig.label}
+                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${LEASE_TYPE.bg} ${LEASE_TYPE.text} border ${LEASE_TYPE.border}`}>
+                  {LEASE_TYPE.label}
                 </span>
                 <span className="w-1 h-1 bg-white/40 rounded-full"></span>
                 <span>ID: {property.propertyId}</span>
@@ -170,8 +147,8 @@ const ViewPropertyDetailModal = ({ property, show, onClose, onEdit, onDelete }) 
             </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 ${VILLA_TYPE.bg} ${VILLA_TYPE.text} border ${VILLA_TYPE.border}`}>
-              <FaHome className="text-xs" /> {VILLA_TYPE.label}
+            <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 ${APARTMENT_TYPE.bg} ${APARTMENT_TYPE.text} border ${APARTMENT_TYPE.border}`}>
+              <FaBuilding className="text-xs" /> {APARTMENT_TYPE.label}
             </span>
           </div>
         </div>
@@ -189,7 +166,7 @@ const ViewPropertyDetailModal = ({ property, show, onClose, onEdit, onDelete }) 
 
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-1">
-                <FaHome className="text-[#00695C] text-sm" />
+                <FiHome className="text-[#00695C] text-sm" />
                 <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Property Title</h4>
               </div>
               <p className="text-sm font-bold text-[#1A2E2A]">{property.propertyTitle}</p>
@@ -200,7 +177,7 @@ const ViewPropertyDetailModal = ({ property, show, onClose, onEdit, onDelete }) 
                 <FiTag className="text-[#00695C] text-sm" />
                 <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Property Type</h4>
               </div>
-              <p className="text-sm font-bold text-[#1A2E2A]">{VILLA_TYPE.label}</p>
+              <p className="text-sm font-bold text-[#1A2E2A]">{APARTMENT_TYPE.label}</p>
             </div>
 
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
@@ -208,7 +185,7 @@ const ViewPropertyDetailModal = ({ property, show, onClose, onEdit, onDelete }) 
                 <FiBriefcase className="text-[#00695C] text-sm" />
                 <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Listing Type</h4>
               </div>
-              <p className="text-sm font-bold text-[#1A2E2A]">{property.listingType}</p>
+              <p className="text-sm font-bold text-[#1A2E2A]">{LEASE_TYPE.label}</p>
             </div>
 
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
@@ -320,23 +297,17 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
   if (!property || !show) return null;
 
   const [formData, setFormData] = useState({
-    propertyId: '', propertyTitle: '', listingType: '',
+    propertyId: '', propertyTitle: '',
     description: '', state: '', district: '', city: '', area: '',
     street: '', pincode: '', latitude: '', longitude: ''
   });
   const [loading, setLoading] = useState(false);
-
-  const listingTypeOptions = Object.keys(LISTING_TYPES);
 
   useEffect(() => {
     if (property) {
       setFormData({
         propertyId: property.propertyId || '',
         propertyTitle: property.propertyTitle || '',
-        // Normalize any legacy 'Sell' value coming from an existing record
-        listingType: property.listingType && property.listingType.toLowerCase() === 'sell'
-          ? 'Buy'
-          : (property.listingType || ''),
         description: property.description || '',
         state: property.state || '',
         district: property.district || '',
@@ -359,7 +330,7 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
-      onSave({ ...property, ...formData, propertyType: VILLA_TYPE.label });
+      onSave({ ...property, ...formData, propertyType: APARTMENT_TYPE.label, listingType: LEASE_TYPE.label });
       setLoading(false);
       onClose();
     }, 700);
@@ -376,8 +347,8 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
           >
             <FiX className="text-lg" />
           </button>
-          <h2 className="text-2xl font-bold text-white">Edit Independent Villa</h2>
-          <p className="text-white/80 text-sm">Update property details</p>
+          <h2 className="text-2xl font-bold text-white">Edit Lease Apartment</h2>
+          <p className="text-white/80 text-sm">Update lease apartment property details</p>
         </div>
 
         {/* Content */}
@@ -385,7 +356,7 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
               <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <FaHome className="text-[#00695C]" />
+                <FaBuilding className="text-[#00695C]" />
                 Basic Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -394,7 +365,7 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
                   <input
                     type="text" name="propertyId" value={formData.propertyId} onChange={handleChange}
                     className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                    placeholder="IV-001"
+                    placeholder="LA-0001"
                   />
                 </div>
                 <div>
@@ -408,19 +379,16 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
                 <div>
                   <label className="block text-xs font-medium text-[#5A7D78] mb-1">Property Type</label>
                   <input
-                    type="text" value={VILLA_TYPE.label} disabled
+                    type="text" value={APARTMENT_TYPE.label} disabled
                     className="w-full px-3 py-2 bg-[#F0F4F3] rounded-xl border border-[#E8F0EE] text-sm text-[#5A7D78] outline-none cursor-not-allowed"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Listing Type *</label>
-                  <select
-                    name="listingType" value={formData.listingType} onChange={handleChange} required
-                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                  >
-                    <option value="">Select Listing Type</option>
-                    {listingTypeOptions.map(type => <option key={type} value={type}>{type}</option>)}
-                  </select>
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Listing Type</label>
+                  <input
+                    type="text" value={LEASE_TYPE.label} disabled
+                    className="w-full px-3 py-2 bg-[#F0F4F3] rounded-xl border border-[#E8F0EE] text-sm text-[#5A7D78] outline-none cursor-not-allowed"
+                  />
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-xs font-medium text-[#5A7D78] mb-1">Description</label>
@@ -542,98 +510,9 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
 };
 
 // ============================================================
-// STAT CARD COMPONENT
-// ============================================================
-const StatCard = ({ icon, title, value, color, delay = 0, isActive, onClick }) => (
-  <div
-    className={`bg-white rounded-2xl p-1 shadow-sm hover:shadow-lg transition-all duration-500 border group cursor-pointer transform hover:-translate-y-1 animate-slide-in ${isActive ? 'ring-2 ring-[#00695C] shadow-lg bg-[#F5F9F8]' : 'border-[#E8F0EE]'}`}
-    style={{ animationDelay: `${delay}ms` }}
-    onClick={() => onClick && onClick()}
-  >
-    <div className="flex items-center gap-3">
-      <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}>
-        {icon}
-      </div>
-      <div className="min-w-0">
-        <p className="text-[10px] font-semibold text-[#5A7D78] uppercase tracking-wider truncate">{title}</p>
-        <p className={`text-lg font-bold text-[#1A2E2A] group-hover:text-[#00695C] transition-colors duration-300 ${isActive ? 'text-[#00695C]' : ''}`}>
-          {typeof value === 'number' ? value.toLocaleString() : value}
-        </p>
-      </div>
-    </div>
-    {isActive && (
-      <div className="mt-1 flex items-center gap-1">
-        <span className="text-[7px] text-[#00695C] font-medium bg-[#E8F4F2] px-2 py-0.5 rounded-full">Active Filter</span>
-      </div>
-    )}
-  </div>
-);
-
-// ============================================================
-// FILTER DROPDOWN COMPONENT
-// ============================================================
-const FilterDropdown = ({ label, options, value, onChange, icon: Icon, allLabel = 'All' }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) setIsOpen(false);
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const selectedOption = options.find(opt => opt.value === value);
-  const displayLabel = selectedOption ? selectedOption.label : allLabel;
-
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2 px-4 py-2.5 bg-white rounded-xl border transition-all duration-300 text-sm font-medium text-[#1A2E2A] hover:shadow-md ${
-          value !== 'all' ? 'border-[#00695C] ring-2 ring-[#00695C]/20 bg-[#F5F9F8]' : 'border-[#E8F0EE] hover:border-[#00695C]/30'
-        }`}
-      >
-        {Icon && <Icon className="text-sm text-[#5A7D78]" />}
-        <span className="whitespace-nowrap">{label}:</span>
-        <span className="font-semibold text-[#00695C]">{displayLabel}</span>
-        <FiChevronDown className={`text-sm text-[#5A7D78] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
-
-      {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-[#E8F0EE] py-2 z-50 max-h-80 overflow-y-auto animate-slide-down">
-          <button
-            onClick={() => { onChange('all'); setIsOpen(false); }}
-            className={`w-full px-4 py-2.5 text-left text-sm transition-all duration-200 flex items-center gap-2 hover:bg-[#F5F9F8] ${
-              value === 'all' ? 'bg-[#E8F4F2] text-[#00695C] font-semibold' : 'text-[#1A2E2A]'
-            }`}
-          >
-            <span className="w-4">{value === 'all' && <FiCheckCircle className="text-[#00695C] text-sm" />}</span>
-            <span>{allLabel}</span>
-          </button>
-          {options.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => { onChange(option.value); setIsOpen(false); }}
-              className={`w-full px-4 py-2.5 text-left text-sm transition-all duration-200 flex items-center gap-2 hover:bg-[#F5F9F8] ${
-                value === option.value ? 'bg-[#E8F4F2] text-[#00695C] font-semibold' : 'text-[#1A2E2A]'
-              }`}
-            >
-              <span className="w-4">{value === option.value && <FiCheckCircle className="text-[#00695C] text-sm" />}</span>
-              <span>{option.label}</span>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// ============================================================
 // MAIN COMPONENT
 // ============================================================
-const IndependentVilla = () => {
+const LeaseApartment = () => {
   const searchInputRef = useRef(null);
 
   // ============ STATE ============
@@ -653,75 +532,51 @@ const IndependentVilla = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [toast, setToast] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
-  const [filterCount, setFilterCount] = useState(0);
-  const [activeListingType, setActiveListingType] = useState('all');
-  const [showStats, setShowStats] = useState(true);
 
   // ============ CONFIRMATION MODAL STATE ============
   const [confirmationModal, setConfirmationModal] = useState({
     isOpen: false, title: '', message: '', confirmText: 'Confirm', cancelText: 'Cancel', type: 'danger', onConfirm: null, onCancel: null
   });
 
-  // ============ STATS ============
-  // ---- 'sell' removed: only total, buy, rent, lease ----
-  const [stats, setStats] = useState({ total: 0, buy: 0, rent: 0, lease: 0 });
-
-  // ============ NORMALIZE LEGACY DATA ============
-  // Converts any legacy 'Sell' listingType (case-insensitive) into 'Buy'.
-  // Only Buy, Rent, Lease are valid listing types going forward.
-  const normalizeListingType = useCallback((property) => {
-    if (property && property.listingType && property.listingType.toLowerCase() === 'sell') {
-      return { ...property, listingType: 'Buy' };
-    }
-    return property;
-  }, []);
-
+  // ============ NORMALIZE DATA ============
   const normalizeProperties = useCallback((list) => {
     if (!list) return list;
-    return list.map(normalizeListingType);
-  }, [normalizeListingType]);
-
-  const computeStats = useCallback((list) => {
-    if (!list || list.length === 0) {
-      setStats({ total: 0, buy: 0, rent: 0, lease: 0 });
-      return;
-    }
-    const total = list.length;
-    const buy = list.filter(p => p.listingType === 'Buy').length;
-    const rent = list.filter(p => p.listingType === 'Rent').length;
-    const lease = list.filter(p => p.listingType === 'Lease').length;
-    setStats({ total, buy, rent, lease });
+    return list.map(p => ({
+      ...p,
+      propertyType: APARTMENT_TYPE.label,
+      listingType: LEASE_TYPE.label
+    }));
   }, []);
 
   // ============ GENERATE MOCK DATA ============
   const generateMockProperties = useCallback(() => {
     const propertyTitles = [
-      'Green Valley Villa', 'Lakeside Independent Villa', 'Sunrise Garden Villa', 'Royal Palm Villa',
-      'Silver Oak Villa', 'Golden Meadows Villa', 'Cedar Woods Villa', 'Maple Leaf Villa',
-      'Orchid Garden Villa', 'Tulip Independent Villa', 'Lotus Courtyard Villa', 'Jasmine Villa',
-      'Emerald Greens Villa', 'Pearl Residency Villa', 'Ruby Enclave Villa', 'Sapphire Villa'
+      'Silver Bay Lease Apartment', 'Orchid Suites Lease Home', 'Palm Grove Lease Residency',
+      'Lake View Lease Apartment', 'Golden Tulip Lease Flat', 'Royal Palm Lease Apartment',
+      'Emerald Lease Apartments', 'Pearl Lease Residency', 'Crystal Lease Suites',
+      'Sapphire Lease Apartment', 'Ruby Lease Flat', 'Diamond Lease Residency',
+      'Sunrise Lease Apartments', 'Moonlight Lease Suites', 'Star Lease Residency',
+      'Cloud Nine Lease Flat', 'Harbor View Lease Apartment', 'Garden Lease Suites'
     ];
     const states = ['Tamil Nadu', 'Karnataka', 'Telangana', 'Maharashtra', 'Delhi', 'West Bengal', 'Gujarat', 'Kerala'];
     const districts = ['Chennai', 'Bengaluru Urban', 'Hyderabad', 'Mumbai Suburban', 'New Delhi', 'Kolkata', 'Ahmedabad', 'Ernakulam'];
     const cities = ['Chennai', 'Bangalore', 'Hyderabad', 'Mumbai', 'Delhi', 'Kolkata', 'Ahmedabad', 'Kochi'];
     const areas = ['Adyar', 'Koramangala', 'Jubilee Hills', 'Bandra', 'Connaught Place', 'Salt Lake', 'Vastrapur', 'Kakkanad'];
     const streets = ['1st Cross Street', 'MG Road', 'Lake View Lane', 'Garden Street', 'Park Avenue', 'Hill Road', 'Church Street', 'Palm Grove Road'];
-    const listingTypes = Object.keys(LISTING_TYPES);
 
     const propertiesList = [];
 
     for (let i = 1; i <= 40; i++) {
-      const listingType = listingTypes[Math.floor(Math.random() * listingTypes.length)];
       const pincode = String(600000 + Math.floor(Math.random() * 99999));
       const hasCoords = Math.random() > 0.4;
 
       propertiesList.push({
-        id: `iv_${i}`,
-        propertyId: `IV-${String(i).padStart(4, '0')}`,
+        id: `la_${i}`,
+        propertyId: `LA-${String(i).padStart(4, '0')}`,
         propertyTitle: propertyTitles[Math.floor(Math.random() * propertyTitles.length)],
-        propertyType: VILLA_TYPE.label,
-        listingType,
-        description: `A well-maintained independent villa with good ventilation and prime connectivity, available for ${listingType.toLowerCase()}.`,
+        propertyType: APARTMENT_TYPE.label,
+        listingType: LEASE_TYPE.label,
+        description: `A well-maintained lease apartment with modern amenities and prime connectivity, available on lease.`,
         state: states[Math.floor(Math.random() * states.length)],
         district: districts[Math.floor(Math.random() * districts.length)],
         city: cities[Math.floor(Math.random() * cities.length)],
@@ -733,9 +588,8 @@ const IndependentVilla = () => {
       });
     }
 
-    computeStats(propertiesList);
     return propertiesList;
-  }, [computeStats]);
+  }, []);
 
   // ============ INITIALIZE DATA ============
   useEffect(() => {
@@ -748,7 +602,7 @@ const IndependentVilla = () => {
     }
   }, [generateMockProperties, normalizeProperties]);
 
-  // ============ FILTER PROPERTIES ============
+  // ============ FILTER PROPERTIES (search only) ============
   const filterProperties = useCallback(() => {
     try {
       let filtered = [...properties];
@@ -758,7 +612,6 @@ const IndependentVilla = () => {
         filtered = filtered.filter(p =>
           (p.propertyTitle && p.propertyTitle.toLowerCase().includes(query)) ||
           (p.propertyId && p.propertyId.toLowerCase().includes(query)) ||
-          (p.listingType && p.listingType.toLowerCase().includes(query)) ||
           (p.state && p.state.toLowerCase().includes(query)) ||
           (p.district && p.district.toLowerCase().includes(query)) ||
           (p.city && p.city.toLowerCase().includes(query)) ||
@@ -767,15 +620,6 @@ const IndependentVilla = () => {
           (p.pincode && p.pincode.toLowerCase().includes(query))
         );
       }
-
-      if (activeListingType !== 'all') {
-        filtered = filtered.filter(p => p.listingType === activeListingType);
-      }
-
-      let count = 0;
-      if (activeListingType !== 'all') count++;
-      if (searchQuery) count++;
-      setFilterCount(count);
 
       filtered.sort((a, b) => {
         let aVal = a[sortField] || '';
@@ -792,7 +636,7 @@ const IndependentVilla = () => {
     } catch (error) {
       console.error('Error filtering properties:', error);
     }
-  }, [properties, searchQuery, activeListingType, sortField, sortDirection]);
+  }, [properties, searchQuery, sortField, sortDirection]);
 
   useEffect(() => { filterProperties(); }, [filterProperties]);
 
@@ -840,14 +684,9 @@ const IndependentVilla = () => {
   }, []);
 
   const handleSaveProperty = useCallback((updatedProperty) => {
-    const normalized = normalizeListingType(updatedProperty);
-    setProperties(prev => {
-      const updated = prev.map(p => p.id === normalized.id ? normalized : p);
-      computeStats(updated);
-      return updated;
-    });
-    setToast({ message: `Property "${normalized.propertyTitle}" updated successfully`, type: 'success' });
-  }, [computeStats, normalizeListingType]);
+    setProperties(prev => prev.map(p => p.id === updatedProperty.id ? updatedProperty : p));
+    setToast({ message: `Property "${updatedProperty.propertyTitle}" updated successfully`, type: 'success' });
+  }, []);
 
   // ============ DELETE PROPERTY WITH CONFIRMATION ============
   const handleDeleteProperty = useCallback((propertyId) => {
@@ -864,11 +703,7 @@ const IndependentVilla = () => {
       onConfirm: () => {
         setActionLoading(propertyId);
         setTimeout(() => {
-          setProperties(prev => {
-            const updated = prev.filter(p => p.id !== propertyId);
-            computeStats(updated);
-            return updated;
-          });
+          setProperties(prev => prev.filter(p => p.id !== propertyId));
           setActionLoading(null);
           setShowViewModal(false);
           setToast({ message: `Deleted property "${property.propertyTitle}"`, type: 'warning' });
@@ -876,26 +711,12 @@ const IndependentVilla = () => {
       },
       onCancel: () => setConfirmationModal(prev => ({ ...prev, isOpen: false }))
     });
-  }, [properties, computeStats]);
+  }, [properties]);
 
-  // ============ STAT CLICK HANDLERS ============
-  const handleListingClick = useCallback((type) => {
-    setActiveListingType(prev => (prev === type ? 'all' : type));
-    if (searchInputRef.current) searchInputRef.current.focus();
-  }, []);
-
-  const handleTotalClick = useCallback(() => {
-    setActiveListingType('all');
+  // ============ CLEAR SEARCH ============
+  const clearSearch = useCallback(() => {
     setSearchQuery('');
     if (searchInputRef.current) searchInputRef.current.focus();
-  }, []);
-
-  // ============ CLEAR ALL FILTERS ============
-  const clearAllFilters = useCallback(() => {
-    setSearchQuery('');
-    setActiveListingType('all');
-    if (searchInputRef.current) searchInputRef.current.focus();
-    setToast({ message: 'All filters cleared', type: 'info' });
   }, []);
 
   // ============ REFRESH DATA ============
@@ -947,7 +768,7 @@ const IndependentVilla = () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `independent_villa_${new Date().toISOString().split('T')[0]}.csv`;
+      a.download = `lease_apartment_${new Date().toISOString().split('T')[0]}.csv`;
       a.click();
       window.URL.revokeObjectURL(url);
       setToast({ message: `${filteredProperties.length} records exported successfully`, type: 'success' });
@@ -977,7 +798,6 @@ const IndependentVilla = () => {
           const count = properties.filter(p => selectedIds.has(p.id)).length;
           const updated = properties.filter(p => !selectedIds.has(p.id));
           setProperties(updated);
-          computeStats(updated);
           setSelectedProperties([]);
           setActionLoading(null);
           setToast({ message: `${count} property(ies) deleted`, type: 'warning' });
@@ -985,10 +805,7 @@ const IndependentVilla = () => {
       },
       onCancel: () => setConfirmationModal(prev => ({ ...prev, isOpen: false }))
     });
-  }, [selectedProperties, properties, computeStats]);
-
-  // ============ FILTER OPTIONS ============
-  const listingTypeOptions = Object.keys(LISTING_TYPES).map(type => ({ value: type, label: type }));
+  }, [selectedProperties, properties]);
 
   // ============================================================
   // RENDER
@@ -1042,19 +859,14 @@ const IndependentVilla = () => {
           <div>
             <div className="flex items-center gap-3 mb-1 flex-wrap">
               <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
-                Independent Villa
+                Lease Apartments
               </h1>
               <span className="px-3 py-1 bg-[#E8F4F2] text-[#00695C] text-xs font-semibold rounded-full animate-pulse">
                 {filteredProperties.length} Properties
               </span>
-              {filterCount > 0 && (
-                <span className="px-3 py-1 bg-[#FEF3E2] text-amber-700 text-xs font-semibold rounded-full">
-                  {filterCount} filters
-                </span>
-              )}
             </div>
             <p className="text-sm text-[#5A7D78] flex items-center gap-2 flex-wrap">
-              <span>All Independent Villa listings across Buy, Rent &amp; Lease</span>
+              <span>All Lease Apartment listings for Lease</span>
               <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
               <span className="text-[#00695C] font-medium">
                 {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
@@ -1062,13 +874,6 @@ const IndependentVilla = () => {
             </p>
           </div>
           <div className="flex items-center gap-2 w-full lg:w-auto flex-wrap">
-            <button
-              onClick={() => setShowStats(!showStats)}
-              className="flex items-center gap-2 px-4 py-2 bg-white border border-[#E8F0EE] rounded-xl hover:border-[#00695C]/30 hover:shadow-md transition-all duration-300 text-sm font-medium text-[#1A2E2A] hover:scale-105"
-            >
-              {showStats ? <FiChevronUp className="text-sm" /> : <FiChevronDown className="text-sm" />}
-              <span className="hidden sm:inline">{showStats ? 'Hide Stats' : 'Show Stats'}</span>
-            </button>
             <button
               onClick={handleRefresh}
               disabled={loading}
@@ -1088,53 +893,7 @@ const IndependentVilla = () => {
         </div>
       </div>
 
-      {/* Stats Section — Total + Listing Types */}
-      {showStats && (
-        <div className="relative animate-slide-in">
-          <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <StatCard
-                icon={<FiHome className="text-white text-sm" />}
-                title="Total Properties"
-                value={stats.total}
-                color="bg-gradient-to-br from-[#00695C] to-[#26A69A]"
-                delay={0}
-                isActive={activeListingType === 'all' && !searchQuery}
-                onClick={handleTotalClick}
-              />
-              <StatCard
-                icon={<FiDollarSign className="text-white text-sm" />}
-                title="Buy"
-                value={stats.buy}
-                color="bg-gradient-to-br from-blue-600 to-blue-400"
-                delay={100}
-                isActive={activeListingType === 'Buy'}
-                onClick={() => handleListingClick('Buy')}
-              />
-              <StatCard
-                icon={<FiKey className="text-white text-sm" />}
-                title="Rent"
-                value={stats.rent}
-                color="bg-gradient-to-br from-purple-600 to-purple-400"
-                delay={200}
-                isActive={activeListingType === 'Rent'}
-                onClick={() => handleListingClick('Rent')}
-              />
-              <StatCard
-                icon={<FiFileText className="text-white text-sm" />}
-                title="Lease"
-                value={stats.lease}
-                color="bg-gradient-to-br from-amber-600 to-amber-400"
-                delay={300}
-                isActive={activeListingType === 'Lease'}
-                onClick={() => handleListingClick('Lease')}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Search and Filter Dropdowns */}
+      {/* Search and View Toggle */}
       <div className="relative bg-white rounded-2xl p-4 shadow-sm border border-[#E8F0EE] hover:shadow-md transition-all duration-300">
         <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4">
           <div className="flex-1 w-full relative">
@@ -1142,14 +901,14 @@ const IndependentVilla = () => {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search by title, ID, listing type, state, city, pincode..."
+              placeholder="Search by title, ID, state, city, pincode..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none placeholder:text-[#B5C9C5]"
             />
             {searchQuery && (
               <button
-                onClick={() => setSearchQuery('')}
+                onClick={clearSearch}
                 className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#5A7D78] hover:text-[#1A2E2A] transition-colors hover:scale-110"
               >
                 <FiX className="text-sm" />
@@ -1158,24 +917,6 @@ const IndependentVilla = () => {
           </div>
 
           <div className="flex items-center gap-2 w-full lg:w-auto flex-wrap">
-            <FilterDropdown
-              label="Listing"
-              options={listingTypeOptions}
-              value={activeListingType}
-              onChange={setActiveListingType}
-              icon={FiActivity}
-              allLabel="All Listings"
-            />
-
-            {(activeListingType !== 'all' || searchQuery) && (
-              <button
-                onClick={clearAllFilters}
-                className="px-4 py-2.5 bg-red-50 text-red-700 rounded-xl hover:bg-red-100 transition-all duration-300 text-sm font-medium flex items-center gap-1 hover:scale-105"
-              >
-                <FiX className="text-sm" /> Clear
-              </button>
-            )}
-
             <div className="flex items-center bg-[#F5F9F8] rounded-xl p-1 border border-[#E8F0EE]">
               <button
                 onClick={() => setViewMode('grid')}
@@ -1230,8 +971,6 @@ const IndependentVilla = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
             {paginatedProperties.map((property, index) => {
               const isSelected = selectedProperties.includes(property.id);
-              const listingConfig = LISTING_TYPES[property.listingType] || LISTING_TYPES['Buy'];
-              const ListingIcon = listingConfig.icon;
 
               return (
                 <div
@@ -1247,26 +986,26 @@ const IndependentVilla = () => {
                         onChange={() => handleSelectProperty(property.id)}
                         className="w-4 h-4 shrink-0 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                       />
-                      <div className={`w-9 h-9 rounded-2xl bg-gradient-to-br ${listingConfig.color} flex items-center justify-center text-white shadow-lg flex-shrink-0`}>
-                        <ListingIcon className="text-sm" />
+                      <div className={`w-9 h-9 rounded-2xl bg-gradient-to-br ${LEASE_TYPE.color} flex items-center justify-center text-white shadow-lg flex-shrink-0`}>
+                        <FiFileText className="text-sm" />
                       </div>
                       <div className="min-w-0">
                         <h3 className="font-bold text-sm text-[#1A2E2A] truncate">{property.propertyTitle}</h3>
                         <div className="flex items-center gap-1.5 mt-0.5">
                           <p className="text-[10px] font-medium text-[#5A7D78]">{property.propertyId}</p>
-                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-semibold leading-none ${listingConfig.bg} ${listingConfig.text} border ${listingConfig.border}`}>
-                            {property.listingType}
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-semibold leading-none ${LEASE_TYPE.bg} ${LEASE_TYPE.text} border ${LEASE_TYPE.border}`}>
+                            {LEASE_TYPE.label}
                           </span>
                         </div>
                       </div>
                     </div>
-                    
+                   
                   </div>
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FaHome className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate font-semibold text-[#1A2E2A]">{VILLA_TYPE.label}</span>
+                      <FaBuilding className="text-[#00695C] flex-shrink-0" />
+                      <span className="truncate font-semibold text-[#1A2E2A]">{APARTMENT_TYPE.label}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiMapPin className="text-[#00695C] flex-shrink-0" />
@@ -1344,8 +1083,8 @@ const IndependentVilla = () => {
               <div className="col-span-2 min-w-0 cursor-pointer hover:text-[#00695C] transition-colors truncate" onClick={() => handleSort('propertyTitle')}>
                 Title {sortField === 'propertyTitle' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1 min-w-0 truncate cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('listingType')}>
-                Listing {sortField === 'listingType' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+              <div className="col-span-1 min-w-0 truncate cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('area')}>
+                Area {sortField === 'area' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
               <div className="col-span-1 min-w-0 truncate cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('city')}>
                 City {sortField === 'city' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
@@ -1366,8 +1105,6 @@ const IndependentVilla = () => {
 
             {paginatedProperties.map((property, index) => {
               const isSelected = selectedProperties.includes(property.id);
-              const listingConfig = LISTING_TYPES[property.listingType] || LISTING_TYPES['Buy'];
-              const ListingIcon = listingConfig.icon;
 
               return (
                 <div
@@ -1382,8 +1119,8 @@ const IndependentVilla = () => {
                       onChange={() => handleSelectProperty(property.id)}
                       className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300 flex-shrink-0"
                     />
-                    <div className={`w-6 h-6 rounded-full bg-gradient-to-br ${listingConfig.color} flex items-center justify-center text-white shadow-md flex-shrink-0`}>
-                      <ListingIcon className="text-[8px]" />
+                    <div className={`w-6 h-6 rounded-full bg-gradient-to-br ${LEASE_TYPE.color} flex items-center justify-center text-white shadow-md flex-shrink-0`}>
+                      <FiFileText className="text-[8px]" />
                     </div>
                     <span className="text-xs font-bold text-[#00695C] truncate">{property.propertyId}</span>
                   </div>
@@ -1392,10 +1129,8 @@ const IndependentVilla = () => {
                     <p className="font-bold text-sm text-[#1A2E2A] truncate">{property.propertyTitle}</p>
                   </div>
 
-                  <div className="col-span-1 min-w-0">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${listingConfig.bg} ${listingConfig.text} border ${listingConfig.border} truncate inline-block max-w-full`}>
-                      {property.listingType}
-                    </span>
+                  <div className="col-span-1 min-w-0 text-xs font-medium text-[#5A7D78] truncate">
+                    {property.area}
                   </div>
 
                   <div className="col-span-1 min-w-0 text-xs font-medium text-[#5A7D78] truncate">
@@ -1458,18 +1193,18 @@ const IndependentVilla = () => {
         {paginatedProperties.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-[#E8F0EE]">
             <div className="w-24 h-24 rounded-full bg-[#F5F9F8] flex items-center justify-center mb-4 animate-float">
-              <FiHome className="text-4xl text-[#B5C9C5]" />
+              <FaBuilding className="text-4xl text-[#B5C9C5]" />
             </div>
             <h3 className="text-xl font-bold text-[#1A2E2A]">No properties found</h3>
             <p className="text-sm text-[#5A7D78] mt-1">
-              {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No independent villa listings have been added yet'}
+              {searchQuery ? 'Try adjusting your search' : 'No lease apartment listings have been added yet'}
             </p>
-            {filterCount > 0 && (
+            {searchQuery && (
               <button
-                onClick={clearAllFilters}
+                onClick={clearSearch}
                 className="mt-4 px-6 py-2.5 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-sm font-bold shadow-lg shadow-[#00695C]/30 hover:scale-105"
               >
-                Clear All Filters
+                Clear Search
               </button>
             )}
           </div>
@@ -1572,4 +1307,4 @@ const IndependentVilla = () => {
   );
 };
 
-export default IndependentVilla;
+export default LeaseApartment;

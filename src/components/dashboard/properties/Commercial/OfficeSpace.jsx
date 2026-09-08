@@ -1,4 +1,4 @@
-// src/components/dashboard/properties/Individual/IndependentVilla.jsx
+// src/components/dashboard/properties/Commercial/OfficeSpace.jsx
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
@@ -8,31 +8,31 @@ import {
   FiChevronUp, FiCheckCircle, FiXCircle, FiHome, FiBriefcase, FiGlobe,
   FiMap, FiActivity, FiDollarSign, FiKey
 } from 'react-icons/fi';
-import { FaHome, FaCity } from 'react-icons/fa';
+import { FaCity } from 'react-icons/fa';
 
 // ============================================================
-// FIXED PROPERTY TYPE — this page only handles Independent Villa
+// FIXED PROPERTY TYPE — this page only handles Office Space
 // ============================================================
-const VILLA_TYPE = {
-  icon: FiHome,
-  color: 'from-purple-600 to-purple-400',
-  bg: 'bg-purple-50',
-  text: 'text-purple-700',
-  border: 'border-purple-200',
-  label: 'Independent Villa (Individual)'
+const OFFICE_SPACE_TYPE = {
+  icon: FiBriefcase,
+  color: 'from-blue-600 to-blue-400',
+  bg: 'bg-blue-50',
+  text: 'text-blue-700',
+  border: 'border-blue-200',
+  label: 'Office Space'
 };
 
 // ============================================================
 // LISTING TYPE CONFIG — the varying dimension on this page
-// ---- 'Sell' removed: only Buy, Rent, Lease are valid listing types ----
+// ---- Only Buy, Rent, Lease are valid listing types ----
 // ============================================================
 const LISTING_TYPES = {
   'Buy': {
     icon: FiDollarSign,
-    color: 'from-blue-600 to-blue-400',
-    bg: 'bg-blue-50',
-    text: 'text-blue-700',
-    border: 'border-blue-200',
+    color: 'from-emerald-600 to-emerald-400',
+    bg: 'bg-emerald-50',
+    text: 'text-emerald-700',
+    border: 'border-emerald-200',
     label: 'Buy'
   },
   'Rent': {
@@ -170,8 +170,8 @@ const ViewPropertyDetailModal = ({ property, show, onClose, onEdit, onDelete }) 
             </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 ${VILLA_TYPE.bg} ${VILLA_TYPE.text} border ${VILLA_TYPE.border}`}>
-              <FaHome className="text-xs" /> {VILLA_TYPE.label}
+            <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 ${OFFICE_SPACE_TYPE.bg} ${OFFICE_SPACE_TYPE.text} border ${OFFICE_SPACE_TYPE.border}`}>
+              <FiBriefcase className="text-xs" /> {OFFICE_SPACE_TYPE.label}
             </span>
           </div>
         </div>
@@ -189,7 +189,7 @@ const ViewPropertyDetailModal = ({ property, show, onClose, onEdit, onDelete }) 
 
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-1">
-                <FaHome className="text-[#00695C] text-sm" />
+                <FiHome className="text-[#00695C] text-sm" />
                 <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Property Title</h4>
               </div>
               <p className="text-sm font-bold text-[#1A2E2A]">{property.propertyTitle}</p>
@@ -200,7 +200,7 @@ const ViewPropertyDetailModal = ({ property, show, onClose, onEdit, onDelete }) 
                 <FiTag className="text-[#00695C] text-sm" />
                 <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Property Type</h4>
               </div>
-              <p className="text-sm font-bold text-[#1A2E2A]">{VILLA_TYPE.label}</p>
+              <p className="text-sm font-bold text-[#1A2E2A]">{OFFICE_SPACE_TYPE.label}</p>
             </div>
 
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
@@ -333,10 +333,7 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
       setFormData({
         propertyId: property.propertyId || '',
         propertyTitle: property.propertyTitle || '',
-        // Normalize any legacy 'Sell' value coming from an existing record
-        listingType: property.listingType && property.listingType.toLowerCase() === 'sell'
-          ? 'Buy'
-          : (property.listingType || ''),
+        listingType: property.listingType || 'Buy',
         description: property.description || '',
         state: property.state || '',
         district: property.district || '',
@@ -359,7 +356,7 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
-      onSave({ ...property, ...formData, propertyType: VILLA_TYPE.label });
+      onSave({ ...property, ...formData, propertyType: OFFICE_SPACE_TYPE.label });
       setLoading(false);
       onClose();
     }, 700);
@@ -376,8 +373,8 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
           >
             <FiX className="text-lg" />
           </button>
-          <h2 className="text-2xl font-bold text-white">Edit Independent Villa</h2>
-          <p className="text-white/80 text-sm">Update property details</p>
+          <h2 className="text-2xl font-bold text-white">Edit Office Space</h2>
+          <p className="text-white/80 text-sm">Update office space property details</p>
         </div>
 
         {/* Content */}
@@ -385,7 +382,7 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
               <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <FaHome className="text-[#00695C]" />
+                <FiBriefcase className="text-[#00695C]" />
                 Basic Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -394,7 +391,7 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
                   <input
                     type="text" name="propertyId" value={formData.propertyId} onChange={handleChange}
                     className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                    placeholder="IV-001"
+                    placeholder="OS-0001"
                   />
                 </div>
                 <div>
@@ -408,7 +405,7 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
                 <div>
                   <label className="block text-xs font-medium text-[#5A7D78] mb-1">Property Type</label>
                   <input
-                    type="text" value={VILLA_TYPE.label} disabled
+                    type="text" value={OFFICE_SPACE_TYPE.label} disabled
                     className="w-full px-3 py-2 bg-[#F0F4F3] rounded-xl border border-[#E8F0EE] text-sm text-[#5A7D78] outline-none cursor-not-allowed"
                   />
                 </div>
@@ -633,7 +630,7 @@ const FilterDropdown = ({ label, options, value, onChange, icon: Icon, allLabel 
 // ============================================================
 // MAIN COMPONENT
 // ============================================================
-const IndependentVilla = () => {
+const OfficeSpace = () => {
   const searchInputRef = useRef(null);
 
   // ============ STATE ============
@@ -663,23 +660,16 @@ const IndependentVilla = () => {
   });
 
   // ============ STATS ============
-  // ---- 'sell' removed: only total, buy, rent, lease ----
   const [stats, setStats] = useState({ total: 0, buy: 0, rent: 0, lease: 0 });
 
-  // ============ NORMALIZE LEGACY DATA ============
-  // Converts any legacy 'Sell' listingType (case-insensitive) into 'Buy'.
-  // Only Buy, Rent, Lease are valid listing types going forward.
-  const normalizeListingType = useCallback((property) => {
-    if (property && property.listingType && property.listingType.toLowerCase() === 'sell') {
-      return { ...property, listingType: 'Buy' };
-    }
-    return property;
-  }, []);
-
+  // ============ NORMALIZE DATA ============
   const normalizeProperties = useCallback((list) => {
     if (!list) return list;
-    return list.map(normalizeListingType);
-  }, [normalizeListingType]);
+    return list.map(p => ({
+      ...p,
+      propertyType: OFFICE_SPACE_TYPE.label
+    }));
+  }, []);
 
   const computeStats = useCallback((list) => {
     if (!list || list.length === 0) {
@@ -696,16 +686,18 @@ const IndependentVilla = () => {
   // ============ GENERATE MOCK DATA ============
   const generateMockProperties = useCallback(() => {
     const propertyTitles = [
-      'Green Valley Villa', 'Lakeside Independent Villa', 'Sunrise Garden Villa', 'Royal Palm Villa',
-      'Silver Oak Villa', 'Golden Meadows Villa', 'Cedar Woods Villa', 'Maple Leaf Villa',
-      'Orchid Garden Villa', 'Tulip Independent Villa', 'Lotus Courtyard Villa', 'Jasmine Villa',
-      'Emerald Greens Villa', 'Pearl Residency Villa', 'Ruby Enclave Villa', 'Sapphire Villa'
+      'Prestige Corporate Office Space', 'Meridian Business Tower Office', 'Skyline Executive Office Suite',
+      'Cyber Gateway Office Floor', 'Horizon Corporate Office Park', 'Silverline Office Chambers',
+      'Innov8 Managed Office Space', 'Regal Corporate Office Suite', 'Metro Business Office Floor',
+      'Union Square Office Complex', 'Galaxy Tech Office Space', 'Fortune Corporate Office Block',
+      'Crown Business Office Suite', 'Emerald IT Office Floor', 'Pinnacle Corporate Office Park',
+      'Aster Executive Office Chambers', 'Zenith Business Office Space', 'Orion Corporate Office Tower'
     ];
     const states = ['Tamil Nadu', 'Karnataka', 'Telangana', 'Maharashtra', 'Delhi', 'West Bengal', 'Gujarat', 'Kerala'];
     const districts = ['Chennai', 'Bengaluru Urban', 'Hyderabad', 'Mumbai Suburban', 'New Delhi', 'Kolkata', 'Ahmedabad', 'Ernakulam'];
     const cities = ['Chennai', 'Bangalore', 'Hyderabad', 'Mumbai', 'Delhi', 'Kolkata', 'Ahmedabad', 'Kochi'];
-    const areas = ['Adyar', 'Koramangala', 'Jubilee Hills', 'Bandra', 'Connaught Place', 'Salt Lake', 'Vastrapur', 'Kakkanad'];
-    const streets = ['1st Cross Street', 'MG Road', 'Lake View Lane', 'Garden Street', 'Park Avenue', 'Hill Road', 'Church Street', 'Palm Grove Road'];
+    const areas = ['Guindy', 'Whitefield', 'Hitech City', 'Andheri', 'Nehru Place', 'Sector V', 'SG Highway', 'Infopark'];
+    const streets = ['Business Park Avenue', 'MG Road', 'Ring Road', 'Commerce Street', 'Tech Park Lane', 'Junction Road', 'Market Street', 'Corporate Boulevard'];
     const listingTypes = Object.keys(LISTING_TYPES);
 
     const propertiesList = [];
@@ -716,12 +708,12 @@ const IndependentVilla = () => {
       const hasCoords = Math.random() > 0.4;
 
       propertiesList.push({
-        id: `iv_${i}`,
-        propertyId: `IV-${String(i).padStart(4, '0')}`,
+        id: `os_${i}`,
+        propertyId: `OS-${String(i).padStart(4, '0')}`,
         propertyTitle: propertyTitles[Math.floor(Math.random() * propertyTitles.length)],
-        propertyType: VILLA_TYPE.label,
+        propertyType: OFFICE_SPACE_TYPE.label,
         listingType,
-        description: `A well-maintained independent villa with good ventilation and prime connectivity, available for ${listingType.toLowerCase()}.`,
+        description: `A well-located office space with modern infrastructure and strong connectivity, available for ${listingType.toLowerCase()}.`,
         state: states[Math.floor(Math.random() * states.length)],
         district: districts[Math.floor(Math.random() * districts.length)],
         city: cities[Math.floor(Math.random() * cities.length)],
@@ -840,14 +832,13 @@ const IndependentVilla = () => {
   }, []);
 
   const handleSaveProperty = useCallback((updatedProperty) => {
-    const normalized = normalizeListingType(updatedProperty);
     setProperties(prev => {
-      const updated = prev.map(p => p.id === normalized.id ? normalized : p);
+      const updated = prev.map(p => p.id === updatedProperty.id ? updatedProperty : p);
       computeStats(updated);
       return updated;
     });
-    setToast({ message: `Property "${normalized.propertyTitle}" updated successfully`, type: 'success' });
-  }, [computeStats, normalizeListingType]);
+    setToast({ message: `Property "${updatedProperty.propertyTitle}" updated successfully`, type: 'success' });
+  }, [computeStats]);
 
   // ============ DELETE PROPERTY WITH CONFIRMATION ============
   const handleDeleteProperty = useCallback((propertyId) => {
@@ -947,7 +938,7 @@ const IndependentVilla = () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `independent_villa_${new Date().toISOString().split('T')[0]}.csv`;
+      a.download = `office_space_${new Date().toISOString().split('T')[0]}.csv`;
       a.click();
       window.URL.revokeObjectURL(url);
       setToast({ message: `${filteredProperties.length} records exported successfully`, type: 'success' });
@@ -1042,7 +1033,7 @@ const IndependentVilla = () => {
           <div>
             <div className="flex items-center gap-3 mb-1 flex-wrap">
               <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
-                Independent Villa
+                Office Spaces
               </h1>
               <span className="px-3 py-1 bg-[#E8F4F2] text-[#00695C] text-xs font-semibold rounded-full animate-pulse">
                 {filteredProperties.length} Properties
@@ -1054,7 +1045,7 @@ const IndependentVilla = () => {
               )}
             </div>
             <p className="text-sm text-[#5A7D78] flex items-center gap-2 flex-wrap">
-              <span>All Independent Villa listings across Buy, Rent &amp; Lease</span>
+              <span>All Office Space listings across Buy, Rent &amp; Lease</span>
               <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
               <span className="text-[#00695C] font-medium">
                 {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
@@ -1094,7 +1085,7 @@ const IndependentVilla = () => {
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <StatCard
-                icon={<FiHome className="text-white text-sm" />}
+                icon={<FiBriefcase className="text-white text-sm" />}
                 title="Total Properties"
                 value={stats.total}
                 color="bg-gradient-to-br from-[#00695C] to-[#26A69A]"
@@ -1106,7 +1097,7 @@ const IndependentVilla = () => {
                 icon={<FiDollarSign className="text-white text-sm" />}
                 title="Buy"
                 value={stats.buy}
-                color="bg-gradient-to-br from-blue-600 to-blue-400"
+                color="bg-gradient-to-br from-emerald-600 to-emerald-400"
                 delay={100}
                 isActive={activeListingType === 'Buy'}
                 onClick={() => handleListingClick('Buy')}
@@ -1260,13 +1251,13 @@ const IndependentVilla = () => {
                         </div>
                       </div>
                     </div>
-                    
+                   
                   </div>
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FaHome className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate font-semibold text-[#1A2E2A]">{VILLA_TYPE.label}</span>
+                      <FiBriefcase className="text-[#00695C] flex-shrink-0" />
+                      <span className="truncate font-semibold text-[#1A2E2A]">{OFFICE_SPACE_TYPE.label}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiMapPin className="text-[#00695C] flex-shrink-0" />
@@ -1458,11 +1449,11 @@ const IndependentVilla = () => {
         {paginatedProperties.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-[#E8F0EE]">
             <div className="w-24 h-24 rounded-full bg-[#F5F9F8] flex items-center justify-center mb-4 animate-float">
-              <FiHome className="text-4xl text-[#B5C9C5]" />
+              <FiBriefcase className="text-4xl text-[#B5C9C5]" />
             </div>
             <h3 className="text-xl font-bold text-[#1A2E2A]">No properties found</h3>
             <p className="text-sm text-[#5A7D78] mt-1">
-              {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No independent villa listings have been added yet'}
+              {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No office space listings have been added yet'}
             </p>
             {filterCount > 0 && (
               <button
@@ -1572,4 +1563,4 @@ const IndependentVilla = () => {
   );
 };
 
-export default IndependentVilla;
+export default OfficeSpace;

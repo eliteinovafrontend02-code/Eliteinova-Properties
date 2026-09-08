@@ -1,4 +1,4 @@
-// src/components/dashboard/properties/Individual/IndependentVilla.jsx
+// src/components/dashboard/properties/Commercial/CommercialOverview.jsx
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
@@ -6,52 +6,193 @@ import {
   FiTrash2, FiRefreshCw, FiDownload, FiAlertTriangle, FiInfo, FiX, FiList,
   FiGrid as FiGridIcon, FiMapPin, FiTag, FiSave, FiFileText, FiHash,
   FiChevronUp, FiCheckCircle, FiXCircle, FiHome, FiBriefcase, FiGlobe,
-  FiMap, FiActivity, FiDollarSign, FiKey
+  FiMap, FiActivity, FiLayers, FiShoppingBag, FiLayout, FiUsers, FiCpu, FiBox, FiTruck
 } from 'react-icons/fi';
-import { FaHome, FaCity } from 'react-icons/fa';
+import {
+  FaBuilding, FaCity, FaWarehouse, FaIndustry, FaStore, FaUtensils, FaHotel,
+  FaHospital, FaGraduationCap, FaFilm, FaGasPump, FaTractor
+} from 'react-icons/fa';
 
 // ============================================================
-// FIXED PROPERTY TYPE — this page only handles Independent Villa
+// PROPERTY TYPE (SUBCATEGORY) CONFIG
 // ============================================================
-const VILLA_TYPE = {
-  icon: FiHome,
-  color: 'from-purple-600 to-purple-400',
-  bg: 'bg-purple-50',
-  text: 'text-purple-700',
-  border: 'border-purple-200',
-  label: 'Independent Villa (Individual)'
-};
-
-// ============================================================
-// LISTING TYPE CONFIG — the varying dimension on this page
-// ---- 'Sell' removed: only Buy, Rent, Lease are valid listing types ----
-// ============================================================
-const LISTING_TYPES = {
-  'Buy': {
-    icon: FiDollarSign,
+const PROPERTY_TYPES = {
+  'OfficeSpace': {
+    icon: FiBriefcase,
     color: 'from-blue-600 to-blue-400',
     bg: 'bg-blue-50',
     text: 'text-blue-700',
     border: 'border-blue-200',
-    label: 'Buy'
+    label: 'Office Space'
   },
-  'Rent': {
-    icon: FiKey,
-    color: 'from-purple-600 to-purple-400',
-    bg: 'bg-purple-50',
-    text: 'text-purple-700',
-    border: 'border-purple-200',
-    label: 'Rent'
+  'RetailShop': {
+    icon: FiShoppingBag,
+    color: 'from-orange-600 to-orange-400',
+    bg: 'bg-orange-50',
+    text: 'text-orange-700',
+    border: 'border-orange-200',
+    label: 'Retail Shop'
   },
-  'Lease': {
-    icon: FiFileText,
+  'Showroom': {
+    icon: FiLayout,
+    color: 'from-violet-600 to-violet-400',
+    bg: 'bg-violet-50',
+    text: 'text-violet-700',
+    border: 'border-violet-200',
+    label: 'Showroom'
+  },
+  'CommercialLand': {
+    icon: FiMap,
+    color: 'from-lime-600 to-lime-400',
+    bg: 'bg-lime-50',
+    text: 'text-lime-700',
+    border: 'border-lime-200',
+    label: 'Commercial Land / Plot'
+  },
+  'WarehouseGodown': {
+    icon: FaWarehouse,
     color: 'from-amber-600 to-amber-400',
     bg: 'bg-amber-50',
     text: 'text-amber-700',
     border: 'border-amber-200',
-    label: 'Lease'
+    label: 'Warehouse / Godown'
+  },
+  'IndustrialFactory': {
+    icon: FaIndustry,
+    color: 'from-stone-600 to-stone-400',
+    bg: 'bg-stone-50',
+    text: 'text-stone-700',
+    border: 'border-stone-200',
+    label: 'Industrial Property / Factory'
+  },
+  'CoworkingSpace': {
+    icon: FiUsers,
+    color: 'from-cyan-600 to-cyan-400',
+    bg: 'bg-cyan-50',
+    text: 'text-cyan-700',
+    border: 'border-cyan-200',
+    label: 'Co-working Space'
+  },
+  'BusinessCenter': {
+    icon: FaBuilding,
+    color: 'from-indigo-600 to-indigo-400',
+    bg: 'bg-indigo-50',
+    text: 'text-indigo-700',
+    border: 'border-indigo-200',
+    label: 'Business Center'
+  },
+  'ShoppingMallSpace': {
+    icon: FaStore,
+    color: 'from-fuchsia-600 to-fuchsia-400',
+    bg: 'bg-fuchsia-50',
+    text: 'text-fuchsia-700',
+    border: 'border-fuchsia-200',
+    label: 'Shopping Mall Space'
+  },
+  'CommercialComplex': {
+    icon: FiLayers,
+    color: 'from-teal-600 to-teal-400',
+    bg: 'bg-teal-50',
+    text: 'text-teal-700',
+    border: 'border-teal-200',
+    label: 'Commercial Complex'
+  },
+  'RestaurantCafeSpace': {
+    icon: FaUtensils,
+    color: 'from-rose-600 to-rose-400',
+    bg: 'bg-rose-50',
+    text: 'text-rose-700',
+    border: 'border-rose-200',
+    label: 'Restaurant / Cafe Space'
+  },
+  'HotelLodgeResort': {
+    icon: FaHotel,
+    color: 'from-pink-600 to-pink-400',
+    bg: 'bg-pink-50',
+    text: 'text-pink-700',
+    border: 'border-pink-200',
+    label: 'Hotel / Lodge / Resort Property'
+  },
+  'ClinicHospitalSpace': {
+    icon: FaHospital,
+    color: 'from-red-600 to-red-400',
+    bg: 'bg-red-50',
+    text: 'text-red-700',
+    border: 'border-red-200',
+    label: 'Clinic / Hospital Space'
+  },
+  'EducationalInstitution': {
+    icon: FaGraduationCap,
+    color: 'from-sky-600 to-sky-400',
+    bg: 'bg-sky-50',
+    text: 'text-sky-700',
+    border: 'border-sky-200',
+    label: 'Educational Institution Property'
+  },
+  'ITTechParkSpace': {
+    icon: FiCpu,
+    color: 'from-purple-600 to-purple-400',
+    bg: 'bg-purple-50',
+    text: 'text-purple-700',
+    border: 'border-purple-200',
+    label: 'IT Park / Tech Park Space'
+  },
+  'MultiplexEntertainment': {
+    icon: FaFilm,
+    color: 'from-zinc-600 to-zinc-400',
+    bg: 'bg-zinc-50',
+    text: 'text-zinc-700',
+    border: 'border-zinc-200',
+    label: 'Multiplex / Entertainment Space'
+  },
+  'PetrolBunkFuelStation': {
+    icon: FaGasPump,
+    color: 'from-yellow-600 to-yellow-400',
+    bg: 'bg-yellow-50',
+    text: 'text-yellow-700',
+    border: 'border-yellow-200',
+    label: 'Petrol Bunk / Fuel Station'
+  },
+  'ColdStorageLogisticsHub': {
+    icon: FiTruck,
+    color: 'from-slate-600 to-slate-400',
+    bg: 'bg-slate-50',
+    text: 'text-slate-700',
+    border: 'border-slate-200',
+    label: 'Cold Storage / Logistics Hub'
+  },
+  'MixedUseCommercial': {
+    icon: FiBox,
+    color: 'from-emerald-600 to-emerald-400',
+    bg: 'bg-emerald-50',
+    text: 'text-emerald-700',
+    border: 'border-emerald-200',
+    label: 'Mixed-use Commercial Property'
+  },
+  'AgriculturalCommercial': {
+    icon: FaTractor,
+    color: 'from-green-600 to-green-400',
+    bg: 'bg-green-50',
+    text: 'text-green-700',
+    border: 'border-green-200',
+    label: 'Agricultural Commercial Property'
   }
 };
+
+// ---- All listing types available globally: Buy, Rent, Lease ----
+const LISTING_TYPE_CONFIG = {
+  'Buy': { bg: 'bg-[#E8F4F2]', text: 'text-[#00695C]', border: 'border-[#B5C9C5]' },
+  'Rent': { bg: 'bg-[#E8F4F2]', text: 'text-[#00695C]', border: 'border-[#B5C9C5]' },
+  'Lease': { bg: 'bg-[#E8F4F2]', text: 'text-[#00695C]', border: 'border-[#B5C9C5]' }
+};
+
+const ALL_LISTING_TYPES = ['Buy', 'Rent', 'Lease'];
+
+// ---- Subcategory-specific listing type restrictions ----
+// Every commercial subcategory allows Buy, Rent or Lease.
+const RESTRICTED_LISTING_TYPES = {};
+
+const getAllowedListingTypes = (propertyType) => RESTRICTED_LISTING_TYPES[propertyType] || ALL_LISTING_TYPES;
 
 // ============================================================
 // TOAST COMPONENT
@@ -140,8 +281,9 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
 const ViewPropertyDetailModal = ({ property, show, onClose, onEdit, onDelete }) => {
   if (!property || !show) return null;
 
-  const listingConfig = LISTING_TYPES[property.listingType] || LISTING_TYPES['Buy'];
-  const ListingIcon = listingConfig.icon;
+  const typeConfig = PROPERTY_TYPES[property.propertyType] || PROPERTY_TYPES['OfficeSpace'];
+  const TypeIcon = typeConfig.icon;
+  const listingConfig = LISTING_TYPE_CONFIG[property.listingType] || LISTING_TYPE_CONFIG['Rent'];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
@@ -155,14 +297,14 @@ const ViewPropertyDetailModal = ({ property, show, onClose, onEdit, onDelete }) 
             <FiX className="text-lg" />
           </button>
           <div className="flex items-center gap-3 mb-2">
-            <div className={`w-14 h-14 rounded-2xl ${listingConfig.bg} border-2 border-white/30 flex items-center justify-center text-2xl ${listingConfig.text} shadow-lg`}>
-              <ListingIcon />
+            <div className={`w-14 h-14 rounded-2xl ${typeConfig.bg} border-2 border-white/30 flex items-center justify-center text-2xl ${typeConfig.text} shadow-lg`}>
+              <TypeIcon />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-white">{property.propertyTitle}</h2>
               <p className="text-white/80 text-sm flex items-center gap-2">
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${listingConfig.bg} ${listingConfig.text} border ${listingConfig.border}`}>
-                  {listingConfig.label}
+                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${typeConfig.bg} ${typeConfig.text} border ${typeConfig.border}`}>
+                  {typeConfig.label}
                 </span>
                 <span className="w-1 h-1 bg-white/40 rounded-full"></span>
                 <span>ID: {property.propertyId}</span>
@@ -170,8 +312,8 @@ const ViewPropertyDetailModal = ({ property, show, onClose, onEdit, onDelete }) 
             </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 ${VILLA_TYPE.bg} ${VILLA_TYPE.text} border ${VILLA_TYPE.border}`}>
-              <FaHome className="text-xs" /> {VILLA_TYPE.label}
+            <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 ${listingConfig.bg} ${listingConfig.text} border ${listingConfig.border}`}>
+              <FiBriefcase className="text-xs" /> {property.listingType}
             </span>
           </div>
         </div>
@@ -189,7 +331,7 @@ const ViewPropertyDetailModal = ({ property, show, onClose, onEdit, onDelete }) 
 
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-1">
-                <FaHome className="text-[#00695C] text-sm" />
+                <FiHome className="text-[#00695C] text-sm" />
                 <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Property Title</h4>
               </div>
               <p className="text-sm font-bold text-[#1A2E2A]">{property.propertyTitle}</p>
@@ -200,7 +342,7 @@ const ViewPropertyDetailModal = ({ property, show, onClose, onEdit, onDelete }) 
                 <FiTag className="text-[#00695C] text-sm" />
                 <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Property Type</h4>
               </div>
-              <p className="text-sm font-bold text-[#1A2E2A]">{VILLA_TYPE.label}</p>
+              <p className="text-sm font-bold text-[#1A2E2A]">{typeConfig.label}</p>
             </div>
 
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
@@ -211,6 +353,7 @@ const ViewPropertyDetailModal = ({ property, show, onClose, onEdit, onDelete }) 
               <p className="text-sm font-bold text-[#1A2E2A]">{property.listingType}</p>
             </div>
 
+            {/* ===== Location fields: Street → Area/Locality → City → District → State → Pincode ===== */}
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-1">
                 <FiMapPin className="text-[#00695C] text-sm" />
@@ -258,6 +401,7 @@ const ViewPropertyDetailModal = ({ property, show, onClose, onEdit, onDelete }) 
               </div>
               <p className="text-sm font-bold text-[#1A2E2A]">{property.pincode}</p>
             </div>
+            {/* ===== End reordered location fields ===== */}
 
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-1">
@@ -320,23 +464,25 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
   if (!property || !show) return null;
 
   const [formData, setFormData] = useState({
-    propertyId: '', propertyTitle: '', listingType: '',
+    propertyId: '', propertyTitle: '', propertyType: '', listingType: '',
     description: '', state: '', district: '', city: '', area: '',
     street: '', pincode: '', latitude: '', longitude: ''
   });
   const [loading, setLoading] = useState(false);
 
-  const listingTypeOptions = Object.keys(LISTING_TYPES);
+  const propertyTypeOptions = Object.keys(PROPERTY_TYPES);
+  // Listing type options depend on the currently selected subcategory
+  const listingTypeOptions = getAllowedListingTypes(formData.propertyType);
+  const isListingTypeLocked = listingTypeOptions.length === 1;
 
   useEffect(() => {
     if (property) {
+      const allowed = getAllowedListingTypes(property.propertyType);
       setFormData({
         propertyId: property.propertyId || '',
         propertyTitle: property.propertyTitle || '',
-        // Normalize any legacy 'Sell' value coming from an existing record
-        listingType: property.listingType && property.listingType.toLowerCase() === 'sell'
-          ? 'Buy'
-          : (property.listingType || ''),
+        propertyType: property.propertyType || '',
+        listingType: allowed.includes(property.listingType) ? property.listingType : allowed[0],
         description: property.description || '',
         state: property.state || '',
         district: property.district || '',
@@ -352,14 +498,23 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'propertyType') {
+      const allowed = getAllowedListingTypes(value);
+      setFormData(prev => ({
+        ...prev,
+        propertyType: value,
+        listingType: allowed.includes(prev.listingType) ? prev.listingType : allowed[0]
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
-      onSave({ ...property, ...formData, propertyType: VILLA_TYPE.label });
+      onSave({ ...property, ...formData });
       setLoading(false);
       onClose();
     }, 700);
@@ -376,8 +531,8 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
           >
             <FiX className="text-lg" />
           </button>
-          <h2 className="text-2xl font-bold text-white">Edit Independent Villa</h2>
-          <p className="text-white/80 text-sm">Update property details</p>
+          <h2 className="text-2xl font-bold text-white">Edit Commercial Property</h2>
+          <p className="text-white/80 text-sm">Update commercial property details</p>
         </div>
 
         {/* Content */}
@@ -385,7 +540,7 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
               <h3 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <FaHome className="text-[#00695C]" />
+                <FiBriefcase className="text-[#00695C]" />
                 Basic Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -394,7 +549,7 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
                   <input
                     type="text" name="propertyId" value={formData.propertyId} onChange={handleChange}
                     className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
-                    placeholder="IV-001"
+                    placeholder="COM-0001"
                   />
                 </div>
                 <div>
@@ -406,21 +561,31 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Property Type</label>
-                  <input
-                    type="text" value={VILLA_TYPE.label} disabled
-                    className="w-full px-3 py-2 bg-[#F0F4F3] rounded-xl border border-[#E8F0EE] text-sm text-[#5A7D78] outline-none cursor-not-allowed"
-                  />
+                  <label className="block text-xs font-medium text-[#5A7D78] mb-1">Property Type *</label>
+                  <select
+                    name="propertyType" value={formData.propertyType} onChange={handleChange} required
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                  >
+                    <option value="">Select Property Type</option>
+                    {propertyTypeOptions.map(type => (
+                      <option key={type} value={type}>{PROPERTY_TYPES[type].label}</option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-[#5A7D78] mb-1">Listing Type *</label>
                   <select
                     name="listingType" value={formData.listingType} onChange={handleChange} required
-                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none"
+                    disabled={isListingTypeLocked}
+                    className="w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none disabled:bg-[#F5F9F8] disabled:cursor-not-allowed"
                   >
-                    <option value="">Select Listing Type</option>
                     {listingTypeOptions.map(type => <option key={type} value={type}>{type}</option>)}
                   </select>
+                  {isListingTypeLocked && (
+                    <p className="text-[11px] text-[#5A7D78] mt-1">
+                      {PROPERTY_TYPES[formData.propertyType]?.label} listings are {listingTypeOptions[0]} only.
+                    </p>
+                  )}
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-xs font-medium text-[#5A7D78] mb-1">Description</label>
@@ -438,6 +603,7 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
                 <FiMapPin className="text-[#00695C]" />
                 Location Details
               </h3>
+              {/* ===== Location fields: Street → Area/Locality → City → District → State → Pincode ===== */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-[#5A7D78] mb-1">Street</label>
@@ -488,6 +654,7 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
                   />
                 </div>
               </div>
+              {/* ===== End reordered location fields ===== */}
             </div>
 
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
@@ -602,7 +769,7 @@ const FilterDropdown = ({ label, options, value, onChange, icon: Icon, allLabel 
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-[#E8F0EE] py-2 z-50 max-h-80 overflow-y-auto animate-slide-down">
+        <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-[#E8F0EE] py-2 z-50 max-h-80 overflow-y-auto animate-slide-down">
           <button
             onClick={() => { onChange('all'); setIsOpen(false); }}
             className={`w-full px-4 py-2.5 text-left text-sm transition-all duration-200 flex items-center gap-2 hover:bg-[#F5F9F8] ${
@@ -633,7 +800,7 @@ const FilterDropdown = ({ label, options, value, onChange, icon: Icon, allLabel 
 // ============================================================
 // MAIN COMPONENT
 // ============================================================
-const IndependentVilla = () => {
+const CommercialOverview = () => {
   const searchInputRef = useRef(null);
 
   // ============ STATE ============
@@ -654,6 +821,7 @@ const IndependentVilla = () => {
   const [toast, setToast] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
   const [filterCount, setFilterCount] = useState(0);
+  const [activePropertyType, setActivePropertyType] = useState('all');
   const [activeListingType, setActiveListingType] = useState('all');
   const [showStats, setShowStats] = useState(true);
 
@@ -662,66 +830,70 @@ const IndependentVilla = () => {
     isOpen: false, title: '', message: '', confirmText: 'Confirm', cancelText: 'Cancel', type: 'danger', onConfirm: null, onCancel: null
   });
 
-  // ============ STATS ============
-  // ---- 'sell' removed: only total, buy, rent, lease ----
-  const [stats, setStats] = useState({ total: 0, buy: 0, rent: 0, lease: 0 });
+  // ============ STATS (total + one count per subcategory) ============
+  const [stats, setStats] = useState(() => {
+    const initial = { total: 0 };
+    Object.keys(PROPERTY_TYPES).forEach(type => { initial[type] = 0; });
+    return initial;
+  });
 
-  // ============ NORMALIZE LEGACY DATA ============
-  // Converts any legacy 'Sell' listingType (case-insensitive) into 'Buy'.
-  // Only Buy, Rent, Lease are valid listing types going forward.
-  const normalizeListingType = useCallback((property) => {
-    if (property && property.listingType && property.listingType.toLowerCase() === 'sell') {
-      return { ...property, listingType: 'Buy' };
+  // ============ ENFORCE LISTING TYPE RULES ============
+  const enforceListingTypeRules = useCallback((property) => {
+    if (!property) return property;
+    const allowed = getAllowedListingTypes(property.propertyType);
+    if (!allowed.includes(property.listingType)) {
+      return { ...property, listingType: allowed[0] };
     }
     return property;
   }, []);
 
   const normalizeProperties = useCallback((list) => {
     if (!list) return list;
-    return list.map(normalizeListingType);
-  }, [normalizeListingType]);
+    return list.map(enforceListingTypeRules);
+  }, [enforceListingTypeRules]);
 
   const computeStats = useCallback((list) => {
-    if (!list || list.length === 0) {
-      setStats({ total: 0, buy: 0, rent: 0, lease: 0 });
-      return;
-    }
-    const total = list.length;
-    const buy = list.filter(p => p.listingType === 'Buy').length;
-    const rent = list.filter(p => p.listingType === 'Rent').length;
-    const lease = list.filter(p => p.listingType === 'Lease').length;
-    setStats({ total, buy, rent, lease });
+    const counts = { total: list ? list.length : 0 };
+    Object.keys(PROPERTY_TYPES).forEach(type => {
+      counts[type] = list ? list.filter(p => p.propertyType === type).length : 0;
+    });
+    setStats(counts);
   }, []);
 
   // ============ GENERATE MOCK DATA ============
   const generateMockProperties = useCallback(() => {
     const propertyTitles = [
-      'Green Valley Villa', 'Lakeside Independent Villa', 'Sunrise Garden Villa', 'Royal Palm Villa',
-      'Silver Oak Villa', 'Golden Meadows Villa', 'Cedar Woods Villa', 'Maple Leaf Villa',
-      'Orchid Garden Villa', 'Tulip Independent Villa', 'Lotus Courtyard Villa', 'Jasmine Villa',
-      'Emerald Greens Villa', 'Pearl Residency Villa', 'Ruby Enclave Villa', 'Sapphire Villa'
+      'Prestige Corporate Office Space', 'Marina Street Retail Shop', 'Grand Motors Showroom',
+      'Highway Commercial Plot', 'Riverfront Warehouse Godown', 'Aravali Industrial Factory Unit',
+      'Innov8 Co-working Hub', 'Meridian Business Center', 'Phoenix Mall Retail Unit',
+      'Silverline Commercial Complex', 'Spice Route Restaurant Space', 'Palm Court Resort Property',
+      'Wellness Clinic Space', 'Bright Future Institution Campus', 'Cyber Tower Tech Park Space',
+      'Galaxy Multiplex Entertainment Unit', 'Highway Petrol Bunk Outlet', 'ColdChain Logistics Hub',
+      'Union Square Mixed-use Property', 'Green Valley Agricultural Commercial Plot'
     ];
     const states = ['Tamil Nadu', 'Karnataka', 'Telangana', 'Maharashtra', 'Delhi', 'West Bengal', 'Gujarat', 'Kerala'];
     const districts = ['Chennai', 'Bengaluru Urban', 'Hyderabad', 'Mumbai Suburban', 'New Delhi', 'Kolkata', 'Ahmedabad', 'Ernakulam'];
     const cities = ['Chennai', 'Bangalore', 'Hyderabad', 'Mumbai', 'Delhi', 'Kolkata', 'Ahmedabad', 'Kochi'];
-    const areas = ['Adyar', 'Koramangala', 'Jubilee Hills', 'Bandra', 'Connaught Place', 'Salt Lake', 'Vastrapur', 'Kakkanad'];
-    const streets = ['1st Cross Street', 'MG Road', 'Lake View Lane', 'Garden Street', 'Park Avenue', 'Hill Road', 'Church Street', 'Palm Grove Road'];
-    const listingTypes = Object.keys(LISTING_TYPES);
+    const areas = ['Guindy', 'Whitefield', 'Hitech City', 'Andheri', 'Nehru Place', 'Sector V', 'SG Highway', 'Infopark'];
+    const streets = ['Industrial Estate Road', 'MG Road', 'Ring Road', 'Commerce Street', 'Business Park Avenue', 'Junction Road', 'Market Street', 'Highway Service Road'];
+    const propertyTypes = Object.keys(PROPERTY_TYPES);
 
     const propertiesList = [];
 
-    for (let i = 1; i <= 40; i++) {
-      const listingType = listingTypes[Math.floor(Math.random() * listingTypes.length)];
+    for (let i = 1; i <= 60; i++) {
+      const propertyType = propertyTypes[Math.floor(Math.random() * propertyTypes.length)];
+      const allowedListingTypes = getAllowedListingTypes(propertyType);
+      const listingType = allowedListingTypes[Math.floor(Math.random() * allowedListingTypes.length)];
       const pincode = String(600000 + Math.floor(Math.random() * 99999));
       const hasCoords = Math.random() > 0.4;
 
       propertiesList.push({
-        id: `iv_${i}`,
-        propertyId: `IV-${String(i).padStart(4, '0')}`,
+        id: `com_${i}`,
+        propertyId: `COM-${String(i).padStart(4, '0')}`,
         propertyTitle: propertyTitles[Math.floor(Math.random() * propertyTitles.length)],
-        propertyType: VILLA_TYPE.label,
+        propertyType,
         listingType,
-        description: `A well-maintained independent villa with good ventilation and prime connectivity, available for ${listingType.toLowerCase()}.`,
+        description: `A well-located ${PROPERTY_TYPES[propertyType].label.toLowerCase()} suited for business operations with strong connectivity.`,
         state: states[Math.floor(Math.random() * states.length)],
         district: districts[Math.floor(Math.random() * districts.length)],
         city: cities[Math.floor(Math.random() * cities.length)],
@@ -758,6 +930,7 @@ const IndependentVilla = () => {
         filtered = filtered.filter(p =>
           (p.propertyTitle && p.propertyTitle.toLowerCase().includes(query)) ||
           (p.propertyId && p.propertyId.toLowerCase().includes(query)) ||
+          (p.propertyType && (PROPERTY_TYPES[p.propertyType]?.label || p.propertyType).toLowerCase().includes(query)) ||
           (p.listingType && p.listingType.toLowerCase().includes(query)) ||
           (p.state && p.state.toLowerCase().includes(query)) ||
           (p.district && p.district.toLowerCase().includes(query)) ||
@@ -768,11 +941,16 @@ const IndependentVilla = () => {
         );
       }
 
+      if (activePropertyType !== 'all') {
+        filtered = filtered.filter(p => p.propertyType === activePropertyType);
+      }
+
       if (activeListingType !== 'all') {
         filtered = filtered.filter(p => p.listingType === activeListingType);
       }
 
       let count = 0;
+      if (activePropertyType !== 'all') count++;
       if (activeListingType !== 'all') count++;
       if (searchQuery) count++;
       setFilterCount(count);
@@ -792,7 +970,7 @@ const IndependentVilla = () => {
     } catch (error) {
       console.error('Error filtering properties:', error);
     }
-  }, [properties, searchQuery, activeListingType, sortField, sortDirection]);
+  }, [properties, searchQuery, activePropertyType, activeListingType, sortField, sortDirection]);
 
   useEffect(() => { filterProperties(); }, [filterProperties]);
 
@@ -840,14 +1018,14 @@ const IndependentVilla = () => {
   }, []);
 
   const handleSaveProperty = useCallback((updatedProperty) => {
-    const normalized = normalizeListingType(updatedProperty);
+    const normalized = enforceListingTypeRules(updatedProperty);
     setProperties(prev => {
       const updated = prev.map(p => p.id === normalized.id ? normalized : p);
       computeStats(updated);
       return updated;
     });
     setToast({ message: `Property "${normalized.propertyTitle}" updated successfully`, type: 'success' });
-  }, [computeStats, normalizeListingType]);
+  }, [computeStats, enforceListingTypeRules]);
 
   // ============ DELETE PROPERTY WITH CONFIRMATION ============
   const handleDeleteProperty = useCallback((propertyId) => {
@@ -879,12 +1057,13 @@ const IndependentVilla = () => {
   }, [properties, computeStats]);
 
   // ============ STAT CLICK HANDLERS ============
-  const handleListingClick = useCallback((type) => {
-    setActiveListingType(prev => (prev === type ? 'all' : type));
+  const handleTypeClick = useCallback((type) => {
+    setActivePropertyType(prev => (prev === type ? 'all' : type));
     if (searchInputRef.current) searchInputRef.current.focus();
   }, []);
 
   const handleTotalClick = useCallback(() => {
+    setActivePropertyType('all');
     setActiveListingType('all');
     setSearchQuery('');
     if (searchInputRef.current) searchInputRef.current.focus();
@@ -893,6 +1072,7 @@ const IndependentVilla = () => {
   // ============ CLEAR ALL FILTERS ============
   const clearAllFilters = useCallback(() => {
     setSearchQuery('');
+    setActivePropertyType('all');
     setActiveListingType('all');
     if (searchInputRef.current) searchInputRef.current.focus();
     setToast({ message: 'All filters cleared', type: 'info' });
@@ -925,14 +1105,14 @@ const IndependentVilla = () => {
       const data = filteredProperties.map(p => ({
         'Property ID': p.propertyId || '',
         'Property Title': p.propertyTitle || '',
-        'Property Type': p.propertyType || '',
+        'Property Type': (PROPERTY_TYPES[p.propertyType]?.label) || p.propertyType || '',
         'Listing Type': p.listingType || '',
         'Description': p.description || '',
-        'State': p.state || '',
-        'District': p.district || '',
-        'City': p.city || '',
-        'Area / Locality': p.area || '',
         'Street': p.street || '',
+        'Area / Locality': p.area || '',
+        'City': p.city || '',
+        'District': p.district || '',
+        'State': p.state || '',
         'Pincode': p.pincode || '',
         'Latitude': p.latitude || '',
         'Longitude': p.longitude || ''
@@ -947,7 +1127,7 @@ const IndependentVilla = () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `independent_villa_${new Date().toISOString().split('T')[0]}.csv`;
+      a.download = `commercial_properties_${new Date().toISOString().split('T')[0]}.csv`;
       a.click();
       window.URL.revokeObjectURL(url);
       setToast({ message: `${filteredProperties.length} records exported successfully`, type: 'success' });
@@ -988,7 +1168,8 @@ const IndependentVilla = () => {
   }, [selectedProperties, properties, computeStats]);
 
   // ============ FILTER OPTIONS ============
-  const listingTypeOptions = Object.keys(LISTING_TYPES).map(type => ({ value: type, label: type }));
+  const propertyTypeOptions = Object.keys(PROPERTY_TYPES).map(type => ({ value: type, label: PROPERTY_TYPES[type].label }));
+  const listingTypeOptions = ALL_LISTING_TYPES.map(type => ({ value: type, label: type }));
 
   // ============================================================
   // RENDER
@@ -1042,7 +1223,7 @@ const IndependentVilla = () => {
           <div>
             <div className="flex items-center gap-3 mb-1 flex-wrap">
               <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
-                Independent Villa
+                Commercial Properties
               </h1>
               <span className="px-3 py-1 bg-[#E8F4F2] text-[#00695C] text-xs font-semibold rounded-full animate-pulse">
                 {filteredProperties.length} Properties
@@ -1054,7 +1235,7 @@ const IndependentVilla = () => {
               )}
             </div>
             <p className="text-sm text-[#5A7D78] flex items-center gap-2 flex-wrap">
-              <span>All Independent Villa listings across Buy, Rent &amp; Lease</span>
+              <span>Office, Retail, Industrial, Hospitality, Institutional &amp; other commercial listings</span>
               <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
               <span className="text-[#00695C] font-medium">
                 {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
@@ -1088,47 +1269,36 @@ const IndependentVilla = () => {
         </div>
       </div>
 
-      {/* Stats Section — Total + Listing Types */}
+      {/* Stats Section — Total + Subcategories */}
       {showStats && (
         <div className="relative animate-slide-in">
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               <StatCard
-                icon={<FiHome className="text-white text-sm" />}
+                icon={<FiBriefcase className="text-white text-sm" />}
                 title="Total Properties"
                 value={stats.total}
                 color="bg-gradient-to-br from-[#00695C] to-[#26A69A]"
                 delay={0}
-                isActive={activeListingType === 'all' && !searchQuery}
+                isActive={activePropertyType === 'all' && activeListingType === 'all' && !searchQuery}
                 onClick={handleTotalClick}
               />
-              <StatCard
-                icon={<FiDollarSign className="text-white text-sm" />}
-                title="Buy"
-                value={stats.buy}
-                color="bg-gradient-to-br from-blue-600 to-blue-400"
-                delay={100}
-                isActive={activeListingType === 'Buy'}
-                onClick={() => handleListingClick('Buy')}
-              />
-              <StatCard
-                icon={<FiKey className="text-white text-sm" />}
-                title="Rent"
-                value={stats.rent}
-                color="bg-gradient-to-br from-purple-600 to-purple-400"
-                delay={200}
-                isActive={activeListingType === 'Rent'}
-                onClick={() => handleListingClick('Rent')}
-              />
-              <StatCard
-                icon={<FiFileText className="text-white text-sm" />}
-                title="Lease"
-                value={stats.lease}
-                color="bg-gradient-to-br from-amber-600 to-amber-400"
-                delay={300}
-                isActive={activeListingType === 'Lease'}
-                onClick={() => handleListingClick('Lease')}
-              />
+              {Object.keys(PROPERTY_TYPES).map((type, idx) => {
+                const config = PROPERTY_TYPES[type];
+                const TypeIcon = config.icon;
+                return (
+                  <StatCard
+                    key={type}
+                    icon={<TypeIcon className="text-white text-sm" />}
+                    title={config.label}
+                    value={stats[type] || 0}
+                    color={`bg-gradient-to-br ${config.color}`}
+                    delay={(idx + 1) * 40}
+                    isActive={activePropertyType === type}
+                    onClick={() => handleTypeClick(type)}
+                  />
+                );
+              })}
             </div>
           </div>
         </div>
@@ -1142,7 +1312,7 @@ const IndependentVilla = () => {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search by title, ID, listing type, state, city, pincode..."
+              placeholder="Search by title, ID, type, state, city, pincode..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none placeholder:text-[#B5C9C5]"
@@ -1159,6 +1329,15 @@ const IndependentVilla = () => {
 
           <div className="flex items-center gap-2 w-full lg:w-auto flex-wrap">
             <FilterDropdown
+              label="Type"
+              options={propertyTypeOptions}
+              value={activePropertyType}
+              onChange={setActivePropertyType}
+              icon={FiTag}
+              allLabel="All Types"
+            />
+
+            <FilterDropdown
               label="Listing"
               options={listingTypeOptions}
               value={activeListingType}
@@ -1167,7 +1346,7 @@ const IndependentVilla = () => {
               allLabel="All Listings"
             />
 
-            {(activeListingType !== 'all' || searchQuery) && (
+            {(activePropertyType !== 'all' || activeListingType !== 'all' || searchQuery) && (
               <button
                 onClick={clearAllFilters}
                 className="px-4 py-2.5 bg-red-50 text-red-700 rounded-xl hover:bg-red-100 transition-all duration-300 text-sm font-medium flex items-center gap-1 hover:scale-105"
@@ -1230,8 +1409,8 @@ const IndependentVilla = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
             {paginatedProperties.map((property, index) => {
               const isSelected = selectedProperties.includes(property.id);
-              const listingConfig = LISTING_TYPES[property.listingType] || LISTING_TYPES['Buy'];
-              const ListingIcon = listingConfig.icon;
+              const typeConfig = PROPERTY_TYPES[property.propertyType] || PROPERTY_TYPES['OfficeSpace'];
+              const TypeIcon = typeConfig.icon;
 
               return (
                 <div
@@ -1247,39 +1426,40 @@ const IndependentVilla = () => {
                         onChange={() => handleSelectProperty(property.id)}
                         className="w-4 h-4 shrink-0 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                       />
-                      <div className={`w-9 h-9 rounded-2xl bg-gradient-to-br ${listingConfig.color} flex items-center justify-center text-white shadow-lg flex-shrink-0`}>
-                        <ListingIcon className="text-sm" />
+                      <div className={`w-9 h-9 rounded-2xl bg-gradient-to-br ${typeConfig.color} flex items-center justify-center text-white shadow-lg flex-shrink-0`}>
+                        <TypeIcon className="text-sm" />
                       </div>
                       <div className="min-w-0">
                         <h3 className="font-bold text-sm text-[#1A2E2A] truncate">{property.propertyTitle}</h3>
                         <div className="flex items-center gap-1.5 mt-0.5">
                           <p className="text-[10px] font-medium text-[#5A7D78]">{property.propertyId}</p>
-                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-semibold leading-none ${listingConfig.bg} ${listingConfig.text} border ${listingConfig.border}`}>
-                            {property.listingType}
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-semibold leading-none ${typeConfig.bg} ${typeConfig.text} border ${typeConfig.border}`}>
+                            {typeConfig.label}
                           </span>
                         </div>
                       </div>
                     </div>
-                    
+
                   </div>
 
+                  {/* ===== Location fields ===== */}
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FaHome className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate font-semibold text-[#1A2E2A]">{VILLA_TYPE.label}</span>
+                      <FiBriefcase className="text-[#00695C] flex-shrink-0" />
+                      <span className="truncate font-semibold text-[#1A2E2A]">{property.listingType}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiMapPin className="text-[#00695C] flex-shrink-0" />
                       <span className="truncate font-medium">{property.street}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
+                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiMapPin className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate font-medium">{property.area}, {property.city}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FaCity className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate font-medium">{property.district}, {property.state}</span>
-                    </div>
+                        <span className="truncate font-medium">{property.area}, {property.city}</span>
+                     </div>
+                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
+                       <FaCity className="text-[#00695C] flex-shrink-0" />
+                          <span className="truncate font-medium">{property.district}, {property.state}</span>
+                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiHash className="text-[#00695C] flex-shrink-0" />
                       <span className="truncate font-semibold text-[#1A2E2A]">{property.pincode}</span>
@@ -1297,6 +1477,7 @@ const IndependentVilla = () => {
                       </div>
                     )}
                   </div>
+                  {/* ===== End reordered location fields ===== */}
 
                   <div className="flex flex-wrap gap-1 mt-2.5 pt-2.5 border-t border-[#E8F0EE]">
                     <button
@@ -1344,14 +1525,15 @@ const IndependentVilla = () => {
               <div className="col-span-2 min-w-0 cursor-pointer hover:text-[#00695C] transition-colors truncate" onClick={() => handleSort('propertyTitle')}>
                 Title {sortField === 'propertyTitle' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
+              <div className="col-span-1 min-w-0 truncate cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('propertyType')}>
+                Type {sortField === 'propertyType' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+              </div>
               <div className="col-span-1 min-w-0 truncate cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('listingType')}>
                 Listing {sortField === 'listingType' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
+              {/* ===== Reordered: City before State to follow Street→Area→City→District→State→Pincode hierarchy ===== */}
               <div className="col-span-1 min-w-0 truncate cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('city')}>
                 City {sortField === 'city' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
-              </div>
-              <div className="col-span-1 min-w-0 truncate cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('district')}>
-                District {sortField === 'district' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
               <div className="col-span-1 min-w-0 truncate cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('state')}>
                 State {sortField === 'state' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
@@ -1366,8 +1548,9 @@ const IndependentVilla = () => {
 
             {paginatedProperties.map((property, index) => {
               const isSelected = selectedProperties.includes(property.id);
-              const listingConfig = LISTING_TYPES[property.listingType] || LISTING_TYPES['Buy'];
-              const ListingIcon = listingConfig.icon;
+              const typeConfig = PROPERTY_TYPES[property.propertyType] || PROPERTY_TYPES['OfficeSpace'];
+              const TypeIcon = typeConfig.icon;
+              const listingConfig = LISTING_TYPE_CONFIG[property.listingType] || LISTING_TYPE_CONFIG['Rent'];
 
               return (
                 <div
@@ -1382,8 +1565,8 @@ const IndependentVilla = () => {
                       onChange={() => handleSelectProperty(property.id)}
                       className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300 flex-shrink-0"
                     />
-                    <div className={`w-6 h-6 rounded-full bg-gradient-to-br ${listingConfig.color} flex items-center justify-center text-white shadow-md flex-shrink-0`}>
-                      <ListingIcon className="text-[8px]" />
+                    <div className={`w-6 h-6 rounded-full bg-gradient-to-br ${typeConfig.color} flex items-center justify-center text-white shadow-md flex-shrink-0`}>
+                      <TypeIcon className="text-[8px]" />
                     </div>
                     <span className="text-xs font-bold text-[#00695C] truncate">{property.propertyId}</span>
                   </div>
@@ -1392,18 +1575,19 @@ const IndependentVilla = () => {
                     <p className="font-bold text-sm text-[#1A2E2A] truncate">{property.propertyTitle}</p>
                   </div>
 
+                  <div className="col-span-1 min-w-0 text-xs font-medium text-[#5A7D78] truncate">
+                    {typeConfig.label}
+                  </div>
+
                   <div className="col-span-1 min-w-0">
                     <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${listingConfig.bg} ${listingConfig.text} border ${listingConfig.border} truncate inline-block max-w-full`}>
                       {property.listingType}
                     </span>
                   </div>
 
+                  {/* ===== Reordered: City before State ===== */}
                   <div className="col-span-1 min-w-0 text-xs font-medium text-[#5A7D78] truncate">
                     {property.city}
-                  </div>
-
-                  <div className="col-span-1 min-w-0 text-xs font-medium text-[#5A7D78] truncate">
-                    {property.district}
                   </div>
 
                   <div className="col-span-1 min-w-0 text-xs font-medium text-[#5A7D78] truncate">
@@ -1458,11 +1642,11 @@ const IndependentVilla = () => {
         {paginatedProperties.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-[#E8F0EE]">
             <div className="w-24 h-24 rounded-full bg-[#F5F9F8] flex items-center justify-center mb-4 animate-float">
-              <FiHome className="text-4xl text-[#B5C9C5]" />
+              <FiBriefcase className="text-4xl text-[#B5C9C5]" />
             </div>
             <h3 className="text-xl font-bold text-[#1A2E2A]">No properties found</h3>
             <p className="text-sm text-[#5A7D78] mt-1">
-              {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No independent villa listings have been added yet'}
+              {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No commercial properties have been added yet'}
             </p>
             {filterCount > 0 && (
               <button
@@ -1572,4 +1756,4 @@ const IndependentVilla = () => {
   );
 };
 
-export default IndependentVilla;
+export default CommercialOverview;

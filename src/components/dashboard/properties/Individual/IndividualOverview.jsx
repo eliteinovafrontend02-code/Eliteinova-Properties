@@ -40,9 +40,9 @@ const PROPERTY_TYPES = {
   }
 };
 
+// ---- 'sell' removed: only Buy, Rent, Lease are valid listing types ----
 const LISTING_TYPE_CONFIG = {
   'Buy': { bg: 'bg-[#E8F4F2]', text: 'text-[#00695C]', border: 'border-[#B5C9C5]' },
-  'sell': { bg: 'bg-[#E8F4F2]', text: 'text-[#00695C]', border: 'border-[#B5C9C5]' },
   'Rent': { bg: 'bg-[#E8F4F2]', text: 'text-[#00695C]', border: 'border-[#B5C9C5]' },
   'Lease': { bg: 'bg-[#E8F4F2]', text: 'text-[#00695C]', border: 'border-[#B5C9C5]' }
 };
@@ -206,7 +206,7 @@ const ViewPropertyDetailModal = ({ property, show, onClose, onEdit, onDelete }) 
               <p className="text-sm font-bold text-[#1A2E2A]">{property.listingType}</p>
             </div>
 
-            {/* ===== Location fields: Street → Area/Locality → City → District → State → Pincode ===== */}
+            {/* ===== Location fields */}
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-1">
                 <FiMapPin className="text-[#00695C] text-sm" />
@@ -324,7 +324,8 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
   const [loading, setLoading] = useState(false);
 
   const propertyTypeOptions = Object.keys(PROPERTY_TYPES);
-  const listingTypeOptions = ['Buy', 'sell', 'Rent', 'Lease'];
+  // ---- 'sell' removed: only Buy, Rent, Lease ----
+  const listingTypeOptions = ['Buy', 'Rent', 'Lease'];
 
   useEffect(() => {
     if (property) {
@@ -332,7 +333,10 @@ const EditPropertyModal = ({ property, show, onClose, onSave }) => {
         propertyId: property.propertyId || '',
         propertyTitle: property.propertyTitle || '',
         propertyType: property.propertyType || '',
-        listingType: property.listingType || '',
+        // Normalize any legacy 'sell' value coming from an existing record
+        listingType: property.listingType && property.listingType.toLowerCase() === 'sell'
+          ? 'Buy'
+          : (property.listingType || ''),
         description: property.description || '',
         state: property.state || '',
         district: property.district || '',
@@ -669,6 +673,21 @@ const IndividualOverview = () => {
     total: 0, independentHouse: 0, independentVilla: 0, duplexResidentialUnit: 0
   });
 
+  // ============ NORMALIZE LEGACY DATA ============
+  // Converts any legacy 'sell' listingType (case-insensitive) into 'Buy'.
+  // Only Buy, Rent, Lease are valid listing types going forward.
+  const normalizeListingType = useCallback((property) => {
+    if (property && property.listingType && property.listingType.toLowerCase() === 'sell') {
+      return { ...property, listingType: 'Buy' };
+    }
+    return property;
+  }, []);
+
+  const normalizeProperties = useCallback((list) => {
+    if (!list) return list;
+    return list.map(normalizeListingType);
+  }, [normalizeListingType]);
+
   const computeStats = useCallback((list) => {
     if (!list || list.length === 0) {
       setStats({ total: 0, independentHouse: 0, independentVilla: 0, duplexResidentialUnit: 0 });
@@ -694,7 +713,8 @@ const IndividualOverview = () => {
     const cities = ['Chennai', 'Bangalore', 'Hyderabad', 'Mumbai', 'Delhi', 'Kolkata', 'Ahmedabad', 'Kochi'];
     const areas = ['Adyar', 'Koramangala', 'Jubilee Hills', 'Bandra', 'Connaught Place', 'Salt Lake', 'Vastrapur', 'Kakkanad'];
     const streets = ['1st Cross Street', 'MG Road', 'Lake View Lane', 'Garden Street', 'Park Avenue', 'Hill Road', 'Church Street', 'Palm Grove Road'];
-    const listingTypes = ['Buy', 'sell', 'Rent', 'Lease'];
+    // ---- 'sell' removed: only Buy, Rent, Lease ----
+    const listingTypes = ['Buy', 'Rent', 'Lease'];
     const propertyTypes = Object.keys(PROPERTY_TYPES);
 
     const propertiesList = [];
@@ -729,13 +749,13 @@ const IndividualOverview = () => {
   // ============ INITIALIZE DATA ============
   useEffect(() => {
     try {
-      const mockProperties = generateMockProperties();
+      const mockProperties = normalizeProperties(generateMockProperties());
       setProperties(mockProperties);
       setFilteredProperties(mockProperties);
     } catch (error) {
       console.error('Error generating mock properties:', error);
     }
-  }, [generateMockProperties]);
+  }, [generateMockProperties, normalizeProperties]);
 
   // ============ FILTER PROPERTIES ============
   const filterProperties = useCallback(() => {
@@ -835,13 +855,14 @@ const IndividualOverview = () => {
   }, []);
 
   const handleSaveProperty = useCallback((updatedProperty) => {
+    const normalized = normalizeListingType(updatedProperty);
     setProperties(prev => {
-      const updated = prev.map(p => p.id === updatedProperty.id ? updatedProperty : p);
+      const updated = prev.map(p => p.id === normalized.id ? normalized : p);
       computeStats(updated);
       return updated;
     });
-    setToast({ message: `Property "${updatedProperty.propertyTitle}" updated successfully`, type: 'success' });
-  }, [computeStats]);
+    setToast({ message: `Property "${normalized.propertyTitle}" updated successfully`, type: 'success' });
+  }, [computeStats, normalizeListingType]);
 
   // ============ DELETE PROPERTY WITH CONFIRMATION ============
   const handleDeleteProperty = useCallback((propertyId) => {
@@ -899,7 +920,7 @@ const IndividualOverview = () => {
     setLoading(true);
     setTimeout(() => {
       try {
-        const mockProperties = generateMockProperties();
+        const mockProperties = normalizeProperties(generateMockProperties());
         setProperties(mockProperties);
         setFilteredProperties(mockProperties);
         setToast({ message: 'Data refreshed successfully', type: 'success' });
@@ -909,7 +930,7 @@ const IndividualOverview = () => {
       }
       setLoading(false);
     }, 1000);
-  }, [generateMockProperties]);
+  }, [generateMockProperties, normalizeProperties]);
 
   // ============ EXPORT DATA ============
   const handleExport = useCallback(() => {
@@ -985,9 +1006,9 @@ const IndividualOverview = () => {
 
   // ============ FILTER OPTIONS ============
   const propertyTypeOptions = Object.keys(PROPERTY_TYPES).map(type => ({ value: type, label: type }));
+  // ---- 'sell' removed: only Buy, Rent, Lease ----
   const listingTypeOptions = [
     { value: 'Buy', label: 'Buy' },
-    { value: 'sell', label: 'sell' },
     { value: 'Rent', label: 'Rent' },
     { value: 'Lease', label: 'Lease' }
   ];
@@ -1274,7 +1295,7 @@ const IndividualOverview = () => {
                    
                   </div>
 
-                  {/* ===== Location fields: Street → Area/Locality → City → District → State → Pincode ===== */}
+                  {/* ===== Location fields  ===== */}
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiBriefcase className="text-[#00695C] flex-shrink-0" />
@@ -1284,22 +1305,14 @@ const IndividualOverview = () => {
                       <FiMapPin className="text-[#00695C] flex-shrink-0" />
                       <span className="truncate font-medium">{property.street}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
+                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiMapPin className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate font-medium">{property.area}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FaCity className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate font-medium">{property.city}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FaCity className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate font-medium">{property.district}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FiMap className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate font-medium">{property.state}</span>
-                    </div>
+                        <span className="truncate font-medium">{property.area}, {property.city}</span>
+                     </div>
+                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
+                       <FaCity className="text-[#00695C] flex-shrink-0" />
+                          <span className="truncate font-medium">{property.district}, {property.state}</span>
+                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiHash className="text-[#00695C] flex-shrink-0" />
                       <span className="truncate font-semibold text-[#1A2E2A]">{property.pincode}</span>
