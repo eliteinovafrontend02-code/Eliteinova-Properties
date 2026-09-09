@@ -78,40 +78,40 @@ import CommercialOverview from './properties/Commercial/CommercialOverview';
 import OfficeSpace from './properties/Commercial/OfficeSpace';
 import RetailShop from './properties/Commercial/RetailShop';
 import Showroom from './properties/Commercial/Showroom';
-// import CommercialLandPlot from './properties/Commercial/CommercialLandPlot';
-// import Warehouse from './properties/Commercial/Warehouse';
-// import IndustrialProperty from './properties/Commercial/IndustrialProperty';
-// import CoWorkingSpace from './properties/Commercial/CoWorkingSpace';
-// import BusinessCenter from './properties/Commercial/BusinessCenter';
-// import ShoppingMallSpace from './properties/Commercial/ShoppingMallSpace';
-// import CommercialComplex from './properties/Commercial/CommercialComplex';
-// import Restaurant from './properties/Commercial/Restaurant';
-// import HotelProperty from './properties/Commercial/HotelProperty';
-// import ClinicSpace from './properties/Commercial/ClinicSpace';
-// import EducationalInstitution from './properties/Commercial/EducationalInstitution';
-// import ITPark from './properties/Commercial/ITPark';
-// import Multiplex from './properties/Commercial/Multiplex';
-// import PetrolBunk from './properties/Commercial/PetrolBunk';
-// import ColdStorage from './properties/Commercial/ColdStorage';
-// import MixedUse from './properties/Commercial/MixedUse';
-// import AgriculturalProperty from './properties/Commercial/AgriculturalProperty';
+import CommercialLandPlot from './properties/Commercial/CommercialLandPlot';
+import Warehouse from './properties/Commercial/Warehouse';
+import IndustrialProperty from './properties/Commercial/IndustrialProperty';
+import CoWorkingSpace from './properties/Commercial/CoWorkingSpace';
+import BusinessCenter from './properties/Commercial/BusinessCenter';
+import ShoppingMallSpace from './properties/Commercial/ShoppingMallSpace';
+import CommercialComplex from './properties/Commercial/CommercialComplex';
+import Restaurant from './properties/Commercial/Restaurant';
+import HotelProperty from './properties/Commercial/HotelProperty';
+import ClinicSpace from './properties/Commercial/ClinicSpace';
+import EducationalInstitution from './properties/Commercial/EducationalInstitution';
+import ITPark from './properties/Commercial/ITPark';
+import Multiplex from './properties/Commercial/Multiplex';
+import PetrolBunk from './properties/Commercial/PetrolBunk';
+import ColdStorage from './properties/Commercial/ColdStorage';
+import MixedUse from './properties/Commercial/MixedUse';
+import AgriculturalProperty from './properties/Commercial/AgriculturalProperty';
 
 // Land & Plots
-// import LandPlotsOverview from './properties/LandPlots/LandPlotsOverview';
-// import ResidentialLandPlots from './properties/LandPlots/ResidentialLandPlots';
-// import CommercialLandPlots from './properties/LandPlots/CommercialLandPlots';
-// import AgriculturalLandPlots from './properties/LandPlots/AgriculturalLandPlots';
-// import IndustrialLand from './properties/LandPlots/IndustrialLand';
-// import MixedUseLand from './properties/LandPlots/MixedUseLand';
-// import InstitutionalLand from './properties/LandPlots/InstitutionalLand';
-// import InvestmentSpecialPurposeLand from './properties/LandPlots/InvestmentSpecialPurposeLand';
+import LandPlotsOverview from './properties/LandPlots/LandPlotsOverview';
+import ResidentialLandPlots from './properties/LandPlots/ResidentialLandPlots';
+import CommercialLandPlots from './properties/LandPlots/CommercialLandPlots';
+import AgriculturalLandPlots from './properties/LandPlots/AgriculturalLandPlots';
+import IndustrialLand from './properties/LandPlots/IndustrialLand';
+import MixedUseLand from './properties/LandPlots/MixedUseLand';
+import InstitutionalLand from './properties/LandPlots/InstitutionalLand';
+import InvestmentSpecialPurposeLand from './properties/LandPlots/InvestmentSpecialPurposeLand';
 
 // Hostel
-// import HostelOverview from './properties/Hostel/HostelOverview';
-// import GirlsHostel from './properties/Hostel/GirlsHostel';
-// import BoysHostel from './properties/Hostel/BoysHostel';
-// import CoLivingSpace from './properties/Hostel/CoLivingSpace';
-// import WorkingProfessionalHostel from './properties/Hostel/WorkingProfessionalHostel';
+import HostelOverview from './properties/Hostel/HostelOverview';
+import GirlsHostel from './properties/Hostel/GirlsHostel';
+import BoysHostel from './properties/Hostel/BoysHostel';
+import CoLivingSpace from './properties/Hostel/CoLivingSpace';
+import WorkingProfessionalHostel from './properties/Hostel/WorkingProfessionalHostel';
 
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 
@@ -539,40 +539,40 @@ const PropertiesDashboard = () => {
               <Route path="commercial/office-space" element={<OfficeSpace />} />
               <Route path="commercial/retail-shop" element={<RetailShop />} />
               <Route path="commercial/showroom" element={<Showroom />} />
-              {/* <Route path="commercial/land-plot" element={<CommercialLandPlot />} /> */}
-              {/* <Route path="commercial/warehouse-godown" element={<Warehouse />} /> */}
-              {/* <Route path="commercial/industrial-factory" element={<IndustrialProperty />} /> */}
-              {/* <Route path="commercial/co-working-space" element={<CoWorkingSpace />} /> */}
-              {/* <Route path="commercial/business-center" element={<BusinessCenter />} /> */}
-              {/* <Route path="commercial/shopping-mall-space" element={<ShoppingMallSpace />} /> */}
-              {/* <Route path="commercial/commercial-complex" element={<CommercialComplex />} /> */}
-              {/* <Route path="commercial/restaurant-cafe" element={<Restaurant />} /> */}
-              {/* <Route path="commercial/hotel-lodge-resort" element={<HotelProperty />} /> */}
-              {/* <Route path="commercial/clinic-hospital" element={<ClinicSpace />} /> */}
-              {/* <Route path="commercial/educational-institution" element={<EducationalInstitution />} /> */}
-              {/* <Route path="commercial/it-tech-park" element={<ITPark />} /> */}
-              {/* <Route path="commercial/multiplex-entertainment" element={<Multiplex />} /> */}
-              {/* <Route path="commercial/petrol-fuel-station" element={<PetrolBunk />} /> */}
-              {/* <Route path="commercial/cold-storage-logistics" element={<ColdStorage />} /> */}
-              {/* <Route path="commercial/mixed-use" element={<MixedUse />} /> */}
-              {/* <Route path="commercial/agricultural-commercial" element={<AgriculturalProperty />} /> */}
+              <Route path="commercial/land-plot" element={<CommercialLandPlot />} />
+              <Route path="commercial/warehouse-godown" element={<Warehouse />} />
+              <Route path="commercial/industrial-factory" element={<IndustrialProperty />} />
+              <Route path="commercial/co-working-space" element={<CoWorkingSpace />} />
+              <Route path="commercial/business-center" element={<BusinessCenter />} />
+              <Route path="commercial/shopping-mall-space" element={<ShoppingMallSpace />} />
+              <Route path="commercial/commercial-complex" element={<CommercialComplex />} />
+              <Route path="commercial/restaurant-cafe" element={<Restaurant />} />
+              <Route path="commercial/hotel-lodge-resort" element={<HotelProperty />} />
+              <Route path="commercial/clinic-hospital" element={<ClinicSpace />} />
+              <Route path="commercial/educational-institution" element={<EducationalInstitution />} />
+              <Route path="commercial/it-tech-park" element={<ITPark />} />
+              <Route path="commercial/multiplex-entertainment" element={<Multiplex />} />
+              <Route path="commercial/petrol-fuel-station" element={<PetrolBunk />} />
+              <Route path="commercial/cold-storage-logistics" element={<ColdStorage />} />
+              <Route path="commercial/mixed-use" element={<MixedUse />} />
+              <Route path="commercial/agricultural-commercial" element={<AgriculturalProperty />} />
 
               {/* Land & Plots */}
-              {/* <Route path="land-plots/overview" element={<LandPlotsOverview />} />
+              <Route path="land-plots/overview" element={<LandPlotsOverview />} />
               <Route path="land-plots/residential" element={<ResidentialLandPlots />} />
               <Route path="land-plots/commercial" element={<CommercialLandPlots />} />
               <Route path="land-plots/agricultural" element={<AgriculturalLandPlots />} />
               <Route path="land-plots/industrial" element={<IndustrialLand />} />
               <Route path="land-plots/mixed-use" element={<MixedUseLand />} />
               <Route path="land-plots/institutional" element={<InstitutionalLand />} />
-              <Route path="land-plots/investment-special-purpose" element={<InvestmentSpecialPurposeLand />} /> */}
+              <Route path="land-plots/investment-special-purpose" element={<InvestmentSpecialPurposeLand />} />
 
               {/* Hostel */}
-              {/* <Route path="hostel/overview" element={<HostelOverview />} />
+              <Route path="hostel/overview" element={<HostelOverview />} />
               <Route path="hostel/girls" element={<GirlsHostel />} />
               <Route path="hostel/boys" element={<BoysHostel />} />
               <Route path="hostel/co-living" element={<CoLivingSpace />} />
-              <Route path="hostel/working-professional" element={<WorkingProfessionalHostel />} /> */}
+              <Route path="hostel/working-professional" element={<WorkingProfessionalHostel />} />
             </Routes>
           </div>
         </div>
