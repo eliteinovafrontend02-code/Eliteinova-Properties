@@ -64,6 +64,13 @@ import PropertyManagersMaintenance from './admin/PropertyManagers/PropertyManage
 import PropertyManagersPropertyControl from './admin/PropertyManagers/PropertyManagersPropertyControl';
 import PropertyManagersPropertiesLeads from './admin/PropertyManagers/PropertyManagersPropertiesLeads';
 
+// Subscriptions
+import SubscriptionsOverview from './admin/Subscriptions/SubscriptionsOverview';
+import OwnerPlans from './admin/Subscriptions/OwnerPlans';
+import AgentPlans from './admin/Subscriptions/AgentPlans';
+import BuilderPlans from './admin/Subscriptions/BuilderPlans';
+import PropertyManagerPlans from './admin/Subscriptions/PropertyManagerPlans';
+
 // Buyers & Tenants
 import BuyerTenantsDashboard from './BuyerTenantsDashboard';
 
@@ -72,7 +79,6 @@ import PropertiesDashboard from './PropertiesDashboard';
 
 // Other modules
 // import LeadManagement from './admin/LeadManagement';
-// import Subscriptions from './admin/Subscriptions';
 // import Payments from './admin/Payments';
 // import ReportsAnalytics from './admin/ReportsAnalytics';
 // import ContentManagement from './admin/ContentManagement';
@@ -147,7 +153,18 @@ const AdminDashboard = () => {
     { key: '/admin/buyers-tenants', icon: <HiOutlineUserGroup />, label: 'Buyers & Tenants' },
     { key: '/admin/properties', icon: <FiHome />, label: 'Properties' },
     { key: '/admin/leads', icon: <FiMessageCircle />, label: 'Lead Management' },
-    { key: '/admin/subscriptions', icon: <FaDollarSign />, label: 'Subscriptions' },
+    {
+      key: 'subscriptions',
+      icon: <FaDollarSign />,
+      label: 'Subscriptions',
+      children: [
+        { key: '/admin/subscriptions/overview', icon: <FiGrid />, label: 'Subscriptions Dashboard' },
+        { key: '/admin/subscriptions/owners', icon: <FiUser />, label: 'Owner Plans' },
+        { key: '/admin/subscriptions/agents', icon: <FiUsers />, label: 'Agent Plans' },
+        { key: '/admin/subscriptions/builders', icon: <FaBuilding />, label: 'Builder Plans' },
+        { key: '/admin/subscriptions/property-managers', icon: <HiOutlineBuildingOffice />, label: 'Property Manager Plans' },
+      ],
+    },
     { key: '/admin/payments', icon: <FaWallet />, label: 'Payments' },
     { key: '/admin/reports', icon: <FaChartLine />, label: 'Reports & Analytics' },
     { key: '/admin/content', icon: <FaImage />, label: 'Content Management' },
@@ -499,13 +516,19 @@ const AdminDashboard = () => {
               <Route path="property-managers/property-control" element={<PropertyManagersPropertyControl />} />
               <Route path="property-managers/leads" element={<PropertyManagersPropertiesLeads />} />
 
+              {/* Subscriptions */}
+              <Route path="subscriptions/overview" element={<SubscriptionsOverview />} />
+              <Route path="subscriptions/owners" element={<OwnerPlans />} />
+              <Route path="subscriptions/agents" element={<AgentPlans />} />
+              <Route path="subscriptions/builders" element={<BuilderPlans />} />
+              <Route path="subscriptions/property-managers" element={<PropertyManagerPlans />} />
+
                {/* Buyers & Tenants — handled by the early return above, no Route needed here */}
 
               {/* Properties — handled by the early return above, no Route needed here */}
 
               {/* Other routes */}
               {/* <Route path="leads" element={<LeadManagement />} /> */}
-              {/* <Route path="subscriptions" element={<Subscriptions />} /> */}
               {/* <Route path="payments" element={<Payments />} /> */}
               {/* <Route path="reports" element={<ReportsAnalytics />} /> */}
               {/* <Route path="content" element={<ContentManagement />} /> */}
