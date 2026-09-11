@@ -38,7 +38,6 @@ import UserManagement from './admin/UserManagement';
 import OwnersOverview from './admin/Owners/OwnersOverview';
 import OwnersRegistration from './admin/Owners/OwnersRegistration';
 import OwnersPropertyControl from './admin/Owners/OwnersPropertyControl';
-import OwnersSubscription from './admin/Owners/OwnersSubscription';
 import OwnersPropertiesLeads from './admin/Owners/OwnersPropertiesLeads';
 
 // Agents
@@ -77,9 +76,21 @@ import BuyerTenantsDashboard from './BuyerTenantsDashboard';
 // Properties
 import PropertiesDashboard from './PropertiesDashboard';
 
+// Payments
+import PaymentsOverview from './admin/Payments/PaymentsDashboard';
+import PaymentTransactions from './admin/Payments/PaymentTransactions';
+import CustomerDetails from './admin/Payments/CustomerDetails';
+import PropertyPaymentDetails from './admin/Payments/PropertyPaymentDetails';
+import PersonalAmountDetails from './admin/Payments/PersonalAmountDetails';
+// import RefundManagement from './admin/Payments/RefundManagement';
+// import PaymentReconciliation from './admin/Payments/PaymentReconciliation';
+// import CommissionRevenue from './admin/Payments/CommissionRevenue';
+// import ManualPayment from './admin/Payments/ManualPayment';
+// import PaymentReports from './admin/Payments/PaymentReports';
+// import TransactionActions from './admin/Payments/TransactionActions';
+
 // Other modules
 // import LeadManagement from './admin/LeadManagement';
-// import Payments from './admin/Payments';
 // import ReportsAnalytics from './admin/ReportsAnalytics';
 // import ContentManagement from './admin/ContentManagement';
 // import Notifications from './admin/Notifications';
@@ -108,7 +119,6 @@ const AdminDashboard = () => {
         { key: '/admin/owners/overview', icon: <FiGrid />, label: 'Owners Dashboard' },
         { key: '/admin/owners/registration', icon: <FiCheckCircle />, label: 'Registration & KYC' },
         { key: '/admin/owners/property-control', icon: <FiSettings />, label: 'Property Control' },
-        { key: '/admin/owners/subscription', icon: <FaDollarSign />, label: 'Subscription' },
         { key: '/admin/owners/leads', icon: <FiMessageCircle />, label: 'Properties Leads' },
       ],
     },
@@ -165,7 +175,24 @@ const AdminDashboard = () => {
         { key: '/admin/subscriptions/property-managers', icon: <HiOutlineBuildingOffice />, label: 'Property Manager Plans' },
       ],
     },
-    { key: '/admin/payments', icon: <FaWallet />, label: 'Payments' },
+    {
+  key: 'payments',
+  icon: <FaWallet />,
+  label: 'Payments',
+  children: [
+    { key: '/admin/payments/overview', icon: <FiGrid />, label: 'Payments Dashboard' },
+    { key: '/admin/payments/transactions', icon: <FiRefreshCw />, label: 'Transactions' },
+    { key: '/admin/payments/customers', icon: <FiUser />, label: 'User / Customer Details' },
+    { key: '/admin/payments/property-details', icon: <FiHome />, label: 'Property Payment Details' },
+    { key: '/admin/payments/personal-amount', icon: <FaDollarSign />, label: 'Personal Amount Details' },
+    { key: '/admin/payments/refunds', icon: <FiDownloadCloud />, label: 'Refund Management' },
+    { key: '/admin/payments/reconciliation', icon: <FiCheckCircle />, label: 'Payment Reconciliation' },
+    { key: '/admin/payments/commission-revenue', icon: <FiTrendingUp />, label: 'Commission & Revenue' },
+    { key: '/admin/payments/manual-payment', icon: <FiEdit />, label: 'Manual Payment' },
+    { key: '/admin/payments/reports', icon: <FaChartLine />, label: 'Payment Reports' },
+    { key: '/admin/payments/transaction-actions', icon: <FiSettings />, label: 'Transaction Actions' },
+  ],
+},
     { key: '/admin/reports', icon: <FaChartLine />, label: 'Reports & Analytics' },
     { key: '/admin/content', icon: <FaImage />, label: 'Content Management' },
     { key: '/admin/notifications', icon: <FaBell />, label: 'Notifications' },
@@ -490,7 +517,6 @@ const AdminDashboard = () => {
               <Route path="owners/overview" element={<OwnersOverview />} />
               <Route path="owners/registration" element={<OwnersRegistration />} />
               <Route path="owners/property-control" element={<OwnersPropertyControl />} />
-              <Route path="owners/subscription" element={<OwnersSubscription />} />
               <Route path="owners/leads" element={<OwnersPropertiesLeads />} />
 
               {/* Agents */}
@@ -523,13 +549,25 @@ const AdminDashboard = () => {
               <Route path="subscriptions/builders" element={<BuilderPlans />} />
               <Route path="subscriptions/property-managers" element={<PropertyManagerPlans />} />
 
+              {/* Payments */}
+                <Route path="payments/overview" element={<PaymentsOverview />} />
+                <Route path="payments/transactions" element={<PaymentTransactions />} />
+                <Route path="payments/customers" element={<CustomerDetails />} />
+                <Route path="payments/property-details" element={<PropertyPaymentDetails />} />
+                <Route path="payments/personal-amount" element={<PersonalAmountDetails />} />
+                {/* <Route path="payments/refunds" element={<RefundManagement />} /> */}
+                {/* <Route path="payments/reconciliation" element={<PaymentReconciliation />} /> */}
+                {/* <Route path="payments/commission-revenue" element={<CommissionRevenue />} /> */}
+                {/* <Route path="payments/manual-payment" element={<ManualPayment />} /> */}
+                {/* <Route path="payments/reports" element={<PaymentReports />} /> */}
+                {/* <Route path="payments/transaction-actions" element={<TransactionActions />} /> */}
+
                {/* Buyers & Tenants — handled by the early return above, no Route needed here */}
 
               {/* Properties — handled by the early return above, no Route needed here */}
 
               {/* Other routes */}
               {/* <Route path="leads" element={<LeadManagement />} /> */}
-              {/* <Route path="payments" element={<Payments />} /> */}
               {/* <Route path="reports" element={<ReportsAnalytics />} /> */}
               {/* <Route path="content" element={<ContentManagement />} /> */}
               {/* <Route path="notifications" element={<Notifications />} /> */}
