@@ -82,8 +82,8 @@ import PaymentTransactions from './admin/Payments/PaymentTransactions';
 import CustomerDetails from './admin/Payments/CustomerDetails';
 import PropertyPaymentDetails from './admin/Payments/PropertyPaymentDetails';
 import PersonalAmountDetails from './admin/Payments/PersonalAmountDetails';
-// import RefundManagement from './admin/Payments/RefundManagement';
-// import PaymentReconciliation from './admin/Payments/PaymentReconciliation';
+import RefundManagement from './admin/Payments/RefundManagement';
+import PaymentReconciliation from './admin/Payments/PaymentReconciliation';
 // import CommissionRevenue from './admin/Payments/CommissionRevenue';
 // import ManualPayment from './admin/Payments/ManualPayment';
 // import PaymentReports from './admin/Payments/PaymentReports';
@@ -555,8 +555,8 @@ const AdminDashboard = () => {
                 <Route path="payments/customers" element={<CustomerDetails />} />
                 <Route path="payments/property-details" element={<PropertyPaymentDetails />} />
                 <Route path="payments/personal-amount" element={<PersonalAmountDetails />} />
-                {/* <Route path="payments/refunds" element={<RefundManagement />} /> */}
-                {/* <Route path="payments/reconciliation" element={<PaymentReconciliation />} /> */}
+                <Route path="payments/refunds" element={<RefundManagement />} />
+                <Route path="payments/reconciliation" element={<PaymentReconciliation />} />
                 {/* <Route path="payments/commission-revenue" element={<CommissionRevenue />} /> */}
                 {/* <Route path="payments/manual-payment" element={<ManualPayment />} /> */}
                 {/* <Route path="payments/reports" element={<PaymentReports />} /> */}
