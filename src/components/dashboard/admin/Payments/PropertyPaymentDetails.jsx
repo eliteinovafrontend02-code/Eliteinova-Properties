@@ -77,17 +77,38 @@ const ALL_STATUSES = Object.keys(STATUS_TYPES);
 const formatCurrency = (amount) => `₹${Number(amount || 0).toLocaleString('en-IN')}`;
 
 // ============================================================
-// GST BREAKDOWN HELPER (18% inclusive)
-// amount is treated as the final/total amount paid; base + GST
-// are derived from it so base + gst === total, e.g. ₹1,297 =>
-// ₹1,099 (base) + ₹198 (GST)
+// GST BREAKDOWN HELPERS (18%)
+// ------------------------------------------------------------
+// getAmountBreakdown: amount is treated as the final/total amount
+// paid; base + GST are derived from it so base + gst === total,
+// e.g. ₹1,297 => ₹1,099 (base) + ₹198 (GST). Used everywhere the
+// STORED total needs to be split for display (grid, list, view).
+//
 // ============================================================
 const GST_RATE = 0.18;
+
 const getAmountBreakdown = (amount) => {
   const total = Number(amount || 0);
   const base = Math.round(total / (1 + GST_RATE));
   const gst = total - base;
   return { total, base, gst };
+};
+
+// getDisplayBreakdown: the source of truth for showing base/GST/total
+// anywhere in the UI (grid cards, list rows, view modal, export).
+// If the payment carries its own explicit baseAmount/gstAmount (set
+// whenever it's edited via the Payment Details form), those exact
+// values are used so what the admin typed is exactly what's shown.
+// Otherwise (e.g. freshly generated mock data) it falls back to
+// deriving an 18%-inclusive split from the stored total.
+const getDisplayBreakdown = (payment) => {
+  if (!payment) return { total: 0, base: 0, gst: 0 };
+  if (payment.baseAmount != null && payment.gstAmount != null) {
+    const base = Number(payment.baseAmount || 0);
+    const gst = Number(payment.gstAmount || 0);
+    return { base, gst, total: base + gst };
+  }
+  return getAmountBreakdown(payment.amount);
 };
 
 // ============================================================
@@ -183,7 +204,7 @@ const ViewPropertyPaymentDetailModal = ({ payment, show, onClose, onEdit, onDele
   const RoleIcon = roleConfig.icon;
   const statusConfig = STATUS_TYPES[payment.status] || STATUS_TYPES['Pending'];
   const StatusIcon = statusConfig.icon;
-  const amountBreakdown = getAmountBreakdown(payment.amount);
+  const amountBreakdown = getDisplayBreakdown(payment);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
@@ -201,16 +222,16 @@ const ViewPropertyPaymentDetailModal = ({ payment, show, onClose, onEdit, onDele
               <PropTypeIcon />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white">{formatCurrency(payment.amount)}</h2>
-              <p className="text-white/70 text-xs">
-                ({formatCurrency(amountBreakdown.base)} + {formatCurrency(amountBreakdown.gst)} GST)
-              </p>
+              {/* Header now leads with the property name instead of the amount */}
+              <h2 className="text-2xl font-bold text-white">{payment.propertyName}</h2>
               <p className="text-white/80 text-sm flex items-center gap-2 flex-wrap mt-1">
                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig.bg} ${statusConfig.text} border ${statusConfig.border}`}>
                   {statusConfig.label}
                 </span>
                 <span className="w-1 h-1 bg-white/40 rounded-full"></span>
                 <span>ID: {payment.propertyId}</span>
+                <span className="w-1 h-1 bg-white/40 rounded-full"></span>
+                <span className="font-semibold">{formatCurrency(payment.amount)}</span>
               </p>
             </div>
           </div>
@@ -354,12 +375,16 @@ const EditPropertyPaymentModal = ({ payment, show, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     propertyId: '', propertyName: '', propertyType: '', propertyPurpose: '',
     propertyLocation: '', listingRole: '', listingName: '',
-    paymentRelatedTo: '', paymentDate: '', amount: '', status: ''
+    paymentRelatedTo: '', paymentDate: '', amount: '', gst: '', status: ''
   });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (payment) {
+      // Amount and GST are independently editable fields, so seed them
+      // from whatever the payment currently has (explicit base/GST if
+      // it was edited before, otherwise an 18%-derived split of the total).
+      const seed = getDisplayBreakdown(payment);
       setFormData({
         propertyId: payment.propertyId || '',
         propertyName: payment.propertyName || '',
@@ -370,7 +395,8 @@ const EditPropertyPaymentModal = ({ payment, show, onClose, onSave }) => {
         listingName: payment.listingName || '',
         paymentRelatedTo: payment.paymentRelatedTo || '',
         paymentDate: payment.paymentDate ? payment.paymentDate.split('T')[0] : '',
-        amount: payment.amount || '',
+        amount: seed.base || '',
+        gst: seed.gst || '',
         status: payment.status || 'Pending'
       });
     }
@@ -385,16 +411,24 @@ const EditPropertyPaymentModal = ({ payment, show, onClose, onSave }) => {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
-      onSave({ ...payment, ...formData, amount: Number(formData.amount) || 0 });
+      // Amount and GST are both typed independently by the admin;
+      // the total is simply their sum, and everything is stored so
+      // later views show exactly these two numbers, not a re-derived split.
+      const base = Number(formData.amount) || 0;
+      const gst = Number(formData.gst) || 0;
+      const total = base + gst;
+      onSave({ ...payment, ...formData, amount: total, baseAmount: base, gstAmount: gst });
       setLoading(false);
       onClose();
     }, 700);
   };
 
   const inputCls = "w-full px-3 py-2 bg-white rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none";
+  const readOnlyInputCls = "w-full px-3 py-2 bg-[#EDF3F1] rounded-xl border border-[#E8F0EE] text-sm font-bold text-[#1A2E2A] outline-none cursor-not-allowed";
   const labelCls = "block text-xs font-medium text-[#5A7D78] mb-1";
 
-  const liveBreakdown = getAmountBreakdown(formData.amount);
+  // Total Amount is always just Amount + Tax/GST, live-computed, read-only
+  const liveTotal = (Number(formData.amount) || 0) + (Number(formData.gst) || 0);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
@@ -473,20 +507,23 @@ const EditPropertyPaymentModal = ({ payment, show, onClose, onSave }) => {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className={labelCls}>Payment Related To *</label>
+                  <label className={labelCls}>Payment Purpose *</label>
                   <select name="paymentRelatedTo" value={formData.paymentRelatedTo} onChange={handleChange} required className={inputCls}>
                     <option value="">Select Payment Type</option>
                     {ALL_PAYMENT_RELATED_TO.map(item => <option key={item} value={item}>{item}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className={labelCls}>Payment Amount (₹) *</label>
+                  <label className={labelCls}>Amount (₹) *</label>
                   <input type="number" name="amount" value={formData.amount} onChange={handleChange} required min="0" className={inputCls} placeholder="Enter amount" />
-                  {Number(formData.amount) > 0 && (
-                    <p className="text-[11px] text-[#5A7D78] mt-1">
-                      ({formatCurrency(liveBreakdown.base)} + {formatCurrency(liveBreakdown.gst)} GST)
-                    </p>
-                  )}
+                </div>
+                <div>
+                  <label className={labelCls}>Tax / GST (₹) *</label>
+                  <input type="number" name="gst" value={formData.gst} onChange={handleChange} required min="0" className={inputCls} placeholder="Enter tax / GST" />
+                </div>
+                <div>
+                  <label className={labelCls}>Total Amount (₹) *</label>
+                  <input type="text" value={formatCurrency(liveTotal).replace('₹', '')} readOnly disabled className={readOnlyInputCls} />
                 </div>
                 <div>
                   <label className={labelCls}>Payment Date *</label>
@@ -727,6 +764,8 @@ const PropertyPaymentDetails = () => {
         payDate.setDate(payDate.getDate() - daysAgo);
       }
 
+      const { base: genBase, gst: genGst } = getAmountBreakdown(amount);
+
       list.push({
         id: `ppay_${i}`,
         propertyId,
@@ -739,6 +778,8 @@ const PropertyPaymentDetails = () => {
         paymentRelatedTo,
         paymentDate: payDate.toISOString(),
         amount,
+        baseAmount: genBase,
+        gstAmount: genGst,
         status
       });
     }
@@ -951,7 +992,7 @@ const PropertyPaymentDetails = () => {
     }
     try {
       const data = filteredPayments.map(p => {
-        const breakdown = getAmountBreakdown(p.amount);
+        const breakdown = getDisplayBreakdown(p);
         return {
           'Property ID': p.propertyId || '',
           'Property Name': p.propertyName || '',
@@ -1313,7 +1354,7 @@ const PropertyPaymentDetails = () => {
               const RoleIcon = roleConfig.icon;
               const statusConfig = STATUS_TYPES[payment.status] || STATUS_TYPES['Pending'];
               const StatusIcon = statusConfig.icon;
-              const amountBreakdown = getAmountBreakdown(payment.amount);
+              const amountBreakdown = getDisplayBreakdown(payment);
 
               return (
                 <div
@@ -1465,7 +1506,7 @@ const PropertyPaymentDetails = () => {
               const propTypeConfig = PROPERTY_TYPE_CONFIG[payment.propertyType] || PROPERTY_TYPE_CONFIG['Individual'];
               const PropTypeIcon = propTypeConfig.icon;
               const statusConfig = STATUS_TYPES[payment.status] || STATUS_TYPES['Pending'];
-              const amountBreakdown = getAmountBreakdown(payment.amount);
+              const amountBreakdown = getDisplayBreakdown(payment);
 
               return (
                 <div

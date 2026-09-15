@@ -155,15 +155,17 @@ const ViewPersonalAmountDetailModal = ({ record, show, onClose, onEdit, onDelete
               <UserTypeIcon />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white">{formatCurrency(record.netAmount)}</h2>
-              <p className="text-white/80 text-sm flex items-center gap-2 flex-wrap">
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${userTypeConfig.bg} ${userTypeConfig.text} border ${userTypeConfig.border}`}>
-                  {record.userType}
-                </span>
-                <span className="w-1 h-1 bg-white/40 rounded-full"></span>
-                <span>Record ID: {record.id}</span>
-              </p>
-            </div>
+            <h2 className="text-2xl font-bold text-white">{record.userName}</h2>
+            <p className="text-white/80 text-sm flex items-center gap-2 flex-wrap">
+              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${userTypeConfig.bg} ${userTypeConfig.text} border ${userTypeConfig.border}`}>
+                {record.userType}
+              </span>
+              <span className="w-1 h-1 bg-white/40 rounded-full"></span>
+              <span>Record ID: {record.id}</span>
+              <span className="w-1 h-1 bg-white/40 rounded-full"></span>
+              <span className="font-semibold">{formatCurrency(record.netAmount)}</span>
+            </p>
+          </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <span className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 bg-white/20 text-white border border-white/30">

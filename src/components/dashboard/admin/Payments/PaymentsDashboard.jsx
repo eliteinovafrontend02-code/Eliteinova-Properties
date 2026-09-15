@@ -223,13 +223,15 @@ const ViewPaymentDetailModal = ({ payment, show, onClose, onEdit, onDelete }) =>
               <StatusIcon />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white">{formatCurrency(payment.amount)}</h2>
+              <h2 className="text-2xl font-bold text-white">{payment.payerName}</h2>
               <p className="text-white/80 text-sm flex items-center gap-2 flex-wrap">
                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig.bg} ${statusConfig.text} border ${statusConfig.border}`}>
                   {statusConfig.label}
                 </span>
                 <span className="w-1 h-1 bg-white/40 rounded-full"></span>
                 <span>ID: {payment.paymentId}</span>
+                <span className="w-1 h-1 bg-white/40 rounded-full"></span>
+                <span className="font-semibold">{formatCurrency(payment.amount)}</span>
               </p>
             </div>
           </div>

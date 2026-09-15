@@ -303,16 +303,18 @@ const ViewTransactionDetailModal = ({ transaction, show, onClose, onEdit, onDele
             <div className={`w-14 h-14 rounded-2xl ${statusConfig.bg} border-2 border-white/30 flex items-center justify-center text-2xl ${statusConfig.text} shadow-lg`}>
               <StatusIcon />
             </div>
-            <div>
-              <h2 className="text-2xl font-bold text-white">{formatCurrency(transaction.totalAmount)}</h2>
-              <p className="text-white/80 text-sm flex items-center gap-2 flex-wrap">
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig.bg} ${statusConfig.text} border ${statusConfig.border}`}>
-                  {statusConfig.label}
-                </span>
-                <span className="w-1 h-1 bg-white/40 rounded-full"></span>
-                <span>Transaction ID: {transaction.transactionId}</span>
-              </p>
-            </div>
+           <div>
+            <h2 className="text-2xl font-bold text-white">{transaction.userName}</h2>
+            <p className="text-white/80 text-sm flex items-center gap-2 flex-wrap">
+              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig.bg} ${statusConfig.text} border ${statusConfig.border}`}>
+                {statusConfig.label}
+              </span>
+              <span className="w-1 h-1 bg-white/40 rounded-full"></span>
+              <span>Transaction ID: {transaction.transactionId}</span>
+              <span className="w-1 h-1 bg-white/40 rounded-full"></span>
+              <span className="font-semibold">{formatCurrency(transaction.totalAmount)}</span>
+            </p>
+          </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <span className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 bg-white/20 text-white border border-white/30">
