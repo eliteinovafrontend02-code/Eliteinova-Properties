@@ -286,56 +286,56 @@ const SiteVisitsOverview = () => {
   });
 
   // ---- Recent Activities ----
-  const activities = useMemo(() => [
-    {
-      icon: <FiUserCheck className="text-white text-sm" />,
-      title: 'Visit Confirmed',
-      time: '8 min ago',
-      description: 'Ananya Iyer confirmed site visit for 3BHK Apartment in Adyar',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-[#00695C] to-[#26A69A]'
-    },
-    {
-      icon: <FiClock className="text-white text-sm" />,
-      title: 'Visit Rescheduled',
-      time: '22 min ago',
-      description: 'Karthik Raja rescheduled villa visit to tomorrow at 11:00 AM',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-amber-500 to-amber-400'
-    },
-    {
-      icon: <FiCheckCircle className="text-white text-sm" />,
-      title: 'Visit Completed',
-      time: '45 min ago',
-      description: 'Divya Menon completed site visit for Plot in Coimbatore',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-emerald-500 to-emerald-400'
-    },
-    {
-      icon: <FiXCircle className="text-white text-sm" />,
-      title: 'Visit Cancelled',
-      time: '1 hour ago',
-      description: 'Rahul Verma cancelled visit for Luxury Apartment in ECR',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-red-500 to-red-400'
-    },
-    {
-      icon: <FiUserX className="text-white text-sm" />,
-      title: 'No Show',
-      time: '2 hours ago',
-      description: 'Priya Patel marked as no-show for 2BHK visit in Velachery',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-purple-500 to-purple-400'
-    },
-    {
-      icon: <FiUserPlus className="text-white text-sm" />,
-      title: 'New Visit Request',
-      time: '3 hours ago',
-      description: 'Suresh Kumar requested visit for 4BHK Villa in ECR',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-blue-500 to-blue-400'
-    }
-  ], []);
+  // const activities = useMemo(() => [
+  //   {
+  //     icon: <FiUserCheck className="text-white text-sm" />,
+  //     title: 'Visit Confirmed',
+  //     time: '8 min ago',
+  //     description: 'Ananya Iyer confirmed site visit for 3BHK Apartment in Adyar',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-[#00695C] to-[#26A69A]'
+  //   },
+  //   {
+  //     icon: <FiClock className="text-white text-sm" />,
+  //     title: 'Visit Rescheduled',
+  //     time: '22 min ago',
+  //     description: 'Karthik Raja rescheduled villa visit to tomorrow at 11:00 AM',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-amber-500 to-amber-400'
+  //   },
+  //   {
+  //     icon: <FiCheckCircle className="text-white text-sm" />,
+  //     title: 'Visit Completed',
+  //     time: '45 min ago',
+  //     description: 'Divya Menon completed site visit for Plot in Coimbatore',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-emerald-500 to-emerald-400'
+  //   },
+  //   {
+  //     icon: <FiXCircle className="text-white text-sm" />,
+  //     title: 'Visit Cancelled',
+  //     time: '1 hour ago',
+  //     description: 'Rahul Verma cancelled visit for Luxury Apartment in ECR',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-red-500 to-red-400'
+  //   },
+  //   {
+  //     icon: <FiUserX className="text-white text-sm" />,
+  //     title: 'No Show',
+  //     time: '2 hours ago',
+  //     description: 'Priya Patel marked as no-show for 2BHK visit in Velachery',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-purple-500 to-purple-400'
+  //   },
+  //   {
+  //     icon: <FiUserPlus className="text-white text-sm" />,
+  //     title: 'New Visit Request',
+  //     time: '3 hours ago',
+  //     description: 'Suresh Kumar requested visit for 4BHK Villa in ECR',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-blue-500 to-blue-400'
+  //   }
+  // ], []);
 
   // ---- Quick Stats ----
   const quickStats = useMemo(() => [
@@ -626,7 +626,7 @@ const SiteVisitsOverview = () => {
       </div>
 
       {/* ===== RECENT ACTIVITIES ===== */}
-      <div>
+      {/* <div>
         <SectionHeader
           icon={<FiActivity className="text-white text-sm" />}
           title="Recent Activities"
@@ -651,7 +651,7 @@ const SiteVisitsOverview = () => {
             />
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* ===== FOOTER ===== */}
       <div className="text-center pt-4">

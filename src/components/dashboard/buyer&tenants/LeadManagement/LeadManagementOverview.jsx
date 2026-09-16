@@ -272,56 +272,56 @@ const LeadManagementOverview = () => {
   });
 
   // ---- Recent Activities ----
-  const activities = useMemo(() => [
-    {
-      icon: <FiUserPlus className="text-white text-sm" />,
-      title: 'New Lead Captured',
-      time: '5 min ago',
-      description: 'Meera Nair enquired about a 3BHK Apartment via Website',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-blue-500 to-blue-400'
-    },
-    {
-      icon: <FiPhone className="text-white text-sm" />,
-      title: 'Lead Contacted',
-      time: '19 min ago',
-      description: 'Arjun Nair called about Villa in ECR, follow-up scheduled',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-[#00695C] to-[#26A69A]'
-    },
-    {
-      icon: <FaWhatsapp className="text-white text-sm" />,
-      title: 'WhatsApp Follow-up',
-      time: '34 min ago',
-      description: 'Sent property brochure to Deepika Shah on WhatsApp',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-emerald-500 to-emerald-400'
-    },
-    {
-      icon: <FaHandshake className="text-white text-sm" />,
-      title: 'Moved to Negotiation',
-      time: '1 hour ago',
-      description: 'Vikram Singh entered negotiation stage for Plot in Coimbatore',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-amber-500 to-amber-400'
-    },
-    {
-      icon: <FaTrophy className="text-white text-sm" />,
-      title: 'Lead Won',
-      time: '2 hours ago',
-      description: 'Sneha Reddy closed successfully for 2BHK in Velachery',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-purple-500 to-purple-400'
-    },
-    {
-      icon: <FaTimesCircle className="text-white text-sm" />,
-      title: 'Lead Lost',
-      time: '3 hours ago',
-      description: 'Rohit Malhotra marked as lost — budget mismatch on 4BHK Villa',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-red-500 to-red-400'
-    }
-  ], []);
+  // const activities = useMemo(() => [
+  //   {
+  //     icon: <FiUserPlus className="text-white text-sm" />,
+  //     title: 'New Lead Captured',
+  //     time: '5 min ago',
+  //     description: 'Meera Nair enquired about a 3BHK Apartment via Website',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-blue-500 to-blue-400'
+  //   },
+  //   {
+  //     icon: <FiPhone className="text-white text-sm" />,
+  //     title: 'Lead Contacted',
+  //     time: '19 min ago',
+  //     description: 'Arjun Nair called about Villa in ECR, follow-up scheduled',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-[#00695C] to-[#26A69A]'
+  //   },
+  //   {
+  //     icon: <FaWhatsapp className="text-white text-sm" />,
+  //     title: 'WhatsApp Follow-up',
+  //     time: '34 min ago',
+  //     description: 'Sent property brochure to Deepika Shah on WhatsApp',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-emerald-500 to-emerald-400'
+  //   },
+  //   {
+  //     icon: <FaHandshake className="text-white text-sm" />,
+  //     title: 'Moved to Negotiation',
+  //     time: '1 hour ago',
+  //     description: 'Vikram Singh entered negotiation stage for Plot in Coimbatore',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-amber-500 to-amber-400'
+  //   },
+  //   {
+  //     icon: <FaTrophy className="text-white text-sm" />,
+  //     title: 'Lead Won',
+  //     time: '2 hours ago',
+  //     description: 'Sneha Reddy closed successfully for 2BHK in Velachery',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-purple-500 to-purple-400'
+  //   },
+  //   {
+  //     icon: <FaTimesCircle className="text-white text-sm" />,
+  //     title: 'Lead Lost',
+  //     time: '3 hours ago',
+  //     description: 'Rohit Malhotra marked as lost — budget mismatch on 4BHK Villa',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-red-500 to-red-400'
+  //   }
+  // ], []);
 
   // ---- Quick Stats ----
   const quickStats = useMemo(() => [
@@ -620,7 +620,7 @@ const LeadManagementOverview = () => {
       </div>
 
       {/* ===== RECENT ACTIVITIES ===== */}
-      <div>
+      {/* <div>
         <SectionHeader
           icon={<FiActivity className="text-white text-sm" />}
           title="Recent Activities"
@@ -645,7 +645,7 @@ const LeadManagementOverview = () => {
             />
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* ===== FOOTER ===== */}
       <div className="text-center pt-4">

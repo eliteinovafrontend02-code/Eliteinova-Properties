@@ -74,31 +74,74 @@ const ALL_APPROVERS = [
 ];
 
 // ============================================================
-// GLOBAL REFUND POLICY (fully editable via "Refund Policy" modal)
-// GST is always retained; each tier defines the % of the BASE
-// amount refunded for a given elapsed-hours range.
+// GLOBAL REFUND POLICY (day-based, 90 days)
 // ============================================================
 const DEFAULT_REFUND_POLICY = {
   gstRatePercent: 18,
-  windowHours: 24,
+  windowDays: 90,
   tiers: [
-    { id: 'tier-1', hourFrom: 0,  hourTo: 1,    baseRefundPercent: 100, label: 'GST-Only Deduction',   note: 'Base refunded, GST retained',    color: 'emerald' },
-    { id: 'tier-2', hourFrom: 1,  hourTo: 6,    baseRefundPercent: 90,  label: 'Early Refund Window',   note: '10% cut on base + GST retained', color: 'teal' },
-    { id: 'tier-3', hourFrom: 6,  hourTo: 12,   baseRefundPercent: 75,  label: 'Standard Refund Window', note: '25% cut on base + GST retained', color: 'amber' },
-    { id: 'tier-4', hourFrom: 12, hourTo: 18,   baseRefundPercent: 50,  label: 'Late Refund Window',    note: '50% cut on base + GST retained', color: 'orange' },
-    { id: 'tier-5', hourFrom: 18, hourTo: 24,   baseRefundPercent: 25,  label: 'Final Refund Window',   note: '75% cut on base + GST retained', color: 'rose' },
-    { id: 'tier-6', hourFrom: 24, hourTo: null, baseRefundPercent: 0,   label: 'Refund Window Closed',  note: 'No refund allowed',              color: 'red' }
+    { id: 'tier-1', dayFrom: 0,  dayTo: 7,    baseRefundPercent: 100, label: 'GST-Only Deduction',      note: 'Base refunded, GST retained (0–7 days)',        color: 'emerald' },
+    { id: 'tier-2', dayFrom: 7,  dayTo: 15,   baseRefundPercent: 90,  label: 'Early Refund Window',     note: '10% cut on base + GST retained (7–15 days)',     color: 'teal' },
+    { id: 'tier-3', dayFrom: 15, dayTo: 30,   baseRefundPercent: 75,  label: 'Standard Refund Window',  note: '25% cut on base + GST retained (15–30 days)',    color: 'amber' },
+    { id: 'tier-4', dayFrom: 30, dayTo: 45,   baseRefundPercent: 50,  label: 'Late Refund Window',      note: '50% cut on base + GST retained (30–45 days)',    color: 'orange' },
+    { id: 'tier-5', dayFrom: 45, dayTo: 60,   baseRefundPercent: 35,  label: 'Extended Refund Window',  note: '65% cut on base + GST retained (45–60 days)',    color: 'rose' },
+    { id: 'tier-6', dayFrom: 60, dayTo: 90,   baseRefundPercent: 15,  label: 'Final Refund Window',     note: '85% cut on base + GST retained (60–90 days)',    color: 'red' },
+    { id: 'tier-7', dayFrom: 90, dayTo: null, baseRefundPercent: 0,   label: 'Refund Window Closed',    note: 'No refund allowed after 90 days',                color: 'red' }
   ]
 };
 
-// Resolve which tier applies for a given number of hours elapsed.
-// Tiers are ordered ascending; pick the first tier whose "hourTo" the
-// elapsed hours still fall within (the last tier's null hourTo = open-ended).
-const resolvePolicyTier = (policy, hrs) => {
+// ============================================================
+// SAFE DAY HELPERS — never return undefined
+// ============================================================
+const isTierOpenEnded = (t) => {
+  const v = t?.dayTo;
+  return v === null || v === undefined || v === '' || Number.isNaN(Number(v));
+};
+
+const safeDayFrom = (t) => {
+  const v = Number(t?.dayFrom);
+  return Number.isFinite(v) ? v : 0;
+};
+
+const safeDayTo = (t) => {
+  const v = Number(t?.dayTo);
+  return Number.isFinite(v) ? v : safeDayFrom(t);
+};
+
+// Short: "0–7d", "7–15d", … "90d+"
+const fmtDayRangeShort = (t) => {
+  const from = safeDayFrom(t);
+  if (isTierOpenEnded(t)) return `${from}d+`;
+  return `${from}–${safeDayTo(t)}d`;
+};
+
+// Long: "Day 0–7", "Day 7–15", … "Day 90+"
+const fmtDayRangeLong = (t) => {
+  const from = safeDayFrom(t);
+  if (isTierOpenEnded(t)) return `Day ${from}+`;
+  return `Day ${from}–${safeDayTo(t)}`;
+};
+
+// Word: "0–7 days", "7–15 days", … "From day 90 onwards"
+const fmtDayRangeWord = (t) => {
+  const from = safeDayFrom(t);
+  if (isTierOpenEnded(t)) return `From day ${from} onwards`;
+  return `${from}–${safeDayTo(t)} days`;
+};
+
+// Note fallback
+const fmtNoteFallback = (t) => {
+  const pct = Number(t?.baseRefundPercent) || 0;
+  const cut = 100 - pct;
+  return `${pct}% of base refunded · ${cut}% day-cut + GST retained (${fmtDayRangeWord(t)})`;
+};
+
+// Resolve which tier applies for a given number of DAYS elapsed.
+const resolvePolicyTier = (policy, days) => {
   const tiers = (policy && policy.tiers && policy.tiers.length) ? policy.tiers : DEFAULT_REFUND_POLICY.tiers;
   for (const t of tiers) {
-    const to = (t.hourTo === null || t.hourTo === '' || t.hourTo === undefined) ? Infinity : Number(t.hourTo);
-    if (hrs <= to) return t;
+    const to = isTierOpenEnded(t) ? Infinity : Number(t.dayTo);
+    if (days <= to) return t;
   }
   return tiers[tiers.length - 1];
 };
@@ -107,6 +150,14 @@ const resolvePolicyTier = (policy, hrs) => {
 // CURRENCY FORMAT HELPER
 // ============================================================
 const formatCurrency = (amount) => `₹${Number(amount || 0).toLocaleString('en-IN')}`;
+
+// ============================================================
+// DAYS/HOURS ELAPSED FORMATTER (e.g. "45d 6h" or "0d 3h")
+// ============================================================
+const formatElapsed = (totalDays, extraHours = 0) => {
+  if (totalDays >= 1) return `${totalDays}d ${extraHours}h`;
+  return `${extraHours}h`;
+};
 
 // ============================================================
 // TOAST COMPONENT
@@ -190,55 +241,41 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
 };
 
 // ============================================================
-// VIEW REFUND DETAIL MODAL
-// GST always retained + time-based deduction on top
+// VIEW REFUND DETAIL MODAL (day-based)
 // ============================================================
 const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy, onOpenPolicy }) => {
   if (!refund || !show) return null;
 
   const activePolicy = policy || DEFAULT_REFUND_POLICY;
   const policyTiers = (activePolicy.tiers && activePolicy.tiers.length) ? activePolicy.tiers : DEFAULT_REFUND_POLICY.tiers;
-  const policyWindowHours = Number(activePolicy.windowHours || DEFAULT_REFUND_POLICY.windowHours);
+  const policyWindowDays = Number(activePolicy.windowDays || DEFAULT_REFUND_POLICY.windowDays);
 
   const statusConfig = REFUND_STATUS_CONFIG[refund.refundStatus] || REFUND_STATUS_CONFIG['Refund Requested'];
   const StatusIcon = statusConfig.icon;
   const methodConfig = REFUND_METHOD_CONFIG[refund.refundMethod] || REFUND_METHOD_CONFIG['UPI'];
   const MethodIcon = methodConfig.icon;
 
-  // ============ DATES ============
   const refundDateObj = new Date(refund.refundDate);
   const originalDateObj = refund.originalDate
     ? new Date(refund.originalDate)
-    : new Date(refundDateObj.getTime() - (refund.hoursSinceOriginal ? refund.hoursSinceOriginal * 3600000 : 3 * 3600000));
+    : new Date(refundDateObj.getTime() - (refund.daysSinceOriginal ? refund.daysSinceOriginal * 86400000 : 3 * 86400000));
 
-  // ============ HOURS ELAPSED ============
   const msElapsed = Math.max(0, refundDateObj - originalDateObj);
-  const hoursElapsed = Math.floor(msElapsed / 3600000);
-  const minutesElapsed = Math.floor((msElapsed % 3600000) / 60000);
-  const hoursLeftInWindow = Math.max(0, policyWindowHours - hoursElapsed);
-  const isWithinWindow = hoursElapsed <= policyWindowHours;
+  const daysElapsed = Math.floor(msElapsed / 86400000);
+  const extraHoursElapsed = Math.floor((msElapsed % 86400000) / 3600000);
+  const daysLeftInWindow = Math.max(0, policyWindowDays - daysElapsed);
 
-  const elapsedLabel = hoursElapsed >= 1
-    ? `${hoursElapsed}h ${minutesElapsed}m`
-    : `${minutesElapsed}m`;
+  const elapsedLabel = formatElapsed(daysElapsed, extraHoursElapsed);
 
-  // ============ GST (configurable, inclusive) ============
   const GST_RATE = Number(activePolicy.gstRatePercent || 0) / 100;
   const originalAmount = Number(refund.originalAmount || 0);
   const gstBase = Math.round(originalAmount / (1 + GST_RATE));
   const gstComponent = originalAmount - gstBase;
 
-  // ============ CONFIGURABLE POLICY TIERS ============
-  // KEY RULE: GST is ALWAYS retained. Then a time-based cut is applied on the base.
-  // baseRefundPercent = % of the BASE amount the customer gets back (fully editable)
-  const matchedTier = resolvePolicyTier(activePolicy, hoursElapsed);
+  const matchedTier = resolvePolicyTier(activePolicy, daysElapsed);
   const tier = {
-    tier: matchedTier.hourTo === null || matchedTier.hourTo === '' || matchedTier.hourTo === undefined
-      ? `Hour ${matchedTier.hourFrom}+`
-      : `Hour ${matchedTier.hourFrom}–${matchedTier.hourTo}`,
-    window: matchedTier.hourTo === null || matchedTier.hourTo === '' || matchedTier.hourTo === undefined
-      ? `After ${matchedTier.hourFrom} hours`
-      : `${matchedTier.hourFrom}–${matchedTier.hourTo} hours`,
+    tier: fmtDayRangeLong(matchedTier),
+    window: fmtDayRangeWord(matchedTier),
     baseRefundPercent: Number(matchedTier.baseRefundPercent),
     timeCutPercent: 100 - Number(matchedTier.baseRefundPercent),
     label: matchedTier.label,
@@ -246,26 +283,19 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
     note: matchedTier.note
   };
 
-  // ============ CALCULATED REFUND (never 100%) ============
-  // Formula: refundAmount = (base × baseRefundPercent%) 
-  //          => GST is always fully retained
   const calculatedRefund = Math.round((gstBase * tier.baseRefundPercent) / 100);
-
-  // Use the actual stored refundAmount for display, but fall back to calculated
   const refundAmount = Number(refund.refundAmount || calculatedRefund);
   const deductionAmount = Math.max(0, originalAmount - refundAmount);
   const deductionPercent = originalAmount > 0 ? ((deductionAmount / originalAmount) * 100).toFixed(1) : '0.0';
   const refundPercent = originalAmount > 0 ? ((refundAmount / originalAmount) * 100).toFixed(1) : '0.0';
 
-  // Break the deduction into its two parts
   const timeCutAmount = Math.round((gstBase * tier.timeCutPercent) / 100);
   const totalDeduction = gstComponent + timeCutAmount;
 
   const isRejected = refund.refundStatus === 'Rejected';
-  const isExpired = hoursElapsed > policyWindowHours;
+  const isExpired = daysElapsed > policyWindowDays;
   const isGstOnlyTier = policyTiers.length > 0 && matchedTier.id === policyTiers[0].id;
 
-  // ============ STATUS TIMELINE ============
   const timelineSteps = [
     { key: 'Refund Requested', label: 'Requested',  icon: FiSend },
     { key: 'Under Review',     label: 'Review',     icon: FiActivity },
@@ -275,9 +305,8 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
   ];
   const currentStatusIndex = ALL_REFUND_STATUSES.indexOf(refund.refundStatus);
   const isRejectedStatus = refund.refundStatus === 'Rejected';
-  const isOverdue = hoursElapsed > policyWindowHours && !['Completed', 'Rejected'].includes(refund.refundStatus);
+  const isOverdue = daysElapsed > policyWindowDays && !['Completed', 'Rejected'].includes(refund.refundStatus);
 
-  // ============ BANNER COLOR ============
   const bannerColor = isRejected || isExpired
     ? { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-800', subtext: 'text-red-700', iconBg: 'bg-red-100 text-red-600', icon: FiXCircle }
     : isGstOnlyTier
@@ -285,13 +314,11 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
       : { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-800', subtext: 'text-amber-700', iconBg: 'bg-amber-100 text-amber-600', icon: FiInfo };
 
   const BannerIcon = bannerColor.icon;
-
-  const hourProgressPct = Math.min(100, (hoursElapsed / policyWindowHours) * 100);
+  const dayProgressPct = Math.min(100, (daysElapsed / policyWindowDays) * 100);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
-        {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] p-6 rounded-t-3xl z-10 shrink-0">
           <button
             onClick={onClose}
@@ -329,10 +356,8 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
           </div>
         </div>
 
-        {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-white">
 
-          {/* ---- Explanation Banner ---- */}
           <div className={`rounded-2xl p-5 mb-5 border-2 ${bannerColor.bg} ${bannerColor.border}`}>
             <div className="flex items-start gap-3">
               <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${bannerColor.iconBg}`}>
@@ -349,32 +374,31 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
                         : `Partial Refund — ${refundPercent}% returned (${tier.label})`}
                 </h3>
                 <p className={`text-xs leading-relaxed ${bannerColor.subtext}`}>
-                  {`Customer paid at ${originalDateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} on ${originalDateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}. `}
-                  {`Refund requested at ${refundDateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} — `}
+                  {`Customer paid on ${originalDateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}. `}
+                  {`Refund requested on ${refundDateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} — `}
                   {`${elapsedLabel} elapsed. `}
                   {isRejected
                     ? `Request was rejected, so no amount was returned.`
                     : isExpired
-                      ? `The 24-hour refund window has passed. No refund is provided.`
+                      ? `The ${policyWindowDays}-day refund window has passed. No refund is provided.`
                       : isGstOnlyTier
-                        ? `Since the refund was within the first hour, only the GST component (${formatCurrency(gstComponent)}) is retained. The base amount (${formatCurrency(gstBase)}) is fully refunded — total ${formatCurrency(refundAmount)}. Note: 100% of the paid amount is never returned as GST is always retained.`
-                        : `Applicable window "${tier.window}" refunds ${tier.baseRefundPercent}% of the base amount. GST (${formatCurrency(gstComponent)}) is retained + ${tier.timeCutPercent}% time cut (${formatCurrency(timeCutAmount)}). Total refund ${formatCurrency(refundAmount)}.`}
+                        ? `Since the refund was within the first 7 days, only the GST component (${formatCurrency(gstComponent)}) is retained. The base amount (${formatCurrency(gstBase)}) is fully refunded — total ${formatCurrency(refundAmount)}. Note: 100% of the paid amount is never returned as GST is always retained.`
+                        : `Applicable window "${tier.window}" refunds ${tier.baseRefundPercent}% of the base amount. GST (${formatCurrency(gstComponent)}) is retained + ${tier.timeCutPercent}% day-based cut (${formatCurrency(timeCutAmount)}). Total refund ${formatCurrency(refundAmount)}.`}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* ---- 24-HOUR PROGRESS BAR ---- */}
           <div className="bg-[#F5F9F8] rounded-2xl p-5 mb-5 border border-[#E8F0EE]">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <FiClock className="text-[#00695C]" />
-                <h3 className="text-sm font-bold text-[#1A2E2A] uppercase tracking-wider">{policyWindowHours}-Hour Refund Window</h3>
+                <h3 className="text-sm font-bold text-[#1A2E2A] uppercase tracking-wider">{policyWindowDays}-Day Refund Window</h3>
               </div>
               <span className={`text-xs font-bold px-3 py-1 rounded-full ${
                 isExpired ? 'bg-red-100 text-red-700' : 'bg-[#E8F4F2] text-[#00695C]'
               }`}>
-                {isExpired ? 'Window Closed' : `${hoursLeftInWindow}h left`}
+                {isExpired ? 'Window Closed' : `${daysLeftInWindow}d left`}
               </span>
             </div>
 
@@ -384,29 +408,31 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
                   className={`h-full rounded-full transition-all duration-700 ${
                     isExpired
                       ? 'bg-gradient-to-r from-red-500 to-red-400'
-                      : hourProgressPct <= 4
+                      : dayProgressPct <= 8
                         ? 'bg-gradient-to-r from-emerald-500 to-emerald-400'
-                        : hourProgressPct <= 25
+                        : dayProgressPct <= 17
                           ? 'bg-gradient-to-r from-teal-500 to-teal-400'
-                          : hourProgressPct <= 50
+                          : dayProgressPct <= 33
                             ? 'bg-gradient-to-r from-amber-500 to-amber-400'
-                            : hourProgressPct <= 75
+                            : dayProgressPct <= 50
                               ? 'bg-gradient-to-r from-orange-500 to-orange-400'
-                              : 'bg-gradient-to-r from-rose-500 to-red-400'
+                              : dayProgressPct <= 67
+                                ? 'bg-gradient-to-r from-rose-500 to-rose-400'
+                                : 'bg-gradient-to-r from-rose-500 to-red-400'
                   }`}
-                  style={{ width: `${hourProgressPct}%` }}
+                  style={{ width: `${dayProgressPct}%` }}
                 />
               </div>
 
-              {Array.from(new Set([0, ...policyTiers.map(t => Number(t.hourFrom)), policyWindowHours])).sort((a, b) => a - b).map((h) => (
+              {Array.from(new Set([0, ...policyTiers.map(t => safeDayFrom(t)), policyWindowDays])).sort((a, b) => a - b).map((d) => (
                 <div
-                  key={h}
+                  key={d}
                   className="absolute top-0 flex flex-col items-center"
-                  style={{ left: `${Math.min(100, (h / policyWindowHours) * 100)}%`, transform: 'translateX(-50%)' }}
+                  style={{ left: `${Math.min(100, (d / policyWindowDays) * 100)}%`, transform: 'translateX(-50%)' }}
                 >
-                  <div className={`w-1 h-3 rounded-full ${hoursElapsed >= h ? 'bg-[#00695C]' : 'bg-[#B5C9C5]'}`} />
-                  <span className={`text-[9px] font-semibold mt-0.5 ${hoursElapsed >= h ? 'text-[#00695C]' : 'text-[#5A7D78]'}`}>
-                    {h}h
+                  <div className={`w-1 h-3 rounded-full ${daysElapsed >= d ? 'bg-[#00695C]' : 'bg-[#B5C9C5]'}`} />
+                  <span className={`text-[9px] font-semibold mt-0.5 ${daysElapsed >= d ? 'text-[#00695C]' : 'text-[#5A7D78]'}`}>
+                    {d}d
                   </span>
                 </div>
               ))}
@@ -420,18 +446,17 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
               <div className="text-right">
                 <p className="text-[#5A7D78] uppercase tracking-wider font-semibold">Remaining</p>
                 <p className={`text-sm font-bold ${isExpired ? 'text-red-600' : 'text-[#00695C]'}`}>
-                  {isExpired ? '0h 0m' : `${hoursLeftInWindow}h ${minutesElapsed > 0 ? 60 - minutesElapsed : 0}m`}
+                  {isExpired ? '0d 0h' : `${daysLeftInWindow}d ${extraHoursElapsed > 0 ? 24 - extraHoursElapsed : 0}h`}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* ---- Policy Tier Table (base-refund %) — fully driven by the configurable Refund Policy ---- */}
           <div className="bg-[#F5F9F8] rounded-2xl p-5 mb-5 border border-[#E8F0EE]">
             <div className="flex items-center justify-between mb-1 flex-wrap gap-2">
               <div className="flex items-center gap-2">
                 <FiActivity className="text-[#00695C]" />
-                <h3 className="text-sm font-bold text-[#1A2E2A] uppercase tracking-wider">Refund Policy Timeline ({policyWindowHours}h)</h3>
+                <h3 className="text-sm font-bold text-[#1A2E2A] uppercase tracking-wider">Refund Policy Timeline ({policyWindowDays} days)</h3>
               </div>
               {onOpenPolicy && (
                 <button
@@ -443,14 +468,14 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
               )}
             </div>
             <p className="text-[10px] text-[#5A7D78] mb-4">
-              GST ({activePolicy.gstRatePercent}%) is always retained. The % below shows how much of the <span className="font-semibold text-[#00695C]">base amount</span> is refunded.
+              GST ({activePolicy.gstRatePercent}%) is always retained. The % below shows how much of the <span className="font-semibold text-[#00695C]">base amount</span> is refunded based on elapsed days.
             </p>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-2">
               {policyTiers.map((t, i) => {
                 const isActive = matchedTier.id === t.id;
-                const isOpenEnded = t.hourTo === null || t.hourTo === '' || t.hourTo === undefined;
-                const rangeLabel = isOpenEnded ? `${t.hourFrom}h+` : `${t.hourFrom}–${t.hourTo}h`;
+                const isOpenEnded = isTierOpenEnded(t);
+                const rangeLabel = fmtDayRangeShort(t);
                 const isGstOnly = i === 0;
                 const basePercent = Number(t.baseRefundPercent);
                 const percentColorCls = basePercent >= 100 ? 'text-emerald-600'
@@ -484,9 +509,9 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
               <div className="flex items-center gap-2">
                 <FiCalendar className="text-[#00695C] text-sm" />
                 <div>
-                  <p className="text-[10px] font-semibold text-[#5A7D78] uppercase tracking-wider">Payment Time</p>
+                  <p className="text-[10px] font-semibold text-[#5A7D78] uppercase tracking-wider">Payment Date</p>
                   <p className="text-xs font-bold text-[#1A2E2A]">
-                    {originalDateObj.toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    {originalDateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </p>
                 </div>
               </div>
@@ -495,7 +520,7 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
                 <div>
                   <p className="text-[10px] font-semibold text-[#5A7D78] uppercase tracking-wider">Refund Requested</p>
                   <p className="text-xs font-bold text-[#1A2E2A]">
-                    {refundDateObj.toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    {refundDateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </p>
                 </div>
               </div>
@@ -511,7 +536,6 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
             </div>
           </div>
 
-          {/* ---- Status Timeline ---- */}
           {!isRejectedStatus && (
             <div className="bg-[#F5F9F8] rounded-2xl p-5 mb-5 border border-[#E8F0EE]">
               <div className="flex items-center gap-2 mb-4">
@@ -553,7 +577,6 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
             </div>
           )}
 
-          {/* ---- Amount Breakdown (detailed) ---- */}
           <div className="bg-[#F5F9F8] rounded-2xl p-5 mb-5 border border-[#E8F0EE]">
             <div className="flex items-center gap-2 mb-4">
               <FiDollarSign className="text-[#00695C]" />
@@ -561,7 +584,6 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
             </div>
 
             <div className="space-y-3">
-              {/* Original */}
               <div className="flex items-center justify-between py-2 border-b border-dashed border-[#D5E3E0]">
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-lg bg-[#E8F4F2] flex items-center justify-center">
@@ -570,14 +592,13 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
                   <div>
                     <p className="text-sm font-semibold text-[#1A2E2A]">Original Transaction Amount</p>
                     <p className="text-[10px] text-[#5A7D78]">
-                      Paid on {originalDateObj.toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                      Paid on {originalDateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </p>
                   </div>
                 </div>
                 <span className="text-sm font-bold text-[#1A2E2A]">{formatCurrency(originalAmount)}</span>
               </div>
 
-              {/* Base */}
               <div className="flex items-center justify-between py-2 border-b border-dashed border-[#D5E3E0]">
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-lg bg-[#E8F4F2] flex items-center justify-center">
@@ -593,7 +614,6 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
                 <span className="text-sm font-bold text-emerald-700">{formatCurrency(gstBase)}</span>
               </div>
 
-              {/* GST — always retained */}
               <div className="flex items-center justify-between py-2 border-b border-dashed border-[#D5E3E0]">
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center">
@@ -609,7 +629,6 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
                 <span className="text-sm font-bold text-amber-700">- {formatCurrency(gstComponent)}</span>
               </div>
 
-              {/* Time-based cut (hidden for GST-only tier) */}
               {!isGstOnlyTier && !isExpired && tier.timeCutPercent > 0 && (
                 <div className="flex items-center justify-between py-2 border-b border-dashed border-[#D5E3E0]">
                   <div className="flex items-center gap-2">
@@ -617,7 +636,7 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
                       <FiThumbsDown className="text-amber-600 text-xs" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-[#1A2E2A]">Time-Based Cut</p>
+                      <p className="text-sm font-semibold text-[#1A2E2A]">Days-Based Time Cut</p>
                       <p className="text-[10px] text-[#5A7D78]">
                         {tier.timeCutPercent}% of base — {tier.label} ({tier.window})
                       </p>
@@ -627,7 +646,6 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
                 </div>
               )}
 
-              {/* Final */}
               <div className={`flex items-center justify-between py-3 rounded-xl px-3 mt-2 ${
                 isRejected || isExpired ? 'bg-red-50' : 'bg-emerald-50'
               }`}>
@@ -649,13 +667,12 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
                 </span>
               </div>
 
-              {/* Summary note */}
               {!isRejected && !isExpired && (
                 <div className="rounded-xl bg-white border border-[#E8F0EE] px-3 py-2 mt-1">
                   <p className="text-[10px] text-[#5A7D78] leading-relaxed">
                     <span className="font-bold text-[#00695C]">Total deducted:</span>{' '}
                     {formatCurrency(totalDeduction)} ({deductionPercent}% of paid amount) —
-                    GST {formatCurrency(gstComponent)} + time cut {formatCurrency(timeCutAmount)}.
+                    GST {formatCurrency(gstComponent)} + day-based cut {formatCurrency(timeCutAmount)}.
                     <span className="block mt-0.5 italic">
                       100% of the paid amount is never refunded; GST is always retained.
                     </span>
@@ -663,7 +680,6 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
                 </div>
               )}
 
-              {/* Coverage bar */}
               {!isRejected && originalAmount > 0 && (
                 <div className="mt-3">
                   <div className="flex items-center justify-between text-[10px] font-semibold text-[#5A7D78] mb-1">
@@ -692,7 +708,6 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
             </div>
           </div>
 
-          {/* ---- Request Details Grid ---- */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-1">
@@ -732,7 +747,7 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
                 <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Refund Date</h4>
               </div>
               <p className="text-sm font-bold text-[#1A2E2A]">
-                {refundDateObj.toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                {refundDateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
               </p>
             </div>
 
@@ -770,7 +785,6 @@ const ViewRefundDetailModal = ({ refund, show, onClose, onEdit, onDelete, policy
           </div>
         </div>
 
-        {/* Footer */}
         <div className="sticky bottom-0 px-6 py-4 bg-white border-t border-[#E8F0EE] rounded-b-3xl shrink-0 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
           <div className="flex items-center gap-3">
             <button
@@ -850,7 +864,6 @@ const EditRefundModal = ({ refund, show, onClose, onSave }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
-        {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] p-6 rounded-t-3xl z-10 shrink-0">
           <button
             onClick={onClose}
@@ -862,7 +875,6 @@ const EditRefundModal = ({ refund, show, onClose, onSave }) => {
           <p className="text-white/80 text-sm">Update refund request details</p>
         </div>
 
-        {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-white">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="bg-[#F5F9F8] rounded-2xl p-4">
@@ -946,7 +958,6 @@ const EditRefundModal = ({ refund, show, onClose, onSave }) => {
           </form>
         </div>
 
-        {/* Footer */}
         <div className="sticky bottom-0 px-6 py-4 bg-white border-t border-[#E8F0EE] rounded-b-3xl shrink-0 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
           <div className="flex items-center gap-3">
             <button
@@ -971,10 +982,7 @@ const EditRefundModal = ({ refund, show, onClose, onSave }) => {
 };
 
 // ============================================================
-// REFUND POLICY MODAL — "Refund Details"
-// Read-only explanation of how refunds are calculated, with a
-// full Edit mode: GST %, window hours, and every tier's hour
-// range, refund %, label and note text are all editable.
+// REFUND POLICY MODAL — Day-Based 
 // ============================================================
 const RefundPolicyModal = ({ show, policy, onClose, onSave }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -1004,19 +1012,18 @@ const RefundPolicyModal = ({ show, policy, onClose, onSave }) => {
   const addTier = () => {
     setDraft(prev => {
       const tiers = [...prev.tiers];
-      const lastFinite = [...tiers].reverse().find(t => t.hourTo !== null && t.hourTo !== '' && t.hourTo !== undefined);
-      const newFrom = lastFinite ? Number(lastFinite.hourTo) : 0;
+      const lastFinite = [...tiers].reverse().find(t => !isTierOpenEnded(t));
+      const newFrom = lastFinite ? safeDayTo(lastFinite) : 0;
       const newTier = {
         id: `tier-${Date.now()}`,
-        hourFrom: newFrom,
-        hourTo: newFrom + 6,
+        dayFrom: newFrom,
+        dayTo: newFrom + 15,
         baseRefundPercent: 50,
         label: 'New Refund Window',
-        note: 'Describe this window',
+        note: `50% of base refunded · 50% day-cut + GST retained (${newFrom}–${newFrom + 15} days)`,
         color: 'slate'
       };
-      // insert before the last (open-ended) tier if one exists
-      const openEndedIdx = tiers.findIndex(t => t.hourTo === null || t.hourTo === '' || t.hourTo === undefined);
+      const openEndedIdx = tiers.findIndex(t => isTierOpenEnded(t));
       if (openEndedIdx >= 0) {
         tiers.splice(openEndedIdx, 0, newTier);
       } else {
@@ -1032,14 +1039,13 @@ const RefundPolicyModal = ({ show, policy, onClose, onSave }) => {
 
   const handleSave = () => {
     setSaving(true);
-    // normalize numeric fields
     const cleaned = {
       gstRatePercent: Number(draft.gstRatePercent) || 0,
-      windowHours: Number(draft.windowHours) || 24,
+      windowDays: Number(draft.windowDays) || 90,
       tiers: draft.tiers.map(t => ({
         ...t,
-        hourFrom: Number(t.hourFrom) || 0,
-        hourTo: (t.hourTo === '' || t.hourTo === null || t.hourTo === undefined) ? null : Number(t.hourTo),
+        dayFrom: safeDayFrom(t),
+        dayTo: isTierOpenEnded(t) ? null : safeDayTo(t),
         baseRefundPercent: Math.max(0, Math.min(100, Number(t.baseRefundPercent) || 0))
       }))
     };
@@ -1055,17 +1061,16 @@ const RefundPolicyModal = ({ show, policy, onClose, onSave }) => {
     setIsEditing(false);
   };
 
-  // ---- sample calculation preview (uses draft while editing, else saved policy) ----
   const previewPolicy = isEditing ? draft : (policy || DEFAULT_REFUND_POLICY);
   const gstRate = Number(previewPolicy.gstRatePercent || 0) / 100;
   const amt = Number(sampleAmount) || 0;
   const base = Math.round(amt / (1 + gstRate));
   const gstAmt = amt - base;
+  const previewWindowDays = Number(previewPolicy.windowDays || 90);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
-        {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] p-6 rounded-t-3xl z-10 shrink-0">
           <button
             onClick={onClose}
@@ -1078,16 +1083,47 @@ const RefundPolicyModal = ({ show, policy, onClose, onSave }) => {
               <FiFileText />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white">Refund Details & Policy</h2>
-              <p className="text-white/80 text-sm">How refunds are calculated — GST, time-based windows &amp; amounts</p>
+              <h2 className="text-2xl font-bold text-white">Refund Details &amp; Policy</h2>
+              <p className="text-white/80 text-sm">
+                Day-based refund calculation — GST, {previewWindowDays}-day windows &amp; amounts
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-white">
 
-          {/* GST + Window settings */}
+          <div className="bg-gradient-to-br from-[#E8F4F2] to-[#F5F9F8] rounded-2xl p-5 mb-5 border border-[#C5EDE5]">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#00695C] flex items-center justify-center flex-shrink-0">
+                <FiInfo className="text-white text-lg" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-bold text-[#00695C] uppercase tracking-wider mb-2">
+                  How Day-Based Refunds Work
+                </h3>
+                <ul className="space-y-1.5 text-xs text-[#1A2E2A] leading-relaxed">
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#00695C] mt-1.5 flex-shrink-0"></span>
+                    <span><strong>GST ({previewPolicy.gstRatePercent}%)</strong> is <strong>always retained</strong> — never refunded.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#00695C] mt-1.5 flex-shrink-0"></span>
+                    <span>Refund eligibility is decided by <strong>elapsed days</strong> since payment, up to <strong>{previewWindowDays} days</strong>.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#00695C] mt-1.5 flex-shrink-0"></span>
+                    <span>Each tier below shows <strong>% of the base amount</strong> refunded — the rest is deducted as a day-based time cut.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#00695C] mt-1.5 flex-shrink-0"></span>
+                    <span><strong>100% of the paid amount is never refunded</strong> — GST is always retained on top of any time cut.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
           <div className="bg-[#F5F9F8] rounded-2xl p-5 mb-5 border border-[#E8F0EE]">
             <div className="flex items-center gap-2 mb-4">
               <FiPercent className="text-[#00695C]" />
@@ -1111,30 +1147,31 @@ const RefundPolicyModal = ({ show, policy, onClose, onSave }) => {
                 )}
               </div>
               <div className="bg-white rounded-xl p-4 border border-[#E8F0EE]">
-                <p className={labelCls}>Refund Window (total hours)</p>
+                <p className={labelCls}>Refund Window (total days)</p>
                 {isEditing ? (
                   <div className="flex items-center gap-2">
                     <input
                       type="number" min="1" step="1"
-                      value={draft.windowHours}
-                      onChange={(e) => setDraft(prev => ({ ...prev, windowHours: e.target.value }))}
+                      value={draft.windowDays}
+                      onChange={(e) => setDraft(prev => ({ ...prev, windowDays: e.target.value }))}
                       className={inputCls}
                     />
-                    <span className="text-sm font-bold text-[#5A7D78]">hours</span>
+                    <span className="text-sm font-bold text-[#5A7D78]">days</span>
                   </div>
                 ) : (
-                  <p className="text-xl font-extrabold text-[#00695C]">{previewPolicy.windowHours}h</p>
+                  <p className="text-xl font-extrabold text-[#00695C]">{previewWindowDays} days</p>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Tiers */}
           <div className="bg-[#F5F9F8] rounded-2xl p-5 mb-5 border border-[#E8F0EE]">
-            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <div className="flex items-center justify-between mb-1 flex-wrap gap-2">
               <div className="flex items-center gap-2">
                 <FiActivity className="text-[#00695C]" />
-                <h3 className="text-sm font-bold text-[#1A2E2A] uppercase tracking-wider">Time-Based Refund Tiers</h3>
+                <h3 className="text-sm font-bold text-[#1A2E2A] uppercase tracking-wider">
+                  Day-Based Refund Tiers
+                </h3>
               </div>
               {isEditing && (
                 <button
@@ -1145,93 +1182,163 @@ const RefundPolicyModal = ({ show, policy, onClose, onSave }) => {
                 </button>
               )}
             </div>
+            <p className="text-[10px] text-[#5A7D78] mb-4">
+              Each tier is defined by an <strong>elapsed-day range</strong> since payment. The % is how much of the base amount is refunded — the remainder is deducted as a day-based cut.
+            </p>
 
             <div className="space-y-3">
-              {(isEditing ? draft.tiers : (previewPolicy.tiers || [])).map((t, i) => (
-                <div key={t.id} className="bg-white rounded-xl p-4 border border-[#E8F0EE]">
-                  {isEditing ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-6 gap-3 items-end">
-                      <div>
-                        <label className={labelCls}>From (h)</label>
-                        <input
-                          type="number" min="0"
-                          value={t.hourFrom}
-                          onChange={(e) => updateTierField(t.id, 'hourFrom', e.target.value)}
-                          className={inputCls}
-                        />
-                      </div>
-                      <div>
-                        <label className={labelCls}>To (h) — blank = open-ended</label>
-                        <input
-                          type="number" min="0"
-                          value={t.hourTo === null || t.hourTo === undefined ? '' : t.hourTo}
-                          onChange={(e) => updateTierField(t.id, 'hourTo', e.target.value)}
-                          placeholder="∞"
-                          className={inputCls}
-                        />
-                      </div>
-                      <div>
-                        <label className={labelCls}>Base Refund %</label>
-                        <input
-                          type="number" min="0" max="100"
-                          value={t.baseRefundPercent}
-                          onChange={(e) => updateTierField(t.id, 'baseRefundPercent', e.target.value)}
-                          className={inputCls}
-                        />
-                      </div>
-                      <div className="sm:col-span-2">
-                        <label className={labelCls}>Label</label>
-                        <input
-                          type="text"
-                          value={t.label}
-                          onChange={(e) => updateTierField(t.id, 'label', e.target.value)}
-                          className={inputCls}
-                        />
-                      </div>
-                      <div className="flex items-center justify-end">
-                        {draft.tiers.length > 1 && (
-                          <button
-                            onClick={() => removeTier(t.id)}
-                            className="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-300 flex items-center justify-center"
-                            title="Remove tier"
-                          >
-                            <FiTrash2 className="text-sm" />
-                          </button>
-                        )}
-                      </div>
-                      <div className="col-span-2 sm:col-span-6">
-                        <label className={labelCls}>Note</label>
-                        <input
-                          type="text"
-                          value={t.note}
-                          onChange={(e) => updateTierField(t.id, 'note', e.target.value)}
-                          className={inputCls}
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-between gap-3 flex-wrap">
-                      <div className="flex items-center gap-3">
-                        <span className="w-10 h-10 rounded-xl bg-[#E8F4F2] flex items-center justify-center text-sm font-extrabold text-[#00695C] flex-shrink-0">
-                          {t.baseRefundPercent}%
-                        </span>
+              {(isEditing ? draft.tiers : (previewPolicy.tiers || [])).map((t) => {
+                const openEnded = isTierOpenEnded(t);
+                const basePercent = Number(t.baseRefundPercent) || 0;
+                const percentColor = basePercent >= 100 ? 'text-emerald-600'
+                  : basePercent >= 75 ? 'text-teal-600'
+                  : basePercent >= 50 ? 'text-amber-600'
+                  : basePercent > 0 ? 'text-rose-600'
+                  : 'text-red-600';
+                return (
+                  <div key={t.id} className="bg-white rounded-xl p-4 border border-[#E8F0EE]">
+                    {isEditing ? (
+                      <div className="grid grid-cols-2 sm:grid-cols-6 gap-3 items-end">
                         <div>
-                          <p className="text-sm font-bold text-[#1A2E2A]">
-                            {t.label} <span className="text-[#5A7D78] font-medium">
-                              ({t.hourFrom}–{(t.hourTo === null || t.hourTo === undefined || t.hourTo === '') ? '∞' : t.hourTo}h)
+                          <label className={labelCls}>From (day)</label>
+                          <input
+                            type="number" min="0"
+                            value={t.dayFrom === '' || t.dayFrom === null || t.dayFrom === undefined ? '' : t.dayFrom}
+                            onChange={(e) => updateTierField(t.id, 'dayFrom', e.target.value)}
+                            className={inputCls}
+                            placeholder="0"
+                          />
+                        </div>
+                        <div>
+                          <label className={labelCls}>To (day) — blank = open-ended</label>
+                          <input
+                            type="number" min="0"
+                            value={openEnded ? '' : t.dayTo}
+                            onChange={(e) => updateTierField(t.id, 'dayTo', e.target.value)}
+                            placeholder="∞"
+                            className={inputCls}
+                          />
+                        </div>
+                        <div>
+                          <label className={labelCls}>Base Refund %</label>
+                          <input
+                            type="number" min="0" max="100"
+                            value={t.baseRefundPercent}
+                            onChange={(e) => updateTierField(t.id, 'baseRefundPercent', e.target.value)}
+                            className={inputCls}
+                          />
+                        </div>
+                        <div className="sm:col-span-2">
+                          <label className={labelCls}>Label</label>
+                          <input
+                            type="text"
+                            value={t.label || ''}
+                            onChange={(e) => updateTierField(t.id, 'label', e.target.value)}
+                            className={inputCls}
+                          />
+                        </div>
+                        <div className="flex items-center justify-end">
+                          {draft.tiers.length > 1 && (
+                            <button
+                              onClick={() => removeTier(t.id)}
+                              className="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-300 flex items-center justify-center"
+                              title="Remove tier"
+                            >
+                              <FiTrash2 className="text-sm" />
+                            </button>
+                          )}
+                        </div>
+                        <div className="col-span-2 sm:col-span-6">
+                          <label className={labelCls}>Note</label>
+                          <input
+                            type="text"
+                            value={t.note || ''}
+                            onChange={(e) => updateTierField(t.id, 'note', e.target.value)}
+                            className={inputCls}
+                            placeholder={fmtNoteFallback(t)}
+                          />
+                        </div>
+
+                        <div className="col-span-2 sm:col-span-6">
+                          <div className="flex items-center gap-2 flex-wrap text-[10px]">
+                            <span className="font-bold text-[#5A7D78] uppercase tracking-wider">Preview:</span>
+                            <span className="font-bold text-[#00695C] bg-[#E8F4F2] px-2 py-0.5 rounded-full">
+                              {fmtDayRangeLong(t)}
                             </span>
-                          </p>
-                          <p className="text-[11px] text-[#5A7D78]">{t.note}</p>
+                            <span className="font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
+                              {basePercent}% base refund
+                            </span>
+                            <span className="font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
+                              {100 - basePercent}% day-cut
+                            </span>
+                          </div>
                         </div>
                       </div>
+                    ) : (
+                      <div className="flex items-center justify-between gap-3 flex-wrap">
+                        <div className="flex items-center gap-3">
+                          <span className={`w-12 h-12 rounded-xl bg-[#E8F4F2] flex items-center justify-center text-sm font-extrabold ${percentColor} flex-shrink-0`}>
+                            {basePercent}%
+                          </span>
+                          <div>
+                            <p className="text-sm font-bold text-[#1A2E2A]">
+                              {t.label || 'Refund Window'}
+                              <span className="text-[#5A7D78] font-medium ml-1.5">
+                                ({fmtDayRangeLong(t)})
+                              </span>
+                            </p>
+                            <p className="text-[11px] text-[#5A7D78]">
+                              {t.note || fmtNoteFallback(t)}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            basePercent >= 100 ? 'bg-emerald-50 text-emerald-700'
+                              : basePercent >= 75 ? 'bg-teal-50 text-teal-700'
+                              : basePercent >= 50 ? 'bg-amber-50 text-amber-700'
+                              : basePercent > 0 ? 'bg-rose-50 text-rose-700'
+                              : 'bg-red-50 text-red-700'
+                          }`}>
+                            {basePercent}% base refund
+                          </span>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
+                            {100 - basePercent}% day-cut
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-dashed border-[#D5E3E0]">
+              <p className="text-[10px] font-semibold text-[#5A7D78] uppercase tracking-wider mb-2">
+                Refund Flow Across {previewWindowDays} Days
+              </p>
+              <div className="flex items-stretch gap-1 overflow-x-auto pb-1">
+                {(previewPolicy.tiers || []).map((t) => {
+                  const basePercent = Number(t.baseRefundPercent) || 0;
+                  const tone = basePercent >= 100 ? 'from-emerald-500 to-emerald-400'
+                    : basePercent >= 75 ? 'from-teal-500 to-teal-400'
+                    : basePercent >= 50 ? 'from-amber-500 to-amber-400'
+                    : basePercent > 0 ? 'from-rose-500 to-rose-400'
+                    : 'from-red-500 to-red-400';
+                  return (
+                    <div key={t.id} className="flex-1 min-w-[90px]">
+                      <div className={`h-1.5 rounded-full bg-gradient-to-r ${tone}`} />
+                      <p className="text-[9px] font-bold text-[#1A2E2A] mt-1.5 text-center truncate">
+                        {fmtDayRangeShort(t)}
+                      </p>
+                      <p className="text-[9px] font-semibold text-[#5A7D78] text-center">{basePercent}%</p>
                     </div>
-                  )}
-                </div>
-              ))}
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          {/* Sample calculation */}
           <div className="bg-[#F5F9F8] rounded-2xl p-5 border border-[#E8F0EE]">
             <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
               <div className="flex items-center gap-2">
@@ -1248,28 +1355,59 @@ const RefundPolicyModal = ({ show, policy, onClose, onSave }) => {
                 />
               </div>
             </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+              <div className="bg-white rounded-xl p-3 border border-[#E8F0EE]">
+                <p className="text-[10px] font-semibold text-[#5A7D78] uppercase tracking-wider mb-0.5">Original Paid</p>
+                <p className="text-sm font-extrabold text-[#1A2E2A]">{formatCurrency(amt)}</p>
+              </div>
+              <div className="bg-white rounded-xl p-3 border border-[#E8F0EE]">
+                <p className="text-[10px] font-semibold text-[#5A7D78] uppercase tracking-wider mb-0.5">Base (excl. GST)</p>
+                <p className="text-sm font-extrabold text-emerald-700">{formatCurrency(base)}</p>
+              </div>
+              <div className="bg-white rounded-xl p-3 border border-[#E8F0EE]">
+                <p className="text-[10px] font-semibold text-[#5A7D78] uppercase tracking-wider mb-0.5">GST Retained</p>
+                <p className="text-sm font-extrabold text-amber-700">{formatCurrency(gstAmt)}</p>
+              </div>
+            </div>
+
             <p className="text-[11px] text-[#5A7D78] mb-3">
-              Base (excl. GST): <span className="font-bold text-[#1A2E2A]">{formatCurrency(base)}</span> · GST retained: <span className="font-bold text-amber-700">{formatCurrency(gstAmt)}</span>
+              Refund by elapsed days (each tile shows the refund for a request made within that day window):
             </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-2">
               {(previewPolicy.tiers || []).map((t) => {
-                const refundAmt = Math.round((base * Number(t.baseRefundPercent)) / 100);
-                const isOpenEnded = t.hourTo === null || t.hourTo === '' || t.hourTo === undefined;
+                const basePercent = Number(t.baseRefundPercent) || 0;
+                const refundAmt = Math.round((base * basePercent) / 100);
+                const dayCutAmt = base - refundAmt;
+                const percentColor = basePercent >= 100 ? 'text-emerald-600'
+                  : basePercent >= 75 ? 'text-teal-600'
+                  : basePercent >= 50 ? 'text-amber-600'
+                  : basePercent > 0 ? 'text-rose-600'
+                  : 'text-red-600';
                 return (
                   <div key={t.id} className="rounded-xl p-2.5 border-2 border-[#E8F0EE] bg-white text-center">
                     <p className="text-[10px] font-semibold text-[#5A7D78] uppercase tracking-wider mb-0.5">
-                      {isOpenEnded ? `${t.hourFrom}h+` : `${t.hourFrom}–${t.hourTo}h`}
+                      {fmtDayRangeLong(t)}
                     </p>
-                    <p className="text-sm font-extrabold text-[#00695C]">{formatCurrency(refundAmt)}</p>
-                    <p className="text-[8px] text-[#5A7D78]">{t.baseRefundPercent}% of base</p>
+                    <p className={`text-sm font-extrabold ${percentColor}`}>{formatCurrency(refundAmt)}</p>
+                    <p className="text-[8px] text-[#5A7D78]">{basePercent}% of base</p>
+                    {basePercent < 100 && (
+                      <p className="text-[8px] text-amber-700 mt-0.5">− {formatCurrency(dayCutAmt)} cut</p>
+                    )}
                   </div>
                 );
               })}
             </div>
+
+            <div className="mt-4 pt-3 border-t border-dashed border-[#D5E3E0]">
+              <p className="text-[10px] text-[#5A7D78] leading-relaxed">
+                <span className="font-bold text-[#00695C]">Note:</span> GST ({previewPolicy.gstRatePercent}%) is always retained regardless of when the refund is requested.
+                On top of that, a day-based cut is applied as shown above. After <strong>{previewWindowDays} days</strong>, no refund is allowed.
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Footer */}
         <div className="sticky bottom-0 px-6 py-4 bg-white border-t border-[#E8F0EE] rounded-b-3xl shrink-0 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
           {isEditing ? (
             <div className="flex items-center gap-3">
@@ -1406,7 +1544,6 @@ const FilterDropdown = ({ label, options, value, onChange, icon: Icon, allLabel 
 const RefundManagement = () => {
   const searchInputRef = useRef(null);
 
-  // ============ STATE ============
   const [refunds, setRefunds] = useState([]);
   const [filteredRefunds, setFilteredRefunds] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -1431,12 +1568,10 @@ const RefundManagement = () => {
   const [refundPolicy, setRefundPolicy] = useState(DEFAULT_REFUND_POLICY);
   const [showPolicyModal, setShowPolicyModal] = useState(false);
 
-  // ============ CONFIRMATION MODAL STATE ============
   const [confirmationModal, setConfirmationModal] = useState({
     isOpen: false, title: '', message: '', confirmText: 'Confirm', cancelText: 'Cancel', type: 'danger', onConfirm: null, onCancel: null
   });
 
-  // ============ STATS ============
   const [stats, setStats] = useState({
     total: 0, 'Refund Requested': 0, 'Under Review': 0, 'Approved': 0, 'Processing': 0, 'Completed': 0, 'Rejected': 0
   });
@@ -1453,7 +1588,6 @@ const RefundManagement = () => {
     setStats(counts);
   }, []);
 
-  // ============ GENERATE MOCK DATA ============
   const generateMockRefunds = useCallback(() => {
     const customerNames = [
       'Arun Kumar', 'Priya Sharma', 'Karthik Reddy', 'Divya Iyer', 'Suresh Nair',
@@ -1477,7 +1611,7 @@ const RefundManagement = () => {
       if (i % 7 === 0) {
         refundDate = new Date(now);
       } else {
-        const daysAgo = Math.floor(Math.random() * 60);
+        const daysAgo = Math.floor(Math.random() * 120);
         refundDate = new Date(now);
         refundDate.setDate(refundDate.getDate() - daysAgo);
       }
@@ -1505,7 +1639,6 @@ const RefundManagement = () => {
     return list;
   }, [computeStats]);
 
-  // ============ INITIALIZE DATA ============
   useEffect(() => {
     try {
       const mockRefunds = generateMockRefunds();
@@ -1516,7 +1649,6 @@ const RefundManagement = () => {
     }
   }, [generateMockRefunds]);
 
-  // ============ FILTER REFUNDS ============
   const filterRefunds = useCallback(() => {
     try {
       let filtered = [...refunds];
@@ -1571,7 +1703,6 @@ const RefundManagement = () => {
 
   useEffect(() => { filterRefunds(); }, [filterRefunds]);
 
-  // ============ PAGINATION ============
   const totalPages = Math.max(1, Math.ceil(filteredRefunds.length / pageSize));
   const paginatedRefunds = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
@@ -1579,7 +1710,6 @@ const RefundManagement = () => {
     return filteredRefunds.slice(start, end);
   }, [filteredRefunds, currentPage, pageSize]);
 
-  // ============ HANDLE SORT ============
   const handleSort = useCallback((field) => {
     if (sortField === field) {
       setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
@@ -1589,7 +1719,6 @@ const RefundManagement = () => {
     }
   }, [sortField]);
 
-  // ============ HANDLE SELECT ALL ============
   const handleSelectAll = useCallback(() => {
     if (selectedRefunds.length === paginatedRefunds.length && paginatedRefunds.length > 0) {
       setSelectedRefunds([]);
@@ -1602,7 +1731,6 @@ const RefundManagement = () => {
     setSelectedRefunds(prev => prev.includes(refundId) ? prev.filter(id => id !== refundId) : [...prev, refundId]);
   }, []);
 
-  // ============ VIEW / EDIT ============
   const handleViewRefund = useCallback((refund) => {
     setViewingRefund(refund);
     setShowViewModal(true);
@@ -1622,7 +1750,6 @@ const RefundManagement = () => {
     setToast({ message: `Refund "${updatedRefund.refundRequestId}" updated successfully`, type: 'success' });
   }, [computeStats]);
 
-  // ============ DELETE ============
   const handleDeleteRefund = useCallback((refundId) => {
     const refund = refunds.find(r => r.id === refundId);
     if (!refund) return;
@@ -1651,7 +1778,6 @@ const RefundManagement = () => {
     });
   }, [refunds, computeStats]);
 
-  // ============ STAT CLICK HANDLERS ============
   const handleStatusClick = useCallback((status) => {
     setActiveStatus(prev => (prev === status ? 'all' : status));
     if (searchInputRef.current) searchInputRef.current.focus();
@@ -1665,7 +1791,6 @@ const RefundManagement = () => {
     if (searchInputRef.current) searchInputRef.current.focus();
   }, []);
 
-  // ============ CLEAR ALL FILTERS ============
   const clearAllFilters = useCallback(() => {
     setSearchQuery('');
     setActiveStatus('all');
@@ -1675,7 +1800,6 @@ const RefundManagement = () => {
     setToast({ message: 'All filters cleared', type: 'info' });
   }, []);
 
-  // ============ REFRESH ============
   const handleRefresh = useCallback(() => {
     setLoading(true);
     setTimeout(() => {
@@ -1692,7 +1816,6 @@ const RefundManagement = () => {
     }, 1000);
   }, [generateMockRefunds]);
 
-  // ============ EXPORT ============
   const handleExport = useCallback(() => {
     if (filteredRefunds.length === 0) {
       setToast({ message: 'No data to export', type: 'warning' });
@@ -1732,7 +1855,6 @@ const RefundManagement = () => {
     }
   }, [filteredRefunds]);
 
-  // ============ BULK DELETE ============
   const handleBulkDelete = useCallback(() => {
     if (selectedRefunds.length === 0) {
       setToast({ message: 'Please select refunds first', type: 'warning' });
@@ -1762,23 +1884,17 @@ const RefundManagement = () => {
     });
   }, [selectedRefunds, refunds, computeStats]);
 
-  // ============ REFUND POLICY SAVE ============
   const handleSavePolicy = useCallback((updatedPolicy) => {
     setRefundPolicy(updatedPolicy);
-    setToast({ message: 'Refund policy updated — all refund views now reflect the new rules', type: 'success' });
+    setToast({ message: 'Refund policy updated — all refund views now reflect the new day-based rules', type: 'success' });
   }, []);
 
-  // ============ FILTER OPTIONS ============
   const statusOptions = ALL_REFUND_STATUSES.map(s => ({ value: s, label: REFUND_STATUS_CONFIG[s].label }));
   const reasonOptions = ALL_REFUND_REASONS.map(r => ({ value: r, label: r }));
   const methodOptions = ALL_REFUND_METHODS.map(m => ({ value: m, label: m }));
 
-  // ============================================================
-  // RENDER
-  // ============================================================
   return (
     <div className="space-y-6 p-4 lg:p-6 bg-[#F8FAF9] min-h-screen">
-      {/* Animated Background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-[#00695C]/5 rounded-full blur-3xl animate-float" />
         <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-[#26A69A]/5 rounded-full blur-3xl animate-float-delayed" />
@@ -1828,7 +1944,6 @@ const RefundManagement = () => {
         onSave={handleSavePolicy}
       />
 
-      {/* Header */}
       <div className="relative animate-fade-in">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div>
@@ -1887,7 +2002,6 @@ const RefundManagement = () => {
         </div>
       </div>
 
-      {/* Stats Section — Total + All Refund Statuses */}
       {showStats && (
         <div className="relative animate-slide-in">
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
@@ -1922,7 +2036,6 @@ const RefundManagement = () => {
         </div>
       )}
 
-      {/* Search bar — one line */}
       <div className="relative bg-white rounded-2xl p-4 shadow-sm border border-[#E8F0EE] hover:shadow-md transition-all duration-300">
         <div className="relative w-full">
           <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm" />
@@ -1944,7 +2057,6 @@ const RefundManagement = () => {
           )}
         </div>
 
-        {/* Filters */}
         <div className="flex items-center gap-2 flex-wrap mt-5">
           <FilterDropdown
             label="Status"
@@ -2023,7 +2135,6 @@ const RefundManagement = () => {
         )}
       </div>
 
-      {/* Refunds Grid/List */}
       <div className="relative">
         {loading ? (
           <div className="flex items-center justify-center py-20">
@@ -2294,7 +2405,6 @@ const RefundManagement = () => {
         )}
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex flex-wrap items-center justify-between bg-white rounded-2xl px-4 py-3 border border-[#E8F0EE] shadow-sm gap-3">
           <div className="flex items-center gap-2 text-sm text-[#5A7D78] flex-wrap">
@@ -2353,7 +2463,6 @@ const RefundManagement = () => {
         </div>
       )}
 
-      {/* CSS Animations */}
       <style>{`
         @keyframes fade-in {
           from { opacity: 0; transform: translateY(10px); }

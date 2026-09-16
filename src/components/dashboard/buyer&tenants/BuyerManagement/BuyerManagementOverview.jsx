@@ -239,56 +239,56 @@ const BuyerManagementOverview = () => {
   });
 
   // ---- Recent Activities ----
-  const activities = useMemo(() => [
-    {
-      icon: <FaUserPlus className="text-white text-sm" />,
-      title: 'New Buyer Registration',
-      time: '3 min ago',
-      description: 'Ananya Iyer registered as a new buyer',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-[#00695C] to-[#26A69A]'
-    },
-    {
-      icon: <FiCheckCircle className="text-white text-sm" />,
-      title: 'KYC Approved',
-      time: '18 min ago',
-      description: 'Karthik Raja\'s Aadhaar & PAN verified successfully',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-emerald-500 to-emerald-400'
-    },
-    {
-      icon: <FiHeart className="text-white text-sm" />,
-      title: 'Property Wishlisted',
-      time: '27 min ago',
-      description: 'Divya Menon added a 3BHK Villa in Chennai to wishlist',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-pink-500 to-pink-400'
-    },
-    {
-      icon: <FiMapPin className="text-white text-sm" />,
-      title: 'Site Visit Scheduled',
-      time: '52 min ago',
-      description: 'Rahul Verma booked a site visit for a Plot in Coimbatore',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-blue-500 to-blue-400'
-    },
-    {
-      icon: <FaHandshake className="text-white text-sm" />,
-      title: 'Offer Submitted',
-      time: '1 hour ago',
-      description: 'Sanjay Gupta submitted an offer on a Luxury Apartment',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-amber-500 to-amber-400'
-    },
-    {
-      icon: <FiPhone className="text-white text-sm" />,
-      title: 'Mobile Verified',
-      time: '2 hours ago',
-      description: 'Meera Nair\'s mobile number was successfully verified',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-purple-500 to-purple-400'
-    }
-  ], []);
+  // const activities = useMemo(() => [
+  //   {
+  //     icon: <FaUserPlus className="text-white text-sm" />,
+  //     title: 'New Buyer Registration',
+  //     time: '3 min ago',
+  //     description: 'Ananya Iyer registered as a new buyer',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-[#00695C] to-[#26A69A]'
+  //   },
+  //   {
+  //     icon: <FiCheckCircle className="text-white text-sm" />,
+  //     title: 'KYC Approved',
+  //     time: '18 min ago',
+  //     description: 'Karthik Raja\'s Aadhaar & PAN verified successfully',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-emerald-500 to-emerald-400'
+  //   },
+  //   {
+  //     icon: <FiHeart className="text-white text-sm" />,
+  //     title: 'Property Wishlisted',
+  //     time: '27 min ago',
+  //     description: 'Divya Menon added a 3BHK Villa in Chennai to wishlist',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-pink-500 to-pink-400'
+  //   },
+  //   {
+  //     icon: <FiMapPin className="text-white text-sm" />,
+  //     title: 'Site Visit Scheduled',
+  //     time: '52 min ago',
+  //     description: 'Rahul Verma booked a site visit for a Plot in Coimbatore',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-blue-500 to-blue-400'
+  //   },
+  //   {
+  //     icon: <FaHandshake className="text-white text-sm" />,
+  //     title: 'Offer Submitted',
+  //     time: '1 hour ago',
+  //     description: 'Sanjay Gupta submitted an offer on a Luxury Apartment',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-amber-500 to-amber-400'
+  //   },
+  //   {
+  //     icon: <FiPhone className="text-white text-sm" />,
+  //     title: 'Mobile Verified',
+  //     time: '2 hours ago',
+  //     description: 'Meera Nair\'s mobile number was successfully verified',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-purple-500 to-purple-400'
+  //   }
+  // ], []);
 
   // ---- Quick Stats ----
   const quickStats = useMemo(() => [
@@ -560,7 +560,7 @@ const BuyerManagementOverview = () => {
       </div>
 
       {/* ===== RECENT ACTIVITIES ===== */}
-      <div>
+      {/* <div>
         <SectionHeader
           icon={<FiActivity className="text-white text-sm" />}
           title="Recent Activities"
@@ -585,7 +585,7 @@ const BuyerManagementOverview = () => {
             />
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* ===== FOOTER ===== */}
       <div className="text-center pt-4">

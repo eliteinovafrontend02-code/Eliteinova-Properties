@@ -254,56 +254,56 @@ const TenantManagementOverview = () => {
   });
 
   // ---- Recent Activities ----
-  const activities = useMemo(() => [
-    {
-      icon: <FaUserPlus className="text-white text-sm" />,
-      title: 'New Tenant Registration',
-      time: '4 min ago',
-      description: 'Priya Sharma registered as a new tenant',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-[#00695C] to-[#26A69A]'
-    },
-    {
-      icon: <FiCheckCircle className="text-white text-sm" />,
-      title: 'KYC Approved',
-      time: '22 min ago',
-      description: 'Rohit Mehra\'s Aadhaar & PAN verified successfully',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-emerald-500 to-emerald-400'
-    },
-    {
-      icon: <FiHomeIcon className="text-white text-sm" />,
-      title: 'Property Saved',
-      time: '35 min ago',
-      description: 'Neha Patel saved a 2BHK Apartment in Indiranagar',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-blue-500 to-blue-400'
-    },
-    {
-      icon: <FiCalendarIcon className="text-white text-sm" />,
-      title: 'Site Visit Scheduled',
-      time: '48 min ago',
-      description: 'Vikram Singh booked a site visit for a Villa in Whitefield',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-amber-500 to-amber-400'
-    },
-    {
-      icon: <FaHandshake className="text-white text-sm" />,
-      title: 'Lease Request Submitted',
-      time: '1 hour ago',
-      description: 'Anjali Nair submitted a lease request for a 3BHK House',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-purple-500 to-purple-400'
-    },
-    {
-      icon: <FiPhone className="text-white text-sm" />,
-      title: 'Mobile Verified',
-      time: '2 hours ago',
-      description: 'Suresh Kumar\'s mobile number was successfully verified',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-pink-500 to-pink-400'
-    }
-  ], []);
+  // const activities = useMemo(() => [
+  //   {
+  //     icon: <FaUserPlus className="text-white text-sm" />,
+  //     title: 'New Tenant Registration',
+  //     time: '4 min ago',
+  //     description: 'Priya Sharma registered as a new tenant',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-[#00695C] to-[#26A69A]'
+  //   },
+  //   {
+  //     icon: <FiCheckCircle className="text-white text-sm" />,
+  //     title: 'KYC Approved',
+  //     time: '22 min ago',
+  //     description: 'Rohit Mehra\'s Aadhaar & PAN verified successfully',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-emerald-500 to-emerald-400'
+  //   },
+  //   {
+  //     icon: <FiHomeIcon className="text-white text-sm" />,
+  //     title: 'Property Saved',
+  //     time: '35 min ago',
+  //     description: 'Neha Patel saved a 2BHK Apartment in Indiranagar',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-blue-500 to-blue-400'
+  //   },
+  //   {
+  //     icon: <FiCalendarIcon className="text-white text-sm" />,
+  //     title: 'Site Visit Scheduled',
+  //     time: '48 min ago',
+  //     description: 'Vikram Singh booked a site visit for a Villa in Whitefield',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-amber-500 to-amber-400'
+  //   },
+  //   {
+  //     icon: <FaHandshake className="text-white text-sm" />,
+  //     title: 'Lease Request Submitted',
+  //     time: '1 hour ago',
+  //     description: 'Anjali Nair submitted a lease request for a 3BHK House',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-purple-500 to-purple-400'
+  //   },
+  //   {
+  //     icon: <FiPhone className="text-white text-sm" />,
+  //     title: 'Mobile Verified',
+  //     time: '2 hours ago',
+  //     description: 'Suresh Kumar\'s mobile number was successfully verified',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-pink-500 to-pink-400'
+  //   }
+  // ], []);
 
   // ---- Quick Stats ----
   const quickStats = useMemo(() => [
@@ -573,7 +573,7 @@ const TenantManagementOverview = () => {
       </div>
 
       {/* ===== RECENT ACTIVITIES ===== */}
-      <div>
+      {/* <div>
         <SectionHeader
           icon={<FiActivity className="text-white text-sm" />}
           title="Recent Activities"
@@ -598,7 +598,7 @@ const TenantManagementOverview = () => {
             />
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* ===== FOOTER ===== */}
       <div className="text-center pt-4">

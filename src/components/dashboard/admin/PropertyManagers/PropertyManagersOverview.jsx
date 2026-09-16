@@ -255,56 +255,56 @@ const PropertyManagersOverview = () => {
   });
 
   // ---- Recent Activities ----
-  const activities = useMemo(() => [
-    {
-      icon: <FaBuilding className="text-white text-sm" />,
-      title: 'New Company Registration',
-      time: '8 min ago',
-      description: 'Green Valley Estate Pvt. Ltd. registered as property manager',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-[#00695C] to-[#26A69A]'
-    },
-    {
-      icon: <FiCheckCircle className="text-white text-sm" />,
-      title: 'KYC Verification Approved',
-      time: '22 min ago',
-      description: 'Sunrise Properties LLP KYC documents verified successfully',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-emerald-500 to-emerald-400'
-    },
-    {
-      icon: <MdOutlinePeopleAlt className="text-white text-sm" />,
-      title: 'Staff Added',
-      time: '45 min ago',
-      description: '5 new staff members added to Maple Realty Group',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-blue-500 to-blue-400'
-    },
-    {
-      icon: <MdOutlineHomeWork className="text-white text-sm" />,
-      title: 'Property Assignment',
-      time: '1 hour ago',
-      description: '3 properties assigned to Blue Ocean Estates',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-purple-500 to-purple-400'
-    },
-    {
-      icon: <FiDollarSign className="text-white text-sm" />,
-      title: 'Rent Collection Recorded',
-      time: '2 hours ago',
-      description: '₹4,50,000 rent collected from 12 tenants',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-amber-500 to-amber-400'
-    },
-    {
-      icon: <FiTool className="text-white text-sm" />,
-      title: 'Service Request Completed',
-      time: '3 hours ago',
-      description: 'Plumbing service request #SR-102 resolved successfully',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-rose-500 to-rose-400'
-    }
-  ], []);
+  // const activities = useMemo(() => [
+  //   {
+  //     icon: <FaBuilding className="text-white text-sm" />,
+  //     title: 'New Company Registration',
+  //     time: '8 min ago',
+  //     description: 'Green Valley Estate Pvt. Ltd. registered as property manager',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-[#00695C] to-[#26A69A]'
+  //   },
+  //   {
+  //     icon: <FiCheckCircle className="text-white text-sm" />,
+  //     title: 'KYC Verification Approved',
+  //     time: '22 min ago',
+  //     description: 'Sunrise Properties LLP KYC documents verified successfully',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-emerald-500 to-emerald-400'
+  //   },
+  //   {
+  //     icon: <MdOutlinePeopleAlt className="text-white text-sm" />,
+  //     title: 'Staff Added',
+  //     time: '45 min ago',
+  //     description: '5 new staff members added to Maple Realty Group',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-blue-500 to-blue-400'
+  //   },
+  //   {
+  //     icon: <MdOutlineHomeWork className="text-white text-sm" />,
+  //     title: 'Property Assignment',
+  //     time: '1 hour ago',
+  //     description: '3 properties assigned to Blue Ocean Estates',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-purple-500 to-purple-400'
+  //   },
+  //   {
+  //     icon: <FiDollarSign className="text-white text-sm" />,
+  //     title: 'Rent Collection Recorded',
+  //     time: '2 hours ago',
+  //     description: '₹4,50,000 rent collected from 12 tenants',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-amber-500 to-amber-400'
+  //   },
+  //   {
+  //     icon: <FiTool className="text-white text-sm" />,
+  //     title: 'Service Request Completed',
+  //     time: '3 hours ago',
+  //     description: 'Plumbing service request #SR-102 resolved successfully',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-rose-500 to-rose-400'
+  //   }
+  // ], []);
 
   // ---- Quick Stats ----
   const quickStats = useMemo(() => [
@@ -576,7 +576,7 @@ const PropertyManagersOverview = () => {
       </div>
 
       {/* ===== RECENT ACTIVITIES ===== */}
-      <div>
+      {/* <div>
         <SectionHeader
           icon={<FiActivity className="text-white text-sm" />}
           title="Recent Activities"
@@ -601,7 +601,7 @@ const PropertyManagersOverview = () => {
             />
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* ===== FOOTER ===== */}
       <div className="text-center pt-4">

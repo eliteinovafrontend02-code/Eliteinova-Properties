@@ -250,56 +250,56 @@ const RentalRequestsOverview = () => {
     conversionRate: 43.8,
   });
   // ---- Recent Activities ----
-  const activities = useMemo(() => [
-    {
-      icon: <FiSend className="text-white text-sm" />,
-      title: 'New Rental Request',
-      time: '6 min ago',
-      description: 'Priya Sharma submitted a request for a 2BHK in Indiranagar',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-[#00695C] to-[#26A69A]'
-    },
-    {
-      icon: <FiPhone className="text-white text-sm" />,
-      title: 'Tenant Contacted',
-      time: '19 min ago',
-      description: 'Vikram Singh was contacted regarding a Koramangala apartment',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-indigo-500 to-indigo-400'
-    },
-    {
-      icon: <FiCalendarIcon className="text-white text-sm" />,
-      title: 'Site Visit Scheduled',
-      time: '34 min ago',
-      description: 'Rohit Mehra booked a site visit for a Villa in Whitefield',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-amber-500 to-amber-400'
-    },
-    {
-      icon: <FiFileText className="text-white text-sm" />,
-      title: 'Application Submitted',
-      time: '52 min ago',
-      description: 'Neha Patel submitted her rental application for HSR Layout',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-blue-500 to-blue-400'
-    },
-    {
-      icon: <FiThumbsUp className="text-white text-sm" />,
-      title: 'Request Approved',
-      time: '1 hour ago',
-      description: 'Owner approved Neha Patel\'s rental request',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-emerald-500 to-emerald-400'
-    },
-    {
-      icon: <FaFileSignature className="text-white text-sm" />,
-      title: 'Agreement Initiated',
-      time: '2 hours ago',
-      description: 'Rental agreement drafted for Anjali Nair\'s 3BHK request',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-purple-500 to-purple-400'
-    }
-  ], []);
+  // const activities = useMemo(() => [
+  //   {
+  //     icon: <FiSend className="text-white text-sm" />,
+  //     title: 'New Rental Request',
+  //     time: '6 min ago',
+  //     description: 'Priya Sharma submitted a request for a 2BHK in Indiranagar',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-[#00695C] to-[#26A69A]'
+  //   },
+  //   {
+  //     icon: <FiPhone className="text-white text-sm" />,
+  //     title: 'Tenant Contacted',
+  //     time: '19 min ago',
+  //     description: 'Vikram Singh was contacted regarding a Koramangala apartment',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-indigo-500 to-indigo-400'
+  //   },
+  //   {
+  //     icon: <FiCalendarIcon className="text-white text-sm" />,
+  //     title: 'Site Visit Scheduled',
+  //     time: '34 min ago',
+  //     description: 'Rohit Mehra booked a site visit for a Villa in Whitefield',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-amber-500 to-amber-400'
+  //   },
+  //   {
+  //     icon: <FiFileText className="text-white text-sm" />,
+  //     title: 'Application Submitted',
+  //     time: '52 min ago',
+  //     description: 'Neha Patel submitted her rental application for HSR Layout',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-blue-500 to-blue-400'
+  //   },
+  //   {
+  //     icon: <FiThumbsUp className="text-white text-sm" />,
+  //     title: 'Request Approved',
+  //     time: '1 hour ago',
+  //     description: 'Owner approved Neha Patel\'s rental request',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-emerald-500 to-emerald-400'
+  //   },
+  //   {
+  //     icon: <FaFileSignature className="text-white text-sm" />,
+  //     title: 'Agreement Initiated',
+  //     time: '2 hours ago',
+  //     description: 'Rental agreement drafted for Anjali Nair\'s 3BHK request',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-purple-500 to-purple-400'
+  //   }
+  // ], []);
 
   // ---- Quick Stats ----
   const quickStats = useMemo(() => [
@@ -576,7 +576,7 @@ const RentalRequestsOverview = () => {
       </div>
 
       {/* ===== RECENT ACTIVITIES ===== */}
-      <div>
+      {/* <div>
         <SectionHeader
           icon={<FiActivity className="text-white text-sm" />}
           title="Recent Activities"
@@ -601,7 +601,7 @@ const RentalRequestsOverview = () => {
             />
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* ===== FOOTER ===== */}
       <div className="text-center pt-4">

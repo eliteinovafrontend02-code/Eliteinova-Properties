@@ -233,57 +233,57 @@ const SavedWishlistOverview = () => {
     pendingNotifications: 9,
   });
 
-  // ---- Recent Activities ----
-  const activities = useMemo(() => [
-    {
-      icon: <FiBookmark className="text-white text-sm" />,
-      title: 'Property Saved',
-      time: '4 min ago',
-      description: 'Ananya Iyer saved a 3BHK Apartment in Adyar to her list',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-[#00695C] to-[#26A69A]'
-    },
-    {
-      icon: <FaHeartSolid className="text-white text-sm" />,
-      title: 'Added to Wishlist',
-      time: '16 min ago',
-      description: 'Karthik Raja added a Villa in ECR to his wishlist',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-pink-500 to-pink-400'
-    },
-    {
-      icon: <MdOutlinePriceChange className="text-white text-sm" />,
-      title: 'Price Drop Alert',
-      time: '31 min ago',
-      description: 'A Plot in Coimbatore on Divya Menon\'s wishlist dropped by ₹2.1L',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-emerald-500 to-emerald-400'
-    },
-    {
-      icon: <FiSlash className="text-white text-sm" />,
-      title: 'Listing Unavailable',
-      time: '48 min ago',
-      description: 'A wishlisted Luxury Apartment was marked sold and removed',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-red-500 to-red-400'
-    },
-    {
-      icon: <FiBell className="text-white text-sm" />,
-      title: 'User Notified',
-      time: '1 hour ago',
-      description: 'Rahul Verma was notified about a price change on a saved property',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-amber-500 to-amber-400'
-    },
-    {
-      icon: <FiTrash2 className="text-white text-sm" />,
-      title: 'Invalid Property Removed',
-      time: '2 hours ago',
-      description: 'Admin removed a delisted property from 6 wishlists',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-purple-500 to-purple-400'
-    }
-  ], []);
+  // // ---- Recent Activities ----
+  // const activities = useMemo(() => [
+  //   {
+  //     icon: <FiBookmark className="text-white text-sm" />,
+  //     title: 'Property Saved',
+  //     time: '4 min ago',
+  //     description: 'Ananya Iyer saved a 3BHK Apartment in Adyar to her list',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-[#00695C] to-[#26A69A]'
+  //   },
+  //   {
+  //     icon: <FaHeartSolid className="text-white text-sm" />,
+  //     title: 'Added to Wishlist',
+  //     time: '16 min ago',
+  //     description: 'Karthik Raja added a Villa in ECR to his wishlist',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-pink-500 to-pink-400'
+  //   },
+  //   {
+  //     icon: <MdOutlinePriceChange className="text-white text-sm" />,
+  //     title: 'Price Drop Alert',
+  //     time: '31 min ago',
+  //     description: 'A Plot in Coimbatore on Divya Menon\'s wishlist dropped by ₹2.1L',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-emerald-500 to-emerald-400'
+  //   },
+  //   {
+  //     icon: <FiSlash className="text-white text-sm" />,
+  //     title: 'Listing Unavailable',
+  //     time: '48 min ago',
+  //     description: 'A wishlisted Luxury Apartment was marked sold and removed',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-red-500 to-red-400'
+  //   },
+  //   {
+  //     icon: <FiBell className="text-white text-sm" />,
+  //     title: 'User Notified',
+  //     time: '1 hour ago',
+  //     description: 'Rahul Verma was notified about a price change on a saved property',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-amber-500 to-amber-400'
+  //   },
+  //   {
+  //     icon: <FiTrash2 className="text-white text-sm" />,
+  //     title: 'Invalid Property Removed',
+  //     time: '2 hours ago',
+  //     description: 'Admin removed a delisted property from 6 wishlists',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-purple-500 to-purple-400'
+  //   }
+  // ], []);
 
   // ---- Quick Stats ----
   const quickStats = useMemo(() => [
@@ -552,7 +552,7 @@ const SavedWishlistOverview = () => {
       </div>
 
       {/* ===== RECENT ACTIVITIES ===== */}
-      <div>
+      {/* <div>
         <SectionHeader
           icon={<FiActivity className="text-white text-sm" />}
           title="Recent Activities"
@@ -577,7 +577,7 @@ const SavedWishlistOverview = () => {
             />
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* ===== FOOTER ===== */}
       <div className="text-center pt-4">

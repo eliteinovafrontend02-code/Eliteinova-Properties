@@ -252,56 +252,56 @@ const PurchaseRequestsOverview = () => {
   });
 
   // ---- Recent Activities ----
-  const activities = useMemo(() => [
-    {
-      icon: <FiSend className="text-white text-sm" />,
-      title: 'New Purchase Request',
-      time: '8 min ago',
-      description: 'Arjun Reddy submitted a purchase request for a 3BHK in Jayanagar',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-[#00695C] to-[#26A69A]'
-    },
-    {
-      icon: <FiPhone className="text-white text-sm" />,
-      title: 'Buyer Contacted',
-      time: '22 min ago',
-      description: 'Meera Krishnan was contacted regarding a Villa in Sarjapur',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-indigo-500 to-indigo-400'
-    },
-    {
-      icon: <FiCalendarIcon className="text-white text-sm" />,
-      title: 'Site Visit Scheduled',
-      time: '41 min ago',
-      description: 'Karan Malhotra booked a site visit for a Plot in Devanahalli',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-amber-500 to-amber-400'
-    },
-    {
-      icon: <FiDollarSign className="text-white text-sm" />,
-      title: 'Offer Submitted',
-      time: '1 hour ago',
-      description: 'Sneha Iyer submitted an offer for an apartment in RT Nagar',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-blue-500 to-blue-400'
-    },
-    {
-      icon: <FaHandshake className="text-white text-sm" />,
-      title: 'Offer Accepted',
-      time: '1 hour ago',
-      description: 'Owner accepted Sneha Iyer\'s offer after negotiation',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-emerald-500 to-emerald-400'
-    },
-    {
-      icon: <FaFileSignature className="text-white text-sm" />,
-      title: 'Agreement Initiated',
-      time: '3 hours ago',
-      description: 'Sale agreement drafted for Ramesh Gowda\'s independent house purchase',
-      color: 'bg-gradient-to-br',
-      gradient: 'from-purple-500 to-purple-400'
-    }
-  ], []);
+  // const activities = useMemo(() => [
+  //   {
+  //     icon: <FiSend className="text-white text-sm" />,
+  //     title: 'New Purchase Request',
+  //     time: '8 min ago',
+  //     description: 'Arjun Reddy submitted a purchase request for a 3BHK in Jayanagar',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-[#00695C] to-[#26A69A]'
+  //   },
+  //   {
+  //     icon: <FiPhone className="text-white text-sm" />,
+  //     title: 'Buyer Contacted',
+  //     time: '22 min ago',
+  //     description: 'Meera Krishnan was contacted regarding a Villa in Sarjapur',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-indigo-500 to-indigo-400'
+  //   },
+  //   {
+  //     icon: <FiCalendarIcon className="text-white text-sm" />,
+  //     title: 'Site Visit Scheduled',
+  //     time: '41 min ago',
+  //     description: 'Karan Malhotra booked a site visit for a Plot in Devanahalli',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-amber-500 to-amber-400'
+  //   },
+  //   {
+  //     icon: <FiDollarSign className="text-white text-sm" />,
+  //     title: 'Offer Submitted',
+  //     time: '1 hour ago',
+  //     description: 'Sneha Iyer submitted an offer for an apartment in RT Nagar',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-blue-500 to-blue-400'
+  //   },
+  //   {
+  //     icon: <FaHandshake className="text-white text-sm" />,
+  //     title: 'Offer Accepted',
+  //     time: '1 hour ago',
+  //     description: 'Owner accepted Sneha Iyer\'s offer after negotiation',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-emerald-500 to-emerald-400'
+  //   },
+  //   {
+  //     icon: <FaFileSignature className="text-white text-sm" />,
+  //     title: 'Agreement Initiated',
+  //     time: '3 hours ago',
+  //     description: 'Sale agreement drafted for Ramesh Gowda\'s independent house purchase',
+  //     color: 'bg-gradient-to-br',
+  //     gradient: 'from-purple-500 to-purple-400'
+  //   }
+  // ], []);
 
   // ---- Quick Stats ----
   const quickStats = useMemo(() => [
@@ -581,7 +581,7 @@ const PurchaseRequestsOverview = () => {
       </div>
 
       {/* ===== RECENT ACTIVITIES ===== */}
-      <div>
+      {/* <div>
         <SectionHeader
           icon={<FiActivity className="text-white text-sm" />}
           title="Recent Activities"
@@ -606,7 +606,7 @@ const PurchaseRequestsOverview = () => {
             />
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* ===== FOOTER ===== */}
       <div className="text-center pt-4">
