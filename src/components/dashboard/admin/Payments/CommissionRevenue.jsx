@@ -329,21 +329,7 @@ const CalendarMenu = ({
             </div>
           )}
 
-          {!showCustom && (
-            <>
-              <div className="border-t border-[#E8F0EE] my-1" />
-              <button onClick={() => { onToggleCalendarView(); setIsOpen(false); }}
-                className={`w-full px-4 py-2.5 text-left text-sm flex items-center justify-between gap-2 hover:bg-[#F5F9F8] transition-colors ${
-                  isCalendarView ? 'bg-[#E8F4F2] text-[#00695C] font-semibold' : 'text-[#1A2E2A]'
-                }`}>
-                <span className="flex items-center gap-2">
-                  <FiCalendar className="text-sm" />
-                  <span>Show Month Calendar</span>
-                </span>
-                {isCalendarView && <FiCheckCircle className="text-[#00695C] text-sm" />}
-              </button>
-            </>
-          )}
+          
         </div>
       )}
     </div>
