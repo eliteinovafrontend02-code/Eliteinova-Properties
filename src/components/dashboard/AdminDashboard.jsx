@@ -87,7 +87,7 @@ import PaymentReconciliation from './admin/Payments/PaymentReconciliation';
 import CommissionRevenue from './admin/Payments/CommissionRevenue';
 import ManualPayment from './admin/Payments/ManualPayment';
 import PaymentReports from './admin/Payments/PaymentReports';
-import TransactionActions from './admin/Payments/TransactionActions';
+
 
 // Other modules
 // import LeadManagement from './admin/LeadManagement';
@@ -190,7 +190,6 @@ const AdminDashboard = () => {
     { key: '/admin/payments/commission-revenue', icon: <FiTrendingUp />, label: 'Commission & Revenue' },
     { key: '/admin/payments/manual-payment', icon: <FiEdit />, label: 'Manual Payment' },
     { key: '/admin/payments/reports', icon: <FaChartLine />, label: 'Payment Reports' },
-    { key: '/admin/payments/transaction-actions', icon: <FiSettings />, label: 'Transaction Actions' },
   ],
 },
     { key: '/admin/reports', icon: <FaChartLine />, label: 'Reports & Analytics' },
@@ -560,7 +559,6 @@ const AdminDashboard = () => {
                 <Route path="payments/commission-revenue" element={<CommissionRevenue />} />
                 <Route path="payments/manual-payment" element={<ManualPayment />} />
                 <Route path="payments/reports" element={<PaymentReports />} />
-                <Route path="payments/transaction-actions" element={<TransactionActions />} />
 
                {/* Buyers & Tenants — handled by the early return above, no Route needed here */}
 
