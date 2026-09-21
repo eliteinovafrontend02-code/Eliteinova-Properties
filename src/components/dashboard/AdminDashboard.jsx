@@ -31,8 +31,10 @@ import { HiOutlineBuildingOffice, HiOutlineUserGroup } from 'react-icons/hi2';
 
 // ============ IMPORT ALL COMPONENTS ============
 import AdminOverview from './admin/AdminOverview';
-// import SuperAdmin from './admin/SuperAdmin';
 import UserManagement from './admin/UserManagement';
+
+// Super Admin
+import SuperAdminDashboard from './SuperAdminDashboard';
 
 // Owners
 import OwnersOverview from './admin/Owners/OwnersOverview';
@@ -232,6 +234,10 @@ const AdminDashboard = () => {
       hour12: true
     });
   };
+
+  if (location.pathname.startsWith('/admin/super-admin')) {
+  return <SuperAdminDashboard />;
+}
 
    if (location.pathname.startsWith('/admin/buyers-tenants')) {
     return <BuyerTenantsDashboard />;
