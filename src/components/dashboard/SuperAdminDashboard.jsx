@@ -17,8 +17,8 @@ import { HiOutlineUserGroup } from 'react-icons/hi2';
 import SuperAdminOverview from './superadmin/SuperAdminOverview';
 
 
-// import UserManagement from './superadmin/UserManagement';
-// import CustomerManagement from './superadmin/CustomerManagement';
+import UserManagement from './superadmin/UserManagement';
+import CustomerManagement from './superadmin/CustomerManagement';
 // import RolePermissions from './superadmin/Role&Permissions';
 // import PropertyManagement from './superadmin/PropertyManagement';
 // import ProjectManagement from './superadmin/ProjectManagement';
@@ -268,22 +268,22 @@ const SuperAdminDashboard = () => {
                 <Route index element={<SuperAdminOverview />} />
                 <Route path="overview" element={<SuperAdminOverview />} />
 
-                {/* <Route path="users" element={<UserManagement />} />
+                <Route path="users" element={<UserManagement />} />
                 <Route path="customers" element={<CustomerManagement />} />
-                <Route path="roles" element={<RolePermissions />} />
-                <Route path="properties" element={<PropertyManagement />} />
-                <Route path="projects" element={<ProjectManagement />} />
-                <Route path="leads" element={<LeadManagement />} />
-                <Route path="subscriptions" element={<SubscriptionManagement />} />
-                <Route path="payments" element={<PaymentsManagement />} />
-                <Route path="advertisements" element={<AdvertisementsManagement />} />
-                <Route path="kyc" element={<KYCVerificationManagement />} />
-                <Route path="locations" element={<LocationManagement />} />
-                <Route path="reports" element={<ReportsAnalyticsManagement />} />
-                <Route path="notifications" element={<Notifications />} />
-                <Route path="activity-logs" element={<ActivityLogs />} />
-                <Route path="content" element={<ContentManagement />} />
-                <Route path="settings" element={<Settings />} /> */}
+                {/* <Route path="roles" element={<RolePermissions />} /> */}
+                {/* <Route path="properties" element={<PropertyManagement />} /> */}
+                {/* <Route path="projects" element={<ProjectManagement />} /> */}
+                {/* <Route path="leads" element={<LeadManagement />} /> */}
+                {/* <Route path="subscriptions" element={<SubscriptionManagement />} /> */}
+                {/* <Route path="payments" element={<PaymentsManagement />} /> */}
+                {/* <Route path="advertisements" element={<AdvertisementsManagement />} /> */}
+                {/* <Route path="kyc" element={<KYCVerificationManagement />} /> */}
+                {/* <Route path="locations" element={<LocationManagement />} /> */}
+                {/* <Route path="reports" element={<ReportsAnalyticsManagement />} /> */}
+                {/* <Route path="notifications" element={<Notifications />} /> */}
+                {/* <Route path="activity-logs" element={<ActivityLogs />} /> */}
+                {/* <Route path="content" element={<ContentManagement />} /> */}
+                {/* <Route path="settings" element={<Settings />} /> */}
               </Routes>
             </div>
           </div>
