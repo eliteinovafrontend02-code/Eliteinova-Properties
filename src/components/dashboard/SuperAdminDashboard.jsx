@@ -20,7 +20,7 @@ import SuperAdminOverview from './superadmin/SuperAdminOverview';
 import UserManagement from './superadmin/UserManagement';
 import CustomerManagement from './superadmin/CustomerManagement';
 // import RolePermissions from './superadmin/Role&Permissions';
-// import PropertyManagement from './superadmin/PropertyManagement';
+import PropertyManagement from './superadmin/PropertyManagement';
 // import ProjectManagement from './superadmin/ProjectManagement';
 // import LeadManagement from './superadmin/LeadManagement';
 // import SubscriptionManagement from './superadmin/SubscriptionManagement';
@@ -271,7 +271,7 @@ const SuperAdminDashboard = () => {
                 <Route path="users" element={<UserManagement />} />
                 <Route path="customers" element={<CustomerManagement />} />
                 {/* <Route path="roles" element={<RolePermissions />} /> */}
-                {/* <Route path="properties" element={<PropertyManagement />} /> */}
+                <Route path="properties" element={<PropertyManagement />} />
                 {/* <Route path="projects" element={<ProjectManagement />} /> */}
                 {/* <Route path="leads" element={<LeadManagement />} /> */}
                 {/* <Route path="subscriptions" element={<SubscriptionManagement />} /> */}
