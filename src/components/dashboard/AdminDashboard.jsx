@@ -92,7 +92,7 @@ import PaymentReports from './admin/Payments/PaymentReports';
 
 
 // Other modules
-// import LeadManagement from './admin/LeadManagement';
+import LeadManagement from './admin/LeadManagement';
 // import ReportsAnalytics from './admin/ReportsAnalytics';
 // import ContentManagement from './admin/ContentManagement';
 // import Notifications from './admin/Notifications';
@@ -571,7 +571,7 @@ const AdminDashboard = () => {
               {/* Properties — handled by the early return above, no Route needed here */}
 
               {/* Other routes */}
-              {/* <Route path="leads" element={<LeadManagement />} /> */}
+              <Route path="leads" element={<LeadManagement />} />
               {/* <Route path="reports" element={<ReportsAnalytics />} /> */}
               {/* <Route path="content" element={<ContentManagement />} /> */}
               {/* <Route path="notifications" element={<Notifications />} /> */}

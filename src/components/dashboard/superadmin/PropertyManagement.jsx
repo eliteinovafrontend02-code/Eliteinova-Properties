@@ -521,7 +521,7 @@ const ConfirmModal = ({ isOpen, title, message, confirmText, cancelText, type, i
   const ModalIcon = Icon || FiAlertTriangle;
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl animate-slide-up overflow-hidden">
         <div className={`h-1.5 bg-gradient-to-r ${theme.gradient}`} />
         <div className="p-6">
