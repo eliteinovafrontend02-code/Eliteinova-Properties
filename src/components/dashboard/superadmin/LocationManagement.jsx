@@ -1,7 +1,6 @@
-// src/components/dashboard/admin/superadmin/PropertyManagement.jsx
+// src/components/dashboard/admin/superadmin/LocationManagement.jsx
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   FiUsers, FiHome, FiMapPin, FiDollarSign, FiCalendar,
   FiClock, FiUser, FiCheckCircle, FiXCircle, FiSearch,
@@ -9,37 +8,31 @@ import {
   FiTrash2, FiRefreshCw, FiDownload, FiAlertTriangle,
   FiInfo, FiX, FiList, FiGrid as FiGridIcon, FiActivity,
   FiMail, FiPhone, FiExternalLink, FiTag, FiGrid, FiSave,
-  FiClock as FiClockIcon, FiUserCheck, FiBriefcase,
-  FiFileText, FiStar, FiShield, FiTool, FiTrendingUp,
-  FiUserPlus, FiPhoneCall, FiThumbsUp, FiThumbsDown, FiTarget,
-  FiGlobe, FiSmartphone, FiRadio, FiShare2, FiHash, FiBookmark,
-  FiFilter, FiCheck, FiMinus, FiPlus, FiEyeOff, FiEye as FiEyeIcon,
-  FiHome as FiHomeIcon, FiAward, FiBarChart2, FiMap, FiChevronUp,
-  FiCheckCircle as FiCheckCircleIcon, FiXCircle as FiXCircleIcon,
-  FiCheckSquare, FiSquare, FiToggleLeft, FiToggleRight,
-  FiPercent, FiPieChart, FiArrowUp, FiArrowDown, FiLayers,
-  FiBox, FiClipboard, FiPackage, FiCreditCard, FiRotateCcw,
-  FiPlayCircle, FiEdit3, FiDatabase,
-  FiKey
+  FiUserCheck, FiBriefcase, FiFileText, FiStar, FiShield,
+  FiTool, FiTrendingUp, FiUserPlus, FiTarget, FiGlobe,
+  FiFilter, FiCheck, FiPlus, FiAward, FiBarChart2, FiMap,
+  FiChevronUp, FiCheckSquare, FiPercent, FiPieChart,
+  FiArrowUp, FiArrowDown, FiLayers, FiBox, FiClipboard,
+  FiPackage, FiCreditCard, FiRotateCcw, FiPlayCircle, FiEdit3,
+  FiDatabase, FiFlag, FiSquare, FiKey, FiHash, FiImage, FiGift,
+  FiCompass, FiNavigation, FiCrosshair
 } from 'react-icons/fi';
 import {
-  FaBuilding, FaBed, FaBath, FaCar, FaCheck,
-  FaTimes, FaStar as FaStarSolid, FaUserTie, FaHome as FaHomeSolid,
-  FaImage, FaCalendarAlt, FaClock, FaPhoneAlt, FaUserCircle,
-  FaComments, FaClipboardList, FaHandshake, FaWhatsapp, FaGoogle,
-  FaUser, FaEnvelope, FaPhone, FaTag as FaTagSolid, FaCity,
-  FaBuilding as FaBuildingSolid, FaUserCog, FaCalendarDay,
-  FaUserCheck as FaUserCheckSolid, FaMapMarkerAlt, FaUserFriends,
-  FaRegUser, FaRegBuilding, FaUserGraduate, FaRegBuilding as FaBuildingReg,
-  FaStore, FaHome, FaWarehouse, FaTree, FaHotel, FaBuilding as FaBuildingIcon,
-  FaRegBuilding as FaBuildingOutline, FaCrown, FaGem, FaHardHat,
-  FaCheck as FaCheckSolid, FaStar, FaRegStar, FaRegClock, FaRulerCombined
+  FaBuilding, FaCheck, FaTimes, FaStar as FaStarSolid,
+  FaUserTie, FaHome as FaHomeSolid, FaCity, FaHardHat,
+  FaCrown, FaGem, FaRulerCombined, FaWarehouse, FaStore,
+  FaHotel, FaTree, FaBuilding as FaBuildingSolid,
+  FaMapMarkerAlt
 } from 'react-icons/fa';
+import {
+  MdOutlineConstruction, MdApartment, MdOutlineBusiness,
+  MdOutlineApartment, MdLocationCity
+} from 'react-icons/md';
 
 // ============================================================
-// PROPERTY CATEGORY CONFIG
+// LOCATION CATEGORY CONFIG  (same colors as Property/Project)
 // ============================================================
-const PROPERTY_CATEGORIES = {
+const LOCATION_CATEGORIES = {
   'Individual': {
     icon: FaHomeSolid,
     color: 'from-blue-600 to-blue-400',
@@ -47,7 +40,7 @@ const PROPERTY_CATEGORIES = {
     text: 'text-blue-700',
     border: 'border-blue-200',
     label: 'Individual',
-    description: 'Independent houses, villas and duplex residential units',
+    description: 'Individual house, villa and duplex locations across cities',
     gradient: 'from-blue-600 via-blue-500 to-indigo-400',
     hex: '#3B82F6'
   },
@@ -58,7 +51,7 @@ const PROPERTY_CATEGORIES = {
     text: 'text-purple-700',
     border: 'border-purple-200',
     label: 'Apartment',
-    description: 'Rental, serviced and luxury apartments across communities',
+    description: 'Apartment communities, gated societies and towers',
     gradient: 'from-purple-600 via-purple-500 to-violet-400',
     hex: '#8B5CF6'
   },
@@ -69,7 +62,7 @@ const PROPERTY_CATEGORIES = {
     text: 'text-emerald-700',
     border: 'border-emerald-200',
     label: 'Commercial',
-    description: 'Offices, retail shops, showrooms and industrial spaces',
+    description: 'Commercial hubs, business parks, retail and IT corridors',
     gradient: 'from-emerald-600 via-emerald-500 to-teal-400',
     hex: '#10B981'
   },
@@ -80,7 +73,7 @@ const PROPERTY_CATEGORIES = {
     text: 'text-amber-700',
     border: 'border-amber-200',
     label: 'Land & Plots',
-    description: 'Residential, commercial, agricultural and industrial land',
+    description: 'Land parcels, plots, agricultural and industrial zones',
     gradient: 'from-amber-600 via-amber-500 to-orange-400',
     hex: '#F59E0B'
   },
@@ -91,81 +84,54 @@ const PROPERTY_CATEGORIES = {
     text: 'text-rose-700',
     border: 'border-rose-200',
     label: 'Hostel',
-    description: 'Girls, boys, co-living and working professional hostels',
+    description: 'Hostel, PG and co-living zones across cities and suburbs',
     gradient: 'from-rose-600 via-rose-500 to-pink-400',
     hex: '#EC4899'
   }
 };
-
-const ALL_CATEGORIES = Object.keys(PROPERTY_CATEGORIES);
+const ALL_CATEGORIES = Object.keys(LOCATION_CATEGORIES);
 
 // ============================================================
-// PROPERTY STATUS / VERIFICATION / LISTING CONFIG
+// LOCATION STATUS CONFIG
 // ============================================================
 const STATUS_CONFIG = {
   'Active': { color: 'bg-emerald-500', text: 'text-emerald-700', bg: 'bg-emerald-50', border: 'border-emerald-200', label: 'Active' },
-  'Pending': { color: 'bg-amber-500', text: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200', label: 'Pending' },
-  'Sold': { color: 'bg-blue-600', text: 'text-blue-700', bg: 'bg-blue-50', border: 'border-blue-200', label: 'Sold' },
-  'Rented': { color: 'bg-purple-600', text: 'text-purple-700', bg: 'bg-purple-50', border: 'border-purple-200', label: 'Rented' },
-  'Expired': { color: 'bg-gray-500', text: 'text-gray-700', bg: 'bg-gray-50', border: 'border-gray-200', label: 'Expired' },
-  'Rejected': { color: 'bg-red-500', text: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200', label: 'Rejected' },
-  'Inactive': { color: 'bg-gray-400', text: 'text-gray-700', bg: 'bg-gray-50', border: 'border-gray-200', label: 'Inactive' }
+  'Popular': { color: 'bg-blue-500', text: 'text-blue-700', bg: 'bg-blue-50', border: 'border-blue-200', label: 'Popular' },
+  'Trending': { color: 'bg-purple-600', text: 'text-purple-700', bg: 'bg-purple-50', border: 'border-purple-200', label: 'Trending' },
+  'Emerging': { color: 'bg-amber-500', text: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200', label: 'Emerging' },
+  'Inactive': { color: 'bg-gray-500', text: 'text-gray-700', bg: 'bg-gray-50', border: 'border-gray-200', label: 'Inactive' }
 };
 
-// Only two verification statuses: Verified / Not Verified
 const VERIFICATION_STATUS = {
-  'Verified': { color: 'bg-emerald-500', text: 'text-emerald-700', bg: 'bg-emerald-50', border: 'border-emerald-200', icon: FiCheckCircle },
-  'Not Verified': { color: 'bg-gray-500', text: 'text-gray-700', bg: 'bg-gray-50', border: 'border-gray-200', icon: FiXCircle }
+  'Verified': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+  'Not Verified': { bg: 'bg-gray-50', text: 'text-gray-700', border: 'border-gray-200' }
 };
 
-// Different colors for Buy / Rent / Lease
-const LISTING_TYPE_CONFIG = {
-  'Buy': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
-  'Rent': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
-  'Lease': { bg: 'bg-violet-50', text: 'text-violet-700', border: 'border-violet-200' }
+// Sub-locations per category (kept for display as a tag)
+const SUB_LOCATIONS = {
+  'Individual': ['Independent House Zone', 'Villa Community', 'Duplex Enclave', 'Row House Colony', 'Premium Residential Zone'],
+  'Apartment': ['Gated Apartment Zone', 'High-Rise Tower Cluster', 'Serviced Apartment Belt', 'Luxury Condo Corridor', 'Studio & 1BHK Cluster'],
+  'Commercial': ['IT Park Corridor', 'Business District', 'Retail Market Zone', 'Showroom Belt', 'Industrial Park', 'Co-Working Hub'],
+  'Land & Plots': ['Residential Plot Zone', 'Commercial Plot Zone', 'Agricultural Belt', 'Industrial Land Zone', 'Investment Land Corridor'],
+  'Hostel': ['Girls Hostel Zone', 'Boys Hostel Zone', 'Co-Living Hub', 'Working Professional Cluster', 'Student Housing Belt']
 };
 
-const OWNER_TYPES = {
-  'Owner': { icon: FaUser, bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', label: 'Owner' },
-  'Agent': { icon: FiUserCheck, bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', label: 'Agent' },
-  'Builder': { icon: FaBuildingSolid, bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200', label: 'Builder' },
-  'Property Manager': { icon: FiBriefcase, bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200', label: 'Property Manager' }
-};
+// City-state-district mapping (correct pairing)
+const CITY_MAPPING = [
+  { city: 'Kochi', state: 'Kerala', district: 'Ernakulam', areas: ['Kakkanad', 'Edappally', 'Fort Kochi', 'Anna Nagar'] },
+  { city: 'Mumbai', state: 'Maharashtra', district: 'Mumbai Suburban', areas: ['Bandra', 'Andheri', 'Powai', 'Worli'] },
+  { city: 'Bangalore', state: 'Karnataka', district: 'Bengaluru Urban', areas: ['Koramangala', 'Indiranagar', 'Whitefield', 'Electronic City', 'Marathahalli'] },
+  { city: 'Chennai', state: 'Tamil Nadu', district: 'Chennai', areas: ['Anna Nagar', 'Adyar', 'T Nagar'] },
+  { city: 'Hyderabad', state: 'Telangana', district: 'Hyderabad', areas: ['Jubilee Hills', 'Gachibowli', 'Hitech City', 'Banjara Hills'] },
+  { city: 'Pune', state: 'Maharashtra', district: 'Pune', areas: ['Koregaon Park', 'Kharadi', 'Viman Nagar'] },
+  { city: 'Delhi', state: 'Delhi', district: 'New Delhi', areas: ['Connaught Place', 'Saket', 'Dwarka'] },
+  { city: 'Ahmedabad', state: 'Gujarat', district: 'Ahmedabad', areas: ['Vastrapur', 'SG Highway', 'Satellite'] },
+  { city: 'Kolkata', state: 'West Bengal', district: 'Kolkata', areas: ['Salt Lake', 'New Town', 'Park Street'] },
+  { city: 'Jaipur', state: 'Rajasthan', district: 'Jaipur', areas: ['Malviya Nagar', 'Vaishali Nagar', 'Mansarovar'] }
+];
 
-// ============================================================
-// SUB-CATEGORIES
-// ============================================================
-const SUB_CATEGORIES = {
-  'Individual': [
-    'Independent House',
-    'Independent Villa',
-    'Duplex Residential Unit'
-  ],
-  'Apartment': [
-    'Rental Apartment', 'Serviced Apartment', 'Lease Apartment', 'Residential Apartment',
-    'Gated Community Apartment', 'Studio Apartment', 'Duplex Apartment', 'Luxury Apartment',
-    'Condominium Apartment', 'Penthouse Apartment'
-  ],
-  'Commercial': [
-    'Office Space', 'Retail Shop', 'Showroom', 'Commercial Land/Plot', 'Warehouse / Godown',
-    'Industrial Property / Factory', 'Co-Working Space', 'Business Center', 'Shopping Mall Space',
-    'Commercial Complex', 'Restaurant Cafe Space', 'Hotel / Lodge / Resort Property',
-    'Clinic / Hospital Space', 'Educational Institution Property', 'IT Park / Tech Park Space',
-    'Multiplex / Entertainment Space', 'Petrol Bunk / Fuel Station', 'Cold Storage / Logistics Hub',
-    'Mixed-Use Commercial Property', 'Agricultural Commercial Property'
-  ],
-  'Land & Plots': [
-    'Residential Land / Plots', 'Commercial Land / Plots', 'Agricultural Land / Plots',
-    'Industrial Land', 'Institutional Land', 'Investment & Special Purpose Land'
-  ],
-  'Hostel': [
-    'Girls Hostel', 'Boys Hostel', 'Co-Living Space', 'Working Professional Hostel'
-  ]
-};
+const LANDMARKS = ['Airport Road', 'Metro Station', 'City Mall', 'Tech Park', 'Central Park', 'Railway Station', 'Bus Terminal', 'Ring Road', 'Beach Road', 'Lake View'];
 
-// ============================================================
-// DATE RANGE PRESETS
-// ============================================================
 const DATE_RANGE_PRESETS = [
   { id: 'today', label: 'Today', icon: FiCalendar, days: 1 },
   { id: 'yesterday', label: 'Yesterday', icon: FiClock, days: 1 },
@@ -203,10 +169,12 @@ const formatCompact = (amount) => {
   if (num >= 1000) return `₹${(num / 1000).toFixed(1)}K`;
   return `₹${num}`;
 };
+
 const formatDate = (date) => {
   try { return new Date(date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }); }
   catch { return 'N/A'; }
 };
+
 const getDateRangeLabel = (preset, customStart, customEnd) => {
   if (preset === 'custom') return `${formatDate(customStart)} - ${formatDate(customEnd)}`;
   return DATE_RANGE_PRESETS.find(p => p.id === preset)?.label || 'Select Range';
@@ -217,19 +185,13 @@ const generateTimeSeriesLabels = (datePreset) => {
     case 'today':
     case 'yesterday':
       return Array.from({ length: 12 }, (_, i) => `${i * 2}:00`);
-    case 'week':
-      return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    case 'month':
-      return ['W1', 'W2', 'W3', 'W4'];
-    case 'quarter':
-      return ['Month 1', 'Month 2', 'Month 3'];
-    case 'year':
-      return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    case 'custom':
-      return ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8'];
+    case 'week': return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    case 'month': return ['W1', 'W2', 'W3', 'W4'];
+    case 'quarter': return ['Month 1', 'Month 2', 'Month 3'];
+    case 'year': return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    case 'custom': return ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8'];
     case 'all':
-    default:
-      return ['2020', '2021', '2022', '2023', '2024', '2025'];
+    default: return ['2020', '2021', '2022', '2023', '2024', '2025'];
   }
 };
 
@@ -243,26 +205,12 @@ const generateGrowthSeries = (labels, seed = 1) => {
 };
 
 // ============================================================
-// DATA GENERATORS
+// DATA GENERATOR — locations  ✅ FIXED: locationName = area only
 // ============================================================
-const generateMockProperties = (category, count = 30, dateRange = 'month', customStart, customEnd) => {
-  const subcats = SUB_CATEGORIES[category] || ['Standard'];
-  const propertyNames = [
-    'Green Valley', 'Lake View', 'Sunrise Heights', 'Royal Palm', 'Silver Oak',
-    'Golden Meadows', 'Cedar Woods', 'Maple Leaf', 'Orchid Garden', 'Tulip Tower',
-    'Lotus Heights', 'Jasmine Villa', 'Emerald Greens', 'Pearl Residency',
-    'Ruby Enclave', 'Sapphire Heights', 'Diamond Ridge', 'Platinum Park'
-  ];
-  const locations = ['MG Road', 'Banjara Hills', 'Jubilee Hills', 'Koramangala', 'Indiranagar', 'Whitefield', 'Electronic City', 'Gachibowli'];
-  const districts = ['Hyderabad', 'Bangalore', 'Chennai', 'Mumbai', 'Delhi', 'Pune', 'Kolkata', 'Ahmedabad'];
-  const cities = ['Hyderabad', 'Bangalore', 'Chennai', 'Mumbai', 'Delhi', 'Pune', 'Kolkata', 'Ahmedabad'];
-  const areas = ['Jubilee Hills', 'Koramangala', 'T Nagar', 'Bandra', 'Connaught Place', 'Koregaon Park', 'Salt Lake', 'Vastrapur'];
-  const ownerAgents = ['Raj Properties', 'Priya Realty', 'Amit Homes', 'Sneha Estates', 'Vikram Realtors', 'Deepa Properties', 'Arjun Builders', 'Meera Developers'];
-  const ownerTypeOptions = ['Owner', 'Agent', 'Builder', 'Property Manager'];
-  const priceRanges = ['₹20L - ₹35L', '₹35L - ₹50L', '₹50L - ₹75L', '₹75L - ₹1Cr', '₹1Cr - ₹1.5Cr', '₹1.5Cr - ₹2Cr', '₹2Cr+'];
-  const statuses = ['Active', 'Inactive', 'Pending', 'Sold', 'Rented', 'Expired', 'Rejected'];
+const generateMockLocations = (category, count = 25, dateRange = 'month', customStart, customEnd) => {
+  const subLocs = SUB_LOCATIONS[category] || ['General'];
+  const statuses = ['Active', 'Popular', 'Trending', 'Emerging', 'Inactive'];
   const verificationStatuses = ['Verified', 'Not Verified'];
-  const listingTypes = ['Buy', 'Rent', 'Lease'];
 
   let maxDaysBack = 180;
   if (dateRange === 'today' || dateRange === 'yesterday') maxDaysBack = 1;
@@ -272,7 +220,7 @@ const generateMockProperties = (category, count = 30, dateRange = 'month', custo
   else if (dateRange === 'year') maxDaysBack = 365;
   else if (dateRange === 'all') maxDaysBack = 730;
   else if (dateRange === 'custom' && customStart) {
-    const diffTime = Math.abs(new Date() - new Date(customStart));
+    const diffTime = Math.abs(new Date() - customStart);
     maxDaysBack = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
@@ -281,94 +229,86 @@ const generateMockProperties = (category, count = 30, dateRange = 'month', custo
     const postedDate = new Date();
     postedDate.setDate(postedDate.getDate() - daysAgo);
 
-    const subcategory = subcats[Math.floor(Math.random() * subcats.length)];
-    const isFeatured = Math.random() > 0.7;
-    const pincode = String(600000 + Math.floor(Math.random() * 99999));
-    const hasCoords = Math.random() > 0.4;
+    const cityData = CITY_MAPPING[Math.floor(Math.random() * CITY_MAPPING.length)];
+    const area = cityData.areas[Math.floor(Math.random() * cityData.areas.length)];
+    const subLoc = subLocs[Math.floor(Math.random() * subLocs.length)];
+    const landmark = LANDMARKS[Math.floor(Math.random() * LANDMARKS.length)];
 
     return {
-      id: `${category.toLowerCase().replace(/[\s&]+/g, '_')}_${i + 1}_${Date.now()}`,
-      propertyId: `PROP-${String(i + 1).padStart(4, '0')}`,
-      propertyName: propertyNames[Math.floor(Math.random() * propertyNames.length)] + ' ' + (i + 1),
+      id: `loc_${category.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_${i + 1}_${Date.now()}`,
+      locationId: `LOC-${String(i + 1).padStart(4, '0')}`,
+      locationName: area,                             
       category,
-      subcategory,
-      listingType: listingTypes[Math.floor(Math.random() * listingTypes.length)],
-      location: locations[Math.floor(Math.random() * locations.length)],
-      district: districts[Math.floor(Math.random() * districts.length)],
-      city: cities[Math.floor(Math.random() * cities.length)],
-      area: areas[Math.floor(Math.random() * areas.length)],
-      street: `${i + 1} Cross Street`,
-      pincode,
-      priceRange: priceRanges[Math.floor(Math.random() * priceRanges.length)],
-      ownerType: ownerTypeOptions[Math.floor(Math.random() * ownerTypeOptions.length)],
-      ownerAgent: ownerAgents[Math.floor(Math.random() * ownerAgents.length)],
+      subLocation: subLoc,                             
+      city: cityData.city,
+      state: cityData.state,
+      district: cityData.district,
+      area,
+      pincode: String(400000 + Math.floor(Math.random() * 99999)),
+      landmark: `Near ${landmark}`,
+      latitude: (11 + Math.random() * 15).toFixed(4),
+      longitude: (72 + Math.random() * 15).toFixed(4),
       status: statuses[Math.floor(Math.random() * statuses.length)],
       verificationStatus: verificationStatuses[Math.floor(Math.random() * verificationStatuses.length)],
-      featured: isFeatured,
-      postedDate: postedDate.toISOString().split('T')[0],
-      latitude: hasCoords ? (11 + Math.random() * 15).toFixed(4) : '',
-      longitude: hasCoords ? (72 + Math.random() * 15).toFixed(4) : '',
-      description: `Beautiful ${category.toLowerCase()} property with excellent amenities and prime location.`,
-      price: Math.floor(Math.random() * 45000000) + 5000000,
-      bedrooms: category === 'Land & Plots' ? 0 : Math.floor(Math.random() * 4) + 1,
-      bathrooms: category === 'Land & Plots' ? 0 : Math.floor(Math.random() * 3) + 1,
-      areaSqft: Math.floor(Math.random() * 3000) + 400,
-      views: Math.floor(Math.random() * 500) + 50,
-      inquiries: Math.floor(Math.random() * 40) + 5
+      featured: Math.random() > 0.7,
+      totalProperties: Math.floor(Math.random() * 500) + 50,
+      activeProperties: 0,
+      avgPrice: Math.floor(Math.random() * 45000000) + 5000000,
+      totalValue: Math.floor(Math.random() * 500000000) + 50000000,
+      views: Math.floor(Math.random() * 5000) + 200,
+      inquiries: Math.floor(Math.random() * 400) + 10,
+      areaSqkm: (Math.random() * 20 + 1).toFixed(2),
+      demandScore: Math.floor(Math.random() * 100) + 1,
+      description: `Prime ${category.toLowerCase()} location in ${cityData.city}, ${cityData.state} with excellent connectivity and amenities.`,
+      postedDate: postedDate.toISOString().split('T')[0]
     };
+  }).map(l => {
+    l.activeProperties = Math.floor(l.totalProperties * (Math.random() * 0.7 + 0.2));
+    return l;
   });
 };
 
 // ============================================================
-// BUILD CATEGORY STATS
+// BUILD STATS
 // ============================================================
-const buildCategoryStats = (category, propertyList, datePreset = 'month') => {
+const buildLocationStats = (category, list, datePreset = 'month') => {
   const growthLabels = generateTimeSeriesLabels(datePreset);
   const growthSeed = seedFromString(`${category}_${datePreset}_growth`);
   const monthlyGrowth = generateGrowthSeries(growthLabels, growthSeed);
-
-  const totalValue = propertyList.reduce((sum, p) => sum + (p.price || 0), 0);
-  const subcats = SUB_CATEGORIES[category] || [];
+  const totalValue = list.reduce((sum, l) => sum + (l.totalValue || 0), 0);
 
   return {
-    total: propertyList.length,
-    active: propertyList.filter(p => p.status === 'Active').length,
-    pending: propertyList.filter(p => p.status === 'Pending').length,
-    sold: propertyList.filter(p => p.status === 'Sold').length,
-    rented: propertyList.filter(p => p.status === 'Rented').length,
-    featured: propertyList.filter(p => p.featured).length,
-    expired: propertyList.filter(p => p.status === 'Expired').length,
-    rejected: propertyList.filter(p => p.status === 'Rejected').length,
-    inactive: propertyList.filter(p => p.status === 'Inactive').length,
-    verified: propertyList.filter(p => p.verificationStatus === 'Verified').length,
-    notVerified: propertyList.filter(p => p.verificationStatus === 'Not Verified').length,
+    total: list.length,
+    active: list.filter(l => l.status === 'Active').length,
+    popular: list.filter(l => l.status === 'Popular').length,
+    trending: list.filter(l => l.status === 'Trending').length,
+    emerging: list.filter(l => l.status === 'Emerging').length,
+    inactive: list.filter(l => l.status === 'Inactive').length,
+    featured: list.filter(l => l.featured).length,
+    verified: list.filter(l => l.verificationStatus === 'Verified').length,
+    notVerified: list.filter(l => l.verificationStatus === 'Not Verified').length,
     totalValue,
-    totalViews: propertyList.reduce((sum, p) => sum + (p.views || 0), 0),
-    totalInquiries: propertyList.reduce((sum, p) => sum + (p.inquiries || 0), 0),
-    avgPrice: propertyList.length > 0 ? Math.floor(totalValue / propertyList.length) : 0,
-    listingDistribution: ['Buy', 'Rent', 'Lease'].map((type, idx) => ({
-      label: type,
-      value: propertyList.filter(p => p.listingType === type).length,
-      color: UNIQUE_COLORS[idx % UNIQUE_COLORS.length]
-    })),
+    totalProperties: list.reduce((sum, l) => sum + (l.totalProperties || 0), 0),
+    activeProperties: list.reduce((sum, l) => sum + (l.activeProperties || 0), 0),
+    totalViews: list.reduce((sum, l) => sum + (l.views || 0), 0),
+    totalInquiries: list.reduce((sum, l) => sum + (l.inquiries || 0), 0),
+    avgPrice: list.length > 0 ? Math.floor(totalValue / list.length) : 0,
+    avgDemandScore: list.length > 0
+      ? Math.round(list.reduce((sum, l) => sum + (l.demandScore || 0), 0) / list.length)
+      : 0,
     statusDistribution: [
-      { label: 'Active', value: propertyList.filter(p => p.status === 'Active').length, color: '#10B981' },
-      { label: 'Pending', value: propertyList.filter(p => p.status === 'Pending').length, color: '#F59E0B' },
-      { label: 'Sold', value: propertyList.filter(p => p.status === 'Sold').length, color: '#3B82F6' },
-      { label: 'Rented', value: propertyList.filter(p => p.status === 'Rented').length, color: '#8B5CF6' },
-      { label: 'Expired', value: propertyList.filter(p => p.status === 'Expired').length, color: '#6B7280' },
-      { label: 'Rejected', value: propertyList.filter(p => p.status === 'Rejected').length, color: '#EF4444' }
-    ],
-    subcategoryDistribution: subcats.map((sub, idx) => ({
-      label: sub,
-      value: propertyList.filter(p => p.subcategory === sub).length,
-      color: UNIQUE_COLORS[idx % UNIQUE_COLORS.length]
-    })),
-    valueByListingType: ['Buy', 'Rent', 'Lease'].map((type, idx) => ({
-      label: type,
-      value: propertyList.filter(p => p.listingType === type).reduce((sum, p) => sum + (p.price || 0), 0),
-      color: UNIQUE_COLORS[idx % UNIQUE_COLORS.length]
-    })),
+      { label: 'Active', value: list.filter(l => l.status === 'Active').length, color: '#10B981' },
+      { label: 'Popular', value: list.filter(l => l.status === 'Popular').length, color: '#3B82F6' },
+      { label: 'Trending', value: list.filter(l => l.status === 'Trending').length, color: '#8B5CF6' },
+      { label: 'Emerging', value: list.filter(l => l.status === 'Emerging').length, color: '#F59E0B' },
+      { label: 'Inactive', value: list.filter(l => l.status === 'Inactive').length, color: '#6B7280' }
+    ].filter(d => d.value > 0),
+    revenueByStatus: [
+      { label: 'Active', value: list.filter(l => l.status === 'Active').reduce((s, l) => s + (l.totalValue || 0), 0), color: '#10B981' },
+      { label: 'Popular', value: list.filter(l => l.status === 'Popular').reduce((s, l) => s + (l.totalValue || 0), 0), color: '#3B82F6' },
+      { label: 'Trending', value: list.filter(l => l.status === 'Trending').reduce((s, l) => s + (l.totalValue || 0), 0), color: '#8B5CF6' },
+      { label: 'Emerging', value: list.filter(l => l.status === 'Emerging').reduce((s, l) => s + (l.totalValue || 0), 0), color: '#F59E0B' }
+    ].filter(d => d.value > 0),
     monthlyGrowth
   };
 };
@@ -436,7 +376,7 @@ const DateRangePicker = ({ selected, onSelect, customStart, customEnd, onCustomC
           <div className="border-t border-[#E8F0EE] px-3 py-2">
             <button
               onClick={() => setShowCustom(!showCustom)}
-              className="w-full flex items-center justify-between text-xs font-bold text-[#00695C] px-2 py-1.5 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300"
+              className="w-full flex items-center justify-between text-xs font-bold text-[#00695C] px-2 py-1.5 rounded-lg hover:bg-[#E8F4F2] transition-all"
             >
               <span className="flex items-center gap-2"><FiEdit3 className="text-sm" /> Custom Range</span>
               <FiChevronDown className={`transition-transform duration-300 ${showCustom ? 'rotate-180' : ''}`} />
@@ -449,7 +389,7 @@ const DateRangePicker = ({ selected, onSelect, customStart, customEnd, onCustomC
                     type="date"
                     value={customStart ? customStart.toISOString().split('T')[0] : ''}
                     onChange={(e) => onCustomChange(new Date(e.target.value), customEnd)}
-                    className="w-full px-2 py-1.5 bg-white rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/10 text-xs text-[#0F1A18] font-medium outline-none"
+                    className="w-full px-2 py-1.5 bg-white rounded-lg border border-[#E8F0EE] focus:border-[#00695C] text-xs text-[#0F1A18] font-medium outline-none"
                   />
                 </div>
                 <div>
@@ -458,7 +398,7 @@ const DateRangePicker = ({ selected, onSelect, customStart, customEnd, onCustomC
                     type="date"
                     value={customEnd ? customEnd.toISOString().split('T')[0] : ''}
                     onChange={(e) => onCustomChange(customStart, new Date(e.target.value))}
-                    className="w-full px-2 py-1.5 bg-white rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/10 text-xs text-[#0F1A18] font-medium outline-none"
+                    className="w-full px-2 py-1.5 bg-white rounded-lg border border-[#E8F0EE] focus:border-[#00695C] text-xs text-[#0F1A18] font-medium outline-none"
                   />
                 </div>
                 <button
@@ -575,73 +515,6 @@ const StatCard = ({ icon, title, value, trend, subtitle, color, delay = 0 }) => 
       </p>
       {subtitle && <p className="text-[12px] text-[#4a6c67] mt-1.5 truncate font-medium">{subtitle}</p>}
       <div className={`absolute bottom-0 left-0 h-1 bg-gradient-to-r ${color} transition-all duration-500 ${isHovered ? 'w-full' : 'w-0'}`} />
-    </div>
-  );
-};
-
-const FlowChart = ({ data = [], height = 280 }) => {
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [animationProgress, setAnimationProgress] = useState(0);
-  useEffect(() => {
-    const t = setTimeout(() => setAnimationProgress(1), 100);
-    return () => clearTimeout(t);
-  }, []);
-
-  if (!Array.isArray(data) || data.length === 0) {
-    return (
-      <div className="w-full flex flex-col items-center justify-center bg-[#F5F9F8] rounded-xl border border-dashed border-[#B5C9C5]" style={{ height }}>
-        <FiBarChart2 className="text-2xl text-[#8FA8A4] mb-2" />
-        <p className="text-xs font-bold text-[#3D5A55]">No data available</p>
-      </div>
-    );
-  }
-
-  const maxValue = Math.max(...data.map(d => d.value), 1);
-  const total = data.reduce((sum, d) => sum + d.value, 0);
-
-  return (
-    <div className="w-full">
-      <div className="space-y-4">
-        {data.map((item, index) => {
-          const percentage = total > 0 ? (item.value / total) * 100 : 0;
-          const widthPercent = animationProgress * (item.value / maxValue) * 100;
-          const isHovered = hoveredIndex === index;
-          const Icon = item.icon;
-          return (
-            <div key={index} className="relative" onMouseEnter={() => setHoveredIndex(index)} onMouseLeave={() => setHoveredIndex(null)}>
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg transition-all"
-                    style={{ background: `linear-gradient(135deg, ${item.color} 0%, ${item.color}CC 100%)`, transform: isHovered ? 'scale(1.15) rotate(5deg)' : 'scale(1)' }}>
-                    {Icon && <Icon className="text-sm" />}
-                  </div>
-                  <div>
-                    <p className={`text-sm font-black ${isHovered ? 'text-[#00695C]' : 'text-[#0F1A18]'}`}>{item.label}</p>
-                    <p className="text-[10px] text-[#3D5A55] font-medium">{item.subtitle || `${percentage.toFixed(1)}% of total`}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-lg font-black" style={{ color: item.color }}>{formatCompact(item.value)}</p>
-                  <p className="text-[10px] text-[#3D5A55] font-bold">{item.count?.toLocaleString() || 0} items</p>
-                </div>
-              </div>
-              <div className="relative h-8 bg-[#F5F9F8] rounded-xl overflow-hidden">
-                <div className="h-full rounded-xl transition-all duration-1000 ease-out relative overflow-hidden"
-                  style={{ width: `${widthPercent}%`, background: `linear-gradient(90deg, ${item.color} 0%, ${item.color}DD 100%)`, transitionDelay: `${index * 100}ms` }}>
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
-                  <div className="absolute inset-0 flex items-center justify-end pr-3">
-                    <span className="text-[10px] font-black text-white drop-shadow-md">{percentage.toFixed(1)}%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      <div className="mt-6 pt-4 border-t border-[#E8F0EE] flex items-center justify-between">
-        <span className="text-xs font-bold text-[#3D5A55] uppercase tracking-wider">Total</span>
-        <span className="text-xl font-black text-[#00695C]">{formatCompact(total)}</span>
-      </div>
     </div>
   );
 };
@@ -913,250 +786,22 @@ const ProgressBar = ({ label, value, max, color, icon: Icon, delay = 0 }) => {
 };
 
 const StatusBadge = ({ status }) => {
-  const styles = {
-    pending: 'bg-amber-100 text-amber-700',
-    approved: 'bg-emerald-100 text-emerald-700',
-    rejected: 'bg-red-100 text-red-700',
-    Active: 'bg-emerald-100 text-emerald-700',
-    Inactive: 'bg-gray-100 text-gray-700',
-    Pending: 'bg-amber-100 text-amber-700',
-    Sold: 'bg-blue-100 text-blue-700',
-    Rented: 'bg-purple-100 text-purple-700',
-    Expired: 'bg-gray-100 text-gray-700',
-    Rejected: 'bg-red-100 text-red-700'
-  };
+  const cfg = STATUS_CONFIG[status] || STATUS_CONFIG['Active'];
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-bold text-[9px] ${styles[status] || 'bg-gray-100 text-gray-600'}`}>
-      {status}
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-bold text-[9px] ${cfg.bg} ${cfg.text} border ${cfg.border}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${cfg.color}`} /> {cfg.label}
     </span>
   );
 };
 
 const VerificationBadge = ({ status }) => {
   const isVerified = status === 'Verified';
-  if (isVerified) {
-    return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-bold text-[9px] border bg-emerald-50 text-emerald-700 border-emerald-200">
-        <FiCheckCircle className="text-[8px]" /> Verified
-      </span>
-    );
-  }
+  const v = VERIFICATION_STATUS[status] || VERIFICATION_STATUS['Not Verified'];
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-bold text-[9px] border bg-gray-50 text-gray-700 border-gray-200">
-      <FiXCircle className="text-[8px]" /> Not Verified
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-bold text-[9px] border ${v.bg} ${v.text} ${v.border}`}>
+      {isVerified ? <FiCheckCircle className="text-[8px]" /> : <FiXCircle className="text-[8px]" />}
+      {status}
     </span>
-  );
-};
-
-// ============================================================
-// CATEGORY OVERVIEW TAB
-// ============================================================
-const CategoryOverviewTab = ({ activeCategory, stats, config, dateRangeLabel, datePreset }) => {
-  const Icon = config.icon;
-
-  const growthTitle = {
-    today: 'Hourly Growth', yesterday: 'Hourly Growth', week: 'Daily Growth',
-    month: 'Weekly Growth', quarter: 'Monthly Growth', year: 'Monthly Growth',
-    all: 'Yearly Growth', custom: 'Period Growth'
-  }[datePreset] || 'Growth Trend';
-
-  return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-r from-[#E8F4F2] to-[#D5F0EA] rounded-2xl p-3 border border-[#C5EDE5] flex items-center gap-2">
-        <FiCalendar className="text-[#00695C] text-sm" />
-        <span className="text-xs font-bold text-[#00695C]">Showing data for: {dateRangeLabel}</span>
-      </div>
-
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={<FiHome className="text-white text-base" />} title={`Total ${activeCategory}`} value={stats.total || 0} trend={12.5} subtitle="All listings" color={`bg-gradient-to-br ${config.gradient}`} delay={0} />
-        <StatCard icon={<FiCheckCircle className="text-white text-base" />} title="Active" value={stats.active || 0} trend={8.3} subtitle="Live listings" color="bg-gradient-to-br from-emerald-600 to-teal-400" delay={100} />
-        <StatCard icon={<FiDollarSign className="text-white text-base" />} title="Total Value" value={formatCompact(stats.totalValue || 0)} trend={15.2} subtitle="Combined price" color="bg-gradient-to-br from-purple-600 to-violet-400" delay={200} />
-        <StatCard icon={<FiEye className="text-white text-base" />} title="Total Views" value={stats.totalViews || 0} trend={10.5} subtitle="All listings" color="bg-gradient-to-br from-amber-600 to-orange-400" delay={300} />
-      </div>
-
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <div className="xl:col-span-2 bg-white rounded-2xl p-6 border border-[#E8F0EE] shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-lg font-black text-[#0F1A18] flex items-center gap-2">
-                <Icon className="animate-icon-float" style={{ color: config.hex }} />
-                {activeCategory} Subcategory Distribution
-              </h3>
-              <p className="text-xs text-[#3D5A55] font-semibold">Property types within this category</p>
-            </div>
-          </div>
-          <FlowChart
-            data={(stats.subcategoryDistribution || []).map((sub, idx) => ({
-              ...sub,
-              icon: idx === 0 ? FiAward : idx === 1 ? FaCrown : FiPackage,
-              subtitle: `${((sub.value / (stats.total || 1)) * 100).toFixed(1)}% of listings`,
-              count: sub.value
-            }))}
-            height={320}
-          />
-        </div>
-        <div className="bg-white rounded-2xl p-6 border border-[#E8F0EE] shadow-sm">
-          <h3 className="text-lg font-black text-[#0F1A18] mb-4 flex items-center gap-2">
-            <FiActivity className="text-[#00695C]" /> Status Distribution
-          </h3>
-          <DonutChart data={stats.statusDistribution || []} size={220} thickness={48} centerLabel="Total" centerValue={stats.total || 0} />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl p-6 border border-[#E8F0EE] shadow-sm">
-          <h3 className="text-lg font-black text-[#0F1A18] mb-4 flex items-center gap-2">
-            <FiDollarSign className="text-[#00695C]" /> Value by Listing Type
-          </h3>
-          <BarChart data={stats.valueByListingType || []} height={280} />
-        </div>
-
-        <div className="bg-white rounded-2xl p-6 border border-[#E8F0EE] shadow-sm">
-          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-            <h3 className="text-lg font-black text-[#0F1A18] flex items-center gap-2">
-              <FiTrendingUp className="text-[#00695C]" /> {growthTitle}
-            </h3>
-            <span className="px-3 py-1 bg-[#E8F4F2] text-[#00695C] text-[10px] font-black rounded-full flex items-center gap-1">
-              <FiCalendar className="text-[10px]" /> {dateRangeLabel}
-            </span>
-          </div>
-          <AreaChart data={stats.monthlyGrowth || []} height={280} color={config.hex} />
-        </div>
-      </div>
-
-      <div className="bg-white rounded-2xl p-6 border border-[#E8F0EE] shadow-sm">
-        <h3 className="text-lg font-black text-[#0F1A18] mb-4 flex items-center gap-2">
-          <FiPercent className="text-[#00695C]" /> Listing Type Distribution
-        </h3>
-        <div className="space-y-3">
-          {(stats.listingDistribution || []).map((item, i) => (
-            <ProgressBar key={i} label={item.label} value={item.value} max={stats.total || 1} color={item.color}
-              icon={i === 0 ? FiTag : i === 1 ? FiKey : FiFileText} delay={i * 100} />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// ============================================================
-// PROPERTY VIEW MODAL (Edit button removed)
-// ============================================================
-const ViewPropertyDetailModal = ({ property, show, onClose, onDelete }) => {
-  if (!property || !show) return null;
-
-  const categoryConfig = PROPERTY_CATEGORIES[property.category] || PROPERTY_CATEGORIES['Individual'];
-  const CategoryIcon = categoryConfig.icon;
-  const statusConfig = STATUS_CONFIG[property.status] || STATUS_CONFIG['Pending'];
-  const ownerTypeConfig = OWNER_TYPES[property.ownerType] || OWNER_TYPES['Owner'];
-  const OwnerIcon = ownerTypeConfig.icon;
-  const isVerified = property.verificationStatus === 'Verified';
-
-  return (
-    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
-        <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] p-6 rounded-t-3xl z-10 shrink-0">
-          <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white">
-            <FiX className="text-lg" />
-          </button>
-          <div className="flex items-center gap-3 mb-2">
-            <div className={`w-14 h-14 rounded-2xl ${categoryConfig.bg} border-2 border-white/30 flex items-center justify-center text-2xl ${categoryConfig.text} shadow-lg`}>
-              <CategoryIcon />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-white truncate">{property.propertyName}</h2>
-              <p className="text-white/80 text-sm flex items-center gap-2 flex-wrap">
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${categoryConfig.bg} ${categoryConfig.text} border ${categoryConfig.border}`}>
-                  {categoryConfig.label}
-                </span>
-                <span>ID: {property.propertyId}</span>
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusConfig.bg} ${statusConfig.text} border ${statusConfig.border}`}>
-              {property.status}
-            </span>
-            <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 border ${isVerified ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}>
-              {isVerified ? <FiCheckCircle className="text-xs" /> : <FiXCircle className="text-xs" />}
-              {isVerified ? 'Verified' : 'Not Verified'}
-            </span>
-            {property.featured && (
-              <span className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200">
-                <FiStar className="text-xs" /> Featured
-              </span>
-            )}
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-6 bg-white">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[
-              { icon: <FiHash />, label: 'Property ID', value: property.propertyId },
-              { icon: <FaHomeSolid />, label: 'Property Name', value: property.propertyName },
-              { icon: <FaTagSolid />, label: 'Category', value: property.category },
-              { icon: <FiTag />, label: 'Subcategory', value: property.subcategory },
-              { icon: <FiBriefcase />, label: 'Listing Type', value: property.listingType },
-              { icon: <FiMapPin />, label: 'Location', value: property.location },
-              { icon: <FaCity />, label: 'District', value: property.district },
-              { icon: <FaCity />, label: 'City', value: property.city },
-              { icon: <FiMap />, label: 'Area', value: property.area },
-              { icon: <FiDollarSign />, label: 'Price Range', value: property.priceRange },
-            ].map((item, i) => (
-              <div key={i} className="bg-[#F5F9F8] rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[#00695C] text-sm">{item.icon}</span>
-                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">{item.label}</h4>
-                </div>
-                <p className="text-sm font-bold text-[#1A2E2A] truncate">{item.value}</p>
-              </div>
-            ))}
-
-            <div className="bg-[#F5F9F8] rounded-2xl p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <FaUserTie className="text-[#00695C] text-sm" />
-                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Owner / Agent / Builder / PM</h4>
-              </div>
-              <div className="flex items-center gap-2 flex-wrap">
-                {property.ownerType && (
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${ownerTypeConfig.bg} ${ownerTypeConfig.text} border ${ownerTypeConfig.border}`}>
-                    <OwnerIcon className="text-[8px] inline mr-1" /> {property.ownerType}
-                  </span>
-                )}
-                <p className="text-sm font-bold text-[#1A2E2A]">{property.ownerAgent || 'Not specified'}</p>
-              </div>
-            </div>
-
-            <div className="bg-[#F5F9F8] rounded-2xl p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <FiCalendar className="text-[#00695C] text-sm" />
-                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Posted Date</h4>
-              </div>
-              <p className="text-sm font-bold text-[#1A2E2A]">{formatDate(property.postedDate)}</p>
-            </div>
-
-            <div className="bg-[#F5F9F8] rounded-2xl p-4 md:col-span-2">
-              <div className="flex items-center gap-2 mb-1">
-                <FiFileText className="text-[#00695C] text-sm" />
-                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Description</h4>
-              </div>
-              <p className="text-sm font-bold text-[#1A2E2A]">{property.description || 'No description available'}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="sticky bottom-0 px-6 py-4 bg-white border-t border-[#E8F0EE] rounded-b-3xl shrink-0 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
-          <div className="flex items-center gap-3">
-            <button onClick={onClose} className="flex-1 px-4 py-2.5 bg-[#F5F9F8] text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] text-sm font-medium">
-              Close
-            </button>
-            <button onClick={() => { if (onDelete) { onDelete(property.id); } }} className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 text-sm font-medium shadow-lg">
-              <FiTrash2 className="inline mr-2" /> Delete
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
   );
 };
 
@@ -1171,10 +816,7 @@ const FilterDropdown = ({ id, label, icon: Icon, value, options, onChange, isOpe
       <button
         type="button"
         onMouseDown={(e) => e.stopPropagation()}
-        onClick={(e) => {
-          e.stopPropagation();
-          setOpenDropdown(open ? null : id);
-        }}
+        onClick={(e) => { e.stopPropagation(); setOpenDropdown(open ? null : id); }}
         className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
           isActive || open
             ? 'bg-[#E8F4F2] text-[#00695C] border border-[#B5C9C5]'
@@ -1202,11 +844,7 @@ const FilterDropdown = ({ id, label, icon: Icon, value, options, onChange, isOpe
             <button
               key={opt}
               type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onChange(opt);
-                setOpenDropdown(null);
-              }}
+              onClick={(e) => { e.stopPropagation(); onChange(opt); setOpenDropdown(null); }}
               className={`w-full px-4 py-2 text-left text-xs transition-all flex items-center justify-between gap-3 hover:bg-[#F5F9F8] ${
                 value === opt ? 'bg-[#E8F4F2] text-[#00695C] font-bold' : 'text-[#0F1A18] font-medium'
               }`}
@@ -1222,17 +860,183 @@ const FilterDropdown = ({ id, label, icon: Icon, value, options, onChange, isOpe
 };
 
 // ============================================================
-// CATEGORY REGISTRATIONS TAB
+// OVERVIEW TAB
 // ============================================================
-const CategoryRegistrationsTab = ({
-  activeCategory, properties, onView, onDelete,
+const CategoryOverviewTab = ({ activeCategory, stats, config, dateRangeLabel, datePreset }) => {
+  const growthTitle = {
+    today: 'Hourly Growth', yesterday: 'Hourly Growth', week: 'Daily Growth',
+    month: 'Weekly Growth', quarter: 'Monthly Growth', year: 'Monthly Growth',
+    all: 'Yearly Growth', custom: 'Period Growth'
+  }[datePreset] || 'Growth Trend';
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-gradient-to-r from-[#E8F4F2] to-[#D5F0EA] rounded-2xl p-3 border border-[#C5EDE5] flex items-center gap-2">
+        <FiCalendar className="text-[#00695C] text-sm" />
+        <span className="text-xs font-bold text-[#00695C]">Showing data for: {dateRangeLabel}</span>
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard icon={<FiMapPin className="text-white text-base" />} title={`Total ${activeCategory} Locations`} value={stats.total || 0} trend={12.5} subtitle="All locations" color={`bg-gradient-to-br ${config.gradient}`} delay={0} />
+        <StatCard icon={<FiActivity className="text-white text-base" />} title="Active Locations" value={stats.active || 0} trend={8.3} subtitle="Live locations" color="bg-gradient-to-br from-blue-600 to-cyan-400" delay={100} />
+        <StatCard icon={<FiTrendingUp className="text-white text-base" />} title="Trending" value={stats.trending || 0} trend={15.2} subtitle="High-demand zones" color="bg-gradient-to-br from-purple-600 to-violet-400" delay={200} />
+        <StatCard icon={<FiDollarSign className="text-white text-base" />} title="Total Value" value={formatCompact(stats.totalValue || 0)} trend={10.5} subtitle="Combined property value" color="bg-gradient-to-br from-amber-600 to-orange-400" delay={300} />
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="bg-white rounded-2xl p-6 border border-[#E8F0EE] shadow-sm">
+          <h3 className="text-lg font-black text-[#0F1A18] mb-4 flex items-center gap-2">
+            <FiActivity className="text-[#00695C]" /> Status Distribution
+          </h3>
+          <DonutChart data={stats.statusDistribution || []} size={240} thickness={52} centerLabel="Total" centerValue={stats.total || 0} />
+        </div>
+        <div className="bg-white rounded-2xl p-6 border border-[#E8F0EE] shadow-sm">
+          <h3 className="text-lg font-black text-[#0F1A18] mb-4 flex items-center gap-2">
+            <FiDollarSign className="text-[#00695C]" /> Value by Status
+          </h3>
+          <BarChart data={stats.revenueByStatus || []} height={280} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="bg-white rounded-2xl p-6 border border-[#E8F0EE] shadow-sm">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <h3 className="text-lg font-black text-[#0F1A18] flex items-center gap-2">
+              <FiTrendingUp className="text-[#00695C]" /> {growthTitle}
+            </h3>
+            <span className="px-3 py-1 bg-[#E8F4F2] text-[#00695C] text-[10px] font-black rounded-full flex items-center gap-1">
+              <FiCalendar className="text-[10px]" /> {dateRangeLabel}
+            </span>
+          </div>
+          <AreaChart data={stats.monthlyGrowth || []} height={280} color={config.hex} />
+        </div>
+
+        <div className="bg-white rounded-2xl p-6 border border-[#E8F0EE] shadow-sm">
+          <h3 className="text-lg font-black text-[#0F1A18] mb-4 flex items-center gap-2">
+            <FiPercent className="text-[#00695C]" /> Status-wise Distribution
+          </h3>
+          <div className="space-y-3">
+            {(stats.statusDistribution || []).map((item, i) => (
+              <ProgressBar key={i} label={item.label} value={item.value} max={stats.total || 1} color={item.color}
+                icon={FiLayers} delay={i * 100} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================================
+// VIEW LOCATION DETAIL MODAL
+// ============================================================
+const ViewLocationDetailModal = ({ location, show, onClose, onDelete }) => {
+  if (!location || !show) return null;
+
+  const categoryConfig = LOCATION_CATEGORIES[location.category] || LOCATION_CATEGORIES['Individual'];
+  const CategoryIcon = categoryConfig.icon;
+  const statusConfig = STATUS_CONFIG[location.status] || STATUS_CONFIG['Active'];
+  const isVerified = location.verificationStatus === 'Verified';
+
+  return (
+    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
+        <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] p-6 rounded-t-3xl z-10 shrink-0">
+          <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white">
+            <FiX className="text-lg" />
+          </button>
+          <div className="flex items-center gap-3 mb-2">
+            <div className={`w-14 h-14 rounded-2xl ${categoryConfig.bg} border-2 border-white/30 flex items-center justify-center text-2xl ${categoryConfig.text} shadow-lg`}>
+              <CategoryIcon />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-white truncate">{location.locationName}</h2>
+              <p className="text-white/80 text-sm flex items-center gap-2 flex-wrap">
+                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${categoryConfig.bg} ${categoryConfig.text} border ${categoryConfig.border}`}>
+                  {categoryConfig.label}
+                </span>
+                <span>ID: {location.locationId}</span>
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusConfig.bg} ${statusConfig.text} border ${statusConfig.border}`}>
+              {statusConfig.label}
+            </span>
+            <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 border ${isVerified ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}>
+              {isVerified ? <FiCheckCircle className="text-xs" /> : <FiXCircle className="text-xs" />}
+              {isVerified ? 'Verified' : 'Not Verified'}
+            </span>
+            {location.featured && (
+              <span className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200">
+                <FiStar className="text-xs" /> Featured
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 bg-white">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              { icon: <FiHash />, label: 'Location ID', value: location.locationId },
+              { icon: <FiMapPin />, label: 'Location Name', value: location.locationName },
+              { icon: <FiTag />, label: 'Category', value: location.category },
+              { icon: <FiBriefcase />, label: 'Sub-Location', value: location.subLocation },
+              { icon: <FiCompass />, label: 'Landmark', value: location.landmark },
+              { icon: <FaCity />, label: 'District', value: location.district },
+              { icon: <FaCity />, label: 'City', value: location.city },
+              { icon: <FiMap />, label: 'State', value: location.state },
+              { icon: <FiHash />, label: 'Pincode', value: location.pincode },
+              { icon: <FiCompass />, label: 'Latitude', value: location.latitude },
+              { icon: <FiCompass />, label: 'Longitude', value: location.longitude },
+              { icon: <FiSquare />, label: 'Area', value: `${location.areaSqkm} sq km` },
+              { icon: <FiHome />, label: 'Total Properties', value: location.totalProperties },
+              { icon: <FiCheckCircle />, label: 'Active Properties', value: location.activeProperties },
+              { icon: <FiDollarSign />, label: 'Avg Price', value: formatCompact(location.avgPrice) },
+              { icon: <FiTrendingUp />, label: 'Demand Score', value: `${location.demandScore}/100` }
+            ].map((item, i) => (
+              <div key={i} className="bg-[#F5F9F8] rounded-2xl p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[#00695C] text-sm">{item.icon}</span>
+                  <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">{item.label}</h4>
+                </div>
+                <p className="text-sm font-bold text-[#1A2E2A] truncate">{item.value}</p>
+              </div>
+            ))}
+
+            <div className="bg-[#F5F9F8] rounded-2xl p-4 md:col-span-2">
+              <div className="flex items-center gap-2 mb-1">
+                <FiFileText className="text-[#00695C] text-sm" />
+                <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Description</h4>
+              </div>
+              <p className="text-sm font-bold text-[#1A2E2A]">{location.description || 'No description available'}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="sticky bottom-0 px-6 py-4 bg-white border-t border-[#E8F0EE] rounded-b-3xl shrink-0 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+          <div className="flex items-center gap-3">
+            <button onClick={onClose} className="flex-1 px-4 py-2.5 bg-[#F5F9F8] text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] text-sm font-medium">
+              Close
+            </button>
+            <button onClick={() => { if (onDelete) { onDelete(location.id); } }} className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 text-sm font-medium shadow-lg">
+              <FiTrash2 className="inline mr-2" /> Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================================
+// CATEGORY MANAGE TAB  (sub-location filter removed)
+// ============================================================
+const CategoryManageTab = ({
+  activeCategory, locations, onView, onDelete,
   actionLoading, searchQuery, setSearchQuery,
   viewMode, setViewMode, dateRangeLabel
 }) => {
-  const config = PROPERTY_CATEGORIES[activeCategory];
-
-  const [listingTypeFilter, setListingTypeFilter] = useState('All');
-  const [propertyTypeFilter, setPropertyTypeFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [openDropdown, setOpenDropdown] = useState(null);
   const filterBarRef = useRef(null);
@@ -1248,61 +1052,54 @@ const CategoryRegistrationsTab = ({
   }, []);
 
   useEffect(() => {
-    setListingTypeFilter('All');
-    setPropertyTypeFilter('All');
     setStatusFilter('All');
     setOpenDropdown(null);
   }, [activeCategory]);
 
-  const listingTypeOptions = ['All', 'Buy', 'Rent', 'Lease'];
-  const propertyTypeOptions = ['All', ...(SUB_CATEGORIES[activeCategory] || [])];
-  const statusOptions = ['All', 'Active', 'Inactive', 'Pending', 'Sold', 'Rented', 'Expired', 'Rejected'];
+  const statusOptions = ['All', ...Object.values(STATUS_CONFIG).map(s => s.label)];
 
   const filtered = useMemo(() => {
-    let result = [...properties];
+    let result = [...locations];
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      result = result.filter(p =>
-        (p.propertyName && p.propertyName.toLowerCase().includes(q)) ||
-        (p.propertyId && p.propertyId.toLowerCase().includes(q)) ||
-        (p.subcategory && p.subcategory.toLowerCase().includes(q)) ||
-        (p.city && p.city.toLowerCase().includes(q)) ||
-        (p.ownerAgent && p.ownerAgent.toLowerCase().includes(q))
+      result = result.filter(l =>
+        (l.locationName && l.locationName.toLowerCase().includes(q)) ||
+        (l.locationId && l.locationId.toLowerCase().includes(q)) ||
+        (l.subLocation && l.subLocation.toLowerCase().includes(q)) ||
+        (l.city && l.city.toLowerCase().includes(q)) ||
+        (l.landmark && l.landmark.toLowerCase().includes(q))
       );
     }
-    if (listingTypeFilter !== 'All') result = result.filter(p => p.listingType === listingTypeFilter);
-    if (propertyTypeFilter !== 'All') result = result.filter(p => p.subcategory === propertyTypeFilter);
-    if (statusFilter !== 'All') result = result.filter(p => p.status === statusFilter);
+    if (statusFilter !== 'All') {
+      const matchKey = Object.keys(STATUS_CONFIG).find(k => STATUS_CONFIG[k].label === statusFilter);
+      if (matchKey) result = result.filter(l => l.status === matchKey);
+    }
     return result;
-  }, [properties, searchQuery, listingTypeFilter, propertyTypeFilter, statusFilter]);
+  }, [locations, searchQuery, statusFilter]);
 
-  const hasActiveFilter =
-    listingTypeFilter !== 'All' || propertyTypeFilter !== 'All' || statusFilter !== 'All';
+  const hasActiveFilter = statusFilter !== 'All';
 
   const clearFilters = () => {
-    setListingTypeFilter('All');
-    setPropertyTypeFilter('All');
     setStatusFilter('All');
   };
 
+  const config = LOCATION_CATEGORIES[activeCategory];
+
   return (
     <div className="space-y-4">
-      {/* Search + Filters — same row */}
       <div ref={filterBarRef} className="relative z-[100] bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3">
-          {/* Search */}
           <div className="flex-1 relative min-w-0">
             <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
             <input
               type="text"
-              placeholder={`Search by property ID, name, subcategory, city, owner...`}
+              placeholder={`Search by location ID, name, sub-location, city, landmark...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:bg-white text-sm text-[#0F1A18] placeholder:text-[#8FA8A4] outline-none transition-all"
             />
           </div>
 
-          {/* Filters */}
           <div className="flex items-center gap-2 flex-wrap">
             <FilterDropdown
               id="status"
@@ -1314,40 +1111,18 @@ const CategoryRegistrationsTab = ({
               isOpen={openDropdown}
               setOpenDropdown={setOpenDropdown}
             />
-            <FilterDropdown
-              id="property"
-              label="Property Type"
-              icon={FiTag}
-              value={propertyTypeFilter}
-              options={propertyTypeOptions}
-              onChange={setPropertyTypeFilter}
-              isOpen={openDropdown}
-              setOpenDropdown={setOpenDropdown}
-            />
-            <FilterDropdown
-              id="listing"
-              label="Listing Type"
-              icon={FiBriefcase}
-              value={listingTypeFilter}
-              options={listingTypeOptions}
-              onChange={setListingTypeFilter}
-              isOpen={openDropdown}
-              setOpenDropdown={setOpenDropdown}
-            />
 
             {hasActiveFilter && (
               <button
                 type="button"
                 onClick={clearFilters}
                 className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold bg-red-50 text-red-600 hover:bg-red-100 transition-all"
-                title="Clear Filters"
               >
                 <FiX className="text-sm" /> Clear
               </button>
             )}
           </div>
 
-          {/* View toggle */}
           <div className="flex items-center bg-[#F5F9F8] rounded-xl p-1 border border-[#E8F0EE] lg:ml-auto">
             <button
               type="button"
@@ -1368,23 +1143,22 @@ const CategoryRegistrationsTab = ({
           </div>
         </div>
 
-        {/* Meta row */}
         <div className="mt-3 flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-2 text-[10px] text-[#3D5A55] font-semibold">
-            <FiCalendar className="text-[#00695C]" /> Showing listings from: {dateRangeLabel}
+            <FiCalendar className="text-[#00695C]" /> Showing locations from: {dateRangeLabel}
           </div>
           <span className="px-3 py-1.5 bg-[#E8F4F2] text-[#00695C] text-xs font-black rounded-xl">
-            {filtered.length} {filtered.length === 1 ? 'property' : 'properties'}
+            {filtered.length} {filtered.length === 1 ? 'location' : 'locations'}
           </span>
         </div>
       </div>
 
       {viewMode === 'grid' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-          {filtered.map((property, index) => (
-            <PropertyGridCard
-              key={property.id}
-              property={property}
+          {filtered.map((location, index) => (
+            <LocationGridCard
+              key={location.id}
+              location={location}
               config={config}
               index={index}
               onView={onView}
@@ -1395,10 +1169,10 @@ const CategoryRegistrationsTab = ({
         </div>
       ) : (
         <div className="space-y-3">
-          {filtered.map((property, index) => (
-            <PropertyListCard
-              key={property.id}
-              property={property}
+          {filtered.map((location, index) => (
+            <LocationListCard
+              key={location.id}
+              location={location}
               config={config}
               index={index}
               onView={onView}
@@ -1412,9 +1186,9 @@ const CategoryRegistrationsTab = ({
       {filtered.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-[#E8F0EE]">
           <div className="w-24 h-24 rounded-full bg-[#F5F9F8] flex items-center justify-center mb-4 animate-float">
-            <FiHome className="text-4xl text-[#8FA8A4]" />
+            <FiMapPin className="text-4xl text-[#8FA8A4]" />
           </div>
-          <h3 className="text-xl font-black text-[#0F1A18]">No properties found</h3>
+          <h3 className="text-xl font-black text-[#0F1A18]">No locations found</h3>
           <p className="text-sm text-[#3D5A55] mt-1 font-medium">Try adjusting your search or filters</p>
           {hasActiveFilter && (
             <button
@@ -1431,13 +1205,12 @@ const CategoryRegistrationsTab = ({
 };
 
 // ============================================================
-// GRID CARD
+// GRID CARD — Properties | Active | Views
 // ============================================================
-const PropertyGridCard = ({ property, config, index, onView, onDelete, actionLoading }) => {
+const LocationGridCard = ({ location, config, index, onView, onDelete, actionLoading }) => {
   const CategoryIcon = config.icon;
-  const statusConfig = STATUS_CONFIG[property.status] || STATUS_CONFIG['Pending'];
-  const listingConfig = LISTING_TYPE_CONFIG[property.listingType] || LISTING_TYPE_CONFIG['Buy'];
-  const isVerified = property.verificationStatus === 'Verified';
+  const statusConfig = STATUS_CONFIG[location.status] || STATUS_CONFIG['Active'];
+  const isVerified = location.verificationStatus === 'Verified';
 
   return (
     <div
@@ -1449,19 +1222,16 @@ const PropertyGridCard = ({ property, config, index, onView, onDelete, actionLoa
           <CategoryIcon className="text-lg" />
         </div>
         <div className="min-w-0 flex-1">
-          <h4 className="font-bold text-[#0F1A18] text-sm leading-tight line-clamp-2" title={property.propertyName}>
-            {property.propertyName}
+          <h4 className="font-bold text-[#0F1A18] text-sm leading-tight line-clamp-2" title={location.locationName}>
+            {location.locationName}
           </h4>
-          <p className="text-[10px] text-[#5A7D78] font-bold mt-0.5 truncate">{property.propertyId}</p>
+          <p className="text-[10px] text-[#5A7D78] font-bold mt-0.5 truncate">{location.locationId}</p>
         </div>
       </div>
 
       <div className="flex items-center gap-1.5 mb-3 flex-wrap">
-        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-bold text-[9px] border ${listingConfig.bg} ${listingConfig.text} ${listingConfig.border}`}>
-          <FiBriefcase className="text-[8px]" /> {property.listingType}
-        </span>
         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-bold text-[9px] ${statusConfig.bg} ${statusConfig.text} border ${statusConfig.border}`}>
-          <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.color}`} /> {property.status}
+          <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.color}`} /> {statusConfig.label}
         </span>
         {isVerified ? (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-bold text-[9px] border bg-emerald-50 text-emerald-700 border-emerald-200">
@@ -1472,7 +1242,7 @@ const PropertyGridCard = ({ property, config, index, onView, onDelete, actionLoa
             <FiXCircle className="text-[8px]" /> Not Verified
           </span>
         )}
-        {property.featured && (
+        {location.featured && (
           <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full font-bold text-[9px] bg-amber-100 text-amber-700">
             <FiStar className="text-[8px]" /> Featured
           </span>
@@ -1480,41 +1250,41 @@ const PropertyGridCard = ({ property, config, index, onView, onDelete, actionLoa
       </div>
 
       <div className="space-y-1.5 text-[11px] text-[#3D5A55] flex-1">
-        <div className="flex items-center gap-2"><FiTag className="flex-shrink-0" /> <span className="truncate">{property.subcategory}</span></div>
-        <div className="flex items-center gap-2"><FiMapPin className="flex-shrink-0" /> <span className="truncate">{property.location}, {property.city}</span></div>
-        <div className="flex items-center gap-2"><FiDollarSign className="flex-shrink-0" /> <span className="font-semibold text-[#1A2E2A]">{property.priceRange}</span></div>
-        <div className="flex items-center gap-2"><FiUser className="flex-shrink-0" /> <span className="truncate">{property.ownerAgent}</span></div>
-        <div className="flex items-center gap-2"><FiCalendar className="flex-shrink-0" /> <span>{formatDate(property.postedDate)}</span></div>
+        <div className="flex items-center gap-2"><FiTag className="flex-shrink-0" /> <span className="truncate">{location.subLocation}</span></div>
+        <div className="flex items-center gap-2"><FiMapPin className="flex-shrink-0" /> <span className="truncate">{location.city}, {location.state}</span></div>
+        <div className="flex items-center gap-2"><FiCompass className="flex-shrink-0" /> <span className="truncate">{location.landmark}</span></div>
+        <div className="flex items-center gap-2"><FiDollarSign className="flex-shrink-0" /> <span className="font-semibold text-[#1A2E2A]">{formatCompact(location.avgPrice)} avg</span></div>
+        <div className="flex items-center gap-2"><FiTrendingUp className="flex-shrink-0" /> <span>Demand: {location.demandScore}/100</span></div>
       </div>
 
       <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-[#E8F0EE]">
         <div className="text-center">
-          <p className="text-sm font-black text-[#0F1A18]">{property.views}</p>
+          <p className="text-sm font-black text-[#0F1A18]">{location.totalProperties}</p>
+          <p className="text-[8px] text-[#3D5A55] uppercase tracking-wider font-bold">Properties</p>
+        </div>
+        <div className="text-center">
+          <p className="text-sm font-black text-[#00695C]">{location.activeProperties}</p>
+          <p className="text-[8px] text-[#3D5A55] uppercase tracking-wider font-bold">Active</p>
+        </div>
+        <div className="text-center">
+          <p className="text-sm font-black" style={{ color: config.hex }}>{location.views}</p>
           <p className="text-[8px] text-[#3D5A55] uppercase tracking-wider font-bold">Views</p>
-        </div>
-        <div className="text-center">
-          <p className="text-sm font-black text-[#0F1A18]">{property.inquiries}</p>
-          <p className="text-[8px] text-[#3D5A55] uppercase tracking-wider font-bold">Inquiries</p>
-        </div>
-        <div className="text-center">
-          <p className="text-sm font-black" style={{ color: config.hex }}>{property.areaSqft}</p>
-          <p className="text-[8px] text-[#3D5A55] uppercase tracking-wider font-bold">Sqft</p>
         </div>
       </div>
 
       <div className="flex gap-2 mt-3 pt-3 border-t border-[#E8F0EE]">
         <button
-          onClick={() => onView(property)}
+          onClick={() => onView(location)}
           className="flex-1 py-2 text-xs font-bold text-[#00695C] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] flex items-center justify-center gap-1.5 transition-all"
         >
           <FiEye className="text-xs" /> View
         </button>
         <button
-          onClick={() => onDelete(property.id)}
-          disabled={actionLoading === property.id}
+          onClick={() => onDelete(location.id)}
+          disabled={actionLoading === location.id}
           className="flex-1 py-2 text-xs font-bold text-red-600 bg-red-50 rounded-xl hover:bg-red-100 flex items-center justify-center gap-1.5 disabled:opacity-50 transition-all"
         >
-          {actionLoading === property.id
+          {actionLoading === location.id
             ? <FiRefreshCw className="text-xs animate-spin" />
             : <FiTrash2 className="text-xs" />}
           Delete
@@ -1525,13 +1295,10 @@ const PropertyGridCard = ({ property, config, index, onView, onDelete, actionLoa
 };
 
 // ============================================================
-// LIST CARD
+// LIST CARD — Properties | Active | Views
 // ============================================================
-const PropertyListCard = ({ property, config, index, onView, onDelete, actionLoading }) => {
+const LocationListCard = ({ location, config, index, onView, onDelete, actionLoading }) => {
   const CategoryIcon = config.icon;
-  const listingConfig = LISTING_TYPE_CONFIG[property.listingType] || LISTING_TYPE_CONFIG['Buy'];
-  const ownerTypeConfig = OWNER_TYPES[property.ownerType] || OWNER_TYPES['Owner'];
-  const OwnerIcon = ownerTypeConfig.icon;
 
   return (
     <div
@@ -1545,35 +1312,32 @@ const PropertyListCard = ({ property, config, index, onView, onDelete, actionLoa
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h4 className="font-bold text-[15px] text-[#0F1A18] truncate">{property.propertyName}</h4>
-              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-bold text-[10px] border ${listingConfig.bg} ${listingConfig.text} ${listingConfig.border}`}>
-                <FiBriefcase className="text-[9px]" /> {property.listingType}
-              </span>
-              <StatusBadge status={property.status} />
-              <VerificationBadge status={property.verificationStatus} />
-              {property.featured && (
+              <h4 className="font-bold text-[15px] text-[#0F1A18] truncate">{location.locationName}</h4>
+              <StatusBadge status={location.status} />
+              <VerificationBadge status={location.verificationStatus} />
+              {location.featured && (
                 <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-700">★ Featured</span>
               )}
             </div>
             <p className="text-[12px] text-[#3D5A55] font-medium mt-0.5 truncate">
-              {property.propertyId} • {property.subcategory}
+              {location.locationId} • {location.subLocation}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0">
           <button
-            onClick={() => onView(property)}
+            onClick={() => onView(location)}
             className="px-4 py-2 text-xs font-bold text-[#00695C] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] flex items-center gap-1.5"
           >
             <FiEye className="text-sm" /> View
           </button>
           <button
-            onClick={() => onDelete(property.id)}
-            disabled={actionLoading === property.id}
+            onClick={() => onDelete(location.id)}
+            disabled={actionLoading === location.id}
             className="px-4 py-2 text-xs font-bold text-red-600 bg-red-50 rounded-xl hover:bg-red-100 flex items-center gap-1.5 disabled:opacity-50"
           >
-            {actionLoading === property.id
+            {actionLoading === location.id
               ? <FiRefreshCw className="text-sm animate-spin" />
               : <FiTrash2 className="text-sm" />}
             Delete
@@ -1586,54 +1350,52 @@ const PropertyListCard = ({ property, config, index, onView, onDelete, actionLoa
           <p className="text-[11px] font-black text-[#185d53] uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
             <FiMapPin className="text-[13px]" /> Location
           </p>
-          <p className="text-[13px] font-semibold text-[#1A2E2A] truncate">{property.city}</p>
-          <p className="text-[12px] text-[#3D5A55] font-medium mt-0.5 truncate">{property.area}</p>
+          <p className="text-[13px] font-semibold text-[#1A2E2A] truncate">{location.city}</p>
+          <p className="text-[12px] text-[#3D5A55] font-medium mt-0.5 truncate">{location.state}</p>
         </div>
         <div className="min-w-0">
           <p className="text-[11px] font-black text-[#185d53] uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-            <FiDollarSign className="text-[13px]" /> Price
+            <FiDollarSign className="text-[13px]" /> Avg Price
           </p>
-          <p className="text-[15px] font-black text-[#00695C]">{property.priceRange}</p>
-          <p className="text-[12px] text-[#3D5A55] font-medium mt-0.5">{property.listingType}</p>
+          <p className="text-[15px] font-black text-[#00695C]">{formatCompact(location.avgPrice)}</p>
+          <p className="text-[12px] text-[#3D5A55] font-medium mt-0.5">Total: {formatCompact(location.totalValue)}</p>
         </div>
         <div className="min-w-0">
           <p className="text-[11px] font-black text-[#185d53] uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-            <FiUser className="text-[13px]" /> {property.ownerType}
+            <FiCompass className="text-[13px]" /> Landmark
           </p>
-          <p className="text-[13px] font-semibold text-[#1A2E2A] truncate">{property.ownerAgent}</p>
-          <p className="text-[12px] text-[#3D5A55] font-medium mt-0.5">
-            <OwnerIcon className="text-[10px] inline mr-1" /> {property.ownerType}
-          </p>
+          <p className="text-[13px] font-semibold text-[#1A2E2A] truncate">{location.landmark}</p>
+          <p className="text-[12px] text-[#3D5A55] font-medium mt-0.5">Area: {location.areaSqkm} sq km</p>
         </div>
         <div className="min-w-0">
           <p className="text-[11px] font-black text-[#185d53] uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-            <FiCalendar className="text-[13px]" /> Posted
+            <FiTrendingUp className="text-[13px]" /> Demand Score
           </p>
-          <p className="text-[13px] font-semibold text-[#1A2E2A]">{formatDate(property.postedDate)}</p>
-          <p className="text-[12px] text-[#3D5A55] font-medium mt-0.5">{property.views} views</p>
+          <p className="text-[13px] font-semibold text-[#1A2E2A]">{location.demandScore}/100</p>
+          <p className="text-[12px] text-[#3D5A55] font-medium mt-0.5">{location.inquiries} inquiries</p>
         </div>
       </div>
 
       <div className="grid grid-cols-3 gap-3 px-5 pb-4">
         <div className="flex items-center gap-2.5 px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE]">
-          <FiEye className="text-[#00695C] text-base flex-shrink-0" />
+          <FiHome className="text-[#00695C] text-base flex-shrink-0" />
           <div className="min-w-0">
-            <p className="text-[15px] font-black text-[#0F1A18] leading-none">{property.views}</p>
+            <p className="text-[15px] font-black text-[#0F1A18] leading-none">{location.totalProperties}</p>
+            <p className="text-[10px] text-[#3D5A55] uppercase tracking-wider font-bold mt-1">Properties</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2.5 px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE]">
+          <FiCheckSquare className="text-[#10B981] text-base flex-shrink-0" />
+          <div className="min-w-0">
+            <p className="text-[15px] font-black text-[#00695C] leading-none">{location.activeProperties}</p>
+            <p className="text-[10px] text-[#3D5A55] uppercase tracking-wider font-bold mt-1">Active</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2.5 px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE]">
+          <FiEye className="text-[#3B82F6] text-base flex-shrink-0" />
+          <div className="min-w-0">
+            <p className="text-[15px] font-black text-[#0F1A18] leading-none">{location.views}</p>
             <p className="text-[10px] text-[#3D5A55] uppercase tracking-wider font-bold mt-1">Views</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2.5 px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE]">
-          <FiMail className="text-[#3B82F6] text-base flex-shrink-0" />
-          <div className="min-w-0">
-            <p className="text-[15px] font-black text-[#0F1A18] leading-none">{property.inquiries}</p>
-            <p className="text-[10px] text-[#3D5A55] uppercase tracking-wider font-bold mt-1">Inquiries</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2.5 px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE]">
-          <FaRulerCombined className="text-amber-500 text-sm flex-shrink-0" />
-          <div className="min-w-0">
-            <p className="text-[15px] font-black text-[#0F1A18] leading-none">{property.areaSqft}</p>
-            <p className="text-[10px] text-[#3D5A55] uppercase tracking-wider font-bold mt-1">Sqft</p>
           </div>
         </div>
       </div>
@@ -1644,9 +1406,7 @@ const PropertyListCard = ({ property, config, index, onView, onDelete, actionLoa
 // ============================================================
 // MAIN COMPONENT
 // ============================================================
-const PropertyManagement = () => {
-  const navigate = useNavigate();
-
+const LocationManagement = () => {
   const [activeCategory, setActiveCategory] = useState('Individual');
   const [activeView, setActiveView] = useState('overview');
   const [activeTab, setActiveTab] = useState('Individual');
@@ -1661,12 +1421,12 @@ const PropertyManagement = () => {
   const [customStart, setCustomStart] = useState(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));
   const [customEnd, setCustomEnd] = useState(new Date());
 
-  const [properties, setProperties] = useState({
+  const [locations, setLocations] = useState({
     'Individual': [], 'Apartment': [], 'Commercial': [], 'Land & Plots': [], 'Hostel': []
   });
   const [categoryStats, setCategoryStats] = useState({});
 
-  const [viewingProperty, setViewingProperty] = useState(null);
+  const [viewingLocation, setViewingLocation] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
 
   const showToast = useCallback((message, type = 'success', duration = 3000) => {
@@ -1675,58 +1435,58 @@ const PropertyManagement = () => {
   }, []);
 
   useEffect(() => {
-    const newProperties = {};
+    const newLocations = {};
     const newStats = {};
     ALL_CATEGORIES.forEach(cat => {
-      const list = generateMockProperties(cat, Math.floor(Math.random() * 20) + 20, datePreset, customStart, customEnd);
-      newProperties[cat] = list;
-      newStats[cat] = buildCategoryStats(cat, list, datePreset);
+      const list = generateMockLocations(cat, Math.floor(Math.random() * 20) + 20, datePreset, customStart, customEnd);
+      newLocations[cat] = list;
+      newStats[cat] = buildLocationStats(cat, list, datePreset);
     });
-    setProperties(newProperties);
+    setLocations(newLocations);
     setCategoryStats(newStats);
   }, [datePreset, customStart, customEnd]);
 
   useEffect(() => {
     setSearchQuery('');
-    setViewingProperty(null);
+    setViewingLocation(null);
   }, [activeCategory]);
 
-  const currentProperties = properties[activeCategory] || [];
+  const currentLocations = locations[activeCategory] || [];
   const currentStats = categoryStats[activeCategory] || {};
-  const currentConfig = PROPERTY_CATEGORIES[activeCategory];
+  const currentConfig = LOCATION_CATEGORIES[activeCategory];
   const dateRangeLabel = getDateRangeLabel(datePreset, customStart, customEnd);
 
-  const handleViewProperty = useCallback((property) => {
-    setViewingProperty(property);
+  const handleViewLocation = useCallback((location) => {
+    setViewingLocation(location);
     setShowViewModal(true);
   }, []);
 
-  const requestDeleteProperty = useCallback((propertyId) => {
-    const property = currentProperties.find(p => p.id === propertyId);
-    if (!property) return;
+  const requestDeleteLocation = useCallback((locationId) => {
+    const location = currentLocations.find(l => l.id === locationId);
+    if (!location) return;
     setConfirmAction({
-      title: 'Delete Property?',
-      message: `Are you sure you want to delete "${property.propertyName}" (${property.propertyId})? This action cannot be undone.`,
+      title: 'Delete Location?',
+      message: `Are you sure you want to delete "${location.locationName}" (${location.locationId})? This action cannot be undone.`,
       confirmText: 'Yes, Delete',
       cancelText: 'No, Cancel',
       type: 'danger',
       icon: FiTrash2,
       onConfirm: () => {
-        setProperties(prev => {
-          const updatedList = prev[activeCategory].filter(p => p.id !== propertyId);
+        setLocations(prev => {
+          const updatedList = prev[activeCategory].filter(l => l.id !== locationId);
           const updated = { ...prev, [activeCategory]: updatedList };
           setCategoryStats(prevStats => ({
             ...prevStats,
-            [activeCategory]: buildCategoryStats(activeCategory, updatedList, datePreset)
+            [activeCategory]: buildLocationStats(activeCategory, updatedList, datePreset)
           }));
           return updated;
         });
         setShowViewModal(false);
-        setViewingProperty(null);
-        showToast(`Property "${property.propertyName}" deleted`, 'warning');
+        setViewingLocation(null);
+        showToast(`Location "${location.locationName}" deleted`, 'warning');
       }
     });
-  }, [currentProperties, activeCategory, datePreset, showToast]);
+  }, [currentLocations, activeCategory, datePreset, showToast]);
 
   const executeConfirmAction = useCallback(() => {
     if (!confirmAction) return;
@@ -1737,9 +1497,9 @@ const PropertyManagement = () => {
   const handleRefresh = useCallback(() => {
     setActionLoading('refresh');
     setTimeout(() => {
-      const list = generateMockProperties(activeCategory, Math.floor(Math.random() * 20) + 20, datePreset, customStart, customEnd);
-      setProperties(prev => ({ ...prev, [activeCategory]: list }));
-      setCategoryStats(prev => ({ ...prev, [activeCategory]: buildCategoryStats(activeCategory, list, datePreset) }));
+      const list = generateMockLocations(activeCategory, Math.floor(Math.random() * 20) + 20, datePreset, customStart, customEnd);
+      setLocations(prev => ({ ...prev, [activeCategory]: list }));
+      setCategoryStats(prev => ({ ...prev, [activeCategory]: buildLocationStats(activeCategory, list, datePreset) }));
       setActionLoading(null);
       showToast('Data refreshed', 'success');
     }, 800);
@@ -1766,12 +1526,12 @@ const PropertyManagement = () => {
         onCancel={() => setConfirmAction(null)}
       />
 
-      {showViewModal && viewingProperty && (
-        <ViewPropertyDetailModal
-          property={viewingProperty}
+      {showViewModal && viewingLocation && (
+        <ViewLocationDetailModal
+          location={viewingLocation}
           show={showViewModal}
-          onClose={() => { setShowViewModal(false); setViewingProperty(null); }}
-          onDelete={requestDeleteProperty}
+          onClose={() => { setShowViewModal(false); setViewingLocation(null); }}
+          onDelete={requestDeleteLocation}
         />
       )}
 
@@ -1781,14 +1541,14 @@ const PropertyManagement = () => {
           <div>
             <div className="flex items-center gap-3 mb-2 flex-wrap">
               <h1 className="text-3xl lg:text-4xl font-black bg-gradient-to-r from-[#00695C] via-[#26A69A] to-[#4DB6AC] bg-clip-text text-transparent">
-                Properties Management
+                Location Management
               </h1>
               <span className="px-3 py-1.5 bg-gradient-to-r from-[#E8F4F2] to-[#D5F0EA] text-[#00695C] text-xs font-black rounded-full flex items-center gap-1.5">
                 <FiActivity className="text-[10px]" /> Super Admin
               </span>
             </div>
             <p className="text-sm text-[#3D5A55] font-semibold flex items-center gap-2 flex-wrap">
-              <span>Manage all property categories across the platform</span>
+              <span>Manage locations, zones and neighborhoods across all categories</span>
               <span className="w-1.5 h-1.5 bg-[#8FA8A4] rounded-full" />
               <span className="text-[#00695C] font-black flex items-center gap-1">
                 <FiCalendar className="text-xs" /> {dateRangeLabel}
@@ -1824,10 +1584,10 @@ const PropertyManagement = () => {
         <div className="relative z-0">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             {ALL_CATEGORIES.map((cat, idx) => {
-              const config = PROPERTY_CATEGORIES[cat];
+              const config = LOCATION_CATEGORIES[cat];
               const Icon = config.icon;
               const isActive = activeCategory === cat;
-              const count = properties[cat]?.length || 0;
+              const count = locations[cat]?.length || 0;
               return (
                 <div
                   key={cat}
@@ -1846,10 +1606,10 @@ const PropertyManagement = () => {
                     {isActive && <FiCheckCircle className="text-white text-sm" />}
                   </div>
                   <h4 className={`text-md font-bold mb-1 ${isActive ? 'text-white' : 'text-[#0F1A18]'}`}>{cat}</h4>
-                  <p className={`text-[11px] font-medium mb-2 ${isActive ? 'text-white/90' : 'text-[#3D5A55]'}`}>{config.description}</p>
+                  <p className={`text-[11px] font-medium mb-2 line-clamp-2 ${isActive ? 'text-white/90' : 'text-[#3D5A55]'}`}>{config.description}</p>
                   <div className={`flex items-center gap-2 pt-2 border-t ${isActive ? 'border-white/20' : 'border-[#E8F0EE]'}`}>
-                    <FiHome className={`text-sm ${isActive ? 'text-white/90' : 'text-[#3D5A55]'}`} />
-                    <span className={`text-xs font-bold ${isActive ? 'text-white' : 'text-[#0F1A18]'}`}>{count} properties</span>
+                    <FiMapPin className={`text-sm ${isActive ? 'text-white/90' : 'text-[#3D5A55]'}`} />
+                    <span className={`text-xs font-bold ${isActive ? 'text-white' : 'text-[#0F1A18]'}`}>{count} locations</span>
                   </div>
                 </div>
               );
@@ -1869,10 +1629,9 @@ const PropertyManagement = () => {
         />
       ) : (
         <>
-          {/* Category tabs */}
           <div className="relative z-0 bg-white rounded-2xl p-2 border border-[#E8F0EE] shadow-sm flex items-center gap-1 overflow-x-auto">
             {ALL_CATEGORIES.map((cat) => {
-              const Icon = PROPERTY_CATEGORIES[cat].icon;
+              const Icon = LOCATION_CATEGORIES[cat].icon;
               const isActive = activeCategory === cat;
               return (
                 <button
@@ -1880,7 +1639,7 @@ const PropertyManagement = () => {
                   onClick={() => { setActiveCategory(cat); setActiveTab(cat); }}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                     isActive
-                      ? `bg-gradient-to-r ${PROPERTY_CATEGORIES[cat].gradient} text-white shadow-md`
+                      ? `bg-gradient-to-r ${LOCATION_CATEGORIES[cat].gradient} text-white shadow-md`
                       : 'text-[#3D5A55] hover:bg-[#F5F9F8]'
                   }`}
                 >
@@ -1891,11 +1650,11 @@ const PropertyManagement = () => {
           </div>
 
           <div key={`tab-content-${activeCategory}-${datePreset}`}>
-            <CategoryRegistrationsTab
+            <CategoryManageTab
               activeCategory={activeCategory}
-              properties={currentProperties}
-              onView={handleViewProperty}
-              onDelete={requestDeleteProperty}
+              locations={currentLocations}
+              onView={handleViewLocation}
+              onDelete={requestDeleteLocation}
               actionLoading={actionLoading}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -1932,6 +1691,7 @@ const PropertyManagement = () => {
         .animate-float-delayed { animation: float-delayed 8s ease-in-out infinite; }
         .animate-icon-float { animation: icon-float 3s ease-in-out infinite; }
         .animate-shimmer { animation: shimmer 2s ease-in-out infinite; }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #F1F5F4; border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: #8FA8A4; border-radius: 4px; }
@@ -1942,4 +1702,4 @@ const PropertyManagement = () => {
   );
 };
 
-export default PropertyManagement;
+export default LocationManagement;

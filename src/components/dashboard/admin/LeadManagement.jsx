@@ -89,11 +89,11 @@ const AMENITIES_LIST = [
 ];
 
 const STAFF_MEMBERS = [
-  { id: 'staff_1', name: 'Suresh Kumar', role: 'Senior Agent', email: 'suresh.kumar@realestate.com', phone: '+91 98765 11111', avatar: 'SK', activeLeads: 12 },
-  { id: 'staff_2', name: 'Anita Desai', role: 'Property Manager', email: 'anita.desai@realestate.com', phone: '+91 98765 22222', avatar: 'AD', activeLeads: 8 },
-  { id: 'staff_3', name: 'Rajesh Nair', role: 'Sales Executive', email: 'rajesh.nair@realestate.com', phone: '+91 98765 33333', avatar: 'RN', activeLeads: 15 },
-  { id: 'staff_4', name: 'Kavita Sharma', role: 'Lead Manager', email: 'kavita.sharma@realestate.com', phone: '+91 98765 44444', avatar: 'KS', activeLeads: 6 },
-  { id: 'staff_5', name: 'Mohan Rao', role: 'Senior Agent', email: 'mohan.rao@realestate.com', phone: '+91 98765 55555', avatar: 'MR', activeLeads: 10 },
+  { id: 'lead_1', name: 'Suresh Kumar', role: 'Senior Agent', email: 'suresh.kumar@realestate.com', phone: '+91 98765 11111', avatar: 'SK', activeLeads: 12 },
+  { id: 'lead_2', name: 'Anita Desai', role: 'Property Manager', email: 'anita.desai@realestate.com', phone: '+91 98765 22222', avatar: 'AD', activeLeads: 8 },
+  { id: 'lead_3', name: 'Rajesh Nair', role: 'Sales Executive', email: 'rajesh.nair@realestate.com', phone: '+91 98765 33333', avatar: 'RN', activeLeads: 15 },
+  { id: 'lead_4', name: 'Kavita Sharma', role: 'Lead Manager', email: 'kavita.sharma@realestate.com', phone: '+91 98765 44444', avatar: 'KS', activeLeads: 6 },
+  { id: 'lead_5', name: 'Mohan Rao', role: 'Senior Agent', email: 'mohan.rao@realestate.com', phone: '+91 98765 55555', avatar: 'MR', activeLeads: 10 },
 ];
 
 const STATUS_COLORS = {
@@ -480,7 +480,7 @@ const ViewLeadDetailsModal = ({ lead, show, onClose, onEdit, onDelete, onViewPro
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <FiUserCheck className="text-[#00695C] shrink-0" />
-                <span className="text-[#5A7D78]">Assigned Staff:</span>
+                <span className="text-[#5A7D78]">Assigned Lead:</span>
                 <span className="font-medium text-[#1A2E2A]">{lead.assignedStaff || 'Unassigned'}</span>
               </div>
             </div>
@@ -769,9 +769,9 @@ const EditLeadModal = ({ lead, show, onClose, onSave, loading }) => {
                 </select>
               </div>
               <div>
-                <label className={labelClass}>Assigned Staff</label>
+                <label className={labelClass}>Assigned Lead</label>
                 <input
-                  type="text" name="assignedStaff" value={formData.assignedStaff} onChange={handleChange}
+                  type="text" name="assignedLead" value={formData.assignedStaff} onChange={handleChange}
                   className={inputClass}
                 />
               </div>
@@ -838,7 +838,7 @@ const EditLeadModal = ({ lead, show, onClose, onSave, loading }) => {
   );
 };
 
-// ============ ASSIGN STAFF MODAL ============
+// ============ ASSIGN LEAD MODAL ============
 const AssignStaffModal = ({ lead, show, onClose, onAssign, loading }) => {
   const [selectedStaff, setSelectedStaff] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -952,8 +952,8 @@ const AssignStaffModal = ({ lead, show, onClose, onAssign, loading }) => {
               <FiUserCheck className="text-sm" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white">Assign Staff</h2>
-              <p className="text-white/70 text-[10px]">Assign staff to lead</p>
+              <h2 className="text-base font-bold text-white">Assign Lead</h2>
+              <p className="text-white/70 text-[10px]">Assign lead to lead</p>
             </div>
           </div>
           <button onClick={onClose} className="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110">
@@ -1054,9 +1054,9 @@ const AssignStaffModal = ({ lead, show, onClose, onAssign, loading }) => {
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
               <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm" />
-              <input type="text" placeholder="Search staff by name, role, or email..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-9 pr-4 py-2 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" />
+              <input type="text" placeholder="Search lead by name, role, or email..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-9 pr-4 py-2 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" />
             </div>
-            <button onClick={handleDownloadStaff} className="px-3 py-2 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 shadow-md shadow-[#00695C]/30 whitespace-nowrap" title="Download staff list as CSV">
+            <button onClick={handleDownloadStaff} className="px-3 py-2 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-xs font-medium flex items-center gap-1 hover:scale-105 shadow-md shadow-[#00695C]/30 whitespace-nowrap" title="Download lead list as CSV">
               <FiDownload className="text-sm" /> Download
             </button>
           </div>
@@ -1068,7 +1068,7 @@ const AssignStaffModal = ({ lead, show, onClose, onAssign, loading }) => {
                 <input type="checkbox" checked={selectAllChecked} onChange={handleSelectAll} className="w-5 h-5 rounded border-2 border-[#C5D3D0] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300 cursor-pointer appearance-none checked:bg-[#00695C] checked:border-[#00695C]" />
                 {selectAllChecked && <FiCheck className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xs pointer-events-none" />}
               </div>
-              <span className="text-xs font-medium text-[#1A2E2A]">Select All ({filteredStaff.length} staff)</span>
+              <span className="text-xs font-medium text-[#1A2E2A]">Select All ({filteredStaff.length} lead)</span>
             </label>
             <span className="text-[10px] text-[#5A7D78]">{selectedStaff.length} selected</span>
           </div>
@@ -1079,7 +1079,7 @@ const AssignStaffModal = ({ lead, show, onClose, onAssign, loading }) => {
               <div className="w-16 h-16 rounded-full bg-[#F5F9F8] flex items-center justify-center mx-auto mb-3">
                 <FiUsers className="text-2xl text-[#B5C9C5]" />
               </div>
-              <p className="text-sm text-[#5A7D78]">No staff members found</p>
+              <p className="text-sm text-[#5A7D78]">No lead members found</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -1126,7 +1126,7 @@ const AssignStaffModal = ({ lead, show, onClose, onAssign, loading }) => {
         <div className="sticky bottom-0 bg-white pt-3 px-4 pb-4 border-t border-[#E8F0EE] flex items-center gap-3">
           <button onClick={onClose} className="flex-1 px-4 py-2 bg-[#F5F9F8] text-[#1A2E2A] rounded-lg hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium">Cancel</button>
           <button onClick={handleSubmit} disabled={selectedStaff.length === 0 || isSubmitting || loading} className="flex-1 px-4 py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-lg hover:shadow-xl transition-all duration-300 text-sm font-medium shadow-md shadow-[#00695C]/30 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-            {isSubmitting || loading ? (<><FiRefreshCw className="animate-spin text-sm" /> Assigning...</>) : (<><FiUserCheck className="text-sm" /> Assign {selectedStaff.length} Staff</>)}
+            {isSubmitting || loading ? (<><FiRefreshCw className="animate-spin text-sm" /> Assigning...</>) : (<><FiUserCheck className="text-sm" /> Assign {selectedStaff.length} Lead</>)}
           </button>
         </div>
       </div>
@@ -1134,7 +1134,7 @@ const AssignStaffModal = ({ lead, show, onClose, onAssign, loading }) => {
   );
 };
 
-// ============ VIEW ASSIGNED STAFF MODAL ============
+// ============ VIEW ASSIGNED LEAD MODAL ============
 const ViewAssignedStaffModal = ({ lead, assignedStaff, show, onClose }) => {
   if (!show || !lead) return null;
 
@@ -1149,8 +1149,8 @@ const ViewAssignedStaffModal = ({ lead, assignedStaff, show, onClose }) => {
               <FiUsers className="text-sm" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white">Assigned Staff</h2>
-              <p className="text-white/70 text-[10px]">Staff assigned to {lead.customerName}</p>
+              <h2 className="text-base font-bold text-white">Assigned Lead</h2>
+              <p className="text-white/70 text-[10px]">Lead assigned to {lead.customerName}</p>
             </div>
           </div>
           <button
@@ -1170,7 +1170,7 @@ const ViewAssignedStaffModal = ({ lead, assignedStaff, show, onClose }) => {
               <div>
                 <p className="text-xs font-semibold text-[#1A2E2A]">Total Assigned</p>
                 <p className="text-[10px] text-[#5A7D78]">
-                  {totalStaff} staff member{totalStaff !== 1 ? 's' : ''}
+                  {totalStaff} Lead member{totalStaff !== 1 ? 's' : ''}
                 </p>
               </div>
             </div>
@@ -1182,8 +1182,8 @@ const ViewAssignedStaffModal = ({ lead, assignedStaff, show, onClose }) => {
               <div className="w-16 h-16 rounded-full bg-[#F5F9F8] flex items-center justify-center mx-auto mb-3">
                 <FiUsers className="text-2xl text-[#B5C9C5]" />
               </div>
-              <p className="text-sm font-medium text-[#1A2E2A] mb-1">No staff assigned yet</p>
-              <p className="text-xs text-[#5A7D78]">Assign staff to this lead to see them here</p>
+              <p className="text-sm font-medium text-[#1A2E2A] mb-1">No lead assigned yet</p>
+              <p className="text-xs text-[#5A7D78]">Assign lead to this lead to see them here</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -2116,7 +2116,7 @@ const LeadManagement = () => {
   const [viewPropertiesLead, setViewPropertiesLead] = useState(null);
   const [showViewPropertiesModal, setShowViewPropertiesModal] = useState(false);
 
-  // Assigned staff tracking
+  // Assigned lead tracking
   const [assignedStaffMap, setAssignedStaffMap] = useState({});
 
   const searchInputRef = useRef(null);
@@ -2499,7 +2499,7 @@ const LeadManagement = () => {
     });
   }, [leads, showConfirmation, showToast, updateStats]);
 
-  // ============ ASSIGN STAFF TO LEAD ============
+  // ============ ASSIGN LEAD TO LEAD ============
   const handleAssignStaffToLead = useCallback((lead) => {
     setAssignStaffLead(lead);
     setShowAssignStaffModal(true);
@@ -2512,7 +2512,7 @@ const LeadManagement = () => {
         const updated = prev.map(lead => {
           if (lead.id === leadId) {
             const staffNames = staffObjects.map(s => s.name).join(', ');
-            showToast(`${staffObjects.length} staff assigned to ${lead.customerName}`, 'success');
+            showToast(`${staffObjects.length} lead assigned to ${lead.customerName}`, 'success');
             return { ...lead, assignedStaff: staffNames, assignedStaffCount: staffObjects.length };
           }
           return lead;
@@ -2533,7 +2533,7 @@ const LeadManagement = () => {
     }, 600);
   }, [showToast, updateStats]);
 
-  // ============ VIEW ASSIGNED STAFF ============
+  // ============ VIEW ASSIGNED LEAD ============
   const handleViewAssignedStaff = useCallback((lead) => {
     setViewAssignedLead(lead);
     setShowViewAssignedModal(true);
@@ -2904,7 +2904,7 @@ const LeadManagement = () => {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search leads by name, mobile, email, lead ID, location, or assigned staff..."
+              placeholder="Search leads by name, mobile, email, lead ID, location, or assigned lead..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none placeholder:text-[#B5C9C5]"
@@ -3184,7 +3184,7 @@ const LeadManagement = () => {
                       onClick={() => handleAssignStaffToLead(lead)}
                       className="flex-1 py-1.5 text-[10px] font-medium text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
                     >
-                      <FiUserCheck className="text-[10px]" /> Assign Staff
+                      <FiUserCheck className="text-[10px]" /> Assign Lead
                     </button>
                     <button
                       onClick={() => handleViewAssignedStaff(lead)}
@@ -3360,14 +3360,14 @@ const LeadManagement = () => {
           <button
             onClick={() => handleAssignStaffToLead(lead)}
             className="p-0.5 rounded hover:bg-blue-50 transition-all duration-300 text-blue-600 hover:scale-110 shrink-0"
-            title="Assign Staff"
+            title="Assign Lead"
           >
             <FiUserCheck className="text-[12px]" />
           </button>
           <button
             onClick={() => handleViewAssignedStaff(lead)}
             className="p-0.5 rounded hover:bg-indigo-50 transition-all duration-300 text-indigo-600 hover:scale-110 relative shrink-0"
-            title="View Assigned Staff"
+            title="View Assigned Lead"
           >
             <FiEye className="text-[12px]" />
             {assignedCount > 0 && (

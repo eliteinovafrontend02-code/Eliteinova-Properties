@@ -689,7 +689,7 @@ const FlowChart = ({ data = [], height = 280 }) => {
                 </div>
                 <div className="text-right">
                   <p className="text-lg font-black" style={{ color: item.color }}>{formatCompact(item.value)}</p>
-                  <p className="text-[10px] text-[#3D5A55] font-bold">{item.count?.toLocaleString() || 0} users</p>
+                  <p className="text-[10px] text-[#3D5A55] font-bold">{item.count?.toLocaleString() || 0} vendors</p>
                 </div>
               </div>
               <div className="relative h-8 bg-[#F5F9F8] rounded-xl overflow-hidden">
@@ -1199,7 +1199,7 @@ const OverviewTab = ({ activeUserType, stats, config, dateRangeLabel, datePreset
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard icon={<FiUsers className="text-white text-base" />} title={`Total ${activeUserType}s`} value={stats.total || 0} trend={12.5} subtitle="All registered" color={`bg-gradient-to-br ${config.gradient}`} delay={0} />
-        <StatCard icon={<FiCheckCircle className="text-white text-base" />} title="Approved" value={stats.approved || 0} trend={8.3} subtitle="Active users" color="bg-gradient-to-br from-emerald-600 to-teal-400" delay={100} />
+        <StatCard icon={<FiCheckCircle className="text-white text-base" />} title="Approved" value={stats.approved || 0} trend={8.3} subtitle="Active vendors" color="bg-gradient-to-br from-emerald-600 to-teal-400" delay={100} />
         <StatCard icon={<FiClock className="text-white text-base" />} title="Pending" value={stats.pending || 0} trend={-3.2} subtitle="Awaiting approval" color="bg-gradient-to-br from-amber-600 to-yellow-400" delay={200} />
         <StatCard icon={<FiDollarSign className="text-white text-base" />} title="Total Revenue" value={formatCompact(stats.totalRevenue || 0)} trend={15.2} subtitle="From this type" color="bg-gradient-to-br from-purple-600 to-violet-400" delay={300} />
       </div>
@@ -1212,14 +1212,14 @@ const OverviewTab = ({ activeUserType, stats, config, dateRangeLabel, datePreset
                 <Icon className="animate-icon-float" style={{ color: config.color }} />
                 {activeUserType} Distribution Flow
               </h3>
-              <p className="text-xs text-[#3D5A55] font-semibold">User distribution across subscription plans</p>
+              <p className="text-xs text-[#3D5A55] font-semibold">Vendor distribution across subscription plans</p>
             </div>
           </div>
           <FlowChart
             data={(stats.planDistribution || []).map((plan, idx) => ({
               ...plan,
               icon: idx === 0 ? FiAward : idx === 1 ? FaCrown : FaGem,
-              subtitle: `${((plan.value / (stats.total || 1)) * 100).toFixed(1)}% of users`,
+              subtitle: `${((plan.value / (stats.total || 1)) * 100).toFixed(1)}% of vendors`,
               count: plan.value
             }))}
             height={320}
@@ -1326,7 +1326,7 @@ const RegistrationsTab = ({
             </button>
           </div>
 
-          <span className="px-3 py-2 bg-[#E8F4F2] text-[#00695C] text-xs font-black rounded-xl">{filtered.length} users</span>
+          <span className="px-3 py-2 bg-[#E8F4F2] text-[#00695C] text-xs font-black rounded-xl">{filtered.length} vendors</span>
         </div>
         <div className="mt-2 flex items-center gap-2 text-[10px] text-[#3D5A55] font-semibold">
           <FiCalendar className="text-[#00695C]" /> Showing registrations from: {dateRangeLabel}
@@ -1617,7 +1617,7 @@ const VerificationTab = ({ userType, users, showToast, viewMode, setViewMode, da
       <div className="bg-white rounded-2xl p-3 border border-[#E8F0EE] shadow-sm flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="px-3 py-1.5 bg-[#E8F4F2] text-[#00695C] text-xs font-black rounded-xl">
-            {userDocs.length} users to verify
+            {userDocs.length} vendors to verify
           </span>
           <span className="text-[10px] text-[#3D5A55] font-semibold flex items-center gap-1">
             <FiCalendar className="text-[#00695C]" /> {dateRangeLabel}
@@ -1715,7 +1715,7 @@ const VerificationTab = ({ userType, users, showToast, viewMode, setViewMode, da
       {userDocs.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-[#E8F0EE]">
           <FiShield className="text-4xl text-[#8FA8A4] mb-3" />
-          <h3 className="text-lg font-black text-[#0F1A18]">No users to verify</h3>
+          <h3 className="text-lg font-black text-[#0F1A18]">No vendors to verify</h3>
         </div>
       )}
 
@@ -1828,7 +1828,7 @@ const PropertiesTab = ({ userType, users, showToast, dateRangeLabel }) => {
     <div className="space-y-4">
       <div className="bg-white rounded-2xl p-3 border border-[#E8F0EE] shadow-sm flex items-center gap-3">
         <span className="px-3 py-1.5 bg-[#E8F4F2] text-[#00695C] text-xs font-black rounded-xl">
-          {users.length} users
+          {users.length} vendors
         </span>
         <span className="text-[10px] text-[#3D5A55] font-semibold flex items-center gap-1">
           <FiCalendar className="text-[#00695C]" /> {dateRangeLabel}
@@ -1877,7 +1877,7 @@ const PropertiesTab = ({ userType, users, showToast, dateRangeLabel }) => {
       {users.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-[#E8F0EE]">
           <FiHome className="text-4xl text-[#8FA8A4] mb-3" />
-          <h3 className="text-lg font-black text-[#0F1A18]">No users to manage</h3>
+          <h3 className="text-lg font-black text-[#0F1A18]">No vendors to manage</h3>
         </div>
       )}
 
@@ -1976,7 +1976,7 @@ const LeadsTab = ({ userType, users, showToast, dateRangeLabel }) => {
     <div className="space-y-4">
       <div className="bg-white rounded-2xl p-3 border border-[#E8F0EE] shadow-sm flex items-center gap-3">
         <span className="px-3 py-1.5 bg-[#E8F4F2] text-[#00695C] text-xs font-black rounded-xl">
-          {users.length} users
+          {users.length} vendors
         </span>
         <span className="text-[10px] text-[#3D5A55] font-semibold flex items-center gap-1">
           <FiCalendar className="text-[#00695C]" /> {dateRangeLabel}
@@ -2021,7 +2021,7 @@ const LeadsTab = ({ userType, users, showToast, dateRangeLabel }) => {
       {users.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-[#E8F0EE]">
           <FiBarChart2 className="text-4xl text-[#8FA8A4] mb-3" />
-          <h3 className="text-lg font-black text-[#0F1A18]">No users to show</h3>
+          <h3 className="text-lg font-black text-[#0F1A18]">No vendors to show</h3>
         </div>
       )}
 
@@ -2248,14 +2248,14 @@ const UserManagement = () => {
           <div>
             <div className="flex items-center gap-3 mb-2 flex-wrap">
               <h1 className="text-3xl lg:text-4xl font-black bg-gradient-to-r from-[#00695C] via-[#26A69A] to-[#4DB6AC] bg-clip-text text-transparent">
-                User Management
+                Vendor Management
               </h1>
               <span className="px-3 py-1.5 bg-gradient-to-r from-[#E8F4F2] to-[#D5F0EA] text-[#00695C] text-xs font-black rounded-full flex items-center gap-1.5">
                 <FiActivity className="text-[10px]" /> Super Admin
               </span>
             </div>
             <p className="text-sm text-[#3D5A55] font-semibold flex items-center gap-2 flex-wrap">
-              <span>Manage all user types across the platform</span>
+              <span>Manage all vendor types across the platform</span>
               <span className="w-1.5 h-1.5 bg-[#8FA8A4] rounded-full" />
               <span className="text-[#00695C] font-black flex items-center gap-1">
                 <FiCalendar className="text-xs" /> {dateRangeLabel}
@@ -2307,7 +2307,7 @@ const UserManagement = () => {
                 <p className={`text-[11px] font-medium mb-2  ${isActive ? 'text-white/90' : 'text-[#3D5A55]'}`}>{config.description}</p>
                 <div className={`flex items-center gap-2 pt-2 border-t ${isActive ? 'border-white/20' : 'border-[#E8F0EE]'}`}>
                   <FiUsers className={`text-sm ${isActive ? 'text-white/90' : 'text-[#3D5A55]'}`} />
-                  <span className={`text-xs font-bold ${isActive ? 'text-white' : 'text-[#0F1A18]'}`}>{users[type]?.length || 0} users</span>
+                  <span className={`text-xs font-bold ${isActive ? 'text-white' : 'text-[#0F1A18]'}`}>{users[type]?.length || 0} vendors</span>
                 </div>
               </div>
             );
