@@ -53,21 +53,27 @@ const PREFERRED_CONTACT_METHODS = [
   'Phone Call', 'WhatsApp', 'Email', 'SMS', 'Meeting', 'Site Visit'
 ];
 
+// ============ UPDATED ENQUIRY TYPES (ONLY 4) ============
 const ENQUIRY_TYPES = [
-  'Buy Enquiry', 'Rent Enquiry', 'Lease Enquiry', 'Property Listing Enquiry',
-  'Property Contact Request', 'Site Visit Request', 'Property Information Request',
-  'Price Enquiry', 'Loan Enquiry', 'Home Construction Enquiry',
-  'Land Purchase Enquiry', 'Property Management Enquiry', 'Other Service Enquiry'
+  'Property Enquiry',
+  'Loan Enquiry',
+  'Insurance Enquiry',
+  'Service Enquiry'
 ];
 
 const LISTING_TYPES = ['Buy', 'Rent', 'Sell', 'Lease'];
 
 const PROPERTY_TYPES = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
 
+// ============ UPDATED LEAD SOURCES (ONLY 7) ============
 const LEAD_SOURCES = [
-  'Website', 'Mobile App', 'Property Listing', 'Search', 'Advertisement',
-  'Google', 'Facebook', 'Instagram', 'WhatsApp', 'Referral',
-  'Owner', 'Agent', 'Builder', 'Property Manager', 'Direct Enquiry', 'Other'
+  'Website',
+  'Advertisement',
+  'Mobile App',
+  'Social Media',
+  'Referral',
+  'Direct Enquiry',
+  'Other'
 ];
 
 const LEAD_STATUSES = [
@@ -152,39 +158,23 @@ const USER_TYPE_COLORS = {
   'property manager': 'bg-amber-100 text-amber-700 border-amber-200'
 };
 
+// ============ UPDATED SOURCE COLORS (ONLY 7 SOURCES) ============
 const SOURCE_COLORS = {
   'Website': 'bg-indigo-100 text-indigo-700 border-indigo-200',
-  'Mobile App': 'bg-violet-100 text-violet-700 border-violet-200',
-  'Property Listing': 'bg-fuchsia-100 text-fuchsia-700 border-fuchsia-200',
-  'Search': 'bg-sky-100 text-sky-700 border-sky-200',
   'Advertisement': 'bg-pink-100 text-pink-700 border-pink-200',
-  'Google': 'bg-red-100 text-red-700 border-red-200',
-  'Facebook': 'bg-blue-100 text-blue-700 border-blue-200',
-  'Instagram': 'bg-rose-100 text-rose-700 border-rose-200',
-  'WhatsApp': 'bg-emerald-100 text-emerald-700 border-emerald-200',
+  'Mobile App': 'bg-violet-100 text-violet-700 border-violet-200',
+  'Social Media': 'bg-blue-100 text-blue-700 border-blue-200',
   'Referral': 'bg-lime-100 text-lime-700 border-lime-200',
-  'Owner': 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  'Agent': 'bg-blue-100 text-blue-700 border-blue-200',
-  'Builder': 'bg-purple-100 text-purple-700 border-purple-200',
-  'Property Manager': 'bg-amber-100 text-amber-700 border-amber-200',
   'Direct Enquiry': 'bg-teal-100 text-teal-700 border-teal-200',
   'Other': 'bg-gray-100 text-gray-700 border-gray-200'
 };
 
+// ============ UPDATED ENQUIRY COLORS (ONLY 4 TYPES) ============
 const ENQUIRY_COLORS = {
-  'Buy Enquiry': 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  'Rent Enquiry': 'bg-blue-100 text-blue-700 border-blue-200',
-  'Lease Enquiry': 'bg-indigo-100 text-indigo-700 border-indigo-200',
-  'Property Listing Enquiry': 'bg-purple-100 text-purple-700 border-purple-200',
-  'Property Contact Request': 'bg-pink-100 text-pink-700 border-pink-200',
-  'Site Visit Request': 'bg-amber-100 text-amber-700 border-amber-200',
-  'Property Information Request': 'bg-cyan-100 text-cyan-700 border-cyan-200',
-  'Price Enquiry': 'bg-orange-100 text-orange-700 border-orange-200',
-  'Loan Enquiry': 'bg-teal-100 text-teal-700 border-teal-200',
-  'Home Construction Enquiry': 'bg-lime-100 text-lime-700 border-lime-200',
-  'Land Purchase Enquiry': 'bg-green-100 text-green-700 border-green-200',
-  'Property Management Enquiry': 'bg-yellow-100 text-yellow-700 border-yellow-200',
-  'Other Service Enquiry': 'bg-gray-100 text-gray-700 border-gray-200'
+  'Property Enquiry': 'bg-emerald-100 text-emerald-700 border-emerald-200',
+  'Loan Enquiry': 'bg-blue-100 text-blue-700 border-blue-200',
+  'Insurance Enquiry': 'bg-purple-100 text-purple-700 border-purple-200',
+  'Service Enquiry': 'bg-amber-100 text-amber-700 border-amber-200'
 };
 
 // ============ TOAST COMPONENT ============
@@ -418,7 +408,6 @@ const ViewLeadDetailsModal = ({ lead, show, onClose, onEdit, onDelete, onViewPro
             </div>
           </div>
 
-          {/* ✅ PROPERTIES SECTION - Only shows count with View Properties button */}
           <div className="bg-[#F5F9F8] rounded-xl p-4">
             <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-3 flex items-center gap-2">
               <FiHome className="text-[#00695C]" /> Properties
@@ -562,7 +551,7 @@ const EditLeadModal = ({ lead, show, onClose, onSave, loading }) => {
         preferredContactMethod: lead.preferredContactMethod || 'Phone Call',
         propertyOwnerName: lead.propertyOwnerName || '',
         propertyOwnerContact: lead.propertyOwnerContact || '',
-        enquiryType: lead.enquiryType || 'Buy Enquiry',
+        enquiryType: lead.enquiryType || 'Property Enquiry',
         listingType: lead.listingType || 'Buy',
         minBudget: lead.minBudget || '',
         maxBudget: lead.maxBudget || '',
@@ -754,6 +743,12 @@ const EditLeadModal = ({ lead, show, onClose, onSave, loading }) => {
                 <label className={labelClass}>Lead Source</label>
                 <select name="leadSource" value={formData.leadSource} onChange={handleChange} className={inputClass}>
                   {LEAD_SOURCES.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className={labelClass}>Enquiry Type</label>
+                <select name="enquiryType" value={formData.enquiryType} onChange={handleChange} className={inputClass}>
+                  {ENQUIRY_TYPES.map(e => <option key={e} value={e}>{e}</option>)}
                 </select>
               </div>
               <div>
@@ -2170,9 +2165,11 @@ const LeadManagement = () => {
       const userType = USER_TYPES[Math.floor(rand() * USER_TYPES.length)];
       const leadStatus = LEAD_STATUSES[Math.floor(rand() * LEAD_STATUSES.length)];
       const leadPriority = LEAD_PRIORITIES[Math.floor(rand() * LEAD_PRIORITIES.length)];
+      // Uses only the 7 updated sources
       const leadSource = LEAD_SOURCES[Math.floor(rand() * LEAD_SOURCES.length)];
-      const enquiryType = ENQUIRY_TYPES[Math.floor(rand() * ENQUIRY_TYPES.length)];
       const listingType = LISTING_TYPES[Math.floor(rand() * LISTING_TYPES.length)];
+      // Uses only the 4 updated enquiry types
+      const enquiryType = ENQUIRY_TYPES[Math.floor(rand() * ENQUIRY_TYPES.length)];
       const propertyType = PROPERTY_TYPES[Math.floor(rand() * PROPERTY_TYPES.length)];
       const preferredContactMethod = PREFERRED_CONTACT_METHODS[Math.floor(rand() * PREFERRED_CONTACT_METHODS.length)];
       const cityIndex = Math.floor(rand() * cities.length);
@@ -2212,7 +2209,7 @@ const LeadManagement = () => {
         createdDate: createdDate.toISOString(),
         lastContacted: lastContacted.toISOString(),
         nextFollowUp: nextFollowUp.toISOString(),
-        notes: `Lead generated from ${leadSource}. Customer is interested in ${propertyType} properties in ${city}. Budget range: ₹${(minBudget/100000).toFixed(1)}L - ₹${(maxBudget/100000).toFixed(1)}L.`,
+        notes: `Lead generated from ${leadSource}. Customer is interested in ${propertyType} properties in ${city}. Enquiry: ${enquiryType}. Budget range: ₹${(minBudget/100000).toFixed(1)}L - ₹${(maxBudget/100000).toFixed(1)}L.`,
         purpose: listingType === 'Buy' ? 'Purchase' : listingType === 'Rent' ? 'Rental' : listingType,
         preferredState: state,
         preferredCity: city,
@@ -2958,6 +2955,7 @@ const LeadManagement = () => {
               <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
             </div>
 
+            {/* ============ SOURCE FILTER (ONLY 7 SOURCES) ============ */}
             <div className="relative">
               <select
                 value={selectedSource}
@@ -2970,6 +2968,7 @@ const LeadManagement = () => {
               <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
             </div>
 
+            {/* ============ ENQUIRY TYPE FILTER (ONLY 4 TYPES) ============ */}
             <div className="relative">
               <select
                 value={selectedEnquiryType}
@@ -3121,14 +3120,16 @@ const LeadManagement = () => {
                               {lead.leadPriority}
                             </span>
                           )}
+                          {/* ============ SOURCE BADGE (7 SOURCES) ============ */}
                           {lead.leadSource && (
                             <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${SOURCE_COLORS[lead.leadSource] || 'bg-gray-100 text-gray-700'}`}>
                               {lead.leadSource}
                             </span>
                           )}
+                          {/* ============ ENQUIRY BADGE (4 TYPES, FULL LABEL) ============ */}
                           {lead.enquiryType && (
                             <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${ENQUIRY_COLORS[lead.enquiryType] || 'bg-gray-100 text-gray-700'}`}>
-                              {lead.enquiryType?.replace(' Enquiry', '')}
+                              {lead.enquiryType}
                             </span>
                           )}
                         </div>
@@ -3330,17 +3331,17 @@ const LeadManagement = () => {
           </span>
         </div>
 
-        {/* Source */}
+        {/* Source - UPDATED (7 SOURCES) */}
         <div className="col-span-1">
           <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium inline-block truncate max-w-full ${SOURCE_COLORS[lead.leadSource] || 'bg-gray-100 text-gray-700'}`}>
             {lead.leadSource}
           </span>
         </div>
 
-        {/* Enquiry */}
+        {/* Enquiry - UPDATED (4 TYPES, FULL LABEL) */}
         <div className="col-span-1">
           <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium inline-block truncate max-w-full ${ENQUIRY_COLORS[lead.enquiryType] || 'bg-gray-100 text-gray-700'}`}>
-            {lead.enquiryType?.replace(' Enquiry', '') || 'N/A'}
+            {lead.enquiryType || 'N/A'}
           </span>
         </div>
 
