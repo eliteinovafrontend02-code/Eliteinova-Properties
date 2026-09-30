@@ -90,9 +90,14 @@ import CommissionRevenue from './admin/Payments/CommissionRevenue';
 import ManualPayment from './admin/Payments/ManualPayment';
 import PaymentReports from './admin/Payments/PaymentReports';
 
+// Lead Management
+// import LeadDashboardAndList from './admin/LeadManagement/LeadDashboardAndList';
+// import LeadDetails from './admin/LeadManagement/LeadDetails';
+// import FollowUpManagement from './admin/LeadManagement/FollowUpManagement';
+// import SiteVisitManagement from './admin/LeadManagement/SiteVisitManagement';
+// import LeadReports from './admin/LeadManagement/LeadReports';
 
 // Other modules
-import LeadManagement from './admin/LeadManagement';
 // import ReportsAnalytics from './admin/ReportsAnalytics';
 // import ContentManagement from './admin/ContentManagement';
 // import Notifications from './admin/Notifications';
@@ -164,7 +169,18 @@ const AdminDashboard = () => {
     },
     { key: '/admin/buyers-tenants', icon: <HiOutlineUserGroup />, label: 'Buyers & Tenants' },
     { key: '/admin/properties', icon: <FiHome />, label: 'Properties' },
-    { key: '/admin/leads', icon: <FiMessageCircle />, label: 'Lead Management' },
+    {
+      key: 'leads',
+      icon: <FiMessageCircle />,
+      label: 'Lead Management',
+      children: [
+        { key: '/admin/leads/dashboard', icon: <FiGrid />, label: 'Lead Dashboard & List' },
+        { key: '/admin/leads/details', icon: <FiInfo />, label: 'Lead Details' },
+        { key: '/admin/leads/follow-ups', icon: <FiClock />, label: 'Follow-Up Management' },
+        { key: '/admin/leads/site-visits', icon: <FiMapPin />, label: 'Site Visit Management' },
+        { key: '/admin/leads/reports', icon: <FaChartLine />, label: 'Lead Reports' },
+      ],
+    },
     {
       key: 'subscriptions',
       icon: <FaDollarSign />,
@@ -178,22 +194,22 @@ const AdminDashboard = () => {
       ],
     },
     {
-  key: 'payments',
-  icon: <FaWallet />,
-  label: 'Payments',
-  children: [
-    { key: '/admin/payments/overview', icon: <FiGrid />, label: 'Payments Dashboard' },
-    { key: '/admin/payments/transactions', icon: <FiRefreshCw />, label: 'Transactions' },
-    { key: '/admin/payments/customers', icon: <FiUser />, label: 'User / Customer Details' },
-    { key: '/admin/payments/property-details', icon: <FiHome />, label: 'Property Payment Details' },
-    { key: '/admin/payments/personal-amount', icon: <FaDollarSign />, label: 'Personal Amount Details' },
-    { key: '/admin/payments/refunds', icon: <FiDownloadCloud />, label: 'Refund Management' },
-    { key: '/admin/payments/reconciliation', icon: <FiCheckCircle />, label: 'Payment Reconciliation' },
-    { key: '/admin/payments/commission-revenue', icon: <FiTrendingUp />, label: 'Commission & Revenue' },
-    { key: '/admin/payments/manual-payment', icon: <FiEdit />, label: 'Manual Payment' },
-    { key: '/admin/payments/reports', icon: <FaChartLine />, label: 'Payment Reports' },
-  ],
-},
+      key: 'payments',
+      icon: <FaWallet />,
+      label: 'Payments',
+      children: [
+        { key: '/admin/payments/overview', icon: <FiGrid />, label: 'Payments Dashboard' },
+        { key: '/admin/payments/transactions', icon: <FiRefreshCw />, label: 'Transactions' },
+        { key: '/admin/payments/customers', icon: <FiUser />, label: 'User / Customer Details' },
+        { key: '/admin/payments/property-details', icon: <FiHome />, label: 'Property Payment Details' },
+        { key: '/admin/payments/personal-amount', icon: <FaDollarSign />, label: 'Personal Amount Details' },
+        { key: '/admin/payments/refunds', icon: <FiDownloadCloud />, label: 'Refund Management' },
+        { key: '/admin/payments/reconciliation', icon: <FiCheckCircle />, label: 'Payment Reconciliation' },
+        { key: '/admin/payments/commission-revenue', icon: <FiTrendingUp />, label: 'Commission & Revenue' },
+        { key: '/admin/payments/manual-payment', icon: <FiEdit />, label: 'Manual Payment' },
+        { key: '/admin/payments/reports', icon: <FaChartLine />, label: 'Payment Reports' },
+      ],
+    },
     { key: '/admin/reports', icon: <FaChartLine />, label: 'Reports & Analytics' },
     { key: '/admin/content', icon: <FaImage />, label: 'Content Management' },
     { key: '/admin/notifications', icon: <FaBell />, label: 'Notifications' },
@@ -210,9 +226,11 @@ const AdminDashboard = () => {
     const path = location.pathname;
     menuItems.forEach(item => {
       if (item.children) {
-        const hasActiveChild = item.children.some(child => path === child.key);
+        const hasActiveChild = item.children.some(
+          child => path === child.key || path.startsWith(child.key + '/')
+        );
         if (hasActiveChild && !openMenus.includes(item.key)) {
-          setOpenMenus([...openMenus, item.key]);
+          setOpenMenus(prev => [...prev, item.key]);
         }
       }
     });
@@ -236,10 +254,10 @@ const AdminDashboard = () => {
   };
 
   if (location.pathname.startsWith('/admin/super-admin')) {
-  return <SuperAdminDashboard />;
-}
+    return <SuperAdminDashboard />;
+  }
 
-   if (location.pathname.startsWith('/admin/buyers-tenants')) {
+  if (location.pathname.startsWith('/admin/buyers-tenants')) {
     return <BuyerTenantsDashboard />;
   }
 
@@ -247,11 +265,13 @@ const AdminDashboard = () => {
     return <PropertiesDashboard />;
   }
 
-  
-
   const isSubActive = (children) => {
     if (!children) return false;
-    return children.some(child => location.pathname === child.key);
+    return children.some(
+      child =>
+        location.pathname === child.key ||
+        location.pathname.startsWith(child.key + '/')
+    );
   };
 
   // Helper function to check if current path is Admin Dashboard
@@ -305,7 +325,9 @@ const AdminDashboard = () => {
           {!collapsed && isOpen && (
             <div className="ml-3 pl-3 border-l-2 border-[#00695C]/20 space-y-0.5 mt-0.5">
               {item.children.map(child => {
-                const isChildActive = location.pathname === child.key;
+                const isChildActive =
+                  location.pathname === child.key ||
+                  location.pathname.startsWith(child.key + '/');
                 return (
                   <button
                     key={child.key}
@@ -441,9 +463,9 @@ const AdminDashboard = () => {
               </div>
             </div>
 
-            {/* Right - Dashboard Navigation Links - CORRECTED ACTIVE STATES */}
+            {/* Right - Dashboard Navigation Links */}
             <div className="flex items-center gap-2">
-              {/* Admin Dashboard - Active only when NOT in super-admin, properties, buyers-tenants */}
+              {/* Admin Dashboard */}
               <button
                 onClick={() => navigate('/admin/overview')}
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
@@ -482,7 +504,7 @@ const AdminDashboard = () => {
                 Properties
               </button>
 
-              {/* Super Admin Dashboard - Active only when in super-admin */}
+              {/* Super Admin Dashboard */}
               <button
                 onClick={() => navigate('/admin/super-admin')}
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
@@ -496,8 +518,6 @@ const AdminDashboard = () => {
               </button>
 
               <div className="w-px h-8 bg-gray-200 mx-1.5" />
-
-              
             </div>
           </div>
         </header>
@@ -513,7 +533,6 @@ const AdminDashboard = () => {
               {/* Main overview routes */}
               <Route index element={<AdminOverview />} />
               <Route path="overview" element={<AdminOverview />} />
-              {/* <Route path="super-admin" element={<SuperAdmin />} /> */}
 
               {/* User Management */}
               <Route path="user-management" element={<UserManagement />} />
@@ -555,23 +574,28 @@ const AdminDashboard = () => {
               <Route path="subscriptions/property-managers" element={<PropertyManagerPlans />} />
 
               {/* Payments */}
-                <Route path="payments/overview" element={<PaymentsOverview />} />
-                <Route path="payments/transactions" element={<PaymentTransactions />} />
-                <Route path="payments/customers" element={<CustomerDetails />} />
-                <Route path="payments/property-details" element={<PropertyPaymentDetails />} />
-                <Route path="payments/personal-amount" element={<PersonalAmountDetails />} />
-                <Route path="payments/refunds" element={<RefundManagement />} />
-                <Route path="payments/reconciliation" element={<PaymentReconciliation />} />
-                <Route path="payments/commission-revenue" element={<CommissionRevenue />} />
-                <Route path="payments/manual-payment" element={<ManualPayment />} />
-                <Route path="payments/reports" element={<PaymentReports />} />
+              <Route path="payments/overview" element={<PaymentsOverview />} />
+              <Route path="payments/transactions" element={<PaymentTransactions />} />
+              <Route path="payments/customers" element={<CustomerDetails />} />
+              <Route path="payments/property-details" element={<PropertyPaymentDetails />} />
+              <Route path="payments/personal-amount" element={<PersonalAmountDetails />} />
+              <Route path="payments/refunds" element={<RefundManagement />} />
+              <Route path="payments/reconciliation" element={<PaymentReconciliation />} />
+              <Route path="payments/commission-revenue" element={<CommissionRevenue />} />
+              <Route path="payments/manual-payment" element={<ManualPayment />} />
+              <Route path="payments/reports" element={<PaymentReports />} />
 
-               {/* Buyers & Tenants — handled by the early return above, no Route needed here */}
+              {/* Lead Management */}
+              {/* <Route path="leads/dashboard" element={<LeadDashboardAndList />} /> */}
+              {/* <Route path="leads/details" element={<LeadDetails />} /> */}
+              {/* <Route path="leads/follow-ups" element={<FollowUpManagement />} /> */}
+              {/* <Route path="leads/site-visits" element={<SiteVisitManagement />} /> */}
+              {/* <Route path="leads/reports" element={<LeadReports />} /> */}
 
+              {/* Buyers & Tenants — handled by the early return above, no Route needed here */}
               {/* Properties — handled by the early return above, no Route needed here */}
 
               {/* Other routes */}
-              <Route path="leads" element={<LeadManagement />} />
               {/* <Route path="reports" element={<ReportsAnalytics />} /> */}
               {/* <Route path="content" element={<ContentManagement />} /> */}
               {/* <Route path="notifications" element={<Notifications />} /> */}
@@ -579,7 +603,6 @@ const AdminDashboard = () => {
             </Routes>
           </div>
         </div>
-        
 
         {/* ============ FOOTER ============ */}
         <footer className="flex-shrink-0 py-2 px-4 border-t border-gray-100 bg-white/50">

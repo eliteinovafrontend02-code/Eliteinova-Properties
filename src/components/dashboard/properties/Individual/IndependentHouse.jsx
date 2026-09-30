@@ -23,8 +23,7 @@ const HOUSE_TYPE = {
 };
 
 // ============================================================
-// LISTING TYPE CONFIG — the varying dimension on this page
-// ---- 'Sell' removed: only Buy, Rent, Lease are valid listing types ----
+// LISTING TYPE CONFIG 
 // ============================================================
 const LISTING_TYPES = {
   'Buy': {
