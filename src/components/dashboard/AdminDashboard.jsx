@@ -40,13 +40,13 @@ import SuperAdminDashboard from './SuperAdminDashboard';
 import OwnersOverview from './admin/Owners/OwnersOverview';
 import OwnersRegistration from './admin/Owners/OwnersRegistration';
 import OwnersPropertyControl from './admin/Owners/OwnersPropertyControl';
-import OwnersPropertiesLeads from './admin/Owners/OwnersPropertiesLeads';
+// import OwnersPropertiesLeads from './admin/Owners/OwnersPropertiesLeads';
 
 // Agents
 import AgentsOverview from './admin/Agents/AgentsOverview';
 import AgentsRegistration from './admin/Agents/AgentsRegistration';
 import AgentsVerification from './admin/Agents/AgentsVerification';
-import AgentsPropertiesLeads from './admin/Agents/AgentsPropertiesLeads';
+// import AgentsPropertiesLeads from './admin/Agents/AgentsPropertiesLeads';
 import AgentsPropertyControl from './admin/Agents/AgentsPropertyControl';
 
 // Builders
@@ -55,7 +55,7 @@ import BuildersRegistration from './admin/Builders/BuildersRegistration';
 import BuildersVerification from './admin/Builders/BuildersVerification';
 import BuildersProjects from './admin/Builders/BuildersProjects';
 import BuildersPropertyControl from './admin/Builders/BuildersPropertyControl';
-import BuildersPropertiesLeads from './admin/Builders/BuildersPropertiesLeads';
+// import BuildersPropertiesLeads from './admin/Builders/BuildersPropertiesLeads';
 
 // Property Managers
 import PropertyManagersOverview from './admin/PropertyManagers/PropertyManagersOverview';
@@ -63,7 +63,7 @@ import PropertyManagersRegistration from './admin/PropertyManagers/PropertyManag
 import PropertyManagersCompanyManagement from './admin/PropertyManagers/PropertyManagersCompanyManagement';
 import PropertyManagersMaintenance from './admin/PropertyManagers/PropertyManagersMaintenance';
 import PropertyManagersPropertyControl from './admin/PropertyManagers/PropertyManagersPropertyControl';
-import PropertyManagersPropertiesLeads from './admin/PropertyManagers/PropertyManagersPropertiesLeads';
+// import PropertyManagersPropertiesLeads from './admin/PropertyManagers/PropertyManagersPropertiesLeads';
 
 // Subscriptions
 import SubscriptionsOverview from './admin/Subscriptions/SubscriptionsOverview';
@@ -126,7 +126,7 @@ const AdminDashboard = () => {
         { key: '/admin/owners/overview', icon: <FiGrid />, label: 'Owners Dashboard' },
         { key: '/admin/owners/registration', icon: <FiCheckCircle />, label: 'Registration & KYC' },
         { key: '/admin/owners/property-control', icon: <FiSettings />, label: 'Property Control' },
-        { key: '/admin/owners/leads', icon: <FiMessageCircle />, label: 'Properties Leads' },
+        // { key: '/admin/owners/leads', icon: <FiMessageCircle />, label: 'Properties Leads' },
       ],
     },
     {
@@ -137,7 +137,7 @@ const AdminDashboard = () => {
         { key: '/admin/agents/overview', icon: <FiGrid />, label: 'Agents Dashboard' },
         { key: '/admin/agents/registration', icon: <FiCheckCircle />, label: 'Registration Approval' },
         { key: '/admin/agents/verification', icon: <FaShieldAlt />, label: 'Agent Verification' },
-        { key: '/admin/agents/leads', icon: <FiHome />, label: 'Properties Leads' },
+        // { key: '/admin/agents/leads', icon: <FiHome />, label: 'Properties Leads' },
         { key: '/admin/agents/property-control', icon: <FiSettings />, label: 'Property Control' },
       ],
     },
@@ -151,7 +151,7 @@ const AdminDashboard = () => {
         { key: '/admin/builders/verification', icon: <FaShieldAlt />, label: 'Builder Verification' },
         { key: '/admin/builders/projects', icon: <FaProjectDiagram />, label: 'Project Management' },
         { key: '/admin/builders/property-control', icon: <FiSettings />, label: 'Property Control' },
-        { key: '/admin/builders/leads', icon: <FiMessageCircle />, label: 'Properties Leads' },
+        // { key: '/admin/builders/leads', icon: <FiMessageCircle />, label: 'Properties Leads' },
       ],
     },
     {
@@ -164,7 +164,7 @@ const AdminDashboard = () => {
         { key: '/admin/property-managers/companies', icon: <FaBuilding />, label: 'Company Management' },
         { key: '/admin/property-managers/maintenance', icon: <BsTools />, label: 'Maintenance' },
         { key: '/admin/property-managers/property-control', icon: <FiSettings />, label: 'Property Control' },
-        { key: '/admin/property-managers/leads', icon: <FiMessageCircle />, label: 'Properties Leads' },
+        // { key: '/admin/property-managers/leads', icon: <FiMessageCircle />, label: 'Properties Leads' },
       ],
     },
     { key: '/admin/buyers-tenants', icon: <HiOutlineUserGroup />, label: 'Buyers & Tenants' },
@@ -541,13 +541,13 @@ const AdminDashboard = () => {
               <Route path="owners/overview" element={<OwnersOverview />} />
               <Route path="owners/registration" element={<OwnersRegistration />} />
               <Route path="owners/property-control" element={<OwnersPropertyControl />} />
-              <Route path="owners/leads" element={<OwnersPropertiesLeads />} />
+              {/* <Route path="owners/leads" element={<OwnersPropertiesLeads />} /> */}
 
               {/* Agents */}
               <Route path="agents/overview" element={<AgentsOverview />} />
               <Route path="agents/registration" element={<AgentsRegistration />} />
               <Route path="agents/verification" element={<AgentsVerification />} />
-              <Route path="agents/leads" element={<AgentsPropertiesLeads />} />
+              {/* <Route path="agents/leads" element={<AgentsPropertiesLeads />} /> */}
               <Route path="agents/property-control" element={<AgentsPropertyControl />} />
 
               {/* Builders */}
@@ -556,7 +556,7 @@ const AdminDashboard = () => {
               <Route path="builders/verification" element={<BuildersVerification />} />
               <Route path="builders/projects" element={<BuildersProjects />} />
               <Route path="builders/property-control" element={<BuildersPropertyControl />} />
-              <Route path="builders/leads" element={<BuildersPropertiesLeads />} />
+              {/* <Route path="builders/leads" element={<BuildersPropertiesLeads />} /> */}
 
               {/* Property Managers */}
               <Route path="property-managers/overview" element={<PropertyManagersOverview />} />
@@ -564,7 +564,7 @@ const AdminDashboard = () => {
               <Route path="property-managers/companies" element={<PropertyManagersCompanyManagement />} />
               <Route path="property-managers/maintenance" element={<PropertyManagersMaintenance />} />
               <Route path="property-managers/property-control" element={<PropertyManagersPropertyControl />} />
-              <Route path="property-managers/leads" element={<PropertyManagersPropertiesLeads />} />
+              {/* <Route path="property-managers/leads" element={<PropertyManagersPropertiesLeads />} /> */}
 
               {/* Subscriptions */}
               <Route path="subscriptions/overview" element={<SubscriptionsOverview />} />
