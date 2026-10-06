@@ -908,7 +908,7 @@ const ReportTypeCard = ({ report, isActive, onClick, index }) => {
   return (
     <div 
       onClick={onClick} 
-      className={`rounded-2xl p-4 cursor-pointer transition-all duration-500 border-3 hover:shadow-xl group relative overflow-hidden animate-card-in ${
+      className={`rounded-2xl p-2 cursor-pointer transition-all duration-500 border-3 hover:shadow-xl group relative overflow-hidden animate-card-in ${
         isActive 
           ? 'bg-gradient-to-br from-[#00695C] to-[#26A69A] border-transparent shadow-xl scale-105' 
           : `${report.bg} border-[#d2ece6] hover:-translate-y-2 hover:border-[#00695C]/40`
@@ -928,7 +928,7 @@ const ReportTypeCard = ({ report, isActive, onClick, index }) => {
         )}
       </div>
       <h4 className={`text-xs font-bold mb-0.5 ${isActive ? 'text-white' : 'text-[#0F1A18]'}`}>{report.title}</h4>
-      <p className={`text-[9px] font-medium ${isActive ? 'text-white/90' : 'text-[#5A7D78]'}`}>{report.desc}</p>
+      <p className={`text-[10px] font-medium ${isActive ? 'text-white/90' : 'text-[#5A7D78]'}`}>{report.desc}</p>
     </div>
   );
 };
@@ -2119,7 +2119,7 @@ const LeadReports = () => {
 
       {/* Report Type Cards */}
       <div className="relative z-0 animate-slide-in">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5  gap-2.5">
           {REPORT_TYPES.map((report, idx) => (
             <ReportTypeCard 
               key={report.id} 
