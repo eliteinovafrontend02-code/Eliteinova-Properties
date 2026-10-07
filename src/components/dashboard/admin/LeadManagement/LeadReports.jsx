@@ -2025,7 +2025,7 @@ const LeadReports = () => {
       <Toast toast={toast} setToast={setToast} />
 
       {/* Header */}
-      <div className="relative z-50 animate-fade-in">
+      <div className="relative z-99 animate-fade-in">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2 flex-wrap">
