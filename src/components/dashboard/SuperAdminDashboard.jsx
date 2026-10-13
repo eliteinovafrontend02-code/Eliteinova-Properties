@@ -19,19 +19,14 @@ import SuperAdminOverview from './superadmin/SuperAdminOverview';
 
 import UserManagement from './superadmin/UserManagement';
 import CustomerManagement from './superadmin/CustomerManagement';
-// import RolePermissions from './superadmin/Role&Permissions';
 import PropertyManagement from './superadmin/PropertyManagement';
 import ProjectManagement from './superadmin/ProjectManagement';
 import LeadManagement from './superadmin/LeadManagement';
 import SubscriptionManagement from './superadmin/SubscriptionManagement';
-// import PaymentsManagement from './superadmin/PaymentsManagement';
-// import AdvertisementsManagement from './superadmin/AdvertisementsManagement';
-// import VerificationManagement from './superadmin/VerificationManagement';
+import PaymentsManagement from './superadmin/PaymentsManagement';
+import VerificationManagement from './superadmin/VerificationManagement';
 import LocationManagement from './superadmin/LocationManagement';
 // import ReportsAnalyticsManagement from './superadmin/Reports&AnalyticsManagement';
-// import Notifications from './superadmin/Notifications';
-// import ActivityLogs from './superadmin/ActivityLogs';
-// import ContentManagement from './superadmin/ContentManagement';
 // import Settings from './superadmin/Settings';
 
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
@@ -44,17 +39,13 @@ const menuItems = [
   { key: '/admin/super-admin/properties', icon: <FiHome />, label: 'Property Admin' },
   { key: '/admin/super-admin/subscriptions', icon: <FiCreditCard />, label: 'Subscription Management' },
   { key: '/admin/super-admin/projects', icon: <FiLayers />, label: 'Project Management' },
-  { key: '/admin/super-admin/advertisements', icon: <FiVolume2 />, label: 'Advertisements' },
   { key: '/admin/super-admin/kyc', icon: <FiUserCheck />, label: 'Verification Management' },
   { key: '/admin/super-admin/locations', icon: <FiMapPin />, label: 'Location Management' },
   { key: '/admin/super-admin/leads', icon: <FiTarget />, label: 'Lead Management' },
   { key: '/admin/super-admin/payments', icon: <FiDollarSign />, label: 'Payments' },
   { key: '/admin/super-admin/reports', icon: <FiBarChart2 />, label: 'Reports & Analytics' },
   { key: '/admin/super-admin/notifications', icon: <FiBell />, label: 'Notifications' },
-  // { key: '/admin/super-admin/roles', icon: <FiLock />, label: 'Roles & Permissions' },
-  // { key: '/admin/super-admin/activity-logs', icon: <FiActivity />, label: 'Activity Logs' },
   { key: '/admin/super-admin/settings', icon: <FiSettings />, label: 'Settings' },
-  { key: '/admin/super-admin/content', icon: <FiFileText />, label: 'Content Management' },
 ];
 
 const SuperAdminDashboard = () => {
@@ -270,19 +261,15 @@ const SuperAdminDashboard = () => {
 
                 <Route path="users" element={<UserManagement />} />
                 <Route path="customers" element={<CustomerManagement />} />
-                {/* <Route path="roles" element={<RolePermissions />} /> */}
                 <Route path="properties" element={<PropertyManagement />} />
                 <Route path="projects" element={<ProjectManagement />} />
                 <Route path="leads" element={<LeadManagement />} />
                 <Route path="subscriptions" element={<SubscriptionManagement />} />
-                {/* <Route path="payments" element={<PaymentsManagement />} /> */}
-                {/* <Route path="advertisements" element={<AdvertisementsManagement />} /> */}
-                {/* <Route path="kyc" element={<VerificationManagement />} /> */}
+                <Route path="payments" element={<PaymentsManagement />} />
+                <Route path="kyc" element={<VerificationManagement />} />
                 <Route path="locations" element={<LocationManagement />} />
                 {/* <Route path="reports" element={<ReportsAnalyticsManagement />} /> */}
                 {/* <Route path="notifications" element={<Notifications />} /> */}
-                {/* <Route path="activity-logs" element={<ActivityLogs />} /> */}
-                {/* <Route path="content" element={<ContentManagement />} /> */}
                 {/* <Route path="settings" element={<Settings />} /> */}
               </Routes>
             </div>

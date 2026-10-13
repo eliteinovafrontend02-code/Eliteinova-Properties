@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  FiUsers, FiUser, FiHome, FiCreditCard, FiLayers, FiVolume2,
+  FiUsers, FiUser, FiHome, FiCreditCard, FiLayers,
   FiUserCheck, FiMapPin, FiTarget, FiDollarSign, FiBarChart2, FiBell,
-  FiLock, FiActivity, FiSettings, FiFileText,
+  FiSettings,
   FiArrowUpRight, FiTrendingUp, FiTrendingDown, FiRefreshCw,
 } from 'react-icons/fi';
 
@@ -13,21 +13,17 @@ const BASE = '/admin/super-admin';
 
 /* ============ STATS DATA ============ */
 const initialStats = [
-  { id: 'users', label: 'Total Users', value: 1248, sub: '38 new this week', trend: 6.2, path: `${BASE}/users`, icon: FiUsers, color: '#00695C', gradient: 'from-[#00695C] to-[#26A69A]' },
+  { id: 'vendors', label: 'Vendors', value: 1248, sub: '38 new this week', trend: 6.2, path: `${BASE}/users`, icon: FiUsers, color: '#00695C', gradient: 'from-[#00695C] to-[#26A69A]' },
   { id: 'customers', label: 'Customers', value: 8420, sub: '214 active today', trend: 4.8, path: `${BASE}/customers`, icon: FiUser, color: '#0288D1', gradient: 'from-[#0288D1] to-[#4FC3F7]' },
   { id: 'properties', label: 'Properties', value: 3562, sub: '86 awaiting approval', trend: 3.1, path: `${BASE}/properties`, icon: FiHome, color: '#00796B', gradient: 'from-[#00796B] to-[#80CBC4]' },
   { id: 'projects', label: 'Projects', value: 142, sub: '18 ongoing launches', trend: 2.4, path: `${BASE}/projects`, icon: FiLayers, color: '#5E35B1', gradient: 'from-[#5E35B1] to-[#9575CD]' },
   { id: 'leads', label: 'Leads', value: 2915, sub: '312 unassigned', trend: 9.7, path: `${BASE}/leads`, icon: FiTarget, color: '#E65100', gradient: 'from-[#E65100] to-[#FFB74D]' },
   { id: 'subscriptions', label: 'Active Subscriptions', value: 684, sub: '27 expiring in 7 days', trend: 1.9, path: `${BASE}/subscriptions`, icon: FiCreditCard, color: '#00695C', gradient: 'from-[#00695C] to-[#4DB6AC]' },
   { id: 'payments', label: 'Revenue (This Month)', value: 4285000, sub: '12 payments pending', trend: 11.3, path: `${BASE}/payments`, icon: FiDollarSign, color: '#1B5E20', gradient: 'from-[#1B5E20] to-[#66BB6A]', currency: true },
-  { id: 'advertisements', label: 'Advertisements', value: 96, sub: '14 pending review', trend: -2.1, path: `${BASE}/advertisements`, icon: FiVolume2, color: '#C2185B', gradient: 'from-[#C2185B] to-[#F06292]' },
-  { id: 'kyc', label: 'KYC & Verification', value: 73, sub: 'pending verifications', trend: -5.4, path: `${BASE}/kyc`, icon: FiUserCheck, color: '#B71C1C', gradient: 'from-[#B71C1C] to-[#EF5350]', attention: true },
+  { id: 'verifications', label: 'Verifications', value: 73, sub: 'pending verifications', trend: -5.4, path: `${BASE}/kyc`, icon: FiUserCheck, color: '#B71C1C', gradient: 'from-[#B71C1C] to-[#EF5350]', attention: true },
   { id: 'locations', label: 'Locations', value: 264, sub: '32 cities covered', trend: null, path: `${BASE}/locations`, icon: FiMapPin, color: '#006064', gradient: 'from-[#006064] to-[#4DD0E1]' },
   { id: 'reports', label: 'Reports & Analytics', value: 48, sub: '6 scheduled reports', trend: null, path: `${BASE}/reports`, icon: FiBarChart2, color: '#283593', gradient: 'from-[#283593] to-[#7986CB]' },
   { id: 'notifications', label: 'Notifications', value: 19, sub: 'unread alerts', trend: null, path: `${BASE}/notifications`, icon: FiBell, color: '#E65100', gradient: 'from-[#E65100] to-[#FFB74D]', attention: true },
-  { id: 'roles', label: 'Roles & Permissions', value: 12, sub: '5 custom roles', trend: null, path: `${BASE}/roles`, icon: FiLock, color: '#4E342E', gradient: 'from-[#4E342E] to-[#A1887F]' },
-  { id: 'activity-logs', label: 'Activity Logs', value: 1876, sub: 'events in last 24 hrs', trend: 7.5, path: `${BASE}/activity-logs`, icon: FiActivity, color: '#37474F', gradient: 'from-[#37474F] to-[#90A4AE]' },
-  { id: 'content', label: 'Content Pages', value: 34, sub: '3 drafts', trend: null, path: `${BASE}/content`, icon: FiFileText, color: '#6A1B9A', gradient: 'from-[#6A1B9A] to-[#BA68C8]' },
   { id: 'settings', label: 'System Settings', value: 8, sub: 'configuration groups', trend: null, path: `${BASE}/settings`, icon: FiSettings, color: '#37474F', gradient: 'from-[#37474F] to-[#90A4AE]' },
 ];
 

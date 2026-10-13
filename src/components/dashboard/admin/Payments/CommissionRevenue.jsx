@@ -170,7 +170,7 @@ const FilterDropdown = ({ label, options, value, onChange, icon: Icon, allLabel 
   const selectedOption = options.find(opt => opt.value === value);
   const displayLabel = selectedOption ? selectedOption.label : allLabel;
   return (
-    <div className="relative z-[60]" ref={dropdownRef}>
+    <div className="relative z-[10]" ref={dropdownRef}>
       <button onClick={() => { if (!disabled) setIsOpen(!isOpen); }} disabled={disabled}
         className={`flex items-center gap-2 px-4 py-2.5 bg-white rounded-xl border transition-all duration-300 text-sm font-medium text-[#1A2E2A] hover:shadow-md disabled:opacity-50 whitespace-nowrap ${
           value !== 'all' ? 'border-[#00695C] ring-2 ring-[#00695C]/20 bg-[#F5F9F8]' : 'border-[#E8F0EE] hover:border-[#00695C]/30'
