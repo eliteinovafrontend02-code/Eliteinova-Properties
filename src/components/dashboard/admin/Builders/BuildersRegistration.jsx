@@ -25,8 +25,9 @@ import { MdOutlineRealEstateAgent, MdApartment, MdOutlineBusiness, MdOutlinePers
 import { HiOutlineBuildingOffice, HiOutlineUserGroup } from 'react-icons/hi2';
 
 /* ============================================================
-   TOAST COMPONENT
+   STANDALONE COMPONENTS
 ============================================================ */
+
 const Toast = ({ toast }) => {
   if (!toast) return null;
   const colors = {
@@ -46,9 +47,6 @@ const Toast = ({ toast }) => {
   );
 };
 
-/* ============================================================
-   STAT CARD COMPONENT
-============================================================ */
 const StatCard = ({ icon, title, value, color, delay = 0, isActive, statsAnimating, onClick }) => {
   return (
     <div
@@ -76,9 +74,6 @@ const StatCard = ({ icon, title, value, color, delay = 0, isActive, statsAnimati
   );
 };
 
-/* ============================================================
-   APPROVAL CONFIRM MODAL
-============================================================ */
 const ApprovalConfirmModal = ({ show, action, actionLoading, builderName, onCancel, onConfirm }) => {
   if (!show) return null;
 
@@ -120,9 +115,49 @@ const ApprovalConfirmModal = ({ show, action, actionLoading, builderName, onCanc
   );
 };
 
-/* ============================================================
-   BUILDER PROPERTIES MODAL
-============================================================ */
+// ============ BLOCK CONFIRM MODAL ============
+const BlockConfirmModal = ({ show, isBlocked, actionLoading, builderName, onCancel, onConfirm }) => {
+  if (!show) return null;
+
+  const isBlock = !isBlocked;
+  const color = isBlock ? 'red' : 'emerald';
+  const Icon = isBlock ? FiLock : FiUnlock;
+  const title = isBlock ? 'Block Builder' : 'Unblock Builder';
+  const message = isBlock 
+    ? `Are you sure you want to block ${builderName}? They will lose access to the platform.`
+    : `Are you sure you want to unblock ${builderName}? They will regain access to the platform.`;
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[#1A2E2A]/50 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl animate-slide-up border border-[#E8F0EE]">
+        <div className="text-center">
+          <div className={`w-16 h-16 rounded-full bg-${color}-50 flex items-center justify-center mx-auto mb-4`}>
+            <Icon className={`text-3xl text-${color}-600`} />
+          </div>
+          <h3 className="text-xl font-bold text-[#1A2E2A]">{title}</h3>
+          <p className="text-sm text-[#5A7D78] mt-2">{message}</p>
+          <div className="flex items-center gap-3 mt-6">
+            <button
+              onClick={onCancel}
+              className="flex-1 px-4 py-2.5 bg-[#F5F9F8] text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium"
+            >
+              No
+            </button>
+            <button
+              onClick={onConfirm}
+              disabled={actionLoading}
+              className={`flex-1 px-4 py-2.5 bg-${color}-600 text-white rounded-xl hover:bg-${color}-700 transition-all duration-300 text-sm font-medium shadow-lg shadow-${color}-600/30 disabled:opacity-50`}
+            >
+              {actionLoading ? <FiRefreshCw className="animate-spin mx-auto" /> : 'Yes'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============ BUILDER PROPERTIES MODAL ============
 const BuilderPropertiesModal = ({ builder, show, onClose, onViewProperty, onViewOwnerProfile }) => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -139,13 +174,6 @@ const BuilderPropertiesModal = ({ builder, show, onClose, onViewProperty, onView
   }, [show, builder]);
 
   if (!show || !builder) return null;
-
-  const statusColors = {
-    pending: 'bg-amber-100 text-amber-700',
-    approved: 'bg-emerald-100 text-emerald-700',
-    rejected: 'bg-red-100 text-red-700',
-    suspended: 'bg-gray-100 text-gray-700'
-  };
 
   const typeIcons = {
     'Individual': <FiUser className="text-[#00695C]" />,
@@ -205,19 +233,6 @@ const BuilderPropertiesModal = ({ builder, show, onClose, onViewProperty, onView
                           {typeIcons[property.type] || <FiTag className="text-[#00695C]" />}
                           {property.type}
                         </span>
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColors[property.status] || 'bg-gray-100 text-gray-700'}`}>
-                          {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
-                        </span>
-                        {property.isFeatured && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
-                            <FaStarSolid className="inline mr-0.5 text-[8px]" /> Featured
-                          </span>
-                        )}
-                        {property.isVerified && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
-                            <FiShield className="inline mr-0.5 text-[8px]" /> Verified
-                          </span>
-                        )}
                       </div>
                     </div>
                     <div className="shrink-0">
@@ -275,7 +290,15 @@ const BuilderPropertiesModal = ({ builder, show, onClose, onViewProperty, onView
                     </button>
                   </div>
 
-                 
+                  <div className="mt-2">
+                    <button
+                      onClick={() => onViewOwnerProfile && onViewOwnerProfile(builder, property)}
+                      className="w-full py-2 rounded-xl text-xs font-medium bg-[#E7F6EF] text-[#167A54] border border-[#BEE4D2] hover:bg-[#D5EFE0] transition-all duration-300 flex items-center justify-center gap-2 hover:scale-[1.02]"
+                    >
+                      <FiExternalLink className="text-xs" />
+                      View Builder Profile
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -298,7 +321,6 @@ const BuilderPropertiesModal = ({ builder, show, onClose, onViewProperty, onView
   );
 };
 
-// Helper function to generate mock properties for a builder
 const generateBuilderProperties = (builder) => {
   const propertyTypes = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
   const statuses = ['pending', 'approved', 'rejected', 'suspended'];
@@ -313,7 +335,6 @@ const generateBuilderProperties = (builder) => {
   ];
 
   const count = builder.propertiesCount || Math.floor(Math.random() * 8) + 1;
-  
   const properties = [];
   const builderNames = [
     'Rajesh Kumar', 'Priya Sharma', 'Amit Singh', 'Sneha Patel', 'Vikram Reddy',
@@ -360,6 +381,7 @@ const generateBuilderProperties = (builder) => {
 /* ============================================================
    VIEW BUILDER MODAL
 ============================================================ */
+
 const ViewBuilderModal = ({ builder, show, actionLoading, onClose, onApprove, onReject, onEdit, onToggleBlock, onViewProperties, onViewProfile }) => {
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -370,10 +392,12 @@ const ViewBuilderModal = ({ builder, show, actionLoading, onClose, onApprove, on
   if (!builder || !show) return null;
 
   const verificationItems = [
-    { key: 'email', label: 'Email' },
-    { key: 'phone', label: 'Phone' },
     { key: 'aadhaar', label: 'Aadhaar' },
     { key: 'pan', label: 'PAN' },
+    { key: 'gst', label: 'GST (Optional)' },
+    { key: 'companyPan', label: 'Company PAN Card' },
+    { key: 'companyRegCert', label: 'Company Registration Certificate' },
+    { key: 'businessAddressProof', label: 'Business Address Proof' },
   ];
   const verifiedCount = verificationItems.filter(item => builder.verification[item.key]).length;
   const verifiedPercent = Math.round((verifiedCount / verificationItems.length) * 100);
@@ -385,7 +409,7 @@ const ViewBuilderModal = ({ builder, show, actionLoading, onClose, onApprove, on
   const tabs = [
     { id: 'overview', label: 'Overview' },
     { id: 'contact', label: 'Contact' },
-    { id: 'verification', label: 'Verification' },
+    { id: 'verification', label: 'Documents' },
   ];
 
   const getSpecializationIcon = (spec) => {
@@ -464,7 +488,7 @@ const ViewBuilderModal = ({ builder, show, actionLoading, onClose, onApprove, on
           </div>
         </div>
         <p className="text-center text-[10px] font-medium mt-1 shrink-0" style={{ color: 'var(--bvm-muted)' }}>
-          {verifiedCount}/{verificationItems.length} verified · {verifiedPercent}%
+          {verifiedCount}/{verificationItems.length} documents verified · {verifiedPercent}%
         </p>
 
         {/* View Properties Button */}
@@ -621,7 +645,7 @@ const ViewBuilderModal = ({ builder, show, actionLoading, onClose, onApprove, on
                   {builder.verificationStatus.charAt(0).toUpperCase() + builder.verificationStatus.slice(1)}
                 </span>
               </div>
-              <div className="grid grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 gap-2.5">
                 {verificationItems.map(item => (
                   <div
                     key={item.key}
@@ -639,7 +663,7 @@ const ViewBuilderModal = ({ builder, show, actionLoading, onClose, onApprove, on
                 ))}
               </div>
               <div className="mt-3 p-3 rounded-xl" style={{ background: 'var(--bvm-surface)', border: '1px solid var(--bvm-border)' }}>
-                <p className="text-[10px] font-medium" style={{ color: 'var(--bvm-muted)' }}>Aadhaar & PAN verified builders get priority listing benefits.</p>
+                <p className="text-[10px] font-medium" style={{ color: 'var(--bvm-muted)' }}>Fully verified builders get priority listing benefits.</p>
               </div>
             </div>
           )}
@@ -733,6 +757,7 @@ const ViewBuilderModal = ({ builder, show, actionLoading, onClose, onApprove, on
 /* ============================================================
    EDIT BUILDER MODAL
 ============================================================ */
+
 const EditBuilderModal = ({ builder, show, onClose, onSave }) => {
   const [formData, setFormData] = useState(null);
 
@@ -752,10 +777,12 @@ const EditBuilderModal = ({ builder, show, onClose, onSave }) => {
         bio: builder.bio || '',
         verificationStatus: builder.verificationStatus || 'pending',
         verification: {
-          email: !!builder.verification?.email,
-          phone: !!builder.verification?.phone,
           aadhaar: !!builder.verification?.aadhaar,
           pan: !!builder.verification?.pan,
+          gst: !!builder.verification?.gst,
+          companyPan: !!builder.verification?.companyPan,
+          companyRegCert: !!builder.verification?.companyRegCert,
+          businessAddressProof: !!builder.verification?.businessAddressProof,
         },
         gstin: builder.gstin || '',
         panNumber: builder.panNumber || '',
@@ -772,10 +799,12 @@ const EditBuilderModal = ({ builder, show, onClose, onSave }) => {
   const handleVerificationToggle = (key) => {
     setFormData(prev => {
       const updatedVerification = { ...prev.verification, [key]: !prev.verification[key] };
-      const allVerified = Object.values(updatedVerification).every(Boolean);
+      
+      const requiredDocs = ['aadhaar', 'pan', 'companyPan', 'companyRegCert', 'businessAddressProof'];
+      const allRequiredVerified = requiredDocs.every(doc => updatedVerification[doc]);
 
       let nextStatus = prev.verificationStatus;
-      if (allVerified) {
+      if (allRequiredVerified) {
         nextStatus = 'verified';
       } else if (prev.verificationStatus === 'verified') {
         nextStatus = 'pending';
@@ -791,10 +820,12 @@ const EditBuilderModal = ({ builder, show, onClose, onSave }) => {
   };
 
   const verificationDocs = [
-    { key: 'email', label: 'Email', icon: <FiMail className="text-sm" /> },
-    { key: 'phone', label: 'Phone', icon: <FiPhone className="text-sm" /> },
-    { key: 'aadhaar', label: 'Aadhaar', icon: <FaIdCard className="text-sm" /> },
-    { key: 'pan', label: 'PAN', icon: <FaFileAlt className="text-sm" /> },
+    { key: 'aadhaar', label: 'Aadhaar', icon: <FaIdCard className="text-sm" />, optional: false },
+    { key: 'pan', label: 'PAN', icon: <FaFileAlt className="text-sm" />, optional: false },
+    { key: 'gst', label: 'GST (Optional)', icon: <FaFileAlt className="text-sm" />, optional: true },
+    { key: 'companyPan', label: 'Company PAN Card', icon: <FaIdCard className="text-sm" />, optional: false },
+    { key: 'companyRegCert', label: 'Company Registration Certificate', icon: <FaCertificate className="text-sm" />, optional: false },
+    { key: 'businessAddressProof', label: 'Business Address Proof', icon: <FiMapPin className="text-sm" />, optional: false },
   ];
 
   return (
@@ -969,7 +1000,7 @@ const EditBuilderModal = ({ builder, show, onClose, onSave }) => {
 
               <div className="col-span-2">
                 <label className="text-xs font-medium text-[#5A7D78] block mb-2">Verification Documents</label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {verificationDocs.map(item => {
                     const isVerified = formData.verification[item.key];
                     return (
@@ -996,7 +1027,7 @@ const EditBuilderModal = ({ builder, show, onClose, onSave }) => {
                     );
                   })}
                 </div>
-                <p className="text-[10px] text-[#5A7D78] mt-1.5">Tap a document to mark it verified / not verified.</p>
+                <p className="text-[10px] text-[#5A7D78] mt-1.5">Tap a document to mark it verified / not verified. Verifying all required documents sets Verification Status to Verified automatically.</p>
               </div>
 
               <div className="col-span-2">
@@ -1038,13 +1069,13 @@ const EditBuilderModal = ({ builder, show, onClose, onSave }) => {
 };
 
 /* ============================================================
-   MAIN COMPONENT - BuildersRegistration
+   MAIN COMPONENT
 ============================================================ */
+
 const BuildersRegistration = () => {
   const navigate = useNavigate();
   const searchInputRef = useRef(null);
 
-  // ============ STATE ============
   const [builders, setBuilders] = useState([]);
   const [filteredBuilders, setFilteredBuilders] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -1069,18 +1100,17 @@ const BuildersRegistration = () => {
   const [actionLoading, setActionLoading] = useState(null);
   const [filterCount, setFilterCount] = useState(0);
   const [activeFilter, setActiveFilter] = useState('all');
-
-  // ============ PROPERTIES MODAL STATE ============
+  
   const [showPropertiesModal, setShowPropertiesModal] = useState(false);
   const [selectedBuilderForProperties, setSelectedBuilderForProperties] = useState(null);
 
-  // ============ TOAST FUNCTION ============
+  const [blockConfirmBuilder, setBlockConfirmBuilder] = useState(null);
+
   const showToast = useCallback((message, type = 'success', duration = 3000) => {
     setToast({ message, type });
     setTimeout(() => setToast(null), duration);
   }, []);
 
-  // ============ STATS ============
   const [stats, setStats] = useState({
     totalBuilders: 0,
     pendingApprovals: 0,
@@ -1091,7 +1121,6 @@ const BuildersRegistration = () => {
     approvedAndVerified: 0,
   });
 
-  // ============ GENERATE MOCK BUILDERS ============
   const generateMockBuilders = useCallback(() => {
     const firstNames = ['Rajesh', 'Priya', 'Amit', 'Sneha', 'Vikram', 'Ananya', 'Deepak', 'Meera', 'Ravi', 'Kavya', 'Suresh', 'Pooja', 'Arjun', 'Lakshmi', 'Kiran', 'Mohan', 'Ritu', 'Gautam', 'Nisha', 'Tarun'];
     const lastNames = ['Kumar', 'Sharma', 'Singh', 'Patel', 'Reddy', 'Gupta', 'Verma', 'Joshi', 'Malhotra', 'Mehta', 'Nair', 'Pillai', 'Rao', 'Shetty', 'Agarwal', 'Khanna', 'Chopra', 'Saxena', 'Tiwari', 'Desai'];
@@ -1128,12 +1157,33 @@ const BuildersRegistration = () => {
       const rating = (Math.random() * 4 + 1).toFixed(1);
       const experience = Math.floor(Math.random() * 15) + 1;
 
-      const verification = {
-        email: Math.random() > 0.15,
-        phone: Math.random() > 0.2,
-        aadhaar: Math.random() > 0.3,
-        pan: Math.random() > 0.35,
+      let verification = { 
+        aadhaar: false, 
+        pan: false, 
+        gst: false, 
+        companyPan: false, 
+        companyRegCert: false, 
+        businessAddressProof: false 
       };
+      if (verificationStatus === 'verified') {
+        verification = { 
+          aadhaar: true, 
+          pan: true, 
+          gst: true, 
+          companyPan: true, 
+          companyRegCert: true, 
+          businessAddressProof: true 
+        };
+      } else if (verificationStatus === 'pending') {
+        verification = {
+          aadhaar: Math.random() > 0.5,
+          pan: Math.random() > 0.5,
+          gst: Math.random() > 0.7,
+          companyPan: Math.random() > 0.5,
+          companyRegCert: Math.random() > 0.5,
+          businessAddressProof: Math.random() > 0.5,
+        };
+      }
 
       builders.push({
         id: `builder_${i}`,
@@ -1186,7 +1236,6 @@ const BuildersRegistration = () => {
     return builders;
   }, []);
 
-  // ============ INITIALIZE DATA ============
   useEffect(() => {
     const mockBuilders = generateMockBuilders();
     setBuilders(mockBuilders);
@@ -1195,7 +1244,6 @@ const BuildersRegistration = () => {
     setTimeout(() => setStatsAnimating(false), 1000);
   }, [generateMockBuilders]);
 
-  // ============ FILTER BUILDERS ============
   const filterBuilders = useCallback(() => {
     let filtered = [...builders];
 
@@ -1245,7 +1293,6 @@ const BuildersRegistration = () => {
     filterBuilders();
   }, [filterBuilders]);
 
-  // ============ PAGINATION ============
   const totalPages = Math.ceil(filteredBuilders.length / pageSize);
   const paginatedBuilders = useMemo(() =>
     filteredBuilders.slice(
@@ -1254,7 +1301,6 @@ const BuildersRegistration = () => {
     )
   , [filteredBuilders, currentPage, pageSize]);
 
-  // ============ HANDLE SORT ============
   const handleSort = useCallback((field) => {
     if (sortField === field) {
       setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
@@ -1264,7 +1310,6 @@ const BuildersRegistration = () => {
     }
   }, [sortField]);
 
-  // ============ HANDLE SELECT ALL ============
   const handleSelectAll = useCallback(() => {
     if (selectedBuilders.length === paginatedBuilders.length) {
       setSelectedBuilders([]);
@@ -1273,7 +1318,6 @@ const BuildersRegistration = () => {
     }
   }, [selectedBuilders, paginatedBuilders]);
 
-  // ============ HANDLE SELECT BUILDER ============
   const handleSelectBuilder = useCallback((builderId) => {
     setSelectedBuilders(prev =>
       prev.includes(builderId)
@@ -1282,7 +1326,6 @@ const BuildersRegistration = () => {
     );
   }, []);
 
-  // ============ HANDLE APPROVAL ============
   const handleApproval = useCallback((builderId, action) => {
     const builder = builders.find(b => b.id === builderId);
     if (!builder) return;
@@ -1290,7 +1333,6 @@ const BuildersRegistration = () => {
     setApprovalAction(action);
   }, [builders]);
 
-  // ============ CONFIRM APPROVAL ============
   const confirmApproval = useCallback(() => {
     const builderId = showApprovalConfirm;
     const action = approvalAction;
@@ -1330,8 +1372,13 @@ const BuildersRegistration = () => {
     }, 800);
   }, [showApprovalConfirm, approvalAction, builders, showToast]);
 
-  // ============ HANDLE TOGGLE BLOCK ============
-  const handleToggleBlock = useCallback((builderId) => {
+  const handleBlockRequest = useCallback((builder) => {
+    setBlockConfirmBuilder(builder);
+  }, []);
+
+  const confirmToggleBlock = useCallback(() => {
+    if (!blockConfirmBuilder) return;
+    const builderId = blockConfirmBuilder.id;
     setActionLoading(`block_${builderId}`);
 
     setTimeout(() => {
@@ -1364,81 +1411,94 @@ const BuildersRegistration = () => {
       updatedBuilders = updatedBuilders.map(b => b.id === builderId ? builder : b);
       setBuilders(updatedBuilders);
       setActionLoading(null);
+      setBlockConfirmBuilder(null);
 
       setViewingBuilder(prev => (prev && prev.id === builderId ? builder : prev));
     }, 600);
-  }, [builders, showToast]);
+  }, [blockConfirmBuilder, builders, showToast]);
 
-  // ============ VIEW BUILDER DETAIL ============
   const handleViewBuilder = useCallback((builder) => {
     setViewingBuilder(builder);
     setShowViewModal(true);
   }, []);
 
-  // ============ VIEW BUILDER PROPERTIES ============
   const handleViewBuilderProperties = useCallback((builder) => {
     setSelectedBuilderForProperties(builder);
     setShowPropertiesModal(true);
   }, []);
 
-  // ============ VIEW INDIVIDUAL PROPERTY DETAIL ============
   const handleViewPropertyDetail = useCallback((property) => {
     navigate(`/properties/${property.id}`);
     showToast(`Opening ${property.title}...`, 'info');
   }, [navigate, showToast]);
 
-  // ============ VIEW BUILDER PROFILE ============
   const handleViewBuilderProfile = useCallback((builderId) => {
     navigate('/profile/builder');
     showToast('Opening Builder Profile...', 'info');
   }, [navigate, showToast]);
 
-  // ============ VIEW PROPERTY OWNER PROFILE ============
   const handleViewOwnerProfile = useCallback((ownerBuilder, property) => {
     handleViewBuilderProfile(ownerBuilder?.id);
   }, [handleViewBuilderProfile]);
 
-  // ============ EDIT BUILDER ============
   const handleEditBuilder = useCallback((builder) => {
     setEditingBuilder(builder);
     setShowEditModal(true);
   }, []);
 
-  // ============ SAVE EDIT ============
   const saveEdit = useCallback((updatedData) => {
-    setBuilders(prev => prev.map(builder => {
+    const updatedBuilders = builders.map(builder => {
       if (builder.id !== editingBuilder.id) return builder;
-      return { ...builder, ...updatedData };
-    }));
+      
+      let syncedVerification = { ...builder.verification, ...updatedData.verification };
+      if (updatedData.verificationStatus === 'verified') {
+        syncedVerification = { 
+          aadhaar: true, 
+          pan: true, 
+          gst: true, 
+          companyPan: true, 
+          companyRegCert: true, 
+          businessAddressProof: true 
+        };
+      }
+      
+      return { ...builder, ...updatedData, verification: syncedVerification };
+    });
 
-    setBuilders(prev => {
-      const total = prev.length;
-      const pending = prev.filter(b => b.status === 'pending').length;
-      const approved = prev.filter(b => b.status === 'approved').length;
-      const rejected = prev.filter(b => b.status === 'rejected').length;
-      const blocked = prev.filter(b => b.status === 'blocked').length;
-      const verified = prev.filter(b => b.verificationStatus === 'verified').length;
-      const approvedAndVerified = prev.filter(b => b.status === 'approved' && b.verificationStatus === 'verified').length;
+    setBuilders(updatedBuilders);
+    setFilteredBuilders(updatedBuilders);
 
-      setStats({
-        totalBuilders: total,
-        pendingApprovals: pending,
-        approved: approved,
-        rejected: rejected,
-        blocked: blocked,
-        verified: verified,
-        approvedAndVerified: approvedAndVerified,
-      });
+    const total = updatedBuilders.length;
+    const pending = updatedBuilders.filter(b => b.status === 'pending').length;
+    const approved = updatedBuilders.filter(b => b.status === 'approved').length;
+    const rejected = updatedBuilders.filter(b => b.status === 'rejected').length;
+    const blocked = updatedBuilders.filter(b => b.status === 'blocked').length;
+    const verified = updatedBuilders.filter(b => b.verificationStatus === 'verified').length;
+    const approvedAndVerified = updatedBuilders.filter(b => b.status === 'approved' && b.verificationStatus === 'verified').length;
 
+    setStats({
+      totalBuilders: total,
+      pendingApprovals: pending,
+      approved: approved,
+      rejected: rejected,
+      blocked: blocked,
+      verified: verified,
+      approvedAndVerified: approvedAndVerified,
+    });
+
+    setViewingBuilder(prev => {
+      if (prev && prev.id === editingBuilder.id) {
+        const found = updatedBuilders.find(b => b.id === editingBuilder.id);
+        return found || prev;
+      }
       return prev;
     });
 
     setShowEditModal(false);
     setEditingBuilder(null);
     showToast('Builder updated successfully', 'success');
-  }, [editingBuilder, showToast]);
+  }, [builders, editingBuilder, showToast]);
 
-  // ============ STAT CLICK HANDLER ============
   const handleStatClick = useCallback((filter) => {
     setActiveFilter(filter);
     if (filter === 'all') {
@@ -1467,7 +1527,6 @@ const BuildersRegistration = () => {
     searchInputRef.current?.focus();
   }, []);
 
-  // ============ CLEAR ALL FILTERS ============
   const clearAllFilters = useCallback(() => {
     setSearchQuery('');
     setSelectedStatus('all');
@@ -1477,7 +1536,6 @@ const BuildersRegistration = () => {
     showToast('All filters cleared', 'info');
   }, [showToast]);
 
-  // ============ REFRESH DATA ============
   const handleRefresh = useCallback(() => {
     setLoading(true);
     setTimeout(() => {
@@ -1491,7 +1549,6 @@ const BuildersRegistration = () => {
     }, 1000);
   }, [generateMockBuilders, showToast]);
 
-  // ============ EXPORT BUILDERS ============
   const handleExportBuilders = useCallback(() => {
     const data = filteredBuilders.map(builder => ({
       Name: builder.name,
@@ -1502,10 +1559,12 @@ const BuildersRegistration = () => {
       Company: builder.company,
       Status: builder.status,
       'Verification Status': builder.verificationStatus,
-      'Email Verified': builder.verification.email ? 'Yes' : 'No',
-      'Phone Verified': builder.verification.phone ? 'Yes' : 'No',
-      'Aadhaar Verified': builder.verification.aadhaar ? 'Yes' : 'No',
-      'PAN Verified': builder.verification.pan ? 'Yes' : 'No',
+      'Aadhaar': builder.verification.aadhaar ? 'Verified' : 'Pending',
+      'PAN': builder.verification.pan ? 'Verified' : 'Pending',
+      'GST': builder.verification.gst ? 'Verified' : 'Pending',
+      'Company PAN Card': builder.verification.companyPan ? 'Verified' : 'Pending',
+      'Company Registration Certificate': builder.verification.companyRegCert ? 'Verified' : 'Pending',
+      'Business Address Proof': builder.verification.businessAddressProof ? 'Verified' : 'Pending',
       Properties: builder.propertiesCount,
       Projects: builder.projectsCount,
       Rating: builder.rating,
@@ -1533,7 +1592,6 @@ const BuildersRegistration = () => {
     showToast(`${filteredBuilders.length} builders exported successfully`, 'success');
   }, [filteredBuilders, showToast]);
 
-  // ============ VIEW MODAL ACTION HANDLERS ============
   const handleViewModalApprove = useCallback((id) => {
     handleApproval(id, 'approve');
   }, [handleApproval]);
@@ -1550,15 +1608,15 @@ const BuildersRegistration = () => {
 
   const handleViewModalToggleBlock = useCallback(() => {
     if (!viewingBuilder) return;
-    handleToggleBlock(viewingBuilder.id);
-  }, [viewingBuilder, handleToggleBlock]);
+    setShowViewModal(false);
+    handleBlockRequest(viewingBuilder);
+  }, [viewingBuilder, handleBlockRequest]);
 
   const handleViewModalViewProperties = useCallback((builder) => {
     setShowViewModal(false);
     handleViewBuilderProperties(builder);
   }, [handleViewBuilderProperties]);
 
-  // ============ BULK ACTIONS ============
   const handleBulkAction = useCallback((action) => {
     if (selectedBuilders.length === 0) {
       showToast('Please select builders first', 'warning');
@@ -1610,19 +1668,15 @@ const BuildersRegistration = () => {
     }, 800);
   }, [selectedBuilders, builders, showToast]);
 
-  // ============ RENDER ============
   return (
     <div className="space-y-6 p-4 lg:p-6 bg-[#F8FAF9] min-h-screen">
-      {/* Animated Background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-[#00695C]/5 rounded-full blur-3xl animate-float" />
         <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-[#26A69A]/5 rounded-full blur-3xl animate-float-delayed" />
       </div>
 
-      {/* Toast */}
       <Toast toast={toast} />
 
-      {/* Approval Confirm Modal */}
       <ApprovalConfirmModal
         show={!!showApprovalConfirm}
         action={approvalAction}
@@ -1632,7 +1686,15 @@ const BuildersRegistration = () => {
         onConfirm={confirmApproval}
       />
 
-      {/* Builder Properties Modal */}
+      <BlockConfirmModal
+        show={!!blockConfirmBuilder}
+        isBlocked={blockConfirmBuilder?.status === 'blocked'}
+        actionLoading={actionLoading === `block_${blockConfirmBuilder?.id}`}
+        builderName={blockConfirmBuilder?.name || ''}
+        onCancel={() => setBlockConfirmBuilder(null)}
+        onConfirm={confirmToggleBlock}
+      />
+
       <BuilderPropertiesModal
         builder={selectedBuilderForProperties}
         show={showPropertiesModal}
@@ -1641,7 +1703,6 @@ const BuildersRegistration = () => {
         onViewOwnerProfile={handleViewOwnerProfile}
       />
 
-      {/* Edit Modal */}
       <EditBuilderModal
         builder={editingBuilder}
         show={showEditModal}
@@ -1649,7 +1710,6 @@ const BuildersRegistration = () => {
         onSave={saveEdit}
       />
 
-      {/* View Modal */}
       <ViewBuilderModal
         builder={viewingBuilder}
         show={showViewModal}
@@ -1663,7 +1723,6 @@ const BuildersRegistration = () => {
         onViewProfile={handleViewBuilderProfile}
       />
 
-      {/* Header */}
       <div className="relative animate-fade-in">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div>
@@ -1714,7 +1773,6 @@ const BuildersRegistration = () => {
         </div>
       </div>
 
-      {/* Stats Section */}
       {showStats && (
         <div className="relative animate-slide-in">
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
@@ -1794,7 +1852,6 @@ const BuildersRegistration = () => {
         </div>
       )}
 
-      {/* Search and Filters */}
       <div className="relative bg-white rounded-2xl p-4 shadow-sm border border-[#E8F0EE] hover:shadow-md transition-all duration-300">
         <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4">
           <div className="flex-1 w-full lg:w-auto relative">
@@ -1875,7 +1932,6 @@ const BuildersRegistration = () => {
           </div>
         </div>
 
-        {/* Bulk Actions */}
         {selectedBuilders.length > 0 && (
           <div className="mt-4 pt-4 border-t border-[#E8F0EE] flex flex-wrap items-center justify-between gap-3 animate-slide-in">
             <span className="text-sm text-[#5A7D78]">
@@ -1909,7 +1965,6 @@ const BuildersRegistration = () => {
         )}
       </div>
 
-      {/* Builders Grid/List */}
       <div className="relative">
         {loading ? (
           <div className="flex items-center justify-center py-20">
@@ -2016,12 +2071,13 @@ const BuildersRegistration = () => {
                   </div>
 
                   {/* Verification Quick Status */}
-                  <div className="grid grid-cols-4 gap-1 mt-2.5 pt-2.5 border-t border-[#E8F0EE]">
+                  <div className="grid grid-cols-3 gap-1 mt-2.5 pt-2.5 border-t border-[#E8F0EE]">
                     {[
-                      { key: 'email', label: 'Email' },
-                      { key: 'phone', label: 'Phone' },
                       { key: 'aadhaar', label: 'Aadhaar' },
-                      { key: 'pan', label: 'PAN' }
+                      { key: 'pan', label: 'PAN' },
+                      { key: 'companyPan', label: 'Co. PAN' },
+                      { key: 'companyRegCert', label: 'Co. Reg.' },
+                      { key: 'businessAddressProof', label: 'Address' }
                     ].map(item => (
                       <div key={item.key} className="text-center">
                         <div className={`text-xs ${builder.verification[item.key] ? 'text-[#00695C]' : 'text-[#B5C9C5]'}`}>
@@ -2032,6 +2088,7 @@ const BuildersRegistration = () => {
                     ))}
                   </div>
 
+                  {/* Stats row - Properties, Projects, Rating (as requested) */}
                   <div className="grid grid-cols-3 gap-2 mt-2.5 pt-2.5 border-t border-[#E8F0EE]">
                     <div className="text-center">
                       <p className="text-sm font-bold text-[#1A2E2A]">{builder.propertiesCount}</p>
@@ -2097,7 +2154,7 @@ const BuildersRegistration = () => {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleToggleBlock(builder.id)}
+                          onClick={() => handleBlockRequest(builder)}
                           disabled={actionLoading === `block_${builder.id}`}
                           className={`flex-1 py-1.5 text-xs font-medium rounded-xl transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 disabled:opacity-50 ${
                             builder.status === 'blocked'
@@ -2135,6 +2192,7 @@ const BuildersRegistration = () => {
           </div>
         ) : (
           <div className="bg-white rounded-2xl border border-[#E8F0EE] shadow-sm overflow-hidden">
+            
             <div className="grid grid-cols-12 gap-2 items-center px-4 py-3 bg-[#F5F9F8] border-b border-[#E8F0EE] text-xs font-medium text-[#5A7D78] uppercase tracking-wider">
               <div className="col-span-1 flex items-center gap-2">
                 <input
@@ -2143,13 +2201,13 @@ const BuildersRegistration = () => {
                   onChange={handleSelectAll}
                   className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                 />
-                <span>Builder</span>
+                <span>Build</span>
               </div>
               <div className="col-span-2 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('name')}>
                 Name {sortField === 'name' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
               <div className="col-span-1">Status</div>
-              <div className="col-span-1">Verification</div>
+              <div className="col-span-1">KYC</div>
               <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('city')}>
                 City {sortField === 'city' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
@@ -2256,7 +2314,7 @@ const BuildersRegistration = () => {
                           className="w-7 h-7 rounded-lg hover:bg-[#E8F8F5] transition-all duration-300 flex items-center justify-center text-[#00695C] hover:scale-110 disabled:opacity-50"
                           title="Approve"
                         >
-                          {actionLoading === 'approve' ? <FiRefreshCw className="text-xs animate-spin" /> : <FiCheckCircle className="text-xs" />}
+                          {actionLoading === 'approve' ? <FiRefreshCw className="text-xs animate-spin" /> : <FiCheckCircle className="text-sm" />}
                         </button>
                         <button
                           type="button"
@@ -2265,7 +2323,7 @@ const BuildersRegistration = () => {
                           className="w-7 h-7 rounded-lg hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-red-500 hover:scale-110 disabled:opacity-50"
                           title="Reject"
                         >
-                          {actionLoading === 'reject' ? <FiRefreshCw className="text-xs animate-spin" /> : <FiXCircle className="text-xs" />}
+                          {actionLoading === 'reject' ? <FiRefreshCw className="text-xs animate-spin" /> : <FiXCircle className="text-sm" />}
                         </button>
                       </>
                     ) : (
@@ -2276,7 +2334,7 @@ const BuildersRegistration = () => {
                           className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
                           title="View"
                         >
-                          <FiEye className="text-xs" />
+                          <FiEye className="text-sm" />
                         </button>
                         <button
                           type="button"
@@ -2284,7 +2342,7 @@ const BuildersRegistration = () => {
                           className="w-7 h-7 rounded-lg hover:bg-blue-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-blue-600 hover:scale-110"
                           title="Edit"
                         >
-                          <FiEdit className="text-xs" />
+                          <FiEdit className="text-sm" />
                         </button>
                         <button
                           type="button"
@@ -2292,11 +2350,11 @@ const BuildersRegistration = () => {
                           className="w-7 h-7 rounded-lg hover:bg-purple-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-purple-600 hover:scale-110"
                           title="View Properties"
                         >
-                          <FiHome className="text-xs" />
+                          <FiHome className="text-sm" />
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleToggleBlock(builder.id)}
+                          onClick={() => handleBlockRequest(builder)}
                           disabled={actionLoading === `block_${builder.id}`}
                           className={`w-7 h-7 rounded-lg transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 ${
                             builder.status === 'blocked'
@@ -2306,11 +2364,11 @@ const BuildersRegistration = () => {
                           title={builder.status === 'blocked' ? 'Unblock' : 'Block'}
                         >
                           {actionLoading === `block_${builder.id}` ? (
-                            <FiRefreshCw className="text-xs animate-spin" />
+                            <FiRefreshCw className="text-sm animate-spin" />
                           ) : builder.status === 'blocked' ? (
-                            <FiUnlock className="text-xs" />
+                            <FiUnlock className="text-sm" />
                           ) : (
-                            <FiLock className="text-xs" />
+                            <FiLock className="text-sm" />
                           )}
                         </button>
                       </>
@@ -2343,7 +2401,6 @@ const BuildersRegistration = () => {
         )}
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex flex-wrap items-center justify-between bg-white rounded-2xl px-4 py-3 border border-[#E8F0EE] shadow-sm gap-3">
           <div className="flex items-center gap-2 text-sm text-[#5A7D78] flex-wrap">
@@ -2410,7 +2467,6 @@ const BuildersRegistration = () => {
         </div>
       )}
 
-      {/* CSS Animations */}
       <style>{`
         @keyframes fade-in {
           from { opacity: 0; transform: translateY(10px); }

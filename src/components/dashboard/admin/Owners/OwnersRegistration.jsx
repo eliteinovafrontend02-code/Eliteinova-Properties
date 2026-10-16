@@ -115,6 +115,48 @@ const ApprovalConfirmModal = ({ show, action, actionLoading, ownerName, onCancel
   );
 };
 
+// ============ BLOCK CONFIRM MODAL ============
+const BlockConfirmModal = ({ show, isBlocked, actionLoading, ownerName, onCancel, onConfirm }) => {
+  if (!show) return null;
+
+  const isBlock = !isBlocked;
+  const color = isBlock ? 'red' : 'emerald';
+  const Icon = isBlock ? FiLock : FiUnlock;
+  const title = isBlock ? 'Block Owner' : 'Unblock Owner';
+  const message = isBlock 
+    ? `Are you sure you want to block ${ownerName}? They will lose access to the platform.`
+    : `Are you sure you want to unblock ${ownerName}? They will regain access to the platform.`;
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[#1A2E2A]/50 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl animate-slide-up border border-[#E8F0EE]">
+        <div className="text-center">
+          <div className={`w-16 h-16 rounded-full bg-${color}-50 flex items-center justify-center mx-auto mb-4`}>
+            <Icon className={`text-3xl text-${color}-600`} />
+          </div>
+          <h3 className="text-xl font-bold text-[#1A2E2A]">{title}</h3>
+          <p className="text-sm text-[#5A7D78] mt-2">{message}</p>
+          <div className="flex items-center gap-3 mt-6">
+            <button
+              onClick={onCancel}
+              className="flex-1 px-4 py-2.5 bg-[#F5F9F8] text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium"
+            >
+              No
+            </button>
+            <button
+              onClick={onConfirm}
+              disabled={actionLoading}
+              className={`flex-1 px-4 py-2.5 bg-${color}-600 text-white rounded-xl hover:bg-${color}-700 transition-all duration-300 text-sm font-medium shadow-lg shadow-${color}-600/30 disabled:opacity-50`}
+            >
+              {actionLoading ? <FiRefreshCw className="animate-spin mx-auto" /> : 'Yes'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ============ OWNER PROPERTIES MODAL ============
 const OwnerPropertiesModal = ({ owner, show, onClose, onViewProperty }) => {
   const [properties, setProperties] = useState([]);
@@ -123,7 +165,6 @@ const OwnerPropertiesModal = ({ owner, show, onClose, onViewProperty }) => {
   useEffect(() => {
     if (show && owner) {
       setLoading(true);
-      // Generate mock properties for this owner
       setTimeout(() => {
         const mockProperties = generateOwnerProperties(owner);
         setProperties(mockProperties);
@@ -133,13 +174,6 @@ const OwnerPropertiesModal = ({ owner, show, onClose, onViewProperty }) => {
   }, [show, owner]);
 
   if (!show || !owner) return null;
-
-  const statusColors = {
-    pending: 'bg-amber-100 text-amber-700',
-    approved: 'bg-emerald-100 text-emerald-700',
-    rejected: 'bg-red-100 text-red-700',
-    suspended: 'bg-gray-100 text-gray-700'
-  };
 
   const typeIcons = {
     'Individual': <FiUser className="text-[#00695C]" />,
@@ -158,7 +192,6 @@ const OwnerPropertiesModal = ({ owner, show, onClose, onViewProperty }) => {
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[85vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
-        {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] px-6 py-4 rounded-t-3xl z-10 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white">
@@ -177,7 +210,6 @@ const OwnerPropertiesModal = ({ owner, show, onClose, onViewProperty }) => {
           </button>
         </div>
 
-        {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-[#F8FAF9]">
           {loading ? (
             <div className="flex items-center justify-center py-12">
@@ -207,19 +239,6 @@ const OwnerPropertiesModal = ({ owner, show, onClose, onViewProperty }) => {
                           {typeIcons[property.type] || <FiTag className="text-[#00695C]" />}
                           {property.type}
                         </span>
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColors[property.status] || 'bg-gray-100 text-gray-700'}`}>
-                          {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
-                        </span>
-                        {property.isFeatured && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
-                            <FaStarSolid className="inline mr-0.5 text-[8px]" /> Featured
-                          </span>
-                        )}
-                        {property.isVerified && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
-                            <FiShield className="inline mr-0.5 text-[8px]" /> Verified
-                          </span>
-                        )}
                       </div>
                     </div>
                     <div className="shrink-0">
@@ -267,7 +286,6 @@ const OwnerPropertiesModal = ({ owner, show, onClose, onViewProperty }) => {
                     </div>
                   </div>
 
-                  {/* View Property Button */}
                   <div className="mt-3 pt-3 border-t border-[#E8F0EE]">
                     <button
                       onClick={() => handleViewProperty(property)}
@@ -283,7 +301,6 @@ const OwnerPropertiesModal = ({ owner, show, onClose, onViewProperty }) => {
           )}
         </div>
 
-        {/* Footer */}
         <div className="sticky bottom-0 px-6 py-3 border-t border-[#E8F0EE] bg-white rounded-b-3xl flex items-center justify-between shrink-0">
           <span className="text-xs text-[#5A7D78]">
             Total: <span className="font-semibold text-[#1A2E2A]">{properties.length}</span> properties
@@ -300,7 +317,6 @@ const OwnerPropertiesModal = ({ owner, show, onClose, onViewProperty }) => {
   );
 };
 
-// Helper function to generate mock properties for an owner
 const generateOwnerProperties = (owner) => {
   const propertyTypes = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
   const statuses = ['pending', 'approved', 'rejected', 'suspended'];
@@ -314,12 +330,8 @@ const generateOwnerProperties = (owner) => {
     'Premium Hostel', 'Student Hostel', 'Working Professional Hostel'
   ];
 
-  // Use the actual propertiesCount from the owner, or a random number if not available
   const count = owner.propertiesCount || Math.floor(Math.random() * 8) + 1;
-  
   const properties = [];
-
-  // Owner names for properties
   const ownerNames = [
     'Rajesh Kumar', 'Priya Sharma', 'Amit Singh', 'Sneha Patel', 'Vikram Reddy',
     'Deepak Verma', 'Meera Joshi', 'Arjun Nair', 'Kavya Rao', 'Suresh Gupta'
@@ -334,19 +346,12 @@ const generateOwnerProperties = (owner) => {
     const city = cities[Math.floor(Math.random() * cities.length)];
     const ownerName = ownerNames[Math.floor(Math.random() * ownerNames.length)];
 
-    // Generate amenities based on property type
     let amenities = [];
-    if (type === 'Individual') {
-      amenities = ['WiFi', 'Parking', 'Garden', 'Security', 'Balcony'];
-    } else if (type === 'Apartment') {
-      amenities = ['WiFi', 'Swimming Pool', 'AC', 'Parking', 'Gym', 'Elevator'];
-    } else if (type === 'Commercial') {
-      amenities = ['WiFi', 'Parking', 'Security', 'AC', 'Elevator'];
-    } else if (type === 'Land & Plots') {
-      amenities = ['Water Connection', 'Electricity', 'Road Access', 'Fencing'];
-    } else if (type === 'Hostel') {
-      amenities = ['WiFi', 'AC', 'Security', 'Mess', 'Laundry'];
-    }
+    if (type === 'Individual') amenities = ['WiFi', 'Parking', 'Garden', 'Security', 'Balcony'];
+    else if (type === 'Apartment') amenities = ['WiFi', 'Swimming Pool', 'AC', 'Parking', 'Gym', 'Elevator'];
+    else if (type === 'Commercial') amenities = ['WiFi', 'Parking', 'Security', 'AC', 'Elevator'];
+    else if (type === 'Land & Plots') amenities = ['Water Connection', 'Electricity', 'Road Access', 'Fencing'];
+    else if (type === 'Hostel') amenities = ['WiFi', 'AC', 'Security', 'Mess', 'Laundry'];
 
     properties.push({
       id: `prop_${owner.id}_${i}`,
@@ -372,14 +377,11 @@ const generateOwnerProperties = (owner) => {
       ownerPhone: owner.phone || `+91 ${Math.floor(Math.random() * 9000000000 + 1000000000)}`,
     });
   }
-
   return properties;
 };
 
 /* ============================================================
-   VIEW OWNER MODAL — redesigned, theme-token based
-   Signature element: a completion ring around the avatar that
-   visualizes how many of the 4 KYC documents are verified.
+   VIEW OWNER MODAL
 ============================================================ */
 
 const ViewOwnerModal = ({ owner, show, actionLoading, onClose, onApprove, onReject, onEdit, onToggleBlock, onViewProperties }) => {
@@ -394,8 +396,7 @@ const ViewOwnerModal = ({ owner, show, actionLoading, onClose, onApprove, onReje
   const kycItems = [
     { key: 'aadhaar', label: 'Aadhaar' },
     { key: 'pan', label: 'PAN' },
-    { key: 'gst', label: 'GST' },
-    { key: 'rera', label: 'RERA' },
+    { key: 'gst', label: 'GST (Optional)' },
   ];
   const kycVerifiedCount = kycItems.filter(item => owner.kyc[item.key]).length;
   const kycPercent = Math.round((kycVerifiedCount / kycItems.length) * 100);
@@ -531,7 +532,7 @@ const ViewOwnerModal = ({ owner, show, actionLoading, onClose, onApprove, onReje
               <div className="grid grid-cols-3 gap-3">
                 {[
                   { label: 'Properties', value: owner.propertiesCount },
-                  { label: 'Leads', value: owner.leadsCount },
+                  { label: 'Views', value: owner.leadsCount }, 
                   { label: 'Rating', value: owner.rating },
                 ].map((stat, i) => (
                   <div
@@ -714,10 +715,7 @@ const ViewOwnerModal = ({ owner, show, actionLoading, onClose, onApprove, onReje
 };
 
 /* ============================================================
-   EDIT OWNER MODAL — now includes editable KYC Status and
-   per-document (Email / Phone / Aadhaar / PAN / GST / RERA)
-   verification toggles, mirroring the Agent edit-modal pattern.
-   Bottom buttons are sticky/fixed at bottom for mobile usability.
+   EDIT OWNER MODAL
 ============================================================ */
 
 const EditOwnerModal = ({ owner, show, onClose, onSave }) => {
@@ -736,10 +734,6 @@ const EditOwnerModal = ({ owner, show, onClose, onSave }) => {
         subscriptionPlan: owner.subscriptionPlan,
         bio: owner.bio || '',
         kycStatus: owner.kycStatus || 'pending',
-        verification: {
-          email: !!owner.verification?.email,
-          phone: !!owner.verification?.phone,
-        },
         kyc: {
           aadhaar: !!owner.kyc?.aadhaar,
           pan: !!owner.kyc?.pan,
@@ -754,13 +748,6 @@ const EditOwnerModal = ({ owner, show, onClose, onSave }) => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleVerificationToggle = (key) => {
-    setFormData(prev => ({
-      ...prev,
-      verification: { ...prev.verification, [key]: !prev.verification[key] },
-    }));
   };
 
   const handleKycToggle = (key) => {
@@ -784,22 +771,15 @@ const EditOwnerModal = ({ owner, show, onClose, onSave }) => {
     onSave(formData);
   };
 
-  const verificationItems = [
-    { key: 'email', label: 'Email', icon: <FiMail className="text-sm" /> },
-    { key: 'phone', label: 'Phone', icon: <FiPhone className="text-sm" /> },
-  ];
-
   const kycDocs = [
     { key: 'aadhaar', label: 'Aadhaar', icon: <FaIdCard className="text-sm" /> },
     { key: 'pan', label: 'PAN', icon: <FaFileAlt className="text-sm" /> },
-    { key: 'gst', label: 'GST', icon: <FaCertificate className="text-sm" /> },
-    { key: 'rera', label: 'RERA', icon: <FaShieldAlt className="text-sm" /> },
+    { key: 'gst', label: 'GST (Optional)', icon: <FaCertificate className="text-sm" /> },
   ];
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-[#1A2E2A]/50 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
-        {/* Header - Sticky */}
         <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] p-6 rounded-t-3xl z-10 shrink-0">
           <button
             onClick={onClose}
@@ -811,7 +791,6 @@ const EditOwnerModal = ({ owner, show, onClose, onSave }) => {
           <p className="text-white/80 text-sm">Update owner information</p>
         </div>
 
-        {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-white">
           <form id="edit-owner-form" onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -907,7 +886,6 @@ const EditOwnerModal = ({ owner, show, onClose, onSave }) => {
                 </select>
               </div>
 
-              {/* KYC Status (overall) */}
               <div className="col-span-2">
                 <label className="text-xs font-medium text-[#5A7D78] block mb-1">KYC Status</label>
                 <select
@@ -922,42 +900,9 @@ const EditOwnerModal = ({ owner, show, onClose, onSave }) => {
                 </select>
               </div>
 
-              {/* Mobile & Email Verification */}
-              <div className="col-span-2">
-                <label className="text-xs font-medium text-[#5A7D78] block mb-2">Mobile &amp; Email Verification</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {verificationItems.map(item => {
-                    const isVerified = formData.verification[item.key];
-                    return (
-                      <button
-                        key={item.key}
-                        type="button"
-                        onClick={() => handleVerificationToggle(item.key)}
-                        className={`flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border text-xs font-medium transition-all duration-300 hover:scale-[1.02] ${
-                          isVerified
-                            ? 'bg-[#E8F8F5] border-[#A8D5CD] text-[#00695C]'
-                            : 'bg-[#F5F9F8] border-[#E8F0EE] text-[#5A7D78]'
-                        }`}
-                      >
-                        <span className="flex items-center gap-1.5">
-                          {item.icon}
-                          {item.label}
-                        </span>
-                        {isVerified ? (
-                          <FiCheckCircle className="text-sm shrink-0" />
-                        ) : (
-                          <FiXCircle className="text-sm shrink-0" />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* KYC Documents (Aadhaar / PAN / GST / RERA) */}
               <div className="col-span-2">
                 <label className="text-xs font-medium text-[#5A7D78] block mb-2">KYC Documents</label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {kycDocs.map(item => {
                     const isVerified = formData.kyc[item.key];
                     return (
@@ -984,7 +929,7 @@ const EditOwnerModal = ({ owner, show, onClose, onSave }) => {
                     );
                   })}
                 </div>
-                <p className="text-[10px] text-[#5A7D78] mt-1.5">Tap a document to mark it verified / not verified. Verifying Aadhaar, PAN, GST &amp; RERA sets KYC Status to Verified automatically.</p>
+                <p className="text-[10px] text-[#5A7D78] mt-1.5">Tap a document to mark it verified / not verified. Verifying Aadhaar, PAN &amp; GST sets KYC Status to Verified automatically.</p>
               </div>
 
               <div className="col-span-2">
@@ -1002,7 +947,6 @@ const EditOwnerModal = ({ owner, show, onClose, onSave }) => {
           </form>
         </div>
 
-        {/* Footer - Sticky at bottom with proper shadow and background */}
         <div className="sticky bottom-0 px-6 py-4 bg-white border-t border-[#E8F0EE] rounded-b-3xl shrink-0 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
           <div className="flex items-center gap-3">
             <button
@@ -1034,7 +978,6 @@ const OwnersRegistration = () => {
   const navigate = useNavigate();
   const searchInputRef = useRef(null);
 
-  // ============ STATE ============
   const [owners, setOwners] = useState([]);
   const [filteredOwners, setFilteredOwners] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -1060,17 +1003,17 @@ const OwnersRegistration = () => {
   const [filterCount, setFilterCount] = useState(0);
   const [activeFilter, setActiveFilter] = useState('all');
   
-  // ============ PROPERTIES MODAL STATE ============
   const [showPropertiesModal, setShowPropertiesModal] = useState(false);
   const [selectedOwnerForProperties, setSelectedOwnerForProperties] = useState(null);
 
-  // ============ TOAST FUNCTION ============
+  // Block confirmation modal state
+  const [blockConfirmOwner, setBlockConfirmOwner] = useState(null);
+
   const showToast = useCallback((message, type = 'success', duration = 3000) => {
     setToast({ message, type });
     setTimeout(() => setToast(null), duration);
   }, []);
 
-  // ============ STATS ============
   const [stats, setStats] = useState({
     totalOwners: 0,
     pendingApprovals: 0,
@@ -1079,10 +1022,9 @@ const OwnersRegistration = () => {
     blocked: 0,
     verifiedKyc: 0,
     pendingKyc: 0,
-    approvedAndVerified: 0, // NEW: Combined Approved & KYC Verified
+    approvedAndVerified: 0,
   });
 
-  // ============ GENERATE MOCK OWNERS ============
   const generateMockOwners = useCallback(() => {
     const firstNames = ['Rajesh', 'Priya', 'Amit', 'Sneha', 'Vikram', 'Ananya', 'Deepak', 'Meera', 'Ravi', 'Kavya', 'Suresh', 'Pooja', 'Arjun', 'Lakshmi', 'Kiran', 'Mohan', 'Ritu', 'Gautam', 'Nisha', 'Tarun'];
     const lastNames = ['Kumar', 'Sharma', 'Singh', 'Patel', 'Reddy', 'Gupta', 'Verma', 'Joshi', 'Malhotra', 'Mehta', 'Nair', 'Pillai', 'Rao', 'Shetty', 'Agarwal', 'Khanna', 'Chopra', 'Saxena', 'Tiwari', 'Desai'];
@@ -1116,15 +1058,19 @@ const OwnersRegistration = () => {
       const leadsCount = Math.floor(Math.random() * 40);
       const rating = (Math.random() * 4 + 1).toFixed(1);
 
-      // Generate KYC verification details
-      const kyc = {
-        aadhaar: Math.random() > 0.3,
-        pan: Math.random() > 0.35,
-        gst: Math.random() > 0.7,
-        rera: Math.random() > 0.6,
-      };
+      // Ensure individual document booleans match the overall kycStatus
+      let kyc = { aadhaar: false, pan: false, gst: false, rera: false };
+      if (kycStatus === 'verified') {
+        kyc = { aadhaar: true, pan: true, gst: true, rera: true };
+      } else if (kycStatus === 'pending') {
+        kyc = {
+          aadhaar: Math.random() > 0.5,
+          pan: Math.random() > 0.5,
+          gst: Math.random() > 0.8,
+          rera: Math.random() > 0.8,
+        };
+      }
 
-      // Email and phone verification
       const verification = {
         email: Math.random() > 0.15,
         phone: Math.random() > 0.2,
@@ -1156,8 +1102,6 @@ const OwnersRegistration = () => {
       });
     }
 
-    // Update stats — computed from the actual generated data so every
-    // stat card, filter click, and count stays accurate.
     const total = owners.length;
     const pending = owners.filter(o => o.status === 'pending').length;
     const approved = owners.filter(o => o.status === 'approved').length;
@@ -1181,7 +1125,6 @@ const OwnersRegistration = () => {
     return owners;
   }, []);
 
-  // ============ INITIALIZE DATA ============
   useEffect(() => {
     const mockOwners = generateMockOwners();
     setOwners(mockOwners);
@@ -1190,7 +1133,6 @@ const OwnersRegistration = () => {
     setTimeout(() => setStatsAnimating(false), 1000);
   }, [generateMockOwners]);
 
-  // ============ FILTER OWNERS ============
   const filterOwners = useCallback(() => {
     let filtered = [...owners];
 
@@ -1239,7 +1181,6 @@ const OwnersRegistration = () => {
     filterOwners();
   }, [filterOwners]);
 
-  // ============ PAGINATION ============
   const totalPages = Math.ceil(filteredOwners.length / pageSize);
   const paginatedOwners = useMemo(() =>
     filteredOwners.slice(
@@ -1248,7 +1189,6 @@ const OwnersRegistration = () => {
     )
   , [filteredOwners, currentPage, pageSize]);
 
-  // ============ HANDLE SORT ============
   const handleSort = useCallback((field) => {
     if (sortField === field) {
       setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
@@ -1258,7 +1198,6 @@ const OwnersRegistration = () => {
     }
   }, [sortField]);
 
-  // ============ HANDLE SELECT ALL ============
   const handleSelectAll = useCallback(() => {
     if (selectedOwners.length === paginatedOwners.length) {
       setSelectedOwners([]);
@@ -1267,7 +1206,6 @@ const OwnersRegistration = () => {
     }
   }, [selectedOwners, paginatedOwners]);
 
-  // ============ HANDLE SELECT OWNER ============
   const handleSelectOwner = useCallback((ownerId) => {
     setSelectedOwners(prev =>
       prev.includes(ownerId)
@@ -1276,7 +1214,6 @@ const OwnersRegistration = () => {
     );
   }, []);
 
-  // ============ HANDLE APPROVAL ============
   const handleApproval = useCallback((ownerId, action) => {
     const owner = owners.find(o => o.id === ownerId);
     if (!owner) return;
@@ -1284,7 +1221,6 @@ const OwnersRegistration = () => {
     setApprovalAction(action);
   }, [owners]);
 
-  // ============ CONFIRM APPROVAL ============
   const confirmApproval = useCallback(() => {
     const ownerId = showApprovalConfirm;
     const action = approvalAction;
@@ -1324,8 +1260,15 @@ const OwnersRegistration = () => {
     }, 800);
   }, [showApprovalConfirm, approvalAction, owners, showToast]);
 
-  // ============ HANDLE TOGGLE BLOCK ============
-  const handleToggleBlock = useCallback((ownerId) => {
+  // Called by the Block button to open the confirmation modal
+  const handleBlockRequest = useCallback((owner) => {
+    setBlockConfirmOwner(owner);
+  }, []);
+
+  // Called when the user confirms the Block/Unblock action
+  const confirmToggleBlock = useCallback(() => {
+    if (!blockConfirmOwner) return;
+    const ownerId = blockConfirmOwner.id;
     setActionLoading(`block_${ownerId}`);
 
     setTimeout(() => {
@@ -1358,80 +1301,85 @@ const OwnersRegistration = () => {
       updatedOwners = updatedOwners.map(o => o.id === ownerId ? owner : o);
       setOwners(updatedOwners);
       setActionLoading(null);
+      setBlockConfirmOwner(null);
 
       setViewingOwner(prev => (prev && prev.id === ownerId ? owner : prev));
     }, 600);
-  }, [owners, showToast]);
+  }, [blockConfirmOwner, owners, showToast]);
 
-  // ============ VIEW OWNER DETAIL ============
   const handleViewOwner = useCallback((owner) => {
     setViewingOwner(owner);
     setShowViewModal(true);
   }, []);
 
-  // ============ VIEW OWNER PROPERTIES ============
   const handleViewOwnerProperties = useCallback((owner) => {
     setSelectedOwnerForProperties(owner);
     setShowPropertiesModal(true);
   }, []);
 
-  // ============ VIEW INDIVIDUAL PROPERTY DETAIL ============
   const handleViewPropertyDetail = useCallback((property) => {
-    // Navigate to property detail page
     navigate(`/properties/${property.id}`);
     showToast(`Opening ${property.title}...`, 'info');
   }, [navigate, showToast]);
 
-  // ============ VIEW Owner PROFILE ============
-    const handleViewOwnerProfile = useCallback((ownerId) => {
-      navigate('/profile/owner');
-      showToast('Opening Owner Profile...', 'info');
-    }, [navigate, showToast]);
+  const handleViewOwnerProfile = useCallback((ownerId) => {
+    navigate('/profile/owner');
+    showToast('Opening Owner Profile...', 'info');
+  }, [navigate, showToast]);
 
-  // ============ EDIT OWNER ============
   const handleEditOwner = useCallback((owner) => {
     setEditingOwner(owner);
     setShowEditModal(true);
   }, []);
 
-  // ============ SAVE EDIT ============
   const saveEdit = useCallback((updatedData) => {
-    setOwners(prev => prev.map(owner => {
+    const updatedOwners = owners.map(owner => {
       if (owner.id !== editingOwner.id) return owner;
-      return { ...owner, ...updatedData };
-    }));
+      
+      let syncedKyc = { ...owner.kyc, ...updatedData.kyc };
+      if (updatedData.kycStatus === 'verified') {
+        syncedKyc = { aadhaar: true, pan: true, gst: true, rera: true };
+      }
+      
+      return { ...owner, ...updatedData, kyc: syncedKyc };
+    });
 
-    // Recompute stats fully to keep counts accurate after KYC/status edits
-    setOwners(prev => {
-      const total = prev.length;
-      const pending = prev.filter(o => o.status === 'pending').length;
-      const approved = prev.filter(o => o.status === 'approved').length;
-      const rejected = prev.filter(o => o.status === 'rejected').length;
-      const blocked = prev.filter(o => o.status === 'blocked').length;
-      const verifiedKyc = prev.filter(o => o.kycStatus === 'verified').length;
-      const pendingKyc = prev.filter(o => o.kycStatus === 'pending').length;
-      const approvedAndVerified = prev.filter(o => o.status === 'approved' && o.kycStatus === 'verified').length;
+    setOwners(updatedOwners);
+    setFilteredOwners(updatedOwners);
 
-      setStats({
-        totalOwners: total,
-        pendingApprovals: pending,
-        approved: approved,
-        rejected: rejected,
-        blocked: blocked,
-        verifiedKyc: verifiedKyc,
-        pendingKyc: pendingKyc,
-        approvedAndVerified: approvedAndVerified,
-      });
+    const total = updatedOwners.length;
+    const pending = updatedOwners.filter(o => o.status === 'pending').length;
+    const approved = updatedOwners.filter(o => o.status === 'approved').length;
+    const rejected = updatedOwners.filter(o => o.status === 'rejected').length;
+    const blocked = updatedOwners.filter(o => o.status === 'blocked').length;
+    const verifiedKyc = updatedOwners.filter(o => o.kycStatus === 'verified').length;
+    const pendingKyc = updatedOwners.filter(o => o.kycStatus === 'pending').length;
+    const approvedAndVerified = updatedOwners.filter(o => o.status === 'approved' && o.kycStatus === 'verified').length;
 
+    setStats({
+      totalOwners: total,
+      pendingApprovals: pending,
+      approved: approved,
+      rejected: rejected,
+      blocked: blocked,
+      verifiedKyc: verifiedKyc,
+      pendingKyc: pendingKyc,
+      approvedAndVerified: approvedAndVerified,
+    });
+
+    setViewingOwner(prev => {
+      if (prev && prev.id === editingOwner.id) {
+        const found = updatedOwners.find(o => o.id === editingOwner.id);
+        return found || prev;
+      }
       return prev;
     });
 
     setShowEditModal(false);
     setEditingOwner(null);
     showToast('Owner updated successfully', 'success');
-  }, [editingOwner, showToast]);
+  }, [owners, editingOwner, showToast]);
 
-  // ============ STAT CLICK HANDLER ============
   const handleStatClick = useCallback((filter) => {
     setActiveFilter(filter);
     if (filter === 'all') {
@@ -1463,7 +1411,6 @@ const OwnersRegistration = () => {
     searchInputRef.current?.focus();
   }, []);
 
-  // ============ CLEAR ALL FILTERS ============
   const clearAllFilters = useCallback(() => {
     setSearchQuery('');
     setSelectedStatus('all');
@@ -1473,7 +1420,6 @@ const OwnersRegistration = () => {
     showToast('All filters cleared', 'info');
   }, [showToast]);
 
-  // ============ REFRESH DATA ============
   const handleRefresh = useCallback(() => {
     setLoading(true);
     setTimeout(() => {
@@ -1487,7 +1433,6 @@ const OwnersRegistration = () => {
     }, 1000);
   }, [generateMockOwners, showToast]);
 
-  // ============ EXPORT OWNERS ============
   const handleExportOwners = useCallback(() => {
     const data = filteredOwners.map(owner => ({
       Name: owner.name,
@@ -1505,7 +1450,7 @@ const OwnersRegistration = () => {
       'Email Verified': owner.verification.email ? 'Yes' : 'No',
       'Phone Verified': owner.verification.phone ? 'Yes' : 'No',
       Properties: owner.propertiesCount,
-      Leads: owner.leadsCount,
+      Views: owner.leadsCount,
       Rating: owner.rating,
       'Registration Date': new Date(owner.registrationDate).toLocaleDateString(),
       'Subscription Plan': owner.subscriptionPlan,
@@ -1526,7 +1471,6 @@ const OwnersRegistration = () => {
     showToast(`${filteredOwners.length} owners exported successfully`, 'success');
   }, [filteredOwners, showToast]);
 
-  // ============ VIEW MODAL ACTION HANDLERS ============
   const handleViewModalApprove = useCallback((id) => {
     handleApproval(id, 'approve');
   }, [handleApproval]);
@@ -1543,15 +1487,15 @@ const OwnersRegistration = () => {
 
   const handleViewModalToggleBlock = useCallback(() => {
     if (!viewingOwner) return;
-    handleToggleBlock(viewingOwner.id);
-  }, [viewingOwner, handleToggleBlock]);
+    setShowViewModal(false);
+    handleBlockRequest(viewingOwner);
+  }, [viewingOwner, handleBlockRequest]);
 
   const handleViewModalViewProperties = useCallback((owner) => {
     setShowViewModal(false);
     handleViewOwnerProperties(owner);
   }, [handleViewOwnerProperties]);
 
-  // ============ BULK ACTIONS ============
   const handleBulkAction = useCallback((action) => {
     if (selectedOwners.length === 0) {
       showToast('Please select owners first', 'warning');
@@ -1584,7 +1528,6 @@ const OwnersRegistration = () => {
       setSelectedOwners([]);
       setActionLoading(null);
 
-      // Update stats
       if (action === 'approve') {
         setStats(prev => ({
           ...prev,
@@ -1604,19 +1547,15 @@ const OwnersRegistration = () => {
     }, 800);
   }, [selectedOwners, owners, showToast]);
 
-  // ============ RENDER ============
   return (
     <div className="space-y-6 p-4 lg:p-6 bg-[#F8FAF9] min-h-screen">
-      {/* Animated Background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-[#00695C]/5 rounded-full blur-3xl animate-float" />
         <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-[#26A69A]/5 rounded-full blur-3xl animate-float-delayed" />
       </div>
 
-      {/* Toast */}
       <Toast toast={toast} />
 
-      {/* Approval Confirm Modal */}
       <ApprovalConfirmModal
         show={!!showApprovalConfirm}
         action={approvalAction}
@@ -1626,7 +1565,16 @@ const OwnersRegistration = () => {
         onConfirm={confirmApproval}
       />
 
-      {/* Owner Properties Modal */}
+      {/* Block/Unblock Confirmation Modal */}
+      <BlockConfirmModal
+        show={!!blockConfirmOwner}
+        isBlocked={blockConfirmOwner?.status === 'blocked'}
+        actionLoading={actionLoading === `block_${blockConfirmOwner?.id}`}
+        ownerName={blockConfirmOwner?.name || ''}
+        onCancel={() => setBlockConfirmOwner(null)}
+        onConfirm={confirmToggleBlock}
+      />
+
       <OwnerPropertiesModal
         owner={selectedOwnerForProperties}
         show={showPropertiesModal}
@@ -1634,7 +1582,6 @@ const OwnersRegistration = () => {
         onViewProperty={handleViewPropertyDetail}
       />
 
-      {/* Edit Modal */}
       <EditOwnerModal
         owner={editingOwner}
         show={showEditModal}
@@ -1642,7 +1589,6 @@ const OwnersRegistration = () => {
         onSave={saveEdit}
       />
 
-      {/* View Modal */}
       <ViewOwnerModal
         owner={viewingOwner}
         show={showViewModal}
@@ -1655,7 +1601,6 @@ const OwnersRegistration = () => {
         onViewProperties={handleViewModalViewProperties}
       />
 
-      {/* Header */}
       <div className="relative animate-fade-in">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div>
@@ -1706,7 +1651,6 @@ const OwnersRegistration = () => {
         </div>
       </div>
 
-      {/* Stats Section — now includes combined Approved & Verified */}
       {showStats && (
         <div className="relative animate-slide-in">
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
@@ -1781,7 +1725,6 @@ const OwnersRegistration = () => {
                 statsAnimating={statsAnimating}
                 onClick={() => handleStatClick('kyc_pending')}
               />
-              {/* NEW: Approved & Verified Stat Card */}
               <StatCard
                 icon={<FaCheck className="text-white text-sm" />}
                 title="Approved & Verified"
@@ -1797,7 +1740,6 @@ const OwnersRegistration = () => {
         </div>
       )}
 
-      {/* Search and Filters */}
       <div className="relative bg-white rounded-2xl p-4 shadow-sm border border-[#E8F0EE] hover:shadow-md transition-all duration-300">
         <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4">
           <div className="flex-1 w-full lg:w-auto relative">
@@ -1878,7 +1820,6 @@ const OwnersRegistration = () => {
           </div>
         </div>
 
-        {/* Bulk Actions */}
         {selectedOwners.length > 0 && (
           <div className="mt-4 pt-4 border-t border-[#E8F0EE] flex flex-wrap items-center justify-between gap-3 animate-slide-in">
             <span className="text-sm text-[#5A7D78]">
@@ -1912,7 +1853,6 @@ const OwnersRegistration = () => {
         )}
       </div>
 
-      {/* Owners Grid/List */}
       <div className="relative">
         {loading ? (
           <div className="flex items-center justify-center py-20">
@@ -2014,13 +1954,12 @@ const OwnersRegistration = () => {
                     </div>
                   </div>
 
-                  {/* KYC Quick Status */}
-                  <div className="grid grid-cols-4 gap-1 mt-2.5 pt-2.5 border-t border-[#E8F0EE]">
+                  {/* KYC Quick Status - Only Aadhaar, PAN, GST (Optional) */}
+                  <div className="grid grid-cols-3 gap-1 mt-2.5 pt-2.5 border-t border-[#E8F0EE]">
                     {[
                       { key: 'aadhaar', label: 'Aadhaar' },
                       { key: 'pan', label: 'PAN' },
-                      { key: 'gst', label: 'GST' },
-                      { key: 'rera', label: 'RERA' }
+                      { key: 'gst', label: 'GST (Optional)' }
                     ].map(item => (
                       <div key={item.key} className="text-center">
                         <div className={`text-xs ${owner.kyc[item.key] ? 'text-[#00695C]' : 'text-[#B5C9C5]'}`}>
@@ -2031,6 +1970,7 @@ const OwnersRegistration = () => {
                     ))}
                   </div>
 
+                  {/* Stats row - Properties, Views, Rating */}
                   <div className="grid grid-cols-3 gap-2 mt-2.5 pt-2.5 border-t border-[#E8F0EE]">
                     <div className="text-center">
                       <p className="text-sm font-bold text-[#1A2E2A]">{owner.propertiesCount}</p>
@@ -2038,7 +1978,7 @@ const OwnersRegistration = () => {
                     </div>
                     <div className="text-center">
                       <p className="text-sm font-bold text-[#1A2E2A]">{owner.leadsCount}</p>
-                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Leads</p>
+                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Views</p>
                     </div>
                     <div className="text-center">
                       <p className="text-sm font-bold text-[#1A2E2A] flex items-center justify-center gap-0.5">
@@ -2096,7 +2036,7 @@ const OwnersRegistration = () => {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleToggleBlock(owner.id)}
+                          onClick={() => handleBlockRequest(owner)}
                           disabled={actionLoading === `block_${owner.id}`}
                           className={`flex-1 py-1.5 text-xs font-medium rounded-xl transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 disabled:opacity-50 ${
                             owner.status === 'blocked'
@@ -2117,24 +2057,24 @@ const OwnersRegistration = () => {
                     )}
                   </div>
 
-                   {/* NEW: View Profile button, its own row below View/Edit/Properties/Block */}
-                                    {!isPending && (
-                                      <div className="mt-1.5">
-                                        <button
-                                          type="button"
-                                          onClick={() => handleViewOwnerProfile(owner.id)}
-                                          className="w-full py-1.5 text-xs font-medium text-[#167A54] bg-[#E7F6EF] border border-[#BEE4D2] rounded-xl hover:bg-[#D5EFE0] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-[1.02]"
-                                        >
-                                          <FiExternalLink className="text-[10px]" /> View Owner Profile
-                                        </button>
-                                      </div>
-                                    )}
+                  {!isPending && (
+                    <div className="mt-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleViewOwnerProfile(owner.id)}
+                        className="w-full py-1.5 text-xs font-medium text-[#167A54] bg-[#E7F6EF] border border-[#BEE4D2] rounded-xl hover:bg-[#D5EFE0] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-[1.02]"
+                      >
+                        <FiExternalLink className="text-[10px]" /> View Owner Profile
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
             })}
           </div>
         ) : (
           <div className="bg-white rounded-2xl border border-[#E8F0EE] shadow-sm overflow-hidden">
+          
             <div className="grid grid-cols-12 gap-2 items-center px-4 py-3 bg-[#F5F9F8] border-b border-[#E8F0EE] text-xs font-medium text-[#5A7D78] uppercase tracking-wider">
               <div className="col-span-1 flex items-center gap-2">
                 <input
@@ -2153,7 +2093,6 @@ const OwnersRegistration = () => {
               <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('city')}>
                 City {sortField === 'city' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1">Email</div>
               <div className="col-span-1 text-center">Phone</div>
               <div className="col-span-1 text-center cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('propertiesCount')}>
                 Props {sortField === 'propertiesCount' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
@@ -2164,7 +2103,7 @@ const OwnersRegistration = () => {
               <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('registrationDate')}>
                 Registered {sortField === 'registrationDate' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1 text-right">Actions</div>
+              <div className="col-span-2 text-right">Actions</div>
             </div>
 
             {paginatedOwners.map((owner, index) => {
@@ -2229,19 +2168,6 @@ const OwnersRegistration = () => {
 
                   <div className="col-span-1 text-xs text-[#5A7D78]">{owner.city}</div>
 
-                  <div className="col-span-1 flex items-center gap-1">
-                    {owner.verification.email ? (
-                      <FiCheckCircle className="text-[#00695C] text-xs" title="Email Verified" />
-                    ) : (
-                      <FiXCircle className="text-[#B5C9C5] text-xs" title="Email Not Verified" />
-                    )}
-                    {owner.verification.phone ? (
-                      <FiCheckCircle className="text-[#00695C] text-xs" title="Phone Verified" />
-                    ) : (
-                      <FiXCircle className="text-[#B5C9C5] text-xs" title="Phone Not Verified" />
-                    )}
-                  </div>
-
                   <div className="col-span-1 text-center text-xs text-[#5A7D78]">{owner.phone}</div>
 
                   <div className="col-span-1 text-center">
@@ -2259,7 +2185,7 @@ const OwnersRegistration = () => {
                     {new Date(owner.registrationDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
                   </div>
 
-                  <div className="col-span-1 flex items-center justify-end gap-1">
+                  <div className="col-span-2 flex items-center justify-end ">
                     {isPending ? (
                       <>
                         <button
@@ -2269,7 +2195,7 @@ const OwnersRegistration = () => {
                           className="w-7 h-7 rounded-lg hover:bg-[#E8F8F5] transition-all duration-300 flex items-center justify-center text-[#00695C] hover:scale-110 disabled:opacity-50"
                           title="Approve"
                         >
-                          {actionLoading === 'approve' ? <FiRefreshCw className="text-xs animate-spin" /> : <FiCheckCircle className="text-xs" />}
+                          {actionLoading === 'approve' ? <FiRefreshCw className="text-xs animate-spin" /> : <FiCheckCircle className="text-sm" />}
                         </button>
                         <button
                           type="button"
@@ -2278,7 +2204,7 @@ const OwnersRegistration = () => {
                           className="w-7 h-7 rounded-lg hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-red-500 hover:scale-110 disabled:opacity-50"
                           title="Reject"
                         >
-                          {actionLoading === 'reject' ? <FiRefreshCw className="text-xs animate-spin" /> : <FiXCircle className="text-xs" />}
+                          {actionLoading === 'reject' ? <FiRefreshCw className="text-xs animate-spin" /> : <FiXCircle className="text-sm" />}
                         </button>
                       </>
                     ) : (
@@ -2289,7 +2215,7 @@ const OwnersRegistration = () => {
                           className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
                           title="View"
                         >
-                          <FiEye className="text-xs" />
+                          <FiEye className="text-sm" />
                         </button>
                         <button
                           type="button"
@@ -2297,7 +2223,7 @@ const OwnersRegistration = () => {
                           className="w-7 h-7 rounded-lg hover:bg-blue-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-blue-600 hover:scale-110"
                           title="Edit"
                         >
-                          <FiEdit className="text-xs" />
+                          <FiEdit className="text-sm" />
                         </button>
                         <button
                           type="button"
@@ -2305,11 +2231,11 @@ const OwnersRegistration = () => {
                           className="w-7 h-7 rounded-lg hover:bg-purple-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-purple-600 hover:scale-110"
                           title="View Properties"
                         >
-                          <FiHome className="text-xs" />
+                          <FiHome className="text-sm" />
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleToggleBlock(owner.id)}
+                          onClick={() => handleBlockRequest(owner)}
                           disabled={actionLoading === `block_${owner.id}`}
                           className={`w-7 h-7 rounded-lg transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 ${
                             owner.status === 'blocked'
@@ -2319,11 +2245,11 @@ const OwnersRegistration = () => {
                           title={owner.status === 'blocked' ? 'Unblock' : 'Block'}
                         >
                           {actionLoading === `block_${owner.id}` ? (
-                            <FiRefreshCw className="text-xs animate-spin" />
+                            <FiRefreshCw className="text-sm animate-spin" />
                           ) : owner.status === 'blocked' ? (
-                            <FiUnlock className="text-xs" />
+                            <FiUnlock className="text-sm" />
                           ) : (
-                            <FiLock className="text-xs" />
+                            <FiLock className="text-sm" />
                           )}
                         </button>
                       </>
@@ -2356,7 +2282,6 @@ const OwnersRegistration = () => {
         )}
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex flex-wrap items-center justify-between bg-white rounded-2xl px-4 py-3 border border-[#E8F0EE] shadow-sm gap-3">
           <div className="flex items-center gap-2 text-sm text-[#5A7D78] flex-wrap">
@@ -2423,7 +2348,6 @@ const OwnersRegistration = () => {
         </div>
       )}
 
-      {/* CSS Animations */}
       <style>{`
         @keyframes fade-in {
           from { opacity: 0; transform: translateY(10px); }

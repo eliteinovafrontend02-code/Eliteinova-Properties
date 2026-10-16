@@ -251,58 +251,6 @@ const OwnersOverview = () => {
     underInspectionProperties: 30,
   });
 
-  // ---- Recent Activities ----
-  // const activities = useMemo(() => [
-  //   {
-  //     icon: <FaUserPlus className="text-white text-sm" />,
-  //     title: 'New Owner Registration',
-  //     time: '2 min ago',
-  //     description: 'Rajesh Kumar registered as a property owner',
-  //     color: 'bg-gradient-to-br',
-  //     gradient: 'from-[#00695C] to-[#26A69A]'
-  //   },
-  //   {
-  //     icon: <FiCheckCircle className="text-white text-sm" />,
-  //     title: 'KYC Approved',
-  //     time: '15 min ago',
-  //     description: 'Priya Sharma\'s Aadhaar & PAN verified successfully',
-  //     color: 'bg-gradient-to-br',
-  //     gradient: 'from-emerald-500 to-emerald-400'
-  //   },
-  //   {
-  //     icon: <FiHome className="text-white text-sm" />,
-  //     title: 'New Property Listed',
-  //     time: '32 min ago',
-  //     description: 'Amit Singh listed a Luxury Apartment in Bangalore',
-  //     color: 'bg-gradient-to-br',
-  //     gradient: 'from-blue-500 to-blue-400'
-  //   },
-  //   {
-  //     icon: <FiEdit className="text-white text-sm" />,
-  //     title: 'Property Approved',
-  //     time: '45 min ago',
-  //     description: 'Vikram Patel\'s property listing was approved',
-  //     color: 'bg-gradient-to-br',
-  //     gradient: 'from-emerald-500 to-emerald-400'
-  //   },
-  //   {
-  //     icon: <FiDollarSign className="text-white text-sm" />,
-  //     title: 'Subscription Upgraded',
-  //     time: '1 hour ago',
-  //     description: 'Sneha Reddy upgraded to Gold Plan',
-  //     color: 'bg-gradient-to-br',
-  //     gradient: 'from-amber-500 to-amber-400'
-  //   },
-  //   {
-  //     icon: <FiUserCheck className="text-white text-sm" />,
-  //     title: 'Owner Verified',
-  //     time: '2 hours ago',
-  //     description: 'Vikram Patel\'s account was verified',
-  //     color: 'bg-gradient-to-br',
-  //     gradient: 'from-purple-500 to-purple-400'
-  //   }
-  // ], []);
-
   // ---- Quick Stats ----
   const quickStats = useMemo(() => [
     { icon: <FiUserPlus className="text-[#00695C]" />, label: 'New This Week', value: stats.newThisWeek },
@@ -445,20 +393,6 @@ const OwnersOverview = () => {
           trendValue="8.3"
         />
         <StatCard
-          icon={<FiHome className="text-lg text-white" />}
-          title="Properties & Leads"
-          value={stats.propertiesAndLeads}
-          subtitle={`${stats.totalLeads} leads assigned`}
-          color="bg-gradient-to-br"
-          gradient="from-blue-600 to-blue-400"
-          borderColor="border-blue-600/30"
-          delay={200}
-          statsAnimating={statsAnimating}
-          onClick={() => navigateTo('/admin/owners/leads')}
-          trend="up"
-          trendValue="15.2"
-        />
-        <StatCard
           icon={<FiEdit className="text-lg text-white" />}
           title="Property Control"
           value={stats.propertyControl}
@@ -472,20 +406,6 @@ const OwnersOverview = () => {
           trend="up"
           trendValue="9.4"
         />
-        <StatCard
-          icon={<FiDollarSign className="text-lg text-white" />}
-          title="Total Revenue"
-          value={`₹${(stats.totalRevenue / 100000).toFixed(1)}L`}
-          subtitle={`+${stats.growthRate}% growth`}
-          color="bg-gradient-to-br"
-          gradient="from-purple-600 to-purple-400"
-          borderColor="border-purple-600/30"
-          delay={400}
-          statsAnimating={statsAnimating}
-          onClick={() => navigateTo('/admin/owners/subscription')}
-          trend="up"
-          trendValue="22.7"
-        />
       </div>
 
       {/* ===== NAVIGATION CARDS ===== */}
@@ -493,10 +413,11 @@ const OwnersOverview = () => {
         <SectionHeader
           icon={<FiShield className="text-white text-sm" />}
           title="Quick Access Modules"
-          subtitle="Manage owners, properties, leads, and subscriptions"
+          subtitle="Manage owners, properties and subscriptions"
         />
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {/* Changed to md:grid-cols-2 to make the 2 remaining cards stretch full width */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Registration & KYC Card */}
           <NavCard
             icon={<FiUserCheck className="text-white text-xl" />}
@@ -514,25 +435,6 @@ const OwnersOverview = () => {
               { label: 'Pending', value: stats.pendingApprovals },
               { label: 'Approved', value: stats.approvedOwners },
               { label: 'Rejected', value: stats.rejectedOwners },
-            ]}
-          />
-
-          {/* Properties & Leads Card */}
-          <NavCard
-            icon={<FiHome className="text-white text-xl" />}
-            title="Properties & Leads"
-            description="Manage property listings, leads, and owner performance with commission tracking."
-            color="bg-gradient-to-br"
-            gradient="from-blue-600 to-blue-400"
-            borderColor="border-blue-600/30"
-            delay={100}
-            onClick={() => navigateTo('/admin/owners/leads')}
-            badge={`${stats.totalLeads} Leads`}
-            badgeColor="bg-gradient-to-r from-blue-500 to-blue-400"
-            stats={[
-              { label: 'Listings', value: stats.totalProperties },
-              { label: 'Leads', value: stats.totalLeads },
-              { label: 'Commission', value: '₹9.5L' },
             ]}
           />
 
@@ -554,54 +456,8 @@ const OwnersOverview = () => {
               { label: 'Featured', value: stats.featuredProperties },
             ]}
           />
-
-          {/* Subscription Plans Card */}
-          <NavCard
-            icon={<FiDollarSign className="text-white text-xl" />}
-            title="Subscription Plans"
-            description="Manage Free, Silver, Gold, and Platinum plans. Upgrade or downgrade owner subscriptions."
-            color="bg-gradient-to-br"
-            gradient="from-amber-600 to-amber-400"
-            borderColor="border-amber-600/30"
-            delay={300}
-            onClick={() => navigateTo('/admin/owners/subscription')}
-            badge={`${stats.premiumOwners} Premium`}
-            badgeColor="bg-gradient-to-r from-purple-500 to-purple-400"
-            stats={[
-              { label: 'Active', value: stats.activeSubscriptions },
-              { label: 'Premium', value: stats.premiumOwners },
-            ]}
-          />
         </div>
       </div>
-
-      {/* ===== RECENT ACTIVITIES ===== */}
-      {/* <div>
-        <SectionHeader
-          icon={<FiActivity className="text-white text-sm" />}
-          title="Recent Activities"
-          subtitle="Live updates from owners and properties"
-          action={true}
-          actionLabel="View All"
-          onAction={() => navigateTo('/admin/notifications')}
-        />
-        
-        <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/50 shadow-lg p-4 hover:shadow-xl transition-all duration-300 hover:border-[#00695C]/20">
-          {activities.map((activity, index) => (
-            <ActivityItem
-              key={index}
-              icon={activity.icon}
-              title={activity.title}
-              time={activity.time}
-              description={activity.description}
-              color={activity.color}
-              gradient={activity.gradient}
-              index={index}
-              isLast={index === activities.length - 1}
-            />
-          ))}
-        </div>
-      </div> */}
 
       {/* ===== FOOTER ===== */}
       <div className="text-center pt-4">

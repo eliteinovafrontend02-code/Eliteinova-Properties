@@ -115,6 +115,48 @@ const ApprovalConfirmModal = ({ show, action, actionLoading, agentName, onCancel
   );
 };
 
+// ============ BLOCK CONFIRM MODAL ============
+const BlockConfirmModal = ({ show, isBlocked, actionLoading, agentName, onCancel, onConfirm }) => {
+  if (!show) return null;
+
+  const isBlock = !isBlocked;
+  const color = isBlock ? 'red' : 'emerald';
+  const Icon = isBlock ? FiLock : FiUnlock;
+  const title = isBlock ? 'Block Agent' : 'Unblock Agent';
+  const message = isBlock 
+    ? `Are you sure you want to block ${agentName}? They will lose access to the platform.`
+    : `Are you sure you want to unblock ${agentName}? They will regain access to the platform.`;
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[#1A2E2A]/50 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl animate-slide-up border border-[#E8F0EE]">
+        <div className="text-center">
+          <div className={`w-16 h-16 rounded-full bg-${color}-50 flex items-center justify-center mx-auto mb-4`}>
+            <Icon className={`text-3xl text-${color}-600`} />
+          </div>
+          <h3 className="text-xl font-bold text-[#1A2E2A]">{title}</h3>
+          <p className="text-sm text-[#5A7D78] mt-2">{message}</p>
+          <div className="flex items-center gap-3 mt-6">
+            <button
+              onClick={onCancel}
+              className="flex-1 px-4 py-2.5 bg-[#F5F9F8] text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium"
+            >
+              No
+            </button>
+            <button
+              onClick={onConfirm}
+              disabled={actionLoading}
+              className={`flex-1 px-4 py-2.5 bg-${color}-600 text-white rounded-xl hover:bg-${color}-700 transition-all duration-300 text-sm font-medium shadow-lg shadow-${color}-600/30 disabled:opacity-50`}
+            >
+              {actionLoading ? <FiRefreshCw className="animate-spin mx-auto" /> : 'Yes'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ============ AGENT PROPERTIES MODAL ============
 const AgentPropertiesModal = ({ agent, show, onClose, onViewProperty, onViewOwnerProfile }) => {
   const [properties, setProperties] = useState([]);
@@ -132,13 +174,6 @@ const AgentPropertiesModal = ({ agent, show, onClose, onViewProperty, onViewOwne
   }, [show, agent]);
 
   if (!show || !agent) return null;
-
-  const statusColors = {
-    pending: 'bg-amber-100 text-amber-700',
-    approved: 'bg-emerald-100 text-emerald-700',
-    rejected: 'bg-red-100 text-red-700',
-    suspended: 'bg-gray-100 text-gray-700'
-  };
 
   const typeIcons = {
     'Individual': <FiUser className="text-[#00695C]" />,
@@ -208,23 +243,11 @@ const AgentPropertiesModal = ({ agent, show, onClose, onViewProperty, onViewOwne
                     <div className="flex-1 min-w-0">
                       <h4 className="font-semibold text-[#1A2E2A] text-sm truncate">{property.title}</h4>
                       <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        {/* Only Property Type badge is shown now */}
                         <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F5F9F8] text-[#5A7D78] flex items-center gap-1">
                           {typeIcons[property.type] || <FiTag className="text-[#00695C]" />}
                           {property.type}
                         </span>
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColors[property.status] || 'bg-gray-100 text-gray-700'}`}>
-                          {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
-                        </span>
-                        {property.isFeatured && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
-                            <FaStarSolid className="inline mr-0.5 text-[8px]" /> Featured
-                          </span>
-                        )}
-                        {property.isVerified && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
-                            <FiShield className="inline mr-0.5 text-[8px]" /> Verified
-                          </span>
-                        )}
                       </div>
                     </div>
                     <div className="shrink-0">
@@ -282,14 +305,14 @@ const AgentPropertiesModal = ({ agent, show, onClose, onViewProperty, onViewOwne
                     </button>
                   </div>
 
-                  {/* NEW: View Owner Profile button, below View Property Details */}
+                  {/* View Agent Profile button */}
                   <div className="mt-2">
                     <button
                       onClick={() => handleViewOwnerProfile(property)}
                       className="w-full py-2 rounded-xl text-xs font-medium bg-[#E7F6EF] text-[#167A54] border border-[#BEE4D2] hover:bg-[#D5EFE0] transition-all duration-300 flex items-center justify-center gap-2 hover:scale-[1.02]"
                     >
                       <FiExternalLink className="text-xs" />
-                      View Owner Profile
+                      View Agent Profile
                     </button>
                   </div>
                 </div>
@@ -315,7 +338,6 @@ const AgentPropertiesModal = ({ agent, show, onClose, onViewProperty, onViewOwne
   );
 };
 
-// Helper function to generate mock properties for an agent
 const generateAgentProperties = (agent) => {
   const propertyTypes = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
   const statuses = ['pending', 'approved', 'rejected', 'suspended'];
@@ -330,7 +352,6 @@ const generateAgentProperties = (agent) => {
   ];
 
   const count = agent.propertiesCount || Math.floor(Math.random() * 8) + 1;
-  
   const properties = [];
   const agentNames = [
     'Rajesh Kumar', 'Priya Sharma', 'Amit Singh', 'Sneha Patel', 'Vikram Reddy',
@@ -347,17 +368,11 @@ const generateAgentProperties = (agent) => {
     const agentName = agentNames[Math.floor(Math.random() * agentNames.length)];
 
     let amenities = [];
-    if (type === 'Individual') {
-      amenities = ['WiFi', 'Parking', 'Garden', 'Security', 'Balcony'];
-    } else if (type === 'Apartment') {
-      amenities = ['WiFi', 'Swimming Pool', 'AC', 'Parking', 'Gym', 'Elevator'];
-    } else if (type === 'Commercial') {
-      amenities = ['WiFi', 'Parking', 'Security', 'AC', 'Elevator'];
-    } else if (type === 'Land & Plots') {
-      amenities = ['Water Connection', 'Electricity', 'Road Access', 'Fencing'];
-    } else if (type === 'Hostel') {
-      amenities = ['WiFi', 'AC', 'Security', 'Mess', 'Laundry'];
-    }
+    if (type === 'Individual') amenities = ['WiFi', 'Parking', 'Garden', 'Security', 'Balcony'];
+    else if (type === 'Apartment') amenities = ['WiFi', 'Swimming Pool', 'AC', 'Parking', 'Gym', 'Elevator'];
+    else if (type === 'Commercial') amenities = ['WiFi', 'Parking', 'Security', 'AC', 'Elevator'];
+    else if (type === 'Land & Plots') amenities = ['Water Connection', 'Electricity', 'Road Access', 'Fencing'];
+    else if (type === 'Hostel') amenities = ['WiFi', 'AC', 'Security', 'Mess', 'Laundry'];
 
     properties.push({
       id: `prop_${agent.id}_${i}`,
@@ -388,9 +403,7 @@ const generateAgentProperties = (agent) => {
 };
 
 /* ============================================================
-   VIEW AGENT MODAL — redesigned, theme-token based
-   Signature element: a completion ring around the avatar that
-   visualizes how many of the 4 verification documents are verified.
+   VIEW AGENT MODAL — updated with 5 verification documents
 ============================================================ */
 
 const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReject, onEdit, onToggleBlock, onViewProperties, onViewProfile }) => {
@@ -402,11 +415,13 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
 
   if (!agent || !show) return null;
 
+  // Updated: 5 documents for the completion ring
   const verificationItems = [
-    { key: 'email', label: 'Email' },
-    { key: 'phone', label: 'Phone' },
     { key: 'aadhaar', label: 'Aadhaar' },
     { key: 'pan', label: 'PAN' },
+    { key: 'agentLicense', label: 'Agent License' },
+    { key: 'gst', label: 'GST (Optional)' },
+    { key: 'businessReg', label: 'Business Reg. Cert. (Optional)' },
   ];
   const verifiedCount = verificationItems.filter(item => agent.verification[item.key]).length;
   const verifiedPercent = Math.round((verifiedCount / verificationItems.length) * 100);
@@ -418,10 +433,9 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
   const tabs = [
     { id: 'overview', label: 'Overview' },
     { id: 'contact', label: 'Contact' },
-    { id: 'verification', label: 'Verification' },
+    { id: 'verification', label: 'Documents' },
   ];
 
-  // Specialization icon mapping
   const getSpecializationIcon = (spec) => {
     switch(spec) {
       case 'Individual': return <FiUser className="text-[#00695C]" />;
@@ -477,7 +491,7 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
           </div>
         </div>
 
-        {/* Avatar with verification completion ring, overlapping the hero */}
+        {/* Avatar with verification completion ring */}
         <div className="relative flex justify-center shrink-0" style={{ marginTop: '-44px' }}>
           <div className="relative w-[88px] h-[88px]">
             <svg viewBox="0 0 76 76" className="absolute inset-0 -rotate-90">
@@ -498,7 +512,7 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
           </div>
         </div>
         <p className="text-center text-[10px] font-medium mt-1 shrink-0" style={{ color: 'var(--avm-muted)' }}>
-          {verifiedCount}/{verificationItems.length} verified · {verifiedPercent}%
+          {verifiedCount}/{verificationItems.length} documents verified · {verifiedPercent}%
         </p>
 
         {/* View Properties Button */}
@@ -568,7 +582,7 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
               <div className="grid grid-cols-3 gap-3">
                 {[
                   { label: 'Properties', value: agent.propertiesCount },
-                  { label: 'Clients', value: agent.clientsCount },
+                  { label: 'Views', value: agent.clientsCount }, 
                   { label: 'Rating', value: agent.rating },
                 ].map((stat, i) => (
                   <div
@@ -655,7 +669,7 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
                   {agent.verificationStatus.charAt(0).toUpperCase() + agent.verificationStatus.slice(1)}
                 </span>
               </div>
-              <div className="grid grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 gap-2.5">
                 {verificationItems.map(item => (
                   <div
                     key={item.key}
@@ -673,7 +687,7 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
                 ))}
               </div>
               <div className="mt-3 p-3 rounded-xl" style={{ background: 'var(--avm-surface)', border: '1px solid var(--avm-border)' }}>
-                <p className="text-[10px] font-medium" style={{ color: 'var(--avm-muted)' }}>Aadhaar & PAN verified agents get priority listing benefits.</p>
+                <p className="text-[10px] font-medium" style={{ color: 'var(--avm-muted)' }}>Aadhaar, PAN & Agent License verified agents get priority listing benefits.</p>
               </div>
             </div>
           )}
@@ -765,9 +779,7 @@ const ViewAgentModal = ({ agent, show, actionLoading, onClose, onApprove, onReje
 };
 
 /* ============================================================
-   EDIT AGENT MODAL — now includes editable Verification Status
-   and per-document (Email / Phone / Aadhaar / PAN) toggles.
-   FIXED: Bottom buttons are now sticky/fixed at bottom
+   EDIT AGENT MODAL — updated with 5 verification documents
 ============================================================ */
 
 const EditAgentModal = ({ agent, show, onClose, onSave }) => {
@@ -789,10 +801,11 @@ const EditAgentModal = ({ agent, show, onClose, onSave }) => {
         bio: agent.bio || '',
         verificationStatus: agent.verificationStatus || 'pending',
         verification: {
-          email: !!agent.verification?.email,
-          phone: !!agent.verification?.phone,
           aadhaar: !!agent.verification?.aadhaar,
           pan: !!agent.verification?.pan,
+          agentLicense: !!agent.verification?.agentLicense,
+          gst: !!agent.verification?.gst,
+          businessReg: !!agent.verification?.businessReg,
         },
       });
     }
@@ -804,13 +817,17 @@ const EditAgentModal = ({ agent, show, onClose, onSave }) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Only count non-optional documents for auto-verification
   const handleVerificationToggle = (key) => {
     setFormData(prev => {
       const updatedVerification = { ...prev.verification, [key]: !prev.verification[key] };
-      const allVerified = Object.values(updatedVerification).every(Boolean);
+      
+      // Auto-verify only when all non-optional documents are verified
+      const requiredDocs = ['aadhaar', 'pan', 'agentLicense'];
+      const allRequiredVerified = requiredDocs.every(doc => updatedVerification[doc]);
 
       let nextStatus = prev.verificationStatus;
-      if (allVerified) {
+      if (allRequiredVerified) {
         nextStatus = 'verified';
       } else if (prev.verificationStatus === 'verified') {
         nextStatus = 'pending';
@@ -826,10 +843,11 @@ const EditAgentModal = ({ agent, show, onClose, onSave }) => {
   };
 
   const verificationDocs = [
-    { key: 'email', label: 'Email', icon: <FiMail className="text-sm" /> },
-    { key: 'phone', label: 'Phone', icon: <FiPhone className="text-sm" /> },
-    { key: 'aadhaar', label: 'Aadhaar', icon: <FaIdCard className="text-sm" /> },
-    { key: 'pan', label: 'PAN', icon: <FaFileAlt className="text-sm" /> },
+    { key: 'aadhaar', label: 'Aadhaar', icon: <FaIdCard className="text-sm" />, optional: false },
+    { key: 'pan', label: 'PAN', icon: <FaFileAlt className="text-sm" />, optional: false },
+    { key: 'agentLicense', label: 'Agent License', icon: <FaCertificate className="text-sm" />, optional: false },
+    { key: 'gst', label: 'GST (Optional)', icon: <FaFileAlt className="text-sm" />, optional: true },
+    { key: 'businessReg', label: 'Business Reg. Cert. (Optional)', icon: <FaRegBuilding className="text-sm" />, optional: true },
   ];
 
   return (
@@ -970,7 +988,6 @@ const EditAgentModal = ({ agent, show, onClose, onSave }) => {
                 </select>
               </div>
 
-              {/* Verification Status (overall) */}
               <div className="col-span-2">
                 <label className="text-xs font-medium text-[#5A7D78] block mb-1">Verification Status</label>
                 <select
@@ -985,10 +1002,9 @@ const EditAgentModal = ({ agent, show, onClose, onSave }) => {
                 </select>
               </div>
 
-              {/* Verification Documents (individual toggles) */}
               <div className="col-span-2">
                 <label className="text-xs font-medium text-[#5A7D78] block mb-2">Verification Documents</label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {verificationDocs.map(item => {
                     const isVerified = formData.verification[item.key];
                     return (
@@ -1015,7 +1031,7 @@ const EditAgentModal = ({ agent, show, onClose, onSave }) => {
                     );
                   })}
                 </div>
-                <p className="text-[10px] text-[#5A7D78] mt-1.5">Tap a document to mark it verified / not verified.</p>
+                <p className="text-[10px] text-[#5A7D78] mt-1.5">Tap a document to mark it verified / not verified. Verifying Aadhaar, PAN &amp; Agent License sets Verification Status to Verified automatically.</p>
               </div>
 
               <div className="col-span-2">
@@ -1065,7 +1081,6 @@ const AgentsRegistration = () => {
   const navigate = useNavigate();
   const searchInputRef = useRef(null);
 
-  // ============ STATE ============
   const [agents, setAgents] = useState([]);
   const [filteredAgents, setFilteredAgents] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -1091,17 +1106,17 @@ const AgentsRegistration = () => {
   const [filterCount, setFilterCount] = useState(0);
   const [activeFilter, setActiveFilter] = useState('all');
   
-  // ============ PROPERTIES MODAL STATE ============
   const [showPropertiesModal, setShowPropertiesModal] = useState(false);
   const [selectedAgentForProperties, setSelectedAgentForProperties] = useState(null);
 
-  // ============ TOAST FUNCTION ============
+  // Block confirmation modal state
+  const [blockConfirmAgent, setBlockConfirmAgent] = useState(null);
+
   const showToast = useCallback((message, type = 'success', duration = 3000) => {
     setToast({ message, type });
     setTimeout(() => setToast(null), duration);
   }, []);
 
-  // ============ STATS ============
   const [stats, setStats] = useState({
     totalAgents: 0,
     pendingApprovals: 0,
@@ -1109,10 +1124,9 @@ const AgentsRegistration = () => {
     rejected: 0,
     blocked: 0,
     verified: 0,
-    approvedAndVerified: 0, // NEW: Combined Approved & Verified
+    approvedAndVerified: 0,
   });
 
-  // ============ GENERATE MOCK AGENTS ============
   const generateMockAgents = useCallback(() => {
     const firstNames = ['Rajesh', 'Priya', 'Amit', 'Sneha', 'Vikram', 'Ananya', 'Deepak', 'Meera', 'Ravi', 'Kavya', 'Suresh', 'Pooja', 'Arjun', 'Lakshmi', 'Kiran', 'Mohan', 'Ritu', 'Gautam', 'Nisha', 'Tarun'];
     const lastNames = ['Kumar', 'Sharma', 'Singh', 'Patel', 'Reddy', 'Gupta', 'Verma', 'Joshi', 'Malhotra', 'Mehta', 'Nair', 'Pillai', 'Rao', 'Shetty', 'Agarwal', 'Khanna', 'Chopra', 'Saxena', 'Tiwari', 'Desai'];
@@ -1149,13 +1163,19 @@ const AgentsRegistration = () => {
       const rating = (Math.random() * 4 + 1).toFixed(1);
       const experience = Math.floor(Math.random() * 15) + 1;
 
-      // Generate verification details
-      const verification = {
-        email: Math.random() > 0.15,
-        phone: Math.random() > 0.2,
-        aadhaar: Math.random() > 0.3,
-        pan: Math.random() > 0.35,
-      };
+      // Ensure individual document booleans match the overall verificationStatus
+      let verification = { aadhaar: false, pan: false, agentLicense: false, gst: false, businessReg: false };
+      if (verificationStatus === 'verified') {
+        verification = { aadhaar: true, pan: true, agentLicense: true, gst: true, businessReg: true };
+      } else if (verificationStatus === 'pending') {
+        verification = {
+          aadhaar: Math.random() > 0.5,
+          pan: Math.random() > 0.5,
+          agentLicense: Math.random() > 0.5,
+          gst: Math.random() > 0.7,
+          businessReg: Math.random() > 0.7,
+        };
+      }
 
       agents.push({
         id: `agent_${i}`,
@@ -1185,7 +1205,6 @@ const AgentsRegistration = () => {
       });
     }
 
-    // Update stats
     const total = agents.length;
     const pending = agents.filter(a => a.status === 'pending').length;
     const approved = agents.filter(a => a.status === 'approved').length;
@@ -1207,7 +1226,6 @@ const AgentsRegistration = () => {
     return agents;
   }, []);
 
-  // ============ INITIALIZE DATA ============
   useEffect(() => {
     const mockAgents = generateMockAgents();
     setAgents(mockAgents);
@@ -1216,7 +1234,6 @@ const AgentsRegistration = () => {
     setTimeout(() => setStatsAnimating(false), 1000);
   }, [generateMockAgents]);
 
-  // ============ FILTER AGENTS ============
   const filterAgents = useCallback(() => {
     let filtered = [...agents];
 
@@ -1266,7 +1283,6 @@ const AgentsRegistration = () => {
     filterAgents();
   }, [filterAgents]);
 
-  // ============ PAGINATION ============
   const totalPages = Math.ceil(filteredAgents.length / pageSize);
   const paginatedAgents = useMemo(() =>
     filteredAgents.slice(
@@ -1275,7 +1291,6 @@ const AgentsRegistration = () => {
     )
   , [filteredAgents, currentPage, pageSize]);
 
-  // ============ HANDLE SORT ============
   const handleSort = useCallback((field) => {
     if (sortField === field) {
       setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
@@ -1285,7 +1300,6 @@ const AgentsRegistration = () => {
     }
   }, [sortField]);
 
-  // ============ HANDLE SELECT ALL ============
   const handleSelectAll = useCallback(() => {
     if (selectedAgents.length === paginatedAgents.length) {
       setSelectedAgents([]);
@@ -1294,7 +1308,6 @@ const AgentsRegistration = () => {
     }
   }, [selectedAgents, paginatedAgents]);
 
-  // ============ HANDLE SELECT AGENT ============
   const handleSelectAgent = useCallback((agentId) => {
     setSelectedAgents(prev =>
       prev.includes(agentId)
@@ -1303,7 +1316,6 @@ const AgentsRegistration = () => {
     );
   }, []);
 
-  // ============ HANDLE APPROVAL ============
   const handleApproval = useCallback((agentId, action) => {
     const agent = agents.find(a => a.id === agentId);
     if (!agent) return;
@@ -1311,7 +1323,6 @@ const AgentsRegistration = () => {
     setApprovalAction(action);
   }, [agents]);
 
-  // ============ CONFIRM APPROVAL ============
   const confirmApproval = useCallback(() => {
     const agentId = showApprovalConfirm;
     const action = approvalAction;
@@ -1324,7 +1335,6 @@ const AgentsRegistration = () => {
       
       if (action === 'approve') {
         agent = { ...agent, status: 'approved' };
-        // Check if the agent is also verified for the combined stat
         const isAlsoVerified = agent.verificationStatus === 'verified';
         setStats(prev => ({
           ...prev,
@@ -1352,8 +1362,15 @@ const AgentsRegistration = () => {
     }, 800);
   }, [showApprovalConfirm, approvalAction, agents, showToast]);
 
-  // ============ HANDLE TOGGLE BLOCK ============
-  const handleToggleBlock = useCallback((agentId) => {
+  // Called by the Block button to open the confirmation modal
+  const handleBlockRequest = useCallback((agent) => {
+    setBlockConfirmAgent(agent);
+  }, []);
+
+  // Called when the user confirms the Block/Unblock action
+  const confirmToggleBlock = useCallback(() => {
+    if (!blockConfirmAgent) return;
+    const agentId = blockConfirmAgent.id;
     setActionLoading(`block_${agentId}`);
 
     setTimeout(() => {
@@ -1386,84 +1403,87 @@ const AgentsRegistration = () => {
       updatedAgents = updatedAgents.map(a => a.id === agentId ? agent : a);
       setAgents(updatedAgents);
       setActionLoading(null);
+      setBlockConfirmAgent(null);
 
       setViewingAgent(prev => (prev && prev.id === agentId ? agent : prev));
     }, 600);
-  }, [agents, showToast]);
+  }, [blockConfirmAgent, agents, showToast]);
 
-  // ============ VIEW AGENT DETAIL ============
   const handleViewAgent = useCallback((agent) => {
     setViewingAgent(agent);
     setShowViewModal(true);
   }, []);
 
-  // ============ VIEW AGENT PROPERTIES ============
   const handleViewAgentProperties = useCallback((agent) => {
     setSelectedAgentForProperties(agent);
     setShowPropertiesModal(true);
   }, []);
 
-  // ============ VIEW INDIVIDUAL PROPERTY DETAIL ============
   const handleViewPropertyDetail = useCallback((property) => {
     navigate(`/properties/${property.id}`);
     showToast(`Opening ${property.title}...`, 'info');
   }, [navigate, showToast]);
 
-  // ============ VIEW AGENT PROFILE ============
   const handleViewAgentProfile = useCallback((agentId) => {
     navigate('/profile/agent');
     showToast('Opening Agent Profile...', 'info');
   }, [navigate, showToast]);
 
-  // ============ VIEW PROPERTY OWNER PROFILE (from Properties modal) ============
   const handleViewOwnerProfile = useCallback((ownerAgent, property) => {
-    // Reuses the same agent-profile navigation; falls back to the agent
-    // shown in the Properties modal since that agent is the property owner.
     handleViewAgentProfile(ownerAgent?.id);
   }, [handleViewAgentProfile]);
 
-  // ============ EDIT AGENT ============
   const handleEditAgent = useCallback((agent) => {
     setEditingAgent(agent);
     setShowEditModal(true);
   }, []);
 
-  // ============ SAVE EDIT ============
   const saveEdit = useCallback((updatedData) => {
-    setAgents(prev => prev.map(agent => {
+    const updatedAgents = agents.map(agent => {
       if (agent.id !== editingAgent.id) return agent;
-      return { ...agent, ...updatedData };
-    }));
+      
+      let syncedVerification = { ...agent.verification, ...updatedData.verification };
+      if (updatedData.verificationStatus === 'verified') {
+        syncedVerification = { aadhaar: true, pan: true, agentLicense: true, gst: true, businessReg: true };
+      }
+      
+      return { ...agent, ...updatedData, verification: syncedVerification };
+    });
 
-    // Recompute stats fully to keep counts accurate after verification/status edits
-    setAgents(prev => {
-      const total = prev.length;
-      const pending = prev.filter(a => a.status === 'pending').length;
-      const approved = prev.filter(a => a.status === 'approved').length;
-      const rejected = prev.filter(a => a.status === 'rejected').length;
-      const blocked = prev.filter(a => a.status === 'blocked').length;
-      const verified = prev.filter(a => a.verificationStatus === 'verified').length;
-      const approvedAndVerified = prev.filter(a => a.status === 'approved' && a.verificationStatus === 'verified').length;
+    setAgents(updatedAgents);
+    setFilteredAgents(updatedAgents);
 
-      setStats({
-        totalAgents: total,
-        pendingApprovals: pending,
-        approved: approved,
-        rejected: rejected,
-        blocked: blocked,
-        verified: verified,
-        approvedAndVerified: approvedAndVerified,
-      });
+    const total = updatedAgents.length;
+    const pending = updatedAgents.filter(a => a.status === 'pending').length;
+    const approved = updatedAgents.filter(a => a.status === 'approved').length;
+    const rejected = updatedAgents.filter(a => a.status === 'rejected').length;
+    const blocked = updatedAgents.filter(a => a.status === 'blocked').length;
+    const verified = updatedAgents.filter(a => a.verificationStatus === 'verified').length;
+    const approvedAndVerified = updatedAgents.filter(a => a.status === 'approved' && a.verificationStatus === 'verified').length;
 
+    setStats({
+      totalAgents: total,
+      pendingApprovals: pending,
+      approved: approved,
+      rejected: rejected,
+      blocked: blocked,
+      verified: verified,
+      approvedAndVerified: approvedAndVerified,
+    });
+
+    setViewingAgent(prev => {
+      if (prev && prev.id === editingAgent.id) {
+        const found = updatedAgents.find(a => a.id === editingAgent.id);
+        return found || prev;
+      }
       return prev;
     });
 
     setShowEditModal(false);
     setEditingAgent(null);
     showToast('Agent updated successfully', 'success');
-  }, [editingAgent, showToast]);
+  }, [agents, editingAgent, showToast]);
 
-  // ============ STAT CLICK HANDLER ============
   const handleStatClick = useCallback((filter) => {
     setActiveFilter(filter);
     if (filter === 'all') {
@@ -1492,7 +1512,6 @@ const AgentsRegistration = () => {
     searchInputRef.current?.focus();
   }, []);
 
-  // ============ CLEAR ALL FILTERS ============
   const clearAllFilters = useCallback(() => {
     setSearchQuery('');
     setSelectedStatus('all');
@@ -1502,7 +1521,6 @@ const AgentsRegistration = () => {
     showToast('All filters cleared', 'info');
   }, [showToast]);
 
-  // ============ REFRESH DATA ============
   const handleRefresh = useCallback(() => {
     setLoading(true);
     setTimeout(() => {
@@ -1516,7 +1534,6 @@ const AgentsRegistration = () => {
     }, 1000);
   }, [generateMockAgents, showToast]);
 
-  // ============ EXPORT AGENTS ============
   const handleExportAgents = useCallback(() => {
     const data = filteredAgents.map(agent => ({
       Name: agent.name,
@@ -1527,12 +1544,13 @@ const AgentsRegistration = () => {
       Agency: agent.agency,
       Status: agent.status,
       'Verification Status': agent.verificationStatus,
-      'Email Verified': agent.verification.email ? 'Yes' : 'No',
-      'Phone Verified': agent.verification.phone ? 'Yes' : 'No',
-      'Aadhaar Verified': agent.verification.aadhaar ? 'Yes' : 'No',
-      'PAN Verified': agent.verification.pan ? 'Yes' : 'No',
+      'Aadhaar': agent.verification.aadhaar ? 'Verified' : 'Pending',
+      'PAN': agent.verification.pan ? 'Verified' : 'Pending',
+      'Agent License': agent.verification.agentLicense ? 'Verified' : 'Pending',
+      'GST': agent.verification.gst ? 'Verified' : 'Pending',
+      'Business Reg. Cert.': agent.verification.businessReg ? 'Verified' : 'Pending',
       Properties: agent.propertiesCount,
-      Clients: agent.clientsCount,
+      Views: agent.clientsCount,
       Rating: agent.rating,
       Experience: agent.experience,
       Specialization: agent.specialization,
@@ -1556,7 +1574,6 @@ const AgentsRegistration = () => {
     showToast(`${filteredAgents.length} agents exported successfully`, 'success');
   }, [filteredAgents, showToast]);
 
-  // ============ VIEW MODAL ACTION HANDLERS ============
   const handleViewModalApprove = useCallback((id) => {
     handleApproval(id, 'approve');
   }, [handleApproval]);
@@ -1573,15 +1590,15 @@ const AgentsRegistration = () => {
 
   const handleViewModalToggleBlock = useCallback(() => {
     if (!viewingAgent) return;
-    handleToggleBlock(viewingAgent.id);
-  }, [viewingAgent, handleToggleBlock]);
+    setShowViewModal(false);
+    handleBlockRequest(viewingAgent);
+  }, [viewingAgent, handleBlockRequest]);
 
   const handleViewModalViewProperties = useCallback((agent) => {
     setShowViewModal(false);
     handleViewAgentProperties(agent);
   }, [handleViewAgentProperties]);
 
-  // ============ BULK ACTIONS ============
   const handleBulkAction = useCallback((action) => {
     if (selectedAgents.length === 0) {
       showToast('Please select agents first', 'warning');
@@ -1633,19 +1650,15 @@ const AgentsRegistration = () => {
     }, 800);
   }, [selectedAgents, agents, showToast]);
 
-  // ============ RENDER ============
   return (
     <div className="space-y-6 p-4 lg:p-6 bg-[#F8FAF9] min-h-screen">
-      {/* Animated Background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-[#00695C]/5 rounded-full blur-3xl animate-float" />
         <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-[#26A69A]/5 rounded-full blur-3xl animate-float-delayed" />
       </div>
 
-      {/* Toast */}
       <Toast toast={toast} />
 
-      {/* Approval Confirm Modal */}
       <ApprovalConfirmModal
         show={!!showApprovalConfirm}
         action={approvalAction}
@@ -1655,7 +1668,15 @@ const AgentsRegistration = () => {
         onConfirm={confirmApproval}
       />
 
-      {/* Agent Properties Modal */}
+      <BlockConfirmModal
+        show={!!blockConfirmAgent}
+        isBlocked={blockConfirmAgent?.status === 'blocked'}
+        actionLoading={actionLoading === `block_${blockConfirmAgent?.id}`}
+        agentName={blockConfirmAgent?.name || ''}
+        onCancel={() => setBlockConfirmAgent(null)}
+        onConfirm={confirmToggleBlock}
+      />
+
       <AgentPropertiesModal
         agent={selectedAgentForProperties}
         show={showPropertiesModal}
@@ -1664,7 +1685,6 @@ const AgentsRegistration = () => {
         onViewOwnerProfile={handleViewOwnerProfile}
       />
 
-      {/* Edit Modal */}
       <EditAgentModal
         agent={editingAgent}
         show={showEditModal}
@@ -1672,7 +1692,6 @@ const AgentsRegistration = () => {
         onSave={saveEdit}
       />
 
-      {/* View Modal */}
       <ViewAgentModal
         agent={viewingAgent}
         show={showViewModal}
@@ -1686,7 +1705,6 @@ const AgentsRegistration = () => {
         onViewProfile={handleViewAgentProfile}
       />
 
-      {/* Header */}
       <div className="relative animate-fade-in">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div>
@@ -1737,7 +1755,6 @@ const AgentsRegistration = () => {
         </div>
       </div>
 
-      {/* Stats Section - Updated with Approved & Verified */}
       {showStats && (
         <div className="relative animate-slide-in">
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
@@ -1802,7 +1819,6 @@ const AgentsRegistration = () => {
                 statsAnimating={statsAnimating}
                 onClick={() => handleStatClick('verified')}
               />
-              {/* NEW: Approved & Verified Stat Card */}
               <StatCard
                 icon={<FaCheck className="text-white text-sm" />}
                 title="Approved & Verified"
@@ -1818,7 +1834,6 @@ const AgentsRegistration = () => {
         </div>
       )}
 
-      {/* Search and Filters */}
       <div className="relative bg-white rounded-2xl p-4 shadow-sm border border-[#E8F0EE] hover:shadow-md transition-all duration-300">
         <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4">
           <div className="flex-1 w-full lg:w-auto relative">
@@ -1899,7 +1914,6 @@ const AgentsRegistration = () => {
           </div>
         </div>
 
-        {/* Bulk Actions */}
         {selectedAgents.length > 0 && (
           <div className="mt-4 pt-4 border-t border-[#E8F0EE] flex flex-wrap items-center justify-between gap-3 animate-slide-in">
             <span className="text-sm text-[#5A7D78]">
@@ -1933,7 +1947,6 @@ const AgentsRegistration = () => {
         )}
       </div>
 
-      {/* Agents Grid/List */}
       <div className="relative">
         {loading ? (
           <div className="flex items-center justify-center py-20">
@@ -1987,11 +2000,13 @@ const AgentsRegistration = () => {
                           <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap inline-flex items-center gap-1 ${statusColors[agent.status]}`}>
                             {agent.status.charAt(0).toUpperCase() + agent.status.slice(1)}
                           </span>
-                          {agent.verificationStatus === 'verified' && (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap bg-[#E8F8F5] text-[#00695C]">
-                              Verified
-                            </span>
-                          )}
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap ${
+                            agent.verificationStatus === 'verified' ? 'bg-[#E8F8F5] text-[#00695C]' :
+                            agent.verificationStatus === 'rejected' ? 'bg-red-50 text-red-700' :
+                            'bg-[#FEF3E2] text-amber-700'
+                          }`}>
+                            {agent.verificationStatus.charAt(0).toUpperCase() + agent.verificationStatus.slice(1)}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -2039,13 +2054,12 @@ const AgentsRegistration = () => {
                     </div>
                   </div>
 
-                  {/* Verification Quick Status */}
-                  <div className="grid grid-cols-4 gap-1 mt-2.5 pt-2.5 border-t border-[#E8F0EE]">
+                  {/* Verification Quick Status - Aadhaar, PAN, Agent License */}
+                  <div className="grid grid-cols-3 gap-1 mt-2.5 pt-2.5 border-t border-[#E8F0EE]">
                     {[
-                      { key: 'email', label: 'Email' },
-                      { key: 'phone', label: 'Phone' },
                       { key: 'aadhaar', label: 'Aadhaar' },
-                      { key: 'pan', label: 'PAN' }
+                      { key: 'pan', label: 'PAN' },
+                      { key: 'agentLicense', label: 'License' }
                     ].map(item => (
                       <div key={item.key} className="text-center">
                         <div className={`text-xs ${agent.verification[item.key] ? 'text-[#00695C]' : 'text-[#B5C9C5]'}`}>
@@ -2056,6 +2070,7 @@ const AgentsRegistration = () => {
                     ))}
                   </div>
 
+                  {/* Stats row - Properties, Views, Rating */}
                   <div className="grid grid-cols-3 gap-2 mt-2.5 pt-2.5 border-t border-[#E8F0EE]">
                     <div className="text-center">
                       <p className="text-sm font-bold text-[#1A2E2A]">{agent.propertiesCount}</p>
@@ -2063,7 +2078,7 @@ const AgentsRegistration = () => {
                     </div>
                     <div className="text-center">
                       <p className="text-sm font-bold text-[#1A2E2A]">{agent.clientsCount}</p>
-                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Clients</p>
+                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Views</p>
                     </div>
                     <div className="text-center">
                       <p className="text-sm font-bold text-[#1A2E2A] flex items-center justify-center gap-0.5">
@@ -2121,7 +2136,7 @@ const AgentsRegistration = () => {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleToggleBlock(agent.id)}
+                          onClick={() => handleBlockRequest(agent)}
                           disabled={actionLoading === `block_${agent.id}`}
                           className={`flex-1 py-1.5 text-xs font-medium rounded-xl transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 disabled:opacity-50 ${
                             agent.status === 'blocked'
@@ -2142,7 +2157,6 @@ const AgentsRegistration = () => {
                     )}
                   </div>
 
-                  {/* NEW: View Profile button, its own row below View/Edit/Properties/Block */}
                   {!isPending && (
                     <div className="mt-1.5">
                       <button
@@ -2159,7 +2173,9 @@ const AgentsRegistration = () => {
             })}
           </div>
         ) : (
+          // list view
           <div className="bg-white rounded-2xl border border-[#E8F0EE] shadow-sm overflow-hidden">
+           
             <div className="grid grid-cols-12 gap-2 items-center px-4 py-3 bg-[#F5F9F8] border-b border-[#E8F0EE] text-xs font-medium text-[#5A7D78] uppercase tracking-wider">
               <div className="col-span-1 flex items-center gap-2">
                 <input
@@ -2174,7 +2190,7 @@ const AgentsRegistration = () => {
                 Name {sortField === 'name' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
               <div className="col-span-1">Status</div>
-              <div className="col-span-1">Verification</div>
+              <div className="col-span-1">KYC</div>
               <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('city')}>
                 City {sortField === 'city' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
@@ -2271,7 +2287,7 @@ const AgentsRegistration = () => {
                     {new Date(agent.registrationDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
                   </div>
 
-                  <div className="col-span-1 flex items-center justify-end gap-1">
+                  <div className="col-span-1 flex items-center justify-end gap-1.5">
                     {isPending ? (
                       <>
                         <button
@@ -2281,7 +2297,7 @@ const AgentsRegistration = () => {
                           className="w-7 h-7 rounded-lg hover:bg-[#E8F8F5] transition-all duration-300 flex items-center justify-center text-[#00695C] hover:scale-110 disabled:opacity-50"
                           title="Approve"
                         >
-                          {actionLoading === 'approve' ? <FiRefreshCw className="text-xs animate-spin" /> : <FiCheckCircle className="text-xs" />}
+                          {actionLoading === 'approve' ? <FiRefreshCw className="text-xs animate-spin" /> : <FiCheckCircle className="text-sm" />}
                         </button>
                         <button
                           type="button"
@@ -2290,7 +2306,7 @@ const AgentsRegistration = () => {
                           className="w-7 h-7 rounded-lg hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-red-500 hover:scale-110 disabled:opacity-50"
                           title="Reject"
                         >
-                          {actionLoading === 'reject' ? <FiRefreshCw className="text-xs animate-spin" /> : <FiXCircle className="text-xs" />}
+                          {actionLoading === 'reject' ? <FiRefreshCw className="text-xs animate-spin" /> : <FiXCircle className="text-sm" />}
                         </button>
                       </>
                     ) : (
@@ -2301,7 +2317,7 @@ const AgentsRegistration = () => {
                           className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
                           title="View"
                         >
-                          <FiEye className="text-xs" />
+                          <FiEye className="text-sm" />
                         </button>
                         <button
                           type="button"
@@ -2309,7 +2325,7 @@ const AgentsRegistration = () => {
                           className="w-7 h-7 rounded-lg hover:bg-blue-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-blue-600 hover:scale-110"
                           title="Edit"
                         >
-                          <FiEdit className="text-xs" />
+                          <FiEdit className="text-sm" />
                         </button>
                         <button
                           type="button"
@@ -2317,11 +2333,11 @@ const AgentsRegistration = () => {
                           className="w-7 h-7 rounded-lg hover:bg-purple-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-purple-600 hover:scale-110"
                           title="View Properties"
                         >
-                          <FiHome className="text-xs" />
+                          <FiHome className="text-sm" />
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleToggleBlock(agent.id)}
+                          onClick={() => handleBlockRequest(agent)}
                           disabled={actionLoading === `block_${agent.id}`}
                           className={`w-7 h-7 rounded-lg transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 ${
                             agent.status === 'blocked'
@@ -2335,7 +2351,7 @@ const AgentsRegistration = () => {
                           ) : agent.status === 'blocked' ? (
                             <FiUnlock className="text-xs" />
                           ) : (
-                            <FiLock className="text-xs" />
+                            <FiLock className="text-sm" />
                           )}
                         </button>
                       </>
@@ -2368,7 +2384,6 @@ const AgentsRegistration = () => {
         )}
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex flex-wrap items-center justify-between bg-white rounded-2xl px-4 py-3 border border-[#E8F0EE] shadow-sm gap-3">
           <div className="flex items-center gap-2 text-sm text-[#5A7D78] flex-wrap">
@@ -2435,7 +2450,6 @@ const AgentsRegistration = () => {
         </div>
       )}
 
-      {/* CSS Animations */}
       <style>{`
         @keyframes fade-in {
           from { opacity: 0; transform: translateY(10px); }

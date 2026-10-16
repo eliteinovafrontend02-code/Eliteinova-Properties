@@ -224,7 +224,6 @@ const AgentsOverview = () => {
     totalAgents: 342,
     registrationApproval: 28,
     agentVerification: 156,
-    propertiesAndLeads: 823, // Changed from propertyManagement
     propertyControl: 95,
     pendingApprovals: 28,
     verifiedAgents: 156,
@@ -238,54 +237,10 @@ const AgentsOverview = () => {
     growthRate: 18.5,
     monthlyGrowth: 9.2,
     newThisWeek: 16,
-    reraVerified: 89,
+    documentVerified: 89,   // renamed from reraVerified
     agencyVerified: 112,
     avgListingsPerAgent: 2.4
   });
-
-  // ---- Recent Activities ----
-  // const activities = useMemo(() => [
-  //   {
-  //     icon: <FaUserPlus className="text-white text-sm" />,
-  //     title: 'New Agent Registration',
-  //     time: '5 min ago',
-  //     description: 'Amit Kumar registered as a real estate agent',
-  //     color: 'bg-gradient-to-br',
-  //     gradient: 'from-[#00695C] to-[#26A69A]'
-  //   },
-  //   {
-  //     icon: <FiCheckCircle className="text-white text-sm" />,
-  //     title: 'RERA Verification Approved',
-  //     time: '18 min ago',
-  //     description: 'Priya Singh\'s RERA certificate verified successfully',
-  //     color: 'bg-gradient-to-br',
-  //     gradient: 'from-emerald-500 to-emerald-400'
-  //   },
-  //   {
-  //     icon: <FiHome className="text-white text-sm" />,
-  //     title: 'New Property Listed',
-  //     time: '45 min ago',
-  //     description: 'Rajesh Sharma listed a Luxury Villa in Mumbai',
-  //     color: 'bg-gradient-to-br',
-  //     gradient: 'from-blue-500 to-blue-400'
-  //   },
-  //   {
-  //     icon: <MdAssignment className="text-white text-sm" />,
-  //     title: 'Lead Assigned',
-  //     time: '1 hour ago',
-  //     description: 'Sneha Reddy assigned 5 new leads to agents',
-  //     color: 'bg-gradient-to-br',
-  //     gradient: 'from-purple-500 to-purple-400'
-  //   },
-  //   {
-  //     icon: <FiDollarSign className="text-white text-sm" />,
-  //     title: 'Commission Recorded',
-  //     time: '2 hours ago',
-  //     description: 'Commission of ₹1,25,000 credited to Vikram Patel',
-  //     color: 'bg-gradient-to-br',
-  //     gradient: 'from-amber-500 to-amber-400'
-  //   }
-  // ], []);
 
   // ---- Quick Stats ----
   const quickStats = useMemo(() => [
@@ -314,7 +269,6 @@ const AgentsOverview = () => {
         totalAgents: prev.totalAgents + Math.floor(Math.random() * 3),
         registrationApproval: Math.max(0, prev.registrationApproval + Math.floor(Math.random() * 5) - 2),
         agentVerification: prev.agentVerification + Math.floor(Math.random() * 4),
-        propertiesAndLeads: prev.propertiesAndLeads + Math.floor(Math.random() * 8), // Changed
         propertyControl: Math.max(0, prev.propertyControl + Math.floor(Math.random() * 6) - 3),
         newThisWeek: prev.newThisWeek + Math.floor(Math.random() * 2),
       }));
@@ -427,7 +381,7 @@ const AgentsOverview = () => {
           icon={<FiShield className="text-lg text-white" />}
           title="Agent Verification"
           value={stats.verifiedAgents}
-          subtitle={`${stats.reraVerified} RERA verified`}
+          subtitle={`${stats.documentVerified} documents verified`}
           color="bg-gradient-to-br"
           gradient="from-purple-600 to-purple-400"
           borderColor="border-purple-600/30"
@@ -436,20 +390,6 @@ const AgentsOverview = () => {
           onClick={() => navigateTo('/admin/agents/verification')}
           trend="up"
           trendValue="12.8"
-        />
-        <StatCard
-          icon={<FiHome className="text-lg text-white" />}
-          title="Properties & Leads" // Changed from "Property Management"
-          value={stats.propertiesAndLeads} // Changed from stats.propertyManagement
-          subtitle={`${stats.totalLeads} leads assigned`}
-          color="bg-gradient-to-br"
-          gradient="from-blue-600 to-blue-400"
-          borderColor="border-blue-600/30"
-          delay={300}
-          statsAnimating={statsAnimating}
-          onClick={() => navigateTo('/admin/agents/leads')} // Updated route
-          trend="up"
-          trendValue="22.3"
         />
         <StatCard
           icon={<FiEdit className="text-lg text-white" />}
@@ -475,7 +415,7 @@ const AgentsOverview = () => {
           subtitle="Manage agents, registrations, and properties"
         />
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* Registration Approval Card */}
           <NavCard
             icon={<FiUserCheck className="text-white text-xl" />}
@@ -500,37 +440,18 @@ const AgentsOverview = () => {
           <NavCard
             icon={<FiShield className="text-white text-xl" />}
             title="Agent Verification"
-            description="Verify RERA certificates, agency documents, and approve professional credentials."
+            description="Verify certificates, agency documents, and approve professional credentials."
             color="bg-gradient-to-br"
             gradient="from-purple-600 to-purple-400"
             borderColor="border-purple-600/30"
             delay={100}
             onClick={() => navigateTo('/admin/agents/verification')}
-            badge={`${stats.reraVerified} RERA`}
+            badge={`${stats.documentVerified} Verified`}
             badgeColor="bg-gradient-to-r from-purple-500 to-purple-400"
             stats={[
-              { label: 'RERA', value: stats.reraVerified },
+              { label: 'Docs', value: stats.documentVerified },
               { label: 'Agency', value: stats.agencyVerified },
               { label: 'Unverified', value: stats.unverifiedAgents },
-            ]}
-          />
-
-          {/* Properties & Leads Card - Changed from Property Management */}
-          <NavCard
-            icon={<FiHome className="text-white text-xl" />}
-            title="Properties & Leads" // Changed from "Property Management"
-            description="Manage property listings, leads, and agent performance with commission tracking." // Updated description
-            color="bg-gradient-to-br"
-            gradient="from-blue-600 to-blue-400"
-            borderColor="border-blue-600/30"
-            delay={200}
-            onClick={() => navigateTo('/admin/agents/leads')} // Updated route
-            badge={`${stats.totalLeads} Leads`}
-            badgeColor="bg-gradient-to-r from-blue-500 to-blue-400"
-            stats={[
-              { label: 'Listings', value: stats.totalListings },
-              { label: 'Leads', value: stats.totalLeads },
-              { label: 'Commission', value: '₹8.75L' },
             ]}
           />
 
@@ -554,34 +475,6 @@ const AgentsOverview = () => {
           />
         </div>
       </div>
-
-      {/* ===== RECENT ACTIVITIES ===== */}
-      {/* <div>
-        <SectionHeader
-          icon={<FiActivity className="text-white text-sm" />}
-          title="Recent Activities"
-          subtitle="Live updates from agents and properties"
-          action={true}
-          actionLabel="View All"
-          onAction={() => navigateTo('/admin/notifications')}
-        />
-        
-        <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/50 shadow-lg p-4 hover:shadow-xl transition-all duration-300 hover:border-[#00695C]/20">
-          {activities.map((activity, index) => (
-            <ActivityItem
-              key={index}
-              icon={activity.icon}
-              title={activity.title}
-              time={activity.time}
-              description={activity.description}
-              color={activity.color}
-              gradient={activity.gradient}
-              index={index}
-              isLast={index === activities.length - 1}
-            />
-          ))}
-        </div>
-      </div> */}
 
       {/* ===== FOOTER ===== */}
       <div className="text-center pt-4">

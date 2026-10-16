@@ -151,7 +151,7 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
         amenities: property.amenities ? property.amenities.join(', ') : '',
         parking: property.parking || 'None',
         views: property.views || 0,
-        inquiries: property.inquiries || 0,
+        enquiries: property.enquiries || 0,
         listedDate: property.listedDate ? new Date(property.listedDate).toISOString().split('T')[0] : '',
       });
       setErrors({});
@@ -207,7 +207,7 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
       bathrooms: Number(formData.bathrooms),
       area: Number(formData.area),
       views: Number(formData.views) || 0,
-      inquiries: Number(formData.inquiries) || 0,
+      enquiries: Number(formData.enquiries) || 0,
     };
 
     setTimeout(() => {
@@ -519,11 +519,11 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
             </div>
 
             <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Inquiries</label>
+              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Enquiries</label>
               <input
                 type="number"
-                name="inquiries"
-                value={formData.inquiries}
+                name="enquiries"
+                value={formData.enquiries}
                 onChange={handleChange}
                 className="w-full px-2 py-1 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
                 min="0"
@@ -647,8 +647,8 @@ const ViewPropertyModal = ({
               <p className="text-[9px] uppercase tracking-wider text-[#5A7D78]">Views</p>
             </div>
             <div className="text-center p-3 bg-[#F5F9F8] rounded-xl">
-              <p className="text-lg font-bold text-[#1A2E2A]">{property.inquiries || 0}</p>
-              <p className="text-[9px] uppercase tracking-wider text-[#5A7D78]">Inquiries</p>
+              <p className="text-lg font-bold text-[#1A2E2A]">{property.enquiries || 0}</p>
+              <p className="text-[9px] uppercase tracking-wider text-[#5A7D78]">Enquiries</p>
             </div>
           </div>
 
@@ -910,7 +910,7 @@ const AgentsPropertyControl = () => {
         listedDate: date.toISOString(),
         updatedDate: new Date(Date.now() - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000)).toISOString(),
         views: Math.floor(Math.random() * 500),
-        inquiries: Math.floor(Math.random() * 50),
+        enquiries: Math.floor(Math.random() * 50),
         description: `Beautiful ${type.toLowerCase()} located in ${city}. Features ${Math.floor(Math.random() * 3) + 2} bedrooms and modern amenities. Perfect for families and professionals.`,
         amenities: amenities,
         parking: Math.random() > 0.5 ? `${Math.floor(Math.random() * 2) + 1} spots` : 'None',
@@ -1517,7 +1517,7 @@ const AgentsPropertyControl = () => {
       Agent: p.agentName,
       'Listed Date': new Date(p.listedDate).toLocaleDateString(),
       Views: p.views,
-      Inquiries: p.inquiries,
+      Enquiries: p.enquiries,
     }));
 
     const csv = [
@@ -2095,7 +2095,8 @@ const AgentsPropertyControl = () => {
         ) : (
           /* List View */
           <div className="bg-white rounded-2xl border border-[#E8F0EE] shadow-sm overflow-hidden">
-            <div className="grid grid-cols-12 gap-2 items-center px-4 py-3 bg-[#F5F9F8] border-b border-[#E8F0EE] text-xs font-medium text-[#5A7D78] uppercase tracking-wider">
+            {/* Header Row */}
+            <div className="grid grid-cols-12 gap-1 items-center px-3 py-3 bg-[#F5F9F8] border-b border-[#E8F0EE] text-xs font-medium text-[#5A7D78] uppercase tracking-wider">
               <div className="col-span-1 flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -2108,14 +2109,14 @@ const AgentsPropertyControl = () => {
               <div className="col-span-2 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('title')}>
                 Title {sortField === 'title' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1">Type</div>
-              <div className="col-span-1">Status</div>
-              <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('price')}>
+              <div className="col-span-1 text-center">Type</div>
+              <div className="col-span-1 text-center">Status</div>
+              <div className="col-span-1 text-center cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('price')}>
                 Price {sortField === 'price' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1">Bed</div>
-              <div className="col-span-1">Bath</div>
-              <div className="col-span-1">Agent</div>
+              <div className="col-span-1 text-center">Bed</div>
+              <div className="col-span-1 text-center">Bath</div>
+              <div className="col-span-1 text-center">Agent</div>
               <div className="col-span-1 text-center">Featured</div>
               <div className="col-span-1 text-center">Verified</div>
               <div className="col-span-1 text-right">Actions</div>
@@ -2133,8 +2134,9 @@ const AgentsPropertyControl = () => {
               return (
                 <div
                   key={property.id}
-                  className={`grid grid-cols-12 gap-2 items-center py-3 px-4 border-b border-[#E8F0EE] hover:bg-[#F5F9F8] transition-all duration-300 group ${isSelected ? 'bg-[#E8F4F2]' : ''}`}
+                  className={`grid grid-cols-12 gap-1 items-center py-3 px-3 border-b border-[#E8F0EE] hover:bg-[#F5F9F8] transition-all duration-300 group ${isSelected ? 'bg-[#E8F4F2]' : ''}`}
                 >
+                  {/* Checkbox & Index */}
                   <div className="col-span-1 flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -2145,27 +2147,35 @@ const AgentsPropertyControl = () => {
                     <span className="text-xs text-[#5A7D78]">{index + 1}</span>
                   </div>
 
+                  {/* Title & Location */}
                   <div className="col-span-2">
                     <p className="font-semibold text-sm text-[#1A2E2A] truncate">{property.title}</p>
                     <p className="text-[10px] text-[#5A7D78] truncate">{property.location}</p>
                   </div>
 
-                  <div className="col-span-1 text-xs text-[#5A7D78]">{property.type}</div>
+                  {/* Type */}
+                  <div className="col-span-1 text-center text-xs text-[#5A7D78] truncate">{property.type}</div>
 
-                  <div className="col-span-1">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColors[property.status] || 'bg-gray-100 text-gray-700'}`}>
+                  {/* Status */}
+                  <div className="col-span-1 text-center">
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap ${statusColors[property.status] || 'bg-gray-100 text-gray-700'}`}>
                       {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
                     </span>
                   </div>
 
-                  <div className="col-span-1 text-sm font-semibold text-[#1A2E2A]">₹{property.price.toLocaleString()}</div>
+                  {/* Price */}
+                  <div className="col-span-1 text-center text-sm font-semibold text-[#1A2E2A] whitespace-nowrap">₹{property.price.toLocaleString()}</div>
 
+                  {/* Bedrooms */}
                   <div className="col-span-1 text-center text-sm text-[#1A2E2A]">{property.bedrooms}</div>
 
+                  {/* Bathrooms */}
                   <div className="col-span-1 text-center text-sm text-[#1A2E2A]">{property.bathrooms}</div>
 
-                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">{property.agentName}</div>
+                  {/* Agent */}
+                  <div className="col-span-1 text-center text-xs text-[#5A7D78] truncate">{property.agentName}</div>
 
+                  {/* Featured */}
                   <div className="col-span-1 text-center">
                     {property.isFeatured ? (
                       <FaStarSolid className="text-amber-500 inline text-xs" />
@@ -2174,6 +2184,7 @@ const AgentsPropertyControl = () => {
                     )}
                   </div>
 
+                  {/* Verified */}
                   <div className="col-span-1 text-center">
                     {property.isVerified ? (
                       <FiShield className="text-blue-600 inline text-xs" />
@@ -2182,133 +2193,146 @@ const AgentsPropertyControl = () => {
                     )}
                   </div>
 
-                  <div className="col-span-1 flex items-center justify-end gap-1">
+                  {/* Actions - 2 rows of 3 icons + Profile button */}
+                  <div className="col-span-1 flex flex-col items-end gap-1">
                     {property.status === 'pending' ? (
                       <>
+                        <div className="grid grid-cols-3 gap-0.5">
+                          <button
+                            type="button"
+                            onClick={() => handleApproveProperty(property.id)}
+                            disabled={actionLoading === `approve_${property.id}`}
+                            className="w-5 h-5 rounded-md hover:bg-emerald-50 transition-all duration-300 flex items-center justify-center text-emerald-600 hover:scale-110 disabled:opacity-50"
+                            title="Approve"
+                          >
+                            {actionLoading === `approve_${property.id}` ? (
+                              <FiRefreshCw className="text-[12px] animate-spin" />
+                            ) : (
+                              <FiCheckCircle className="text-[12px]" />
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRejectProperty(property.id)}
+                            disabled={actionLoading === `reject_${property.id}`}
+                            className="w-5 h-5 rounded-md hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-red-600 hover:scale-110 disabled:opacity-50"
+                            title="Reject"
+                          >
+                            {actionLoading === `reject_${property.id}` ? (
+                              <FiRefreshCw className="text-[12px] animate-spin" />
+                            ) : (
+                              <FiXCircle className="text-[12px]" />
+                            )}
+                          </button>
+                          <div className="w-5 h-5"></div>
+                        </div>
                         <button
                           type="button"
-                          onClick={() => handleApproveProperty(property.id)}
-                          disabled={actionLoading === `approve_${property.id}`}
-                          className="w-7 h-7 rounded-lg hover:bg-emerald-50 transition-all duration-300 flex items-center justify-center text-emerald-600 hover:scale-110 disabled:opacity-50"
-                          title="Approve"
+                          onClick={() => handleViewAgentProfile(property.agentId)}
+                          className="px-2 py-0.5 text-[9px] font-medium text-[#00695C] bg-[#E8F4F2] rounded-md hover:bg-[#C5EDE5] transition-all duration-300 flex items-center gap-1 hover:scale-[1.02]"
+                          title="View Agent Profile"
                         >
-                          {actionLoading === `approve_${property.id}` ? (
-                            <FiRefreshCw className="text-xs animate-spin" />
-                          ) : (
-                            <FiCheckCircle className="text-xs" />
-                          )}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleRejectProperty(property.id)}
-                          disabled={actionLoading === `reject_${property.id}`}
-                          className="w-7 h-7 rounded-lg hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-red-600 hover:scale-110 disabled:opacity-50"
-                          title="Reject"
-                        >
-                          {actionLoading === `reject_${property.id}` ? (
-                            <FiRefreshCw className="text-xs animate-spin" />
-                          ) : (
-                            <FiXCircle className="text-xs" />
-                          )}
+                          <FiExternalLink className="text-[9px]" />
+                          Profile
                         </button>
                       </>
                     ) : (
                       <>
+                        <div className="grid grid-cols-3 gap-0.5">
+                          <button
+                            type="button"
+                            onClick={() => handleViewProperty(property)}
+                            className="w-5 h-5 rounded-md hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
+                            title="View"
+                          >
+                            <FiEye className="text-[12px]" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleEditProperty(property)}
+                            className="w-5 h-5 rounded-md hover:bg-blue-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-blue-600 hover:scale-110"
+                            title="Edit"
+                          >
+                            <FiEdit className="text-[12px]" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleToggleFeature(property.id)}
+                            disabled={actionLoading === `feature_${property.id}`}
+                            className={`w-5 h-5 rounded-md transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 ${
+                              property.isFeatured
+                                ? 'text-purple-600 hover:bg-purple-50'
+                                : 'text-amber-600 hover:bg-amber-50'
+                            }`}
+                            title={property.isFeatured ? 'Unfeature' : 'Feature'}
+                          >
+                            {actionLoading === `feature_${property.id}` ? (
+                              <FiRefreshCw className="text-[12px] animate-spin" />
+                            ) : (
+                              <FaStarSolid className="text-[12px]" />
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleToggleVerify(property.id)}
+                            disabled={actionLoading === `verify_${property.id}`}
+                            className={`w-5 h-5 rounded-md transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 ${
+                              property.isVerified
+                                ? 'text-blue-600 hover:bg-blue-50'
+                                : 'text-emerald-600 hover:bg-emerald-50'
+                            }`}
+                            title={property.isVerified ? 'Unverify' : 'Verify'}
+                          >
+                            {actionLoading === `verify_${property.id}` ? (
+                              <FiRefreshCw className="text-[12px] animate-spin" />
+                            ) : (
+                              <FiShield className="text-[12px]" />
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleToggleSuspend(property.id)}
+                            disabled={actionLoading === `suspend_${property.id}`}
+                            className={`w-5 h-5 rounded-md transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 ${
+                              property.status === 'suspended'
+                                ? 'text-emerald-600 hover:bg-emerald-50'
+                                : 'text-red-600 hover:bg-red-50'
+                            }`}
+                            title={property.status === 'suspended' ? 'Unsuspend' : 'Suspend'}
+                          >
+                            {actionLoading === `suspend_${property.id}` ? (
+                              <FiRefreshCw className="text-[12px] animate-spin" />
+                            ) : property.status === 'suspended' ? (
+                              <FiCheckCircle className="text-[12px]" />
+                            ) : (
+                              <FiMinimize className="text-[12px]" />
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteProperty(property.id)}
+                            disabled={actionLoading === `delete_${property.id}`}
+                            className="w-5 h-5 rounded-md hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-red-500 hover:scale-110 disabled:opacity-50"
+                            title="Delete"
+                          >
+                            {actionLoading === `delete_${property.id}` ? (
+                              <FiRefreshCw className="text-[12px] animate-spin" />
+                            ) : (
+                              <FiTrash2 className="text-[12px]" />
+                            )}
+                          </button>
+                        </div>
                         <button
                           type="button"
-                          onClick={() => handleViewProperty(property)}
-                          className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
-                          title="View"
+                          onClick={() => handleViewAgentProfile(property.agentId)}
+                          className="px-2 py-0.5 text-[9px] font-medium text-[#00695C] bg-[#E8F4F2] rounded-md hover:bg-[#C5EDE5] transition-all duration-300 flex items-center gap-1 hover:scale-[1.02]"
+                          title="View Agent Profile"
                         >
-                          <FiEye className="text-xs" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleEditProperty(property)}
-                          className="w-7 h-7 rounded-lg hover:bg-blue-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-blue-600 hover:scale-110"
-                          title="Edit"
-                        >
-                          <FiEdit className="text-xs" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleToggleFeature(property.id)}
-                          disabled={actionLoading === `feature_${property.id}`}
-                          className={`w-7 h-7 rounded-lg transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 ${
-                            property.isFeatured
-                              ? 'text-purple-600 hover:bg-purple-50'
-                              : 'text-amber-600 hover:bg-amber-50'
-                          }`}
-                          title={property.isFeatured ? 'Unfeature' : 'Feature'}
-                        >
-                          {actionLoading === `feature_${property.id}` ? (
-                            <FiRefreshCw className="text-xs animate-spin" />
-                          ) : (
-                            <FaStarSolid className="text-xs" />
-                          )}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleToggleVerify(property.id)}
-                          disabled={actionLoading === `verify_${property.id}`}
-                          className={`w-7 h-7 rounded-lg transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 ${
-                            property.isVerified
-                              ? 'text-blue-600 hover:bg-blue-50'
-                              : 'text-emerald-600 hover:bg-emerald-50'
-                          }`}
-                          title={property.isVerified ? 'Unverify' : 'Verify'}
-                        >
-                          {actionLoading === `verify_${property.id}` ? (
-                            <FiRefreshCw className="text-xs animate-spin" />
-                          ) : (
-                            <FiShield className="text-xs" />
-                          )}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleToggleSuspend(property.id)}
-                          disabled={actionLoading === `suspend_${property.id}`}
-                          className={`w-7 h-7 rounded-lg transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 ${
-                            property.status === 'suspended'
-                              ? 'text-emerald-600 hover:bg-emerald-50'
-                              : 'text-red-600 hover:bg-red-50'
-                          }`}
-                          title={property.status === 'suspended' ? 'Unsuspend' : 'Suspend'}
-                        >
-                          {actionLoading === `suspend_${property.id}` ? (
-                            <FiRefreshCw className="text-xs animate-spin" />
-                          ) : property.status === 'suspended' ? (
-                            <FiCheckCircle className="text-xs" />
-                          ) : (
-                            <FiMinimize className="text-xs" />
-                          )}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteProperty(property.id)}
-                          disabled={actionLoading === `delete_${property.id}`}
-                          className="w-7 h-7 rounded-lg hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-red-500 hover:scale-110 disabled:opacity-50"
-                          title="Delete"
-                        >
-                          {actionLoading === `delete_${property.id}` ? (
-                            <FiRefreshCw className="text-xs animate-spin" />
-                          ) : (
-                            <FiTrash2 className="text-xs" />
-                          )}
+                          <FiExternalLink className="text-[9px]" />
+                          Profile
                         </button>
                       </>
                     )}
-                  </div>
-
-                  <div className="col-span-12 mt-1 flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => handleViewAgentProfile(property.agentId)}
-                      className="px-3 py-1 text-[10px] font-medium text-[#00695C] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center gap-1 hover:scale-[1.02]"
-                    >
-                      <FiExternalLink className="text-[10px]" />
-                      View Agent Profile
-                    </button>
                   </div>
                 </div>
               );
