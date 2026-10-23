@@ -1537,7 +1537,7 @@ const OwnersPropertyControl = () => {
 
   // ============ RENDER ============
   return (
-    <div className="space-y-6 p-4 lg:p-6 bg-[#F8FAF9] min-h-screen">
+    <div className="space-y-6 p-4 lg:p-6 pb-24 bg-[#F8FAF9] min-h-full h-full overflow-y-auto custom-page-scroll relative">
       {/* Animated Background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-[#00695C]/5 rounded-full blur-3xl animate-float" />
@@ -2409,6 +2409,8 @@ const OwnersPropertyControl = () => {
           </div>
         </div>
       )}
+
+      <div className="pb-5"/>
 
       {/* CSS Animations */}
       <style>{`

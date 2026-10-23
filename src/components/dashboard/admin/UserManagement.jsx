@@ -110,6 +110,63 @@ const DeleteConfirmModal = ({ show, user, actionLoading, onCancel, onConfirm }) 
   );
 };
 
+const BlockConfirmModal = ({ show, user, actionLoading, onCancel, onConfirm }) => {
+  if (!show || !user) return null;
+
+  const isBlocking = user.status !== 'blocked';
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[#1A2E2A]/50 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl animate-slide-up border border-[#E8F0EE]">
+        <div className="text-center">
+          <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${isBlocking ? 'bg-amber-50' : 'bg-[#E8F8F5]'}`}>
+            {isBlocking ? (
+              <FiLock className="text-3xl text-amber-600" />
+            ) : (
+              <FiUnlock className="text-3xl text-[#00695C]" />
+            )}
+          </div>
+          
+          <h3 className="text-xl font-bold text-[#1A2E2A]">
+            {isBlocking ? 'Block User' : 'Unblock User'}
+          </h3>
+          
+          <p className="text-sm text-[#5A7D78] mt-2">
+            Are you sure you want to {isBlocking ? 'block' : 'unblock'}{' '}
+            <span className="font-semibold text-[#1A2E2A]">{user.name}</span>?
+            {isBlocking && " They will no longer be able to access the platform."}
+          </p>
+
+          <div className="flex items-center gap-3 mt-6">
+            <button
+              onClick={onCancel}
+              disabled={actionLoading === user.id}
+              className="flex-1 px-4 py-2.5 bg-[#F5F9F8] text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={onConfirm}
+              disabled={actionLoading === user.id}
+              className={`flex-1 px-4 py-2.5 text-white rounded-xl transition-all duration-300 text-sm font-medium shadow-lg disabled:opacity-50 ${
+                isBlocking 
+                  ? 'bg-amber-500 hover:bg-amber-600 shadow-amber-500/30' 
+                  : 'bg-[#00695C] hover:bg-[#004D40] shadow-[#00695C]/30'
+              }`}
+            >
+              {actionLoading === user.id ? (
+                <FiRefreshCw className="animate-spin mx-auto" />
+              ) : (
+                isBlocking ? 'Block User' : 'Unblock User'
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const BulkDeleteConfirmModal = ({ show, count, actionLoading, onCancel, onConfirm }) => {
   if (!show) return null;
 
@@ -160,52 +217,64 @@ const ViewUserModal = ({ user, show, actionLoading, onClose, onEdit, onToggleBlo
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A2E2A]/50 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-[#E8F0EE] animate-slide-up">
-        <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] p-6 rounded-t-3xl z-10">
+      <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-[#E8F0EE] animate-slide-up flex flex-col">
+        
+        <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] p-6 rounded-t-3xl z-10 flex-shrink-0">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110"
           >
             <FiX className="text-lg" />
           </button>
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center text-white font-bold text-2xl backdrop-blur-sm border-2 border-white/30 shadow-xl">
-              {user.avatar}
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-white">{user.name}</h2>
-              <p className="text-white/80 text-sm">User Details</p>
-              <div className="flex items-center gap-2 mt-2 flex-wrap">
-                <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-white/20 text-white border border-white/20 flex items-center gap-1">
-                  {user.role.icon}
-                  {user.role.label}
-                </span>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium border border-white/20 ${
-                  user.status === 'active' ? 'bg-emerald-500/30 text-emerald-100' :
-                  user.status === 'blocked' ? 'bg-red-500/30 text-red-100' :
-                  user.status === 'pending' ? 'bg-amber-500/30 text-amber-100' :
-                  'bg-gray-500/30 text-gray-100'
-                }`}>
-                  {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
-                </span>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium border border-white/20 ${
-                  user.verification === 'verified' ? 'bg-emerald-500/30 text-emerald-100' :
-                  user.verification === 'pending' ? 'bg-amber-500/30 text-amber-100' :
-                  'bg-red-500/30 text-red-100'
-                }`}>
-                  {user.verification.charAt(0).toUpperCase() + user.verification.slice(1)}
-                </span>
-                {user.featured && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-yellow-400/30 text-yellow-200 border border-yellow-400/30">
-                    <FaStarSolid className="inline mr-0.5 text-[8px]" /> Featured
+          
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center text-white font-bold text-xl backdrop-blur-sm border border-white/30 shadow-sm flex-shrink-0">
+                {user.avatar}
+              </div>
+              <div className="flex flex-col">
+                <h2 className="text-xl font-bold text-white leading-tight">{user.name}</h2>
+                
+                <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-white/20 text-white border border-white/20 flex items-center gap-1">
+                    {user.role.icon}
+                    {user.role.label}
                   </span>
-                )}
+
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-white/20 text-white border border-white/20 flex items-center gap-1">
+                    <FiAward className="text-[10px]" />
+                    {user.subscriptionPlan}
+                  </span>
+
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium border border-white/20 ${
+                    user.status === 'active' ? 'bg-emerald-500/30 text-emerald-100' :
+                    user.status === 'blocked' ? 'bg-red-500/30 text-red-100' :
+                    user.status === 'pending' ? 'bg-amber-500/30 text-amber-100' :
+                    'bg-gray-500/30 text-gray-100'
+                  }`}>
+                    {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+                  </span>
+
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium border border-white/20 ${
+                    user.verification === 'verified' ? 'bg-emerald-500/30 text-emerald-100' :
+                    user.verification === 'pending' ? 'bg-amber-500/30 text-amber-100' :
+                    'bg-red-500/30 text-red-100'
+                  }`}>
+                    KYC: {user.verification.charAt(0).toUpperCase() + user.verification.slice(1)}
+                  </span>
+
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-white/20 text-white border border-white/20 flex items-center gap-1">
+                    <FiHome className="text-[10px]" />
+                    {user.propertyType}
+                  </span>
+                </div>
+
               </div>
             </div>
           </div>
         </div>
 
-        <div className="p-6 space-y-4 bg-white">
+        <div className="p-6 space-y-4 bg-white flex-grow overflow-y-auto">
           <div className="grid grid-cols-2 gap-4">
             <ViewField label="Full Name" value={user.name} />
             <ViewField label="Email" value={user.email} />
@@ -213,7 +282,8 @@ const ViewUserModal = ({ user, show, actionLoading, onClose, onEdit, onToggleBlo
             <ViewField label="Role" value={user.role.label} />
             <ViewField label="City" value={user.city} />
             <ViewField label="State" value={user.state} />
-            <ViewField label="Company" value={user.company} />
+            <ViewField label="Property Name" value={user.propertyName} />
+            <ViewField label="Property Type" value={user.propertyType} />
             <ViewField label="Subscription Plan" value={user.subscriptionPlan} />
             <ViewField label="Status" value={user.status.charAt(0).toUpperCase() + user.status.slice(1)} />
             <ViewField label="Verification" value={user.verification.charAt(0).toUpperCase() + user.verification.slice(1)} />
@@ -228,19 +298,14 @@ const ViewUserModal = ({ user, show, actionLoading, onClose, onEdit, onToggleBlo
               KYC Verification Status
             </h4>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { key: 'aadhaar', label: 'Aadhaar' },
-                { key: 'pan', label: 'PAN' },
-                { key: 'gst', label: 'GST' },
-                { key: 'rera', label: 'RERA' }
-              ].map(item => (
-                <div key={item.key} className={`rounded-xl p-3 text-center ${user.kyc[item.key] ? 'bg-[#E8F8F5] border border-[#A8D5CD]' : 'bg-[#F5F9F8] border border-[#E8F0EE]'}`}>
-                  <div className={`text-lg ${user.kyc[item.key] ? 'text-[#00695C]' : 'text-[#B5C9C5]'}`}>
-                    {user.kyc[item.key] ? <FiCheckCircle /> : <FiXCircle />}
+              {user.kycDocs.map((doc, idx) => (
+                <div key={idx} className={`rounded-xl p-3 text-center ${doc.verified ? 'bg-[#E8F8F5] border border-[#A8D5CD]' : 'bg-[#F5F9F8] border border-[#E8F0EE]'}`}>
+                  <div className={`text-lg ${doc.verified ? 'text-[#00695C]' : 'text-[#B5C9C5]'}`}>
+                    {doc.verified ? <FiCheckCircle /> : <FiXCircle />}
                   </div>
-                  <p className="text-[10px] font-medium mt-1 text-[#1A2E2A]">{item.label}</p>
-                  <p className={`text-[8px] ${user.kyc[item.key] ? 'text-[#00695C]' : 'text-[#B5C9C5]'}`}>
-                    {user.kyc[item.key] ? 'Verified' : 'Pending'}
+                  <p className="text-[10px] font-medium mt-1 text-[#1A2E2A]">{doc.name}</p>
+                  <p className={`text-[8px] ${doc.verified ? 'text-[#00695C]' : 'text-[#B5C9C5]'}`}>
+                    {doc.verified ? 'Verified' : 'Pending'}
                   </p>
                 </div>
               ))}
@@ -249,61 +314,71 @@ const ViewUserModal = ({ user, show, actionLoading, onClose, onEdit, onToggleBlo
 
           <div className="grid grid-cols-3 gap-4">
             <div className="bg-[#F5F9F8] rounded-2xl p-4 text-center border border-[#E8F0EE]">
-              <p className="text-2xl font-bold text-[#00695C]">{user.propertiesCount}</p>
-              <p className="text-[10px] text-[#5A7D78] uppercase tracking-wider">Properties</p>
+              <p className="text-2xl font-bold text-[#00695C]">
+                {user.roleId === 'buyer' || user.roleId === 'tenant' ? user.savedCount : user.propertiesCount}
+              </p>
+              <p className="text-[10px] text-[#5A7D78] uppercase tracking-wider">
+                {user.roleId === 'buyer' || user.roleId === 'tenant' ? 'Saved' : 'Properties'}
+              </p>
             </div>
             <div className="bg-[#F5F9F8] rounded-2xl p-4 text-center border border-[#E8F0EE]">
-              <p className="text-2xl font-bold text-[#00695C]">{user.leadsCount}</p>
-              <p className="text-[10px] text-[#5A7D78] uppercase tracking-wider">Leads</p>
+              <p className="text-2xl font-bold text-[#00695C]">
+                {user.roleId === 'buyer' || user.roleId === 'tenant' ? user.viewedCount : (user.roleId === 'builder' ? user.projectsCount : user.viewsCount)}
+              </p>
+              <p className="text-[10px] text-[#5A7D78] uppercase tracking-wider">
+                {user.roleId === 'buyer' || user.roleId === 'tenant' ? 'Viewed' : (user.roleId === 'builder' ? 'Projects' : 'Views')}
+              </p>
             </div>
             <div className="bg-[#F5F9F8] rounded-2xl p-4 text-center border border-[#E8F0EE]">
               <p className="text-2xl font-bold text-[#00695C] flex items-center justify-center gap-1">
-                <FaStarSolid className="text-yellow-400 text-base" />
-                {user.rating}
+                {user.roleId === 'buyer' || user.roleId === 'tenant' ? (
+                  <>
+                    <FiMail className="text-[#00695C] text-base" />
+                    {user.enquiriesCount}
+                  </>
+                ) : (
+                  <>
+                    <FaStarSolid className="text-yellow-400 text-base" />
+                    {user.rating}
+                  </>
+                )}
               </p>
-              <p className="text-[10px] text-[#5A7D78] uppercase tracking-wider">Rating</p>
+              <p className="text-[10px] text-[#5A7D78] uppercase tracking-wider">
+                {user.roleId === 'buyer' || user.roleId === 'tenant' ? 'Enquiries' : 'Rating'}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-5 p-5 justify-center border-t border-white/10 bg-gradient-to-r from-[#00695C] to-[#26A69A] sticky bottom-0 rounded-b-3xl">
-          <button
-            onClick={onEdit}
-            className="px-8 py-4 bg-white text-[#00695C] rounded-xl hover:bg-[#F5F9F8] transition-all duration-300 text-base font-semibold flex items-center gap-2 hover:-translate-y-0.5 shadow-lg"
-          >
-            <FiEdit className="text-lg" /> Edit Profile
-          </button>
-          <button
-            onClick={onToggleBlock}
-            disabled={actionLoading === user.id}
-            className={`px-8 py-4 rounded-xl transition-all duration-300 text-base font-semibold flex items-center gap-2 hover:-translate-y-0.5 disabled:opacity-50 shadow-lg ${
-              user.status === 'blocked'
-                ? 'bg-white text-emerald-700 hover:bg-[#F5F9F8]'
-                : 'bg-white text-red-700 hover:bg-[#F5F9F8]'
-            }`}
-          >
-            {actionLoading === user.id ? (
-              <FiRefreshCw className="animate-spin text-lg" />
-            ) : user.status === 'blocked' ? (
-              <FiUnlock className="text-lg" />
-            ) : (
-              <FiLock className="text-lg" />
-            )}
-            {user.status === 'blocked' ? 'Unblock User' : 'Block User'}
-          </button>
-          <button
-            onClick={onDelete}
-            className="px-8 py-4 bg-white text-red-700 rounded-xl hover:bg-[#F5F9F8] transition-all duration-300 text-base font-semibold flex items-center gap-2 hover:-translate-y-0.5 shadow-lg"
-          >
-            <FiTrash2 className="text-lg" /> Delete User
-          </button>
+        <div className="p-4 bg-white border-t border-[#E8F0EE] sticky bottom-0 rounded-b-3xl z-10 flex-shrink-0">
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              className="flex-1 px-4 py-2.5 bg-[#F5F9F8] text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium"
+            >
+              Close
+            </button>
+            <button
+              onClick={onEdit}
+              className="flex-1 px-4 py-2.5 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-sm font-medium flex items-center justify-center gap-2 shadow-lg shadow-[#00695C]/30 hover:scale-[1.02]"
+            >
+              <FiEdit className="text-sm" /> Edit
+            </button>
+            <button
+              onClick={onDelete}
+              className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-300 text-sm font-medium flex items-center justify-center gap-2 shadow-lg shadow-red-600/30 hover:scale-[1.02]"
+            >
+              <FiTrash2 className="text-sm" /> Delete
+            </button>
+          </div>
         </div>
+
       </div>
     </div>
   );
 };
 
-const EditUserModal = ({ user, show, onClose, onSave }) => {
+const EditUserModal = ({ user, show, onClose, onSave, roleConfig }) => {
   const [formData, setFormData] = useState(null);
 
   useEffect(() => {
@@ -314,7 +389,8 @@ const EditUserModal = ({ user, show, onClose, onSave }) => {
         phone: user.phone,
         city: user.city,
         state: user.state,
-        company: user.company,
+        propertyName: user.propertyName,
+        propertyType: user.propertyType,
         status: user.status,
         verification: user.verification,
         roleId: user.roleId,
@@ -395,7 +471,7 @@ const EditUserModal = ({ user, show, onClose, onSave }) => {
                 <option value="owner">Owner</option>
                 <option value="agent">Agent</option>
                 <option value="builder">Builder</option>
-                <option value="property_manager">Property Manager</option>
+                <option value="property_management">Property Management</option>
                 <option value="buyer">Buyer</option>
                 <option value="tenant">Tenant</option>
               </select>
@@ -421,14 +497,29 @@ const EditUserModal = ({ user, show, onClose, onSave }) => {
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-[#5A7D78] block mb-1">Company</label>
+              <label className="text-xs font-medium text-[#5A7D78] block mb-1">Property Name</label>
               <input
                 type="text"
-                name="company"
-                value={formData.company}
+                name="propertyName"
+                value={formData.propertyName}
                 onChange={handleChange}
                 className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
               />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-[#5A7D78] block mb-1">Property Type</label>
+              <select
+                name="propertyType"
+                value={formData.propertyType}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
+              >
+                <option value="Individual">Individual</option>
+                <option value="Apartment">Apartment</option>
+                <option value="Commercial">Commercial</option>
+                <option value="Land & Plots">Land & Plots</option>
+                <option value="Hostel">Hostel</option>
+              </select>
             </div>
             <div>
               <label className="text-xs font-medium text-[#5A7D78] block mb-1">Subscription Plan</label>
@@ -438,13 +529,9 @@ const EditUserModal = ({ user, show, onClose, onSave }) => {
                 onChange={handleChange}
                 className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
               >
-                <option value="Free">Free</option>
-                <option value="Silver">Silver</option>
-                <option value="Gold">Gold</option>
-                <option value="Platinum">Platinum</option>
-                <option value="Basic">Basic</option>
-                <option value="Professional">Professional</option>
-                <option value="Enterprise">Enterprise</option>
+                {roleConfig[formData.roleId]?.subscriptions.map(sub => (
+                  <option key={sub} value={sub}>{sub}</option>
+                ))}
               </select>
             </div>
             <div>
@@ -520,6 +607,8 @@ const UserManagement = () => {
   const [selectedRole, setSelectedRole] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedVerification, setSelectedVerification] = useState('all');
+  const [selectedSubscription, setSelectedSubscription] = useState('all');
+  const [selectedPropertyType, setSelectedPropertyType] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState('name');
@@ -533,6 +622,7 @@ const UserManagement = () => {
   const [editingUser, setEditingUser] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
+  const [showBlockConfirm, setShowBlockConfirm] = useState(null);
   const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
   const [toast, setToast] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
@@ -565,7 +655,13 @@ const UserManagement = () => {
       bg: 'bg-[#00695C]/5',
       route: '/admin/owners/overview',
       description: 'Property owners who list their properties',
-      statColor: 'bg-gradient-to-br from-[#00695C] to-[#26A69A]'
+      statColor: 'bg-gradient-to-br from-[#00695C] to-[#26A69A]',
+      subscriptions: ['Free', 'Silver', 'Gold', 'Platinum'],
+      kycDocs: [
+        { name: 'Aadhaar', key: 'aadhaar' },
+        { name: 'PAN', key: 'pan' },
+        { name: 'GST (Optional)', key: 'gst' }
+      ]
     },
     agent: {
       id: 'agent',
@@ -575,7 +671,15 @@ const UserManagement = () => {
       bg: 'bg-blue-600/5',
       route: '/admin/agents/overview',
       description: 'Real estate agents helping buy/sell properties',
-      statColor: 'bg-gradient-to-br from-blue-600 to-blue-400'
+      statColor: 'bg-gradient-to-br from-blue-600 to-blue-400',
+      subscriptions: ['Basic', 'Professional', 'Enterprise'],
+      kycDocs: [
+        { name: 'Aadhaar', key: 'aadhaar' },
+        { name: 'PAN', key: 'pan' },
+        { name: 'Agent License', key: 'agent_license' },
+        { name: 'GST (Optional)', key: 'gst' },
+        { name: 'Business Reg. Cert (Optional)', key: 'business_cert' }
+      ]
     },
     builder: {
       id: 'builder',
@@ -585,17 +689,35 @@ const UserManagement = () => {
       bg: 'bg-purple-600/5',
       route: '/admin/builders/overview',
       description: 'Builders and developers with projects',
-      statColor: 'bg-gradient-to-br from-purple-600 to-purple-400'
+      statColor: 'bg-gradient-to-br from-purple-600 to-purple-400',
+      subscriptions: ['Basic', 'Premium', 'Enterprise'],
+      kycDocs: [
+        { name: 'Aadhaar', key: 'aadhaar' },
+        { name: 'PAN', key: 'pan' },
+        { name: 'GST (Optional)', key: 'gst' },
+        { name: 'Company PAN', key: 'company_pan' },
+        { name: 'Company Reg. Cert', key: 'company_reg_cert' },
+        { name: 'Business Address Proof', key: 'business_address_proof' }
+      ]
     },
-    property_manager: {
-      id: 'property_manager',
-      label: 'Property Manager',
+    property_management: {
+      id: 'property_management',
+      label: 'Property Management',
       icon: <FaUserCog className="text-amber-600" />,
       color: 'bg-amber-600/10 text-amber-600 border-amber-600/30',
       bg: 'bg-amber-600/5',
-      route: '/admin/property-managers/overview',
+      route: '/admin/property-management/overview',
       description: 'Companies managing properties and tenants',
-      statColor: 'bg-gradient-to-br from-amber-600 to-amber-400'
+      statColor: 'bg-gradient-to-br from-amber-600 to-amber-400',
+      subscriptions: ['Standard', 'Business', 'Enterprise'],
+      kycDocs: [
+        { name: 'Aadhaar', key: 'aadhaar' },
+        { name: 'PAN', key: 'pan' },
+        { name: 'Company PAN', key: 'company_pan' },
+        { name: 'Company Reg. Cert', key: 'company_reg_cert' },
+        { name: 'Business Address Proof', key: 'business_address_proof' },
+        { name: 'GST (Optional)', key: 'gst' }
+      ]
     },
     buyer: {
       id: 'buyer',
@@ -605,7 +727,14 @@ const UserManagement = () => {
       bg: 'bg-emerald-600/5',
       route: '/admin/buyers-tenants',
       description: 'Buyers looking for properties',
-      statColor: 'bg-gradient-to-br from-emerald-600 to-emerald-400'
+      statColor: 'bg-gradient-to-br from-emerald-600 to-emerald-400',
+      subscriptions: ['Basic'],
+      kycDocs: [
+        { name: 'Aadhaar', key: 'aadhaar' },
+        { name: 'PAN', key: 'pan' },
+        { name: 'Address Proof', key: 'address_proof' },
+        { name: 'Income Proof', key: 'income_proof' }
+      ]
     },
     tenant: {
       id: 'tenant',
@@ -615,9 +744,19 @@ const UserManagement = () => {
       bg: 'bg-rose-600/5',
       route: '/admin/buyers-tenants',
       description: 'Tenants renting properties',
-      statColor: 'bg-gradient-to-br from-rose-600 to-rose-400'
+      statColor: 'bg-gradient-to-br from-rose-600 to-rose-400',
+      subscriptions: ['Basic'],
+      kycDocs: [
+        { name: 'Aadhaar', key: 'aadhaar' },
+        { name: 'PAN', key: 'pan' },
+        { name: 'Address Proof', key: 'address_proof' },
+        { name: 'Income Proof', key: 'income_proof' }
+      ]
     }
   }), []);
+
+  // ============ PROPERTY TYPES ============
+  const propertyTypes = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
 
   // ============ GENERATE MOCK USERS ============
   const generateMockUsers = useCallback(() => {
@@ -627,6 +766,7 @@ const UserManagement = () => {
     const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur', 'Lucknow', 'Nagpur', 'Kolkata', 'Surat', 'Indore', 'Bhopal', 'Visakhapatnam', 'Patna', 'Vadodara', 'Agra', 'Nashik', 'Faridabad'];
     const statuses = ['active', 'inactive', 'blocked', 'pending'];
     const verificationStatuses = ['verified', 'pending', 'rejected'];
+    const propertyNames = ['Skyline Residency', 'Green Valley Villas', 'Tech Park One', 'Riverfront Apartments', 'Palm Grove', 'Mountain View', 'Lake Side', 'Urban Nest', 'Golden Heights', 'Serene Spaces'];
 
     const users = [];
     const usedNames = new Set();
@@ -646,13 +786,18 @@ const UserManagement = () => {
       const status = statuses[Math.floor(Math.random() * statuses.length)];
       const verification = verificationStatuses[Math.floor(Math.random() * verificationStatuses.length)];
       const city = cities[Math.floor(Math.random() * cities.length)];
+      const propertyType = propertyTypes[Math.floor(Math.random() * propertyTypes.length)];
+      const propertyName = propertyNames[Math.floor(Math.random() * propertyNames.length)];
 
       const date = new Date();
       date.setDate(date.getDate() - Math.floor(Math.random() * 365));
 
-      const propertiesCount = Math.floor(Math.random() * 25);
-      const leadsCount = Math.floor(Math.random() * 50);
-      const rating = (Math.random() * 4 + 1).toFixed(1);
+      const kycDocs = role.kycDocs.map(doc => ({
+        ...doc,
+        verified: Math.random() > 0.3
+      }));
+
+      const subscriptionPlan = role.subscriptions[Math.floor(Math.random() * role.subscriptions.length)];
 
       users.push({
         id: `user_${i}`,
@@ -666,21 +811,21 @@ const UserManagement = () => {
         city: city,
         state: ['Maharashtra', 'Delhi', 'Karnataka', 'Tamil Nadu', 'Telangana', 'Uttar Pradesh', 'Gujarat', 'Rajasthan', 'West Bengal', 'Bihar'][Math.floor(Math.random() * 10)],
         joinedDate: date.toISOString(),
-        propertiesCount: propertiesCount,
-        leadsCount: leadsCount,
-        rating: rating,
+        propertyName: propertyName,
+        propertyType: propertyType,
+        propertiesCount: Math.floor(Math.random() * 25),
+        leadsCount: Math.floor(Math.random() * 50),
+        viewsCount: Math.floor(Math.random() * 500),
+        projectsCount: Math.floor(Math.random() * 10),
+        savedCount: Math.floor(Math.random() * 30),
+        viewedCount: Math.floor(Math.random() * 100),
+        enquiriesCount: Math.floor(Math.random() * 20),
+        rating: (Math.random() * 4 + 1).toFixed(1),
         avatar: firstName[0] + lastName[0],
-        company: ['ABC Realty', 'Dream Homes', 'Green Valley', 'Luxury Living', 'Urban Estate', 'Prime Properties', 'Elite Homes', 'Royal Estate', 'Golden Key', 'Smart Living'][Math.floor(Math.random() * 10)],
-        kyc: {
-          aadhaar: Math.random() > 0.2,
-          pan: Math.random() > 0.25,
-          gst: Math.random() > 0.7,
-          rera: Math.random() > 0.6,
-        },
+        kycDocs: kycDocs,
         lastActive: new Date(Date.now() - Math.floor(Math.random() * 7 * 24 * 60 * 60 * 1000)).toISOString(),
         totalSpent: Math.floor(Math.random() * 500000),
-        subscriptionPlan: ['Free', 'Silver', 'Gold', 'Platinum', 'Basic', 'Professional', 'Enterprise'][Math.floor(Math.random() * 7)],
-        featured: Math.random() > 0.85,
+        subscriptionPlan: subscriptionPlan,
         verifiedBadge: Math.random() > 0.7,
         bio: `Experienced professional in the real estate industry with expertise in ${role.label.toLowerCase()} services.`,
       });
@@ -709,7 +854,7 @@ const UserManagement = () => {
         user.email.toLowerCase().includes(query) ||
         user.phone.includes(query) ||
         user.city.toLowerCase().includes(query) ||
-        user.company.toLowerCase().includes(query) ||
+        user.propertyName.toLowerCase().includes(query) ||
         user.role.label.toLowerCase().includes(query)
       );
     }
@@ -726,10 +871,20 @@ const UserManagement = () => {
       filtered = filtered.filter(user => user.verification === selectedVerification);
     }
 
+    if (selectedSubscription !== 'all') {
+      filtered = filtered.filter(user => user.subscriptionPlan === selectedSubscription);
+    }
+
+    if (selectedPropertyType !== 'all') {
+      filtered = filtered.filter(user => user.propertyType === selectedPropertyType);
+    }
+
     let count = 0;
     if (selectedRole !== 'all') count++;
     if (selectedStatus !== 'all') count++;
     if (selectedVerification !== 'all') count++;
+    if (selectedSubscription !== 'all') count++;
+    if (selectedPropertyType !== 'all') count++;
     if (searchQuery) count++;
     setFilterCount(count);
 
@@ -747,7 +902,7 @@ const UserManagement = () => {
 
     setFilteredUsers(filtered);
     setCurrentPage(1);
-  }, [users, searchQuery, selectedRole, selectedStatus, selectedVerification, sortField, sortDirection]);
+  }, [users, searchQuery, selectedRole, selectedStatus, selectedVerification, selectedSubscription, selectedPropertyType, sortField, sortDirection]);
 
   useEffect(() => {
     filterUsers();
@@ -860,6 +1015,11 @@ const UserManagement = () => {
       setShowDeleteConfirm(userId);
       return;
     }
+    
+    if (action === 'block' || action === 'unblock') {
+      setShowBlockConfirm(userId);
+      return;
+    }
 
     setActionLoading(userId);
 
@@ -869,14 +1029,6 @@ const UserManagement = () => {
       let actionMessage = '';
 
       switch (action) {
-        case 'block':
-          user = { ...user, status: 'blocked' };
-          actionMessage = 'User blocked successfully';
-          break;
-        case 'unblock':
-          user = { ...user, status: 'active' };
-          actionMessage = 'User unblocked successfully';
-          break;
         case 'verify':
           user = { ...user, verification: 'verified' };
           actionMessage = 'User verified successfully';
@@ -897,6 +1049,29 @@ const UserManagement = () => {
       setViewingUser(prev => (prev && prev.id === userId ? user : prev));
     }, 600);
   }, [users, showToast]);
+
+  // ============ CONFIRM BLOCK/UNBLOCK ============
+  const confirmBlockAction = useCallback(() => {
+    const userId = showBlockConfirm;
+    const user = users.find(u => u.id === userId);
+    if (!user) return;
+    
+    setShowBlockConfirm(null); 
+    setActionLoading(userId); 
+
+    setTimeout(() => {
+      const isBlocking = user.status !== 'blocked';
+      const updatedUsers = users.map(u => 
+        u.id === userId ? { ...u, status: isBlocking ? 'blocked' : 'active' } : u
+      );
+      
+      setUsers(updatedUsers);
+      setActionLoading(null);
+      showToast(`User ${isBlocking ? 'blocked' : 'unblocked'} successfully`, 'success');
+      
+      setViewingUser(prev => (prev && prev.id === userId ? { ...prev, status: isBlocking ? 'blocked' : 'active' } : prev));
+    }, 600);
+  }, [showBlockConfirm, users, showToast]);
 
   // ============ CONFIRM DELETE ============
   const confirmDelete = useCallback(() => {
@@ -945,6 +1120,8 @@ const UserManagement = () => {
     }
     setSelectedStatus('all');
     setSelectedVerification('all');
+    setSelectedSubscription('all');
+    setSelectedPropertyType('all');
     searchInputRef.current?.focus();
   }, []);
 
@@ -954,6 +1131,8 @@ const UserManagement = () => {
     setSelectedRole('all');
     setSelectedStatus('all');
     setSelectedVerification('all');
+    setSelectedSubscription('all');
+    setSelectedPropertyType('all');
     searchInputRef.current?.focus();
     showToast('All filters cleared', 'info');
   }, [showToast]);
@@ -983,6 +1162,8 @@ const UserManagement = () => {
       Verification: user.verification,
       City: user.city,
       State: user.state,
+      'Property Name': user.propertyName,
+      'Property Type': user.propertyType,
       Properties: user.propertiesCount,
       Leads: user.leadsCount,
       Rating: user.rating,
@@ -1024,11 +1205,20 @@ const UserManagement = () => {
     setShowDeleteConfirm(viewingUser.id);
   }, [viewingUser]);
 
+  // ============ AVAILABLE SUBSCRIPTION OPTIONS FOR FILTER ============
+  const subscriptionOptions = useMemo(() => {
+    if (selectedRole === 'buyer' || selectedRole === 'tenant') return [];
+    if (selectedRole === 'all') {
+      return ['Free', 'Silver', 'Gold', 'Platinum', 'Basic', 'Professional', 'Enterprise', 'Premium', 'Standard', 'Business'];
+    }
+    return roleConfig[selectedRole]?.subscriptions || [];
+  }, [selectedRole, roleConfig]);
+
   // ============ RENDER ============
   return (
-    <div className="space-y-6 p-4 lg:p-6 bg-[#F8FAF9] min-h-screen">
+     <div className="space-y-6 p-4 lg:p-6 pb-24 bg-[#F8FAF9] min-h-full h-full overflow-y-auto custom-page-scroll">
       {/* Animated Background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-[#00695C]/5 rounded-full blur-3xl animate-float" />
         <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-[#26A69A]/5 rounded-full blur-3xl animate-float-delayed" />
       </div>
@@ -1036,13 +1226,20 @@ const UserManagement = () => {
       {/* Toast */}
       <Toast toast={toast} />
 
-      {/* Delete Confirm Modals */}
+      {/* Modals */}
       <DeleteConfirmModal
         show={!!showDeleteConfirm}
         user={users.find(u => u.id === showDeleteConfirm)}
         actionLoading={actionLoading}
         onCancel={() => setShowDeleteConfirm(null)}
         onConfirm={confirmDelete}
+      />
+      <BlockConfirmModal
+        show={!!showBlockConfirm}
+        user={users.find(u => u.id === showBlockConfirm)}
+        actionLoading={actionLoading}
+        onCancel={() => setShowBlockConfirm(null)}
+        onConfirm={confirmBlockAction}
       />
       <BulkDeleteConfirmModal
         show={showBulkDeleteConfirm}
@@ -1051,16 +1248,13 @@ const UserManagement = () => {
         onCancel={() => setShowBulkDeleteConfirm(false)}
         onConfirm={confirmBulkDelete}
       />
-
-      {/* Edit Modal */}
       <EditUserModal
         user={editingUser}
         show={showEditModal}
         onClose={() => { setShowEditModal(false); setEditingUser(null); }}
         onSave={saveEdit}
+        roleConfig={roleConfig}
       />
-
-      {/* View Modal */}
       <ViewUserModal
         user={viewingUser}
         show={showViewModal}
@@ -1122,7 +1316,7 @@ const UserManagement = () => {
         </div>
       </div>
 
-      {/* Stats Section - Light Theme */}
+      {/* Stats Section */}
       {showStats && (
         <div className="relative animate-slide-in">
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
@@ -1173,11 +1367,11 @@ const UserManagement = () => {
               />
               <StatCard
                 icon={<FaUserCog className="text-white text-sm" />}
-                title="Property Managers"
+                title="Property Management"
                 value={stats.totalPropertyManagers}
                 color="bg-gradient-to-br from-amber-600 to-amber-400"
                 delay={400}
-                roleId="property_manager"
+                roleId="property_management"
                 selectedRole={selectedRole}
                 statsAnimating={statsAnimating}
                 onClick={handleStatClick}
@@ -1209,101 +1403,132 @@ const UserManagement = () => {
         </div>
       )}
 
-      {/* Search and Filters - Light Theme */}
+      {/* Search and Filters */}
       <div className="relative bg-white rounded-2xl p-4 shadow-sm border border-[#E8F0EE] hover:shadow-md transition-all duration-300">
-        <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4">
-          <div className="flex-1 w-full lg:w-auto relative">
-            <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm" />
-            <input
-              ref={searchInputRef}
-              type="text"
-              placeholder="Search users by name, email, phone, city, or company..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none placeholder:text-[#B5C9C5]"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#5A7D78] hover:text-[#1A2E2A] transition-colors hover:scale-110"
-              >
-                <FiX className="text-sm" />
-              </button>
-            )}
+        <div className="relative w-full">
+          <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm" />
+          <input
+            ref={searchInputRef}
+            type="text"
+            placeholder="Search users by name, email, phone, city, or property..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-11 pr-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none placeholder:text-[#B5C9C5]"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#5A7D78] hover:text-[#1A2E2A] transition-colors hover:scale-110"
+            >
+              <FiX className="text-sm" />
+            </button>
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 mt-4 w-full">
+          <div className="relative">
+            <select
+              value={selectedRole}
+              onChange={(e) => {
+                setSelectedRole(e.target.value);
+                setSelectedSubscription('all');
+              }}
+              className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
+            >
+              <option value="all">All Roles</option>
+              <option value="owner">Owners</option>
+              <option value="agent">Agents</option>
+              <option value="builder">Builders</option>
+              <option value="property_management">Property Management</option>
+              <option value="buyer">Buyers</option>
+              <option value="tenant">Tenants</option>
+            </select>
+            <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
           </div>
 
-          <div className="flex items-center gap-2 w-full lg:w-auto flex-wrap">
+          <div className="relative">
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
+            >
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="pending">Pending</option>
+              <option value="blocked">Blocked</option>
+            </select>
+            <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
+          </div>
+
+          <div className="relative">
+            <select
+              value={selectedVerification}
+              onChange={(e) => setSelectedVerification(e.target.value)}
+              className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
+            >
+              <option value="all">All Verification</option>
+              <option value="verified">Verified</option>
+              <option value="pending">Pending</option>
+              <option value="rejected">Rejected</option>
+            </select>
+            <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
+          </div>
+
+          {subscriptionOptions.length > 0 && (
             <div className="relative">
               <select
-                value={selectedRole}
-                onChange={(e) => setSelectedRole(e.target.value)}
+                value={selectedSubscription}
+                onChange={(e) => setSelectedSubscription(e.target.value)}
                 className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
               >
-                <option value="all">All Roles</option>
-                <option value="owner">Owners</option>
-                <option value="agent">Agents</option>
-                <option value="builder">Builders</option>
-                <option value="property_manager">Property Managers</option>
-                <option value="buyer">Buyers</option>
-                <option value="tenant">Tenants</option>
+                <option value="all">All Subscriptions</option>
+                {subscriptionOptions.map(sub => (
+                  <option key={sub} value={sub}>{sub}</option>
+                ))}
               </select>
               <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
             </div>
+          )}
 
-            <div className="relative">
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
-              >
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-                <option value="pending">Pending</option>
-                <option value="blocked">Blocked</option>
-              </select>
-              <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
-            </div>
+          <div className="relative">
+            <select
+              value={selectedPropertyType}
+              onChange={(e) => setSelectedPropertyType(e.target.value)}
+              className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
+            >
+              <option value="all">All Property Types</option>
+              {propertyTypes.map(pt => (
+                <option key={pt} value={pt}>{pt}</option>
+              ))}
+            </select>
+            <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
+          </div>
 
-            <div className="relative">
-              <select
-                value={selectedVerification}
-                onChange={(e) => setSelectedVerification(e.target.value)}
-                className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
-              >
-                <option value="all">All Verification</option>
-                <option value="verified">Verified</option>
-                <option value="pending">Pending</option>
-                <option value="rejected">Rejected</option>
-              </select>
-              <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
-            </div>
+          {filterCount > 0 && (
+            <button
+              onClick={clearAllFilters}
+              className="px-3 py-2.5 bg-[#FEF3E2] text-amber-700 rounded-xl hover:bg-[#FEE6C5] transition-all duration-300 text-sm font-medium flex items-center gap-1 hover:scale-105"
+            >
+              <FiX className="text-sm" /> Clear
+            </button>
+          )}
 
-            {filterCount > 0 && (
-              <button
-                onClick={clearAllFilters}
-                className="px-3 py-2.5 bg-[#FEF3E2] text-amber-700 rounded-xl hover:bg-[#FEE6C5] transition-all duration-300 text-sm font-medium flex items-center gap-1 hover:scale-105"
-              >
-                <FiX className="text-sm" /> Clear
-              </button>
-            )}
-
-            <div className="flex items-center bg-[#F5F9F8] rounded-xl p-1 border border-[#E8F0EE]">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-lg transition-all duration-300 hover:scale-110 ${viewMode === 'grid' ? 'bg-white shadow-sm text-[#00695C]' : 'text-[#5A7D78] hover:text-[#1A2E2A]'}`}
-                title="Grid View"
-              >
-                <FiGrid className="text-sm" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-2 rounded-lg transition-all duration-300 hover:scale-110 ${viewMode === 'list' ? 'bg-white shadow-sm text-[#00695C]' : 'text-[#5A7D78] hover:text-[#1A2E2A]'}`}
-                title="List View"
-              >
-                <FiList className="text-sm" />
-              </button>
-            </div>
+          <div className="flex items-center bg-[#F5F9F8] rounded-xl p-1 border border-[#E8F0EE]">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-2 rounded-lg transition-all duration-300 hover:scale-110 ${viewMode === 'grid' ? 'bg-white shadow-sm text-[#00695C]' : 'text-[#5A7D78] hover:text-[#1A2E2A]'}`}
+              title="Grid View"
+            >
+              <FiGrid className="text-sm" />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-2 rounded-lg transition-all duration-300 hover:scale-110 ${viewMode === 'list' ? 'bg-white shadow-sm text-[#00695C]' : 'text-[#5A7D78] hover:text-[#1A2E2A]'}`}
+              title="List View"
+            >
+              <FiList className="text-sm" />
+            </button>
           </div>
         </div>
 
@@ -1379,6 +1604,27 @@ const UserManagement = () => {
                 rejected: 'bg-red-50 text-red-700'
               };
 
+              const subscriptionColors = {
+                Free: 'bg-gray-100 text-gray-600',
+                Basic: 'bg-blue-50 text-blue-600',
+                Silver: 'bg-slate-200 text-slate-700',
+                Gold: 'bg-yellow-100 text-yellow-700',
+                Platinum: 'bg-indigo-100 text-indigo-700',
+                Professional: 'bg-cyan-100 text-cyan-700',
+                Premium: 'bg-purple-100 text-purple-700',
+                Enterprise: 'bg-rose-100 text-rose-700',
+                Standard: 'bg-teal-100 text-teal-700',
+                Business: 'bg-orange-100 text-orange-700'
+              };
+
+              const propertyTypeColors = {
+                Individual: 'bg-blue-50 text-blue-700 border-blue-200',
+                Apartment: 'bg-purple-50 text-purple-700 border-purple-200',
+                Commercial: 'bg-orange-50 text-orange-700 border-orange-200',
+                'Land & Plots': 'bg-green-50 text-green-700 border-green-200',
+                Hostel: 'bg-pink-50 text-pink-700 border-pink-200'
+              };
+
               const isSelected = selectedUsers.includes(user.id);
 
               return (
@@ -1407,28 +1653,28 @@ const UserManagement = () => {
                       </div>
                       <div>
                         <h3 className="font-semibold text-[#1A2E2A]">{user.name}</h3>
+                        
                         <div className="flex items-center gap-1 flex-wrap mt-1">
                           <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium inline-flex items-center gap-1 ${user.role.color}`}>
                             {user.role.icon}
                             <span>{user.role.label}</span>
                           </span>
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${subscriptionColors[user.subscriptionPlan] || 'bg-gray-100 text-gray-600'}`}>
+                            {user.subscriptionPlan}
+                          </span>
                         </div>
+                        
                         <div className="flex items-center gap-1 flex-wrap mt-0.5">
                           <span className={`text-[8px] px-1.5 py-0.5 rounded-full font-medium ${statusColors[user.status]}`}>
                             {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
                           </span>
                           <span className={`text-[8px] px-1.5 py-0.5 rounded-full font-medium ${verificationColors[user.verification]}`}>
-                            {user.verification.charAt(0).toUpperCase() + user.verification.slice(1)}
+                            KYC: {user.verification.charAt(0).toUpperCase() + user.verification.slice(1)}
                           </span>
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
-                      {user.featured && (
-                        <div className="w-6 h-6 bg-[#FEF3E2] rounded-full flex items-center justify-center">
-                          <FaStarSolid className="text-amber-500 text-[10px]" />
-                        </div>
-                      )}
                       <button
                         type="button"
                         className="w-8 h-8 rounded-xl hover:bg-[#F5F9F8] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
@@ -1440,7 +1686,13 @@ const UserManagement = () => {
                     </div>
                   </div>
 
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 mt-2">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[9px] px-2 py-0.5 rounded-md font-medium border ${propertyTypeColors[user.propertyType] || 'bg-gray-50 text-gray-700 border-gray-200'}`}>
+                        {user.propertyType}
+                      </span>
+                    </div>
+
                     <div className="flex items-center gap-2 text-xs text-[#5A7D78]">
                       <FiMail className="text-[#00695C] flex-shrink-0" />
                       <span className="truncate">{user.email}</span>
@@ -1454,6 +1706,10 @@ const UserManagement = () => {
                       <span>{user.city}, {user.state}</span>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-[#5A7D78]">
+                      <FiHome className="text-[#00695C] flex-shrink-0" />
+                      <span className="truncate">{user.propertyName}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-[#5A7D78]">
                       <FiCalendar className="text-[#00695C] flex-shrink-0" />
                       <span>Joined {new Date(user.joinedDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                     </div>
@@ -1461,19 +1717,38 @@ const UserManagement = () => {
 
                   <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-[#E8F0EE]">
                     <div className="text-center">
-                      <p className="text-sm font-bold text-[#1A2E2A]">{user.propertiesCount}</p>
-                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Properties</p>
+                      <p className="text-sm font-bold text-[#1A2E2A]">
+                        {user.roleId === 'buyer' || user.roleId === 'tenant' ? user.savedCount : user.propertiesCount}
+                      </p>
+                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">
+                        {user.roleId === 'buyer' || user.roleId === 'tenant' ? 'Saved' : 'Properties'}
+                      </p>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm font-bold text-[#1A2E2A]">{user.leadsCount}</p>
-                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Leads</p>
+                      <p className="text-sm font-bold text-[#1A2E2A]">
+                        {user.roleId === 'buyer' || user.roleId === 'tenant' ? user.viewedCount : (user.roleId === 'builder' ? user.projectsCount : user.viewsCount)}
+                      </p>
+                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">
+                        {user.roleId === 'buyer' || user.roleId === 'tenant' ? 'Viewed' : (user.roleId === 'builder' ? 'Projects' : 'Views')}
+                      </p>
                     </div>
                     <div className="text-center">
                       <p className="text-sm font-bold text-[#1A2E2A] flex items-center justify-center gap-0.5">
-                        <FaStarSolid className="text-amber-400 text-[10px]" />
-                        {user.rating}
+                        {user.roleId === 'buyer' || user.roleId === 'tenant' ? (
+                          <>
+                            <FiMail className="text-[#00695C] text-[10px]" />
+                            {user.enquiriesCount}
+                          </>
+                        ) : (
+                          <>
+                            <FaStarSolid className="text-amber-400 text-[10px]" />
+                            {user.rating}
+                          </>
+                        )}
                       </p>
-                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Rating</p>
+                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">
+                        {user.roleId === 'buyer' || user.roleId === 'tenant' ? 'Enquiries' : 'Rating'}
+                      </p>
                     </div>
                   </div>
 
@@ -1531,38 +1806,36 @@ const UserManagement = () => {
             })}
           </div>
         ) : (
-          <div className="bg-white rounded-2xl border border-[#E8F0EE] shadow-sm overflow-hidden">
-            <div className="grid grid-cols-12 gap-3 items-center px-4 py-3 bg-[#F5F9F8] border-b border-[#E8F0EE] text-xs font-medium text-[#5A7D78] uppercase tracking-wider">
-              <div className="col-span-1 flex items-center gap-2">
+          <div className="bg-white rounded-2xl border border-[#E8F0EE] shadow-sm w-full">
+            
+            {/* --- TABLE HEADER --- */}
+            <div className="grid grid-cols-[2.5fr_1fr_1fr_1.5fr_1fr_1fr_1fr_1fr_120px] gap-2 items-center px-4 py-3 bg-[#F5F9F8] border-b border-[#E8F0EE] text-[11px] font-medium text-[#5A7D78] uppercase tracking-wider">
+              <div className="flex items-center gap-2 min-w-0">
                 <input
                   type="checkbox"
                   checked={selectedUsers.length === paginatedUsers.length && paginatedUsers.length > 0}
                   onChange={handleSelectAll}
-                  className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
+                  className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300 flex-shrink-0"
                 />
-                <span>User</span>
+                <span className="cursor-pointer hover:text-[#00695C] transition-colors truncate" onClick={() => handleSort('name')}>
+                  Name {sortField === 'name' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+                </span>
               </div>
-              <div className="col-span-2 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('name')}>
-                Name {sortField === 'name' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
-              </div>
-              <div className="col-span-1">Role</div>
-              <div className="col-span-1">Status</div>
-              <div className="col-span-1">Verification</div>
-              <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('city')}>
+              <div className="truncate">Role</div>
+              <div className="truncate">Plan</div>
+              <div className="truncate">Property Type</div>
+              <div className="truncate">Status</div>
+              <div className="truncate">KYC</div>
+              <div className="truncate cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('city')}>
                 City {sortField === 'city' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1 text-center cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('propertiesCount')}>
-                Properties {sortField === 'propertiesCount' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
-              </div>
-              <div className="col-span-1 text-center cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('rating')}>
-                Rating {sortField === 'rating' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
-              </div>
-              <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('joinedDate')}>
+              <div className="truncate cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('joinedDate')}>
                 Joined {sortField === 'joinedDate' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-2 text-right">Actions</div>
+              <div className="text-right pr-1 whitespace-nowrap">Actions</div>
             </div>
 
+            {/* --- TABLE ROWS --- */}
             {paginatedUsers.map((user, index) => {
               const statusColors = {
                 active: 'bg-[#E8F8F5] text-[#00695C]',
@@ -1577,79 +1850,111 @@ const UserManagement = () => {
                 rejected: 'bg-red-50 text-red-700'
               };
 
+              const subscriptionColors = {
+                Free: 'bg-gray-100 text-gray-600',
+                Basic: 'bg-blue-50 text-blue-600',
+                Silver: 'bg-slate-200 text-slate-700',
+                Gold: 'bg-yellow-100 text-yellow-700',
+                Platinum: 'bg-indigo-100 text-indigo-700',
+                Professional: 'bg-cyan-100 text-cyan-700',
+                Premium: 'bg-purple-100 text-purple-700',
+                Enterprise: 'bg-rose-100 text-rose-700',
+                Standard: 'bg-teal-100 text-teal-700',
+                Business: 'bg-orange-100 text-orange-700'
+              };
+
+              const propertyTypeColors = {
+                Individual: 'bg-blue-50 text-blue-700 border-blue-200',
+                Apartment: 'bg-purple-50 text-purple-700 border-purple-200',
+                Commercial: 'bg-orange-50 text-orange-700 border-orange-200',
+                'Land & Plots': 'bg-green-50 text-green-700 border-green-200',
+                Hostel: 'bg-pink-50 text-pink-700 border-pink-200'
+              };
+
               const isSelected = selectedUsers.includes(user.id);
 
               return (
                 <div
                   key={user.id}
-                  className={`grid grid-cols-12 gap-3 items-center py-3 px-4 border-b border-[#E8F0EE] hover:bg-[#F5F9F8] transition-all duration-300 group ${isSelected ? 'bg-[#E8F4F2]' : ''}`}
+                  className={`grid grid-cols-[2.5fr_1fr_1fr_1.5fr_1fr_1fr_1fr_1fr_120px] gap-2 items-center py-3 px-4 border-b border-[#E8F0EE] hover:bg-[#F5F9F8] transition-all duration-300 group ${isSelected ? 'bg-[#E8F4F2]' : ''}`}
                   style={{ animationDelay: `${index * 30}ms` }}
                 >
-                  <div className="col-span-1 flex items-center gap-2">
+                  {/* Name & Avatar */}
+                  <div className="flex items-center gap-3 min-w-0">
                     <input
                       type="checkbox"
                       checked={isSelected}
                       onChange={() => handleSelectUser(user.id)}
-                      className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
+                      className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300 flex-shrink-0"
                     />
-                    <div className="relative">
+                    <div className="relative flex-shrink-0">
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white font-bold text-xs shadow-md">
                         {user.avatar}
                       </div>
                       {user.verification === 'verified' && (
-                        <div className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#00695C] rounded-full flex items-center justify-center shadow-lg">
+                        <div className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#00695C] rounded-full flex items-center justify-center shadow-lg border border-white">
                           <FaCheck className="text-white text-[6px]" />
                         </div>
                       )}
                     </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-sm text-[#1A2E2A] truncate leading-tight">{user.name}</p>
+                      <p className="text-[10px] text-[#5A7D78] truncate">{user.email}</p>
+                    </div>
                   </div>
 
-                  <div className="col-span-2">
-                    <p className="font-semibold text-sm text-[#1A2E2A]">{user.name}</p>
-                    <p className="text-[10px] text-[#5A7D78] truncate">{user.email}</p>
-                  </div>
-
-                  <div className="col-span-1">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium inline-flex items-center gap-1 ${user.role.color}`}>
+                  {/* Role */}
+                  <div className="min-w-0 flex">
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium inline-flex items-center gap-1 max-w-full ${user.role.color}`}>
                       {user.role.icon}
-                      <span>{user.role.label}</span>
+                      <span className="truncate">{user.role.label}</span>
                     </span>
                   </div>
 
-                  <div className="col-span-1">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColors[user.status]}`}>
+                  {/* Plan */}
+                  <div className="min-w-0 flex">
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium inline-flex items-center gap-1 max-w-full ${subscriptionColors[user.subscriptionPlan] || 'bg-gray-100 text-gray-600'}`}>
+                      <FiAward className="text-[9px] flex-shrink-0" />
+                      <span className="truncate">{user.subscriptionPlan}</span>
+                    </span>
+                  </div>
+
+                  {/* Property Type */}
+                  <div className="min-w-0 flex">
+                    <span className={`text-[9px] px-2 py-0.5 rounded-md font-medium border inline-flex items-center gap-1 max-w-full ${propertyTypeColors[user.propertyType] || 'bg-gray-50 text-gray-700 border-gray-200'}`}>
+                      <FiHome className="text-[9px] flex-shrink-0" />
+                      <span className="truncate">{user.propertyType}</span>
+                    </span>
+                  </div>
+
+                  {/* Status */}
+                  <div className="min-w-0 flex">
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium inline-block truncate max-w-full ${statusColors[user.status]}`}>
                       {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
                     </span>
                   </div>
 
-                  <div className="col-span-1">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${verificationColors[user.verification]}`}>
+                  {/* KYC Status */}
+                  <div className="min-w-0 flex">
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium inline-block truncate max-w-full ${verificationColors[user.verification]}`}>
                       {user.verification.charAt(0).toUpperCase() + user.verification.slice(1)}
                     </span>
                   </div>
 
-                  <div className="col-span-1 text-xs text-[#5A7D78]">{user.city}</div>
+                  {/* City */}
+                  <div className="text-xs text-[#5A7D78] truncate">{user.city}</div>
 
-                  <div className="col-span-1 text-center">
-                    <p className="text-sm font-bold text-[#1A2E2A]">{user.propertiesCount}</p>
-                  </div>
-
-                  <div className="col-span-1 text-center">
-                    <p className="text-sm font-bold text-[#1A2E2A] flex items-center justify-center gap-0.5">
-                      <FaStarSolid className="text-amber-400 text-[10px]" />
-                      {user.rating}
-                    </p>
-                  </div>
-
-                  <div className="col-span-1 text-xs text-[#5A7D78]">
+                  {/* Joined Date */}
+                  <div className="text-xs text-[#5A7D78] truncate">
                     {new Date(user.joinedDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
                   </div>
 
-                  <div className="col-span-2 flex items-center justify-end gap-1">
+                  {/* Actions */}
+                  <div className="flex items-center justify-end gap-1">
                     <button
                       type="button"
                       onClick={() => handleViewUser(user)}
-                      className="w-8 h-8 rounded-xl hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
+                      className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
                       title="View"
                     >
                       <FiEye className="text-sm" />
@@ -1657,7 +1962,7 @@ const UserManagement = () => {
                     <button
                       type="button"
                       onClick={() => handleEditUser(user)}
-                      className="w-8 h-8 rounded-xl hover:bg-blue-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-blue-600 hover:scale-110"
+                      className="w-7 h-7 rounded-lg hover:bg-blue-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-blue-600 hover:scale-110"
                       title="Edit"
                     >
                       <FiEdit className="text-sm" />
@@ -1672,7 +1977,7 @@ const UserManagement = () => {
                         }
                       }}
                       disabled={actionLoading === user.id}
-                      className={`w-8 h-8 rounded-xl transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed ${
+                      className={`w-7 h-7 rounded-lg transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed ${
                         user.status === 'blocked'
                           ? 'text-[#00695C] hover:bg-[#E8F8F5]'
                           : 'text-red-500 hover:bg-red-50'
@@ -1690,7 +1995,7 @@ const UserManagement = () => {
                     <button
                       type="button"
                       onClick={() => setShowDeleteConfirm(user.id)}
-                      className="w-8 h-8 rounded-xl hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-red-600 hover:scale-110"
+                      className="w-7 h-7 rounded-lg hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-red-600 hover:scale-110"
                       title="Delete"
                     >
                       <FiTrash2 className="text-sm" />
@@ -1788,7 +2093,9 @@ const UserManagement = () => {
             </button>
           </div>
         </div>
+       
       )}
+      <div className="pb-5"/>
 
       {/* CSS Animations */}
       <style>{`
@@ -1824,24 +2131,7 @@ const UserManagement = () => {
         .animate-float-delayed { animation: float-delayed 8s ease-in-out infinite; }
         .animate-pulse-once { animation: pulse-once 1s ease-out; }
 
-        /* Scrollbar */
-        .overflow-y-auto::-webkit-scrollbar {
-          width: 4px;
-        }
-        .overflow-y-auto::-webkit-scrollbar-track {
-          background: #F8FAF9;
-        }
-        .overflow-y-auto::-webkit-scrollbar-thumb {
-          background: #B5C9C5;
-          border-radius: 20px;
-        }
-        .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-          background: #5A7D78;
-        }
-        .overflow-y-auto {
-          scrollbar-width: thin;
-          scrollbar-color: #B5C9C5 #F8FAF9;
-        }
+
       `}</style>
     </div>
   );

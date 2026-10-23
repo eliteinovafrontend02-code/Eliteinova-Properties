@@ -2016,7 +2016,7 @@ const LeadReports = () => {
   };
 
   return (
-    <div className="space-y-6 p-4 lg:p-6 min-h-screen bg-[#F8FAF9]">
+    <div className="space-y-6 p-4 lg:p-6 pb-24 bg-[#F8FAF9] min-h-full h-full overflow-y-auto custom-page-scroll relative">
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-1/2 -right-1/2 w-[500px] h-[500px] rounded-full blur-3xl animate-float bg-[#00695C]/5" />
         <div className="absolute -bottom-1/2 -left-1/2 w-[500px] h-[500px] rounded-full blur-3xl animate-float-delayed bg-[#26A69A]/5" />
@@ -2152,6 +2152,8 @@ const LeadReports = () => {
         </div>
       ) : renderChartSection()}
 
+      <div className="pb-5"/>
+
       <style>{`
         @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slide-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -2171,10 +2173,6 @@ const LeadReports = () => {
         .animate-float-delayed { animation: float-delayed 8s ease-in-out infinite; }
         .animate-spin-reverse { animation: spin-reverse 3s linear infinite; }
         
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #F1F5F4; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #8FA8A4; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #00695C; }
       `}</style>
     </div>
   );

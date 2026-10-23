@@ -502,9 +502,9 @@ const PropertiesDashboard = () => {
           </div>
         </header>
 
-        {/* ============ CONTENT - Scrollable area ============ */}
-        <div className="flex-1 overflow-y-auto p-4 content-scroll" style={{ minHeight: 0 }}>
-          <div className="bg-white rounded-2xl shadow-sm p-6 min-h-full relative overflow-hidden">
+        {/* ============ CONTENT - No Scroll (Right-side scrollbar removed) ============ */}
+        <div className="flex-1 overflow-hidden p-4" style={{ minHeight: 0 }}>
+          <div className="bg-white rounded-2xl shadow-sm p-6 h-full relative overflow-hidden">
             {/* Animated Background Decor */}
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#00695C]/5 rounded-full blur-3xl animate-float" />
             <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-[#26A69A]/5 rounded-full blur-3xl animate-float-delayed" />
@@ -593,6 +593,12 @@ const PropertiesDashboard = () => {
 
       {/* ============ TAILWIND CSS ANIMATIONS & SCROLLBAR STYLES ============ */}
       <style>{`
+        /* Prevent the entire page (body) from scrolling — kills the extra right-side scrollbar */
+        html, body, #root {
+          height: 100%;
+          overflow: hidden;
+        }
+
         @keyframes shimmer {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(100%); }
@@ -616,7 +622,7 @@ const PropertiesDashboard = () => {
         .animate-float { animation: float 15s ease-in-out infinite; }
         .animate-float-delayed { animation: float-delayed 18s ease-in-out infinite; }
 
-        /* Sidebar Scrollbar Styles */
+        /* Sidebar Scrollbar Styles — the ONLY scrollbar allowed */
         .sidebar-scroll::-webkit-scrollbar {
           width: 4px;
         }
@@ -635,24 +641,13 @@ const PropertiesDashboard = () => {
           scrollbar-color: #d1d5db transparent;
         }
 
-        /* Content Scrollbar Styles */
-        .content-scroll::-webkit-scrollbar {
-          width: 6px;
-        }
-        .content-scroll::-webkit-scrollbar-track {
-          background: #f1f1f1;
-          border-radius: 10px;
-        }
-        .content-scroll::-webkit-scrollbar-thumb {
-          background: #c1c7cd;
-          border-radius: 10px;
-        }
-        .content-scroll::-webkit-scrollbar-thumb:hover {
-          background: #a0a7ae;
-        }
+        /* Hide any scrollbar on the main content area just in case */
         .content-scroll {
-          scrollbar-width: thin;
-          scrollbar-color: #c1c7cd #f1f1f1;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        .content-scroll::-webkit-scrollbar {
+          display: none;
         }
 
         @media (max-width: 768px) {

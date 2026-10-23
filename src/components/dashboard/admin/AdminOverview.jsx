@@ -38,8 +38,7 @@ const AdminOverview = () => {
   const [statsAnimating, setStatsAnimating] = useState(false);
   
   const [stats, setStats] = useState({
-    totalVendors: 1247,
-    totalUsers: 8452,
+    totalMembers: 1247,
     totalProperties: 3689,
     totalLeads: 421,
     totalRevenue: 2847500,
@@ -52,8 +51,8 @@ const AdminOverview = () => {
     totalCommercial: 567,
     totalPlots: 456,
     totalHostel: 438,
-    vendorPendingApprovals: 23,
-    vendorActiveListings: 1847,
+    memberPendingApprovals: 23,
+    memberActiveListings: 1847,
     revenueGrowth: 12.5,
     propertyGrowth: 8.3,
     userGrowth: 15.7,
@@ -137,7 +136,7 @@ const AdminOverview = () => {
       type: 'payment',
       status: 'success',
       icon: <FiDollarSign />,
-      route: '/admin/payments',
+      route: '/admin/payments/overview',
       avatar: 'PS'
     },
     {
@@ -189,7 +188,7 @@ const AdminOverview = () => {
       type: 'lead',
       status: 'success',
       icon: <FiMessageCircle />,
-      route: '/admin/leads',
+      route: '/admin/leads/dashboard/dashboard',
       avatar: 'AR'
     },
     {
@@ -267,7 +266,7 @@ const AdminOverview = () => {
       type: 'payment',
       status: 'success',
       icon: <FiDollarSign />,
-      route: '/admin/payments',
+      route: '/admin/payments/overview',
       avatar: 'MR'
     },
     {
@@ -483,12 +482,11 @@ const AdminOverview = () => {
       setStatsAnimating(false);
       setStats(prev => ({
         ...prev,
-        totalVendors: prev.totalVendors + Math.floor(Math.random() * 10),
-        totalUsers: prev.totalUsers + Math.floor(Math.random() * 50),
+        totalMembers: prev.totalMembers + Math.floor(Math.random() * 10),
         totalProperties: prev.totalProperties + Math.floor(Math.random() * 20),
         totalLeads: prev.totalLeads + Math.floor(Math.random() * 5),
-        vendorPendingApprovals: Math.floor(Math.random() * 30) + 5,
-        vendorActiveListings: prev.vendorActiveListings + Math.floor(Math.random() * 15),
+        memberPendingApprovals: Math.floor(Math.random() * 30) + 5,
+        memberActiveListings: prev.memberActiveListings + Math.floor(Math.random() * 15),
       }));
       
       const allActivities = generateMockActivities();
@@ -518,11 +516,10 @@ const AdminOverview = () => {
 
   const handleStatClick = useCallback((type) => {
     const routes = {
-      'Total Vendors': '/admin/user-management',
-      'Total Users': '/admin/user-management',
+      'Total Members': '/admin/user-management',
       'Total Properties': '/admin/properties/overview',
-      'Total Leads': '/admin/leads',
-      'Total Revenue': '/admin/payments',
+      'Total Leads': '/admin/leads/dashboard',
+      'Total Revenue': '/admin/payments/overview',
       'Owners': '/admin/owners/overview',
       'Agents': '/admin/agents/overview',
       'Builders': '/admin/builders/overview',
@@ -863,9 +860,9 @@ const AdminOverview = () => {
   ]);
 
   return (
-    <div className="space-y-6 p-4 lg:p-6 bg-gradient-to-br from-gray-50/50 to-white min-h-screen">
+            <div className="space-y-6 p-4 lg:p-6 pb-24 bg-gradient-to-br from-gray-50/50 to-white min-h-full h-full overflow-y-auto custom-page-scroll relative">
       {/* Animated Background Elements */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-[#00695C]/5 rounded-full blur-3xl animate-float" />
         <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-[#26A69A]/5 rounded-full blur-3xl animate-float-delayed" />
       </div>
@@ -906,25 +903,16 @@ const AdminOverview = () => {
         </div>
       </div>
 
-      {/* Overall Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 relative">
+      {/* Overall Stats Grid - 4 cards in 4 columns */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 relative">
         <StatCard
           icon={<BsPeople className="text-lg text-white" />}
-          title="Total Vendors"
-          value={stats.totalVendors}
+          title="Total Members"
+          value={stats.totalMembers}
           trend={5.2}
           trendValue={5.2}
           color="bg-gradient-to-br from-[#00695C] to-[#26A69A]"
           delay={0}
-        />
-        <StatCard
-          icon={<FiUsers className="text-lg text-white" />}
-          title="Total Users"
-          value={stats.totalUsers}
-          trend={15.7}
-          trendValue={15.7}
-          color="bg-gradient-to-br from-blue-600 to-blue-400"
-          delay={100}
         />
         <StatCard
           icon={<FiHome className="text-lg text-white" />}
@@ -933,7 +921,7 @@ const AdminOverview = () => {
           trend={8.3}
           trendValue={8.3}
           color="bg-gradient-to-br from-purple-600 to-purple-400"
-          delay={200}
+          delay={100}
         />
         <StatCard
           icon={<FiMessageCircle className="text-lg text-white" />}
@@ -942,7 +930,7 @@ const AdminOverview = () => {
           trend={-3.2}
           trendValue={3.2}
           color="bg-gradient-to-br from-amber-600 to-amber-400"
-          delay={300}
+          delay={200}
         />
         <StatCard
           icon={<FiDollarSign className="text-lg text-white" />}
@@ -951,7 +939,7 @@ const AdminOverview = () => {
           trend={12.5}
           trendValue={12.5}
           color="bg-gradient-to-br from-emerald-600 to-emerald-400"
-          delay={400}
+          delay={300}
         />
       </div>
 
@@ -966,7 +954,6 @@ const AdminOverview = () => {
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
-
             { key: 'Owners', count: stats.totalOwners, icon: <FiUser className="text-[#00695C] text-lg" />, color: 'from-[#00695C]/10 to-[#26A69A]/10', border: 'border-[#00695C]/10', textColor: 'text-[#00695C]' },
             { key: 'Agents', count: stats.totalAgents, icon: <MdOutlineRealEstateAgent className="text-blue-600 text-lg" />, color: 'from-blue-600/10 to-blue-400/10', border: 'border-blue-600/10', textColor: 'text-blue-600' },
             { key: 'Builders', count: stats.totalBuilders, icon: <FaBuilding className="text-purple-600 text-lg" />, color: 'from-purple-600/10 to-purple-400/10', border: 'border-purple-600/10', textColor: 'text-purple-600' },
@@ -989,12 +976,12 @@ const AdminOverview = () => {
               <p className="text-2xl font-bold text-gray-800">{item.count}</p>
               <div className="flex items-center justify-between mt-2">
                 <p className="text-xs text-gray-500">
-                  {Math.round((item.count / stats.totalVendors) * 100)}% of vendors
+                  {Math.round((item.count / stats.totalMembers) * 100)}% of members
                 </p>
                 <div className="flex-1 mx-2 h-1.5 bg-gray-200/50 rounded-full overflow-hidden">
                   <div 
                     className={`h-full rounded-full transition-all duration-1000 ${item.textColor.replace('text', 'bg')}`}
-                    style={{ width: `${(item.count / stats.totalVendors) * 100}%` }}
+                    style={{ width: `${(item.count / stats.totalMembers) * 100}%` }}
                   />
                 </div>
               </div>
@@ -1002,42 +989,6 @@ const AdminOverview = () => {
           ))}
         </div>
       </div>
-
-      {/* Property Types */}
-      {/* <div className="relative">
-        <h2 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-          <div className="p-1.5 bg-[#00695C]/10 rounded-lg">
-            <FiHome className="text-[#00695C]" />
-          </div>
-          Property Types Distribution
-        </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-          {[
-            { key: 'Individuals', count: stats.totalIndividuals, icon: <FaRegBuilding className="text-sm" />, color: 'from-indigo-100 to-indigo-50', iconColor: 'text-indigo-600' },
-            { key: 'Apartments', count: stats.totalApartments, icon: <MdApartment className="text-sm" />, color: 'from-blue-100 to-blue-50', iconColor: 'text-blue-600' },
-            { key: 'Commercial', count: stats.totalCommercial, icon: <FiShoppingBag className="text-sm" />, color: 'from-emerald-100 to-emerald-50', iconColor: 'text-emerald-600' },
-            { key: 'Plots & Land', count: stats.totalPlots, icon: <FiMapPin className="text-sm" />, color: 'from-amber-100 to-amber-50', iconColor: 'text-amber-600' },
-            { key: 'Hostel & PG', count: stats.totalHostel, icon: <FiHomeIcon className="text-sm" />, color: 'from-rose-100 to-rose-50', iconColor: 'text-rose-600' }
-          ].map((item, index) => (
-            <div 
-              key={item.key}
-              className={`bg-gradient-to-br ${item.color} rounded-2xl p-4 border border-gray-100/80 cursor-pointer hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 hover:scale-[1.02] animate-slide-in group`}
-              style={{ animationDelay: `${index * 100}ms` }}
-              onClick={() => handleStatClick(item.key)}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl bg-white/80 ${item.iconColor} flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300`}>
-                  {item.icon}
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 font-medium">{item.key}</p>
-                  <p className="text-lg font-bold text-gray-800">{item.count}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div> */}
 
       {/* Vendor Status & Recent Activities */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1058,18 +1009,18 @@ const AdminOverview = () => {
                   </div>
                 </div>
                 <span className="text-3xl font-bold text-amber-600 group-hover:scale-110 transition-transform duration-300">
-                  {stats.vendorPendingApprovals}
+                  {stats.memberPendingApprovals}
                 </span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-1000"
-                    style={{ width: `${(stats.vendorPendingApprovals / 50) * 100}%` }}
+                    style={{ width: `${(stats.memberPendingApprovals / 50) * 100}%` }}
                   />
                 </div>
                 <span className="text-xs text-gray-400 whitespace-nowrap font-medium">
-                  {Math.round((stats.vendorPendingApprovals / 50) * 100)}%
+                  {Math.round((stats.memberPendingApprovals / 50) * 100)}%
                 </span>
               </div>
               <button 
@@ -1100,18 +1051,18 @@ const AdminOverview = () => {
                   </div>
                 </div>
                 <span className="text-3xl font-bold text-emerald-600 group-hover:scale-110 transition-transform duration-300">
-                  {stats.vendorActiveListings}
+                  {stats.memberActiveListings}
                 </span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all duration-1000"
-                    style={{ width: `${(stats.vendorActiveListings / 2500) * 100}%` }}
+                    style={{ width: `${(stats.memberActiveListings / 2500) * 100}%` }}
                   />
                 </div>
                 <span className="text-xs text-gray-400 whitespace-nowrap font-medium">
-                  {Math.round((stats.vendorActiveListings / stats.totalProperties) * 100)}% of total
+                  {Math.round((stats.memberActiveListings / stats.totalProperties) * 100)}% of total
                 </span>
               </div>
               <button 
@@ -1222,42 +1173,13 @@ const AdminOverview = () => {
             </div>
           </div>
         </div>
+
+        <div className="pb-10"/>
       </div>
 
       {/* Custom Scrollbar and Animations */}
       <style>{`
-        /* Scrollbar Styles */
-        .activity-scroll::-webkit-scrollbar {
-          width: 4px;
-        }
-        .activity-scroll::-webkit-scrollbar-track {
-          background: #f8fafc;
-          border-radius: 20px;
-        }
-        .activity-scroll::-webkit-scrollbar-thumb {
-          background: #d1d5db;
-          border-radius: 20px;
-          transition: background 0.3s;
-        }
-        .activity-scroll::-webkit-scrollbar-thumb:hover {
-          background: #9ca3af;
-        }
-        .activity-scroll {
-          scrollbar-width: thin;
-          scrollbar-color: #d1d5db #f8fafc;
-        }
-
-        .scrollbar-thin::-webkit-scrollbar {
-          height: 3px;
-        }
-        .scrollbar-thin::-webkit-scrollbar-track {
-          background: #f1f1f1;
-          border-radius: 20px;
-        }
-        .scrollbar-thin::-webkit-scrollbar-thumb {
-          background: #d1d5db;
-          border-radius: 20px;
-        }
+       
 
         /* Animations */
         @keyframes fadeIn {

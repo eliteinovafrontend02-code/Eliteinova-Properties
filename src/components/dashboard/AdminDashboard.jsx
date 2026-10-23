@@ -94,8 +94,6 @@ import SiteVisitManagement from './admin/LeadManagement/SiteVisitManagement';
 import LeadReports from './admin/LeadManagement/LeadReports';
 
 // Other modules
-// import ReportsAnalytics from './admin/ReportsAnalytics';
-// import ContentManagement from './admin/ContentManagement';
 // import Notifications from './admin/Notifications';
 // import Settings from './admin/Settings';
 
@@ -202,8 +200,6 @@ const AdminDashboard = () => {
         { key: '/admin/payments/reports', icon: <FaChartLine />, label: 'Payment Reports' },
       ],
     },
-    { key: '/admin/reports', icon: <FaChartLine />, label: 'Reports & Analytics' },
-    { key: '/admin/content', icon: <FaImage />, label: 'Content Management' },
     { key: '/admin/notifications', icon: <FaBell />, label: 'Notifications' },
     { key: '/admin/settings', icon: <FiSettings />, label: 'Settings' },
   ];
@@ -514,9 +510,9 @@ const AdminDashboard = () => {
           </div>
         </header>
 
-        {/* ============ CONTENT - Scrollable area ============ */}
-        <div className="flex-1 overflow-y-auto p-4 content-scroll" style={{ minHeight: 0 }}>
-          <div className="bg-white rounded-2xl shadow-sm p-6 min-h-full relative overflow-hidden">
+        {/* ============ CONTENT - No Scroll ============ */}
+        <div className="flex-1 overflow-hidden p-4" style={{ minHeight: 0 }}>
+          <div className="bg-white rounded-2xl shadow-sm p-6 h-full relative overflow-hidden">
             {/* Animated Background Decor */}
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#00695C]/5 rounded-full blur-3xl animate-float" />
             <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-[#26A69A]/5 rounded-full blur-3xl animate-float-delayed" />
@@ -584,8 +580,6 @@ const AdminDashboard = () => {
               {/* Properties — handled by the early return above, no Route needed here */}
 
               {/* Other routes */}
-              {/* <Route path="reports" element={<ReportsAnalytics />} /> */}
-              {/* <Route path="content" element={<ContentManagement />} /> */}
               {/* <Route path="notifications" element={<Notifications />} /> */}
               {/* <Route path="settings" element={<Settings />} /> */}
             </Routes>
@@ -608,6 +602,12 @@ const AdminDashboard = () => {
 
       {/* ============ TAILWIND CSS ANIMATIONS & SCROLLBAR STYLES ============ */}
       <style>{`
+        /* Prevent the entire page from scrolling */
+        html, body, #root {
+          height: 100%;
+          overflow: hidden;
+        }
+
         @keyframes shimmer {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(100%); }
@@ -630,45 +630,6 @@ const AdminDashboard = () => {
         .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
         .animate-float { animation: float 15s ease-in-out infinite; }
         .animate-float-delayed { animation: float-delayed 18s ease-in-out infinite; }
-        
-        /* Sidebar Scrollbar Styles */
-        .sidebar-scroll::-webkit-scrollbar {
-          width: 4px;
-        }
-        .sidebar-scroll::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .sidebar-scroll::-webkit-scrollbar-thumb {
-          background: #d1d5db;
-          border-radius: 20px;
-        }
-        .sidebar-scroll::-webkit-scrollbar-thumb:hover {
-          background: #9ca3af;
-        }
-        .sidebar-scroll {
-          scrollbar-width: thin;
-          scrollbar-color: #d1d5db transparent;
-        }
-        
-        /* Content Scrollbar Styles */
-        .content-scroll::-webkit-scrollbar {
-          width: 6px;
-        }
-        .content-scroll::-webkit-scrollbar-track {
-          background: #f1f1f1;
-          border-radius: 10px;
-        }
-        .content-scroll::-webkit-scrollbar-thumb {
-          background: #c1c7cd;
-          border-radius: 10px;
-        }
-        .content-scroll::-webkit-scrollbar-thumb:hover {
-          background: #a0a7ae;
-        }
-        .content-scroll {
-          scrollbar-width: thin;
-          scrollbar-color: #c1c7cd #f1f1f1;
-        }
         
         @media (max-width: 768px) {
           aside { transform: translateX(${collapsed ? '-100%' : '0'}); }

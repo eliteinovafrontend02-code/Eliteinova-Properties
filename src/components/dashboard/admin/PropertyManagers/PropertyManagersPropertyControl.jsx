@@ -145,15 +145,11 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
         status: property.status || 'pending',
         isFeatured: property.isFeatured || false,
         isVerified: property.isVerified || false,
-        managerName: property.managerName || '',
-        managerEmail: property.managerEmail || '',
-        managerPhone: property.managerPhone || '',
-        propertyManagerCompany: property.propertyManagerCompany || '',
         description: property.description || '',
         amenities: property.amenities ? property.amenities.join(', ') : '',
         parking: property.parking || 'None',
         views: property.views || 0,
-        inquiries: property.inquiries || 0,
+        enquiries: property.enquiries || 0,
         listedDate: property.listedDate ? new Date(property.listedDate).toISOString().split('T')[0] : '',
       });
       setErrors({});
@@ -183,11 +179,6 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
     if (!formData.location.trim()) newErrors.location = 'Location is required';
     if (!formData.price || formData.price <= 0) newErrors.price = 'Valid price is required';
     if (!formData.area || formData.area <= 0) newErrors.area = 'Valid area is required';
-    if (!formData.managerName.trim()) newErrors.managerName = 'Property Manager name is required';
-    if (!formData.managerEmail.trim()) newErrors.managerEmail = 'Property Manager email is required';
-    if (formData.managerEmail && !/\S+@\S+\.\S+/.test(formData.managerEmail)) {
-      newErrors.managerEmail = 'Valid email is required';
-    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -209,7 +200,7 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
       bathrooms: Number(formData.bathrooms),
       area: Number(formData.area),
       views: Number(formData.views) || 0,
-      inquiries: Number(formData.inquiries) || 0,
+      enquiries: Number(formData.enquiries) || 0,
     };
 
     setTimeout(() => {
@@ -221,7 +212,7 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
-        {/* Header - Compact */}
+        {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] px-5 py-3 rounded-t-2xl z-10 shrink-0 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white">
@@ -240,9 +231,9 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
           </button>
         </div>
 
-        {/* Form - Compact Design */}
+        {/* Form */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
-          {/* Basic Information - 2 Column Grid */}
+          {/* Basic Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="md:col-span-2">
               <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">
@@ -337,7 +328,7 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
             </div>
           </div>
 
-          {/* Property Details - 4 Column Grid */}
+          {/* Property Details */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div>
               <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">
@@ -426,63 +417,6 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
             </div>
           </div>
 
-          {/* Property Manager Information - 4 Column */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">
-                Manager Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="managerName"
-                value={formData.managerName}
-                onChange={handleChange}
-                className={`w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.managerName ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]`}
-                placeholder="Full name"
-              />
-              {errors.managerName && <p className="text-[10px] text-red-500 mt-0.5">{errors.managerName}</p>}
-            </div>
-
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">
-                Manager Email <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="email"
-                name="managerEmail"
-                value={formData.managerEmail}
-                onChange={handleChange}
-                className={`w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.managerEmail ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]`}
-                placeholder="manager@email.com"
-              />
-              {errors.managerEmail && <p className="text-[10px] text-red-500 mt-0.5">{errors.managerEmail}</p>}
-            </div>
-
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Manager Phone</label>
-              <input
-                type="text"
-                name="managerPhone"
-                value={formData.managerPhone}
-                onChange={handleChange}
-                className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
-                placeholder="+91 9876543210"
-              />
-            </div>
-
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Company Name</label>
-              <input
-                type="text"
-                name="propertyManagerCompany"
-                value={formData.propertyManagerCompany}
-                onChange={handleChange}
-                className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
-                placeholder="Property Management Company"
-              />
-            </div>
-          </div>
-
           {/* Description */}
           <div>
             <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Description</label>
@@ -496,7 +430,7 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
             />
           </div>
 
-          {/* Additional Settings - Compact */}
+          {/* Additional Settings */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="flex items-center gap-2">
               <input
@@ -533,11 +467,11 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
             </div>
 
             <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Inquiries</label>
+              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Enquiries</label>
               <input
                 type="number"
-                name="inquiries"
-                value={formData.inquiries}
+                name="enquiries"
+                value={formData.enquiries}
                 onChange={handleChange}
                 className="w-full px-2 py-1 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none text-[#1A2E2A]"
                 min="0"
@@ -545,7 +479,7 @@ const EditPropertyModal = ({ property, show, onClose, onSave, loading }) => {
             </div>
           </div>
 
-          {/* Form Actions - Fixed at bottom */}
+          {/* Form Actions */}
           <div className="sticky bottom-0 bg-white pt-3 border-t border-[#E8F0EE] flex items-center gap-3">
             <button
               type="button"
@@ -588,7 +522,6 @@ const ViewPropertyModal = ({
   onVerify,
   onSuspend,
   onDelete,
-  onViewManagerProfile,
   onApprove,
   onReject
 }) => {
@@ -618,7 +551,7 @@ const ViewPropertyModal = ({
           </button>
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center text-white text-3xl">
-              <FaClipboardList />
+              <FaHome />
             </div>
             <div className="flex-1">
               <h2 className="text-xl font-bold text-white">{property.title}</h2>
@@ -655,32 +588,9 @@ const ViewPropertyModal = ({
               <p className="text-[9px] uppercase tracking-wider text-[#5A7D78]">Views</p>
             </div>
             <div className="text-center p-3 bg-[#F5F9F8] rounded-xl">
-              <p className="text-lg font-bold text-[#1A2E2A]">{property.inquiries || 0}</p>
-              <p className="text-[9px] uppercase tracking-wider text-[#5A7D78]">Inquiries</p>
+              <p className="text-lg font-bold text-[#1A2E2A]">{property.enquiries || 0}</p>
+              <p className="text-[9px] uppercase tracking-wider text-[#5A7D78]">Enquiries</p>
             </div>
-          </div>
-
-          {/* Manager Info with View Profile Button */}
-          <div className="flex items-center justify-between p-3 bg-[#F5F9F8] rounded-xl">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#00695C] flex items-center justify-center text-white font-bold">
-                {property.managerName?.charAt(0) || 'M'}
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-[#1A2E2A]">{property.managerName || 'Unknown Manager'}</p>
-                <p className="text-xs text-[#5A7D78]">Property Manager · {property.managerEmail || 'No email'}</p>
-                {property.propertyManagerCompany && (
-                  <p className="text-xs text-[#00695C] font-medium">{property.propertyManagerCompany}</p>
-                )}
-              </div>
-            </div>
-            <button
-              onClick={onViewManagerProfile}
-              className="px-4 py-2 bg-[#00695C] text-white rounded-xl hover:bg-[#004D40] transition-all duration-300 text-xs font-medium flex items-center gap-2 hover:scale-105"
-            >
-              <FiExternalLink className="text-xs" />
-              My Profile
-            </button>
           </div>
 
           {/* Details */}
@@ -731,7 +641,7 @@ const ViewPropertyModal = ({
           </div>
         </div>
 
-        {/* Footer Actions - Fixed at bottom */}
+        {/* Footer Actions */}
         <div className="sticky bottom-0 px-6 py-4 border-t border-[#E8F0EE] flex flex-wrap items-center gap-2 bg-white">
           {property.status === 'pending' ? (
             <>
@@ -868,17 +778,6 @@ const PropertyManagersPropertyControl = () => {
     const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur', 'Lucknow', 'Nagpur'];
     const amenitiesList = ['WiFi', 'Swimming Pool', 'AC', 'Parking', 'Gym', 'Security', 'Balcony', 'Garden', 'Elevator', 'Furnished'];
 
-    const propertyManagers = [
-      { id: 'manager_1', name: 'Rahul Sharma', email: 'rahul.sharma@pm.com', phone: '+91 9876543210', company: 'Sharma Property Management' },
-      { id: 'manager_2', name: 'Priya Patel', email: 'priya.patel@pm.com', phone: '+91 9876543211', company: 'Patel Realty Services' },
-      { id: 'manager_3', name: 'Amit Deshmukh', email: 'amit.deshmukh@pm.com', phone: '+91 9876543212', company: 'Deshmukh Estates' },
-      { id: 'manager_4', name: 'Sneha Reddy', email: 'sneha.reddy@pm.com', phone: '+91 9876543213', company: 'Reddy Property Solutions' },
-      { id: 'manager_5', name: 'Vikram Singh', email: 'vikram.singh@pm.com', phone: '+91 9876543214', company: 'Singh Management Group' },
-      { id: 'manager_6', name: 'Meera Nair', email: 'meera.nair@pm.com', phone: '+91 9876543215', company: 'Nair Realty Partners' },
-      { id: 'manager_7', name: 'Arjun Iyer', email: 'arjun.iyer@pm.com', phone: '+91 9876543216', company: 'Iyer Property Advisors' },
-      { id: 'manager_8', name: 'Kavya Rao', email: 'kavya.rao@pm.com', phone: '+91 9876543217', company: 'Rao Management Services' },
-    ];
-
     const properties = [];
     const titles = [
       'Luxury Apartment with Sea View', 'Modern Family Home', 'Spacious Villa', 'Penthouse Suite',
@@ -888,7 +787,6 @@ const PropertyManagersPropertyControl = () => {
 
     for (let i = 1; i <= 60; i++) {
       const status = statuses[Math.floor(Math.random() * statuses.length)];
-      const manager = propertyManagers[Math.floor(Math.random() * propertyManagers.length)];
       const city = cities[Math.floor(Math.random() * cities.length)];
       const type = propertyTypes[Math.floor(Math.random() * propertyTypes.length)];
 
@@ -912,16 +810,11 @@ const PropertyManagersPropertyControl = () => {
         status: status,
         isFeatured: Math.random() > 0.8,
         isVerified: Math.random() > 0.7,
-        managerName: manager.name,
-        managerEmail: manager.email,
-        managerPhone: manager.phone,
-        managerId: manager.id,
-        propertyManagerCompany: manager.company,
         listedDate: date.toISOString(),
         updatedDate: new Date(Date.now() - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000)).toISOString(),
         views: Math.floor(Math.random() * 500),
-        inquiries: Math.floor(Math.random() * 50),
-        description: `Beautiful ${type.toLowerCase()} located in ${city}. Managed by ${manager.company}. Features ${Math.floor(Math.random() * 3) + 2} bedrooms and modern amenities. Perfect for families and professionals.`,
+        enquiries: Math.floor(Math.random() * 50),
+        description: `Beautiful ${type.toLowerCase()} located in ${city}. Features ${Math.floor(Math.random() * 3) + 2} bedrooms and modern amenities. Perfect for families and professionals.`,
         amenities: amenities,
         parking: Math.random() > 0.5 ? `${Math.floor(Math.random() * 2) + 1} spots` : 'None',
         images: [`https://picsum.photos/seed/${i}/400/300`],
@@ -963,13 +856,10 @@ const PropertyManagersPropertyControl = () => {
       filtered = filtered.filter(p =>
         p.title.toLowerCase().includes(query) ||
         p.location.toLowerCase().includes(query) ||
-        p.managerName.toLowerCase().includes(query) ||
-        p.propertyManagerCompany.toLowerCase().includes(query) ||
         p.type.toLowerCase().includes(query)
       );
     }
 
-    // Status filter
     if (selectedStatus !== 'all') {
       if (selectedStatus === 'verified') {
         filtered = filtered.filter(p => p.isVerified === true);
@@ -980,7 +870,6 @@ const PropertyManagersPropertyControl = () => {
       }
     }
 
-    // Type filter
     if (selectedType !== 'all') {
       filtered = filtered.filter(p => p.type.toLowerCase() === selectedType.toLowerCase());
     }
@@ -991,7 +880,6 @@ const PropertyManagersPropertyControl = () => {
     if (searchQuery) count++;
     setFilterCount(count);
 
-    // Sorting
     filtered.sort((a, b) => {
       let aVal = a[sortField] || '';
       let bVal = b[sortField] || '';
@@ -1095,12 +983,6 @@ const PropertyManagersPropertyControl = () => {
     setViewingProperty(property);
     setShowViewModal(true);
   }, []);
-
-  // ============ VIEW MANAGER PROFILE ============
-  const handleViewManagerProfile = useCallback((managerId) => {
-    navigate('/profile/property-management');
-    showToast('Opening Property Manager Profile...', 'info');
-  }, [navigate, showToast]);
 
   // ============ EDIT PROPERTY ============
   const handleEditProperty = useCallback((property) => {
@@ -1208,7 +1090,7 @@ const PropertyManagersPropertyControl = () => {
   const handleRejectProperty = useCallback((propertyId) => {
     showConfirmation({
       title: 'Reject Property',
-      message: 'Are you sure you want to reject this property? The property manager will be notified.',
+      message: 'Are you sure you want to reject this property?',
       confirmText: 'Yes, Reject',
       confirmColor: 'bg-red-500',
       icon: <FiXCircle className="text-4xl text-red-500" />,
@@ -1525,11 +1407,9 @@ const PropertyManagersPropertyControl = () => {
       Status: p.status,
       Featured: p.isFeatured ? 'Yes' : 'No',
       Verified: p.isVerified ? 'Yes' : 'No',
-      'Property Manager': p.managerName,
-      Company: p.propertyManagerCompany,
       'Listed Date': new Date(p.listedDate).toLocaleDateString(),
       Views: p.views,
-      Inquiries: p.inquiries,
+      Enquiries: p.enquiries,
     }));
 
     const csv = [
@@ -1541,7 +1421,7 @@ const PropertyManagersPropertyControl = () => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `property_manager_properties_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `properties_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
     showToast(`${filteredProperties.length} properties exported successfully`, 'success');
@@ -1549,9 +1429,9 @@ const PropertyManagersPropertyControl = () => {
 
   // ============ RENDER ============
   return (
-    <div className="space-y-6 p-4 lg:p-6 bg-[#F8FAF9] min-h-screen">
+    <div className="space-y-6 p-4 lg:p-6 pb-24 bg-[#F8FAF9] min-h-full h-full overflow-y-auto custom-page-scroll relative">
       {/* Animated Background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-[#00695C]/5 rounded-full blur-3xl animate-float" />
         <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-[#26A69A]/5 rounded-full blur-3xl animate-float-delayed" />
       </div>
@@ -1583,7 +1463,6 @@ const PropertyManagersPropertyControl = () => {
         onVerify={() => handleToggleVerify(viewingProperty?.id)}
         onSuspend={() => handleToggleSuspend(viewingProperty?.id)}
         onDelete={() => handleDeleteProperty(viewingProperty?.id)}
-        onViewManagerProfile={handleViewManagerProfile}
         onApprove={handleApproveProperty}
         onReject={handleRejectProperty}
       />
@@ -1603,7 +1482,7 @@ const PropertyManagersPropertyControl = () => {
           <div>
             <div className="flex items-center gap-3 mb-1 flex-wrap">
               <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
-                Property Managers Control
+                Property Control
               </h1>
               <span className="px-3 py-1 bg-[#E8F4F2] text-[#00695C] text-xs font-semibold rounded-full animate-pulse">
                 {filteredProperties.length} Properties
@@ -1615,7 +1494,7 @@ const PropertyManagersPropertyControl = () => {
               )}
             </div>
             <p className="text-sm text-[#5A7D78] flex items-center gap-2 flex-wrap">
-              <span>Manage and control all property listings from property managers</span>
+              <span>Manage and control all property listings</span>
               <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
               <span className="text-[#00695C] font-medium">{new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
             </p>
@@ -1729,7 +1608,7 @@ const PropertyManagersPropertyControl = () => {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search properties by title, location, property manager..."
+              placeholder="Search properties by title, location..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none placeholder:text-[#B5C9C5]"
@@ -1909,7 +1788,7 @@ const PropertyManagersPropertyControl = () => {
                         className="w-4 h-4 shrink-0 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                       />
                       <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white text-sm shadow-lg">
-                        <FaClipboardList />
+                        <FaHome />
                       </div>
                       <div className="min-w-0">
                         <h3 className="font-semibold text-[#1A2E2A] text-sm truncate">{property.title}</h3>
@@ -1952,10 +1831,6 @@ const PropertyManagersPropertyControl = () => {
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiDollarSign className="text-[#00695C] flex-shrink-0" />
                       <span className="font-semibold text-[#1A2E2A]">₹{property.price.toLocaleString()}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FiBriefcase className="text-[#00695C] flex-shrink-0 text-xs" />
-                      <span className="truncate">{property.propertyManagerCompany || property.managerName}</span>
                     </div>
                   </div>
 
@@ -2089,17 +1964,6 @@ const PropertyManagersPropertyControl = () => {
                       </>
                     )}
                   </div>
-
-                  <div className="mt-1.5">
-                    <button
-                      type="button"
-                      onClick={() => handleViewManagerProfile(property.managerId)}
-                      className="w-full py-1.5 text-[10px] font-medium text-[#00695C] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-[1.02]"
-                    >
-                      <FiExternalLink className="text-[10px]" />
-                      View Manager Profile
-                    </button>
-                  </div>
                 </div>
               );
             })}
@@ -2107,7 +1971,8 @@ const PropertyManagersPropertyControl = () => {
         ) : (
           /* List View */
           <div className="bg-white rounded-2xl border border-[#E8F0EE] shadow-sm overflow-hidden">
-            <div className="grid grid-cols-12 gap-2 items-center px-4 py-3 bg-[#F5F9F8] border-b border-[#E8F0EE] text-xs font-medium text-[#5A7D78] uppercase tracking-wider">
+            {/* Header Row */}
+            <div className="grid grid-cols-12 gap-1 items-center px-3 py-3 bg-[#F5F9F8] border-b border-[#E8F0EE] text-xs font-medium text-[#5A7D78] uppercase tracking-wider">
               <div className="col-span-1 flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -2120,14 +1985,14 @@ const PropertyManagersPropertyControl = () => {
               <div className="col-span-2 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('title')}>
                 Title {sortField === 'title' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1">Type</div>
-              <div className="col-span-1">Status</div>
-              <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('price')}>
+              <div className="col-span-1 text-center">Type</div>
+              <div className="col-span-1 text-center">Status</div>
+              <div className="col-span-1 text-center cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('price')}>
                 Price {sortField === 'price' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1">Bed</div>
-              <div className="col-span-1">Bath</div>
-              <div className="col-span-1">Manager</div>
+              <div className="col-span-1 text-center">Bed</div>
+              <div className="col-span-1 text-center">Bath</div>
+              <div className="col-span-1 text-center">Location</div>
               <div className="col-span-1 text-center">Featured</div>
               <div className="col-span-1 text-center">Verified</div>
               <div className="col-span-1 text-right">Actions</div>
@@ -2145,8 +2010,9 @@ const PropertyManagersPropertyControl = () => {
               return (
                 <div
                   key={property.id}
-                  className={`grid grid-cols-12 gap-2 items-center py-3 px-4 border-b border-[#E8F0EE] hover:bg-[#F5F9F8] transition-all duration-300 group ${isSelected ? 'bg-[#E8F4F2]' : ''}`}
+                  className={`grid grid-cols-12 gap-1 items-center py-3 px-3 border-b border-[#E8F0EE] hover:bg-[#F5F9F8] transition-all duration-300 group ${isSelected ? 'bg-[#E8F4F2]' : ''}`}
                 >
+                  {/* Checkbox & Index */}
                   <div className="col-span-1 flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -2157,27 +2023,35 @@ const PropertyManagersPropertyControl = () => {
                     <span className="text-xs text-[#5A7D78]">{index + 1}</span>
                   </div>
 
+                  {/* Title & Location */}
                   <div className="col-span-2">
                     <p className="font-semibold text-sm text-[#1A2E2A] truncate">{property.title}</p>
                     <p className="text-[10px] text-[#5A7D78] truncate">{property.location}</p>
                   </div>
 
-                  <div className="col-span-1 text-xs text-[#5A7D78]">{property.type}</div>
+                  {/* Type */}
+                  <div className="col-span-1 text-center text-xs text-[#5A7D78] truncate">{property.type}</div>
 
-                  <div className="col-span-1">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColors[property.status] || 'bg-gray-100 text-gray-700'}`}>
+                  {/* Status */}
+                  <div className="col-span-1 text-center">
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap ${statusColors[property.status] || 'bg-gray-100 text-gray-700'}`}>
                       {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
                     </span>
                   </div>
 
-                  <div className="col-span-1 text-sm font-semibold text-[#1A2E2A]">₹{property.price.toLocaleString()}</div>
+                  {/* Price */}
+                  <div className="col-span-1 text-center text-sm font-semibold text-[#1A2E2A] whitespace-nowrap">₹{property.price.toLocaleString()}</div>
 
+                  {/* Bedrooms */}
                   <div className="col-span-1 text-center text-sm text-[#1A2E2A]">{property.bedrooms}</div>
 
+                  {/* Bathrooms */}
                   <div className="col-span-1 text-center text-sm text-[#1A2E2A]">{property.bathrooms}</div>
 
-                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">{property.managerName}</div>
+                  {/* Location (Simplified) */}
+                  <div className="col-span-1 text-center text-xs text-[#5A7D78] truncate">{property.location}</div>
 
+                  {/* Featured */}
                   <div className="col-span-1 text-center">
                     {property.isFeatured ? (
                       <FaStarSolid className="text-amber-500 inline text-xs" />
@@ -2186,6 +2060,7 @@ const PropertyManagersPropertyControl = () => {
                     )}
                   </div>
 
+                  {/* Verified */}
                   <div className="col-span-1 text-center">
                     {property.isVerified ? (
                       <FiShield className="text-blue-600 inline text-xs" />
@@ -2194,59 +2069,61 @@ const PropertyManagersPropertyControl = () => {
                     )}
                   </div>
 
-                  <div className="col-span-1 flex items-center justify-end gap-1">
+                  {/* Actions - 2 rows of 3 icons */}
+                  <div className="col-span-1 flex flex-col items-end gap-1">
                     {property.status === 'pending' ? (
-                      <>
+                      <div className="grid grid-cols-3 gap-0.5">
                         <button
                           type="button"
                           onClick={() => handleApproveProperty(property.id)}
                           disabled={actionLoading === `approve_${property.id}`}
-                          className="w-7 h-7 rounded-lg hover:bg-emerald-50 transition-all duration-300 flex items-center justify-center text-emerald-600 hover:scale-110 disabled:opacity-50"
+                          className="w-5 h-5 rounded-md hover:bg-emerald-50 transition-all duration-300 flex items-center justify-center text-emerald-600 hover:scale-110 disabled:opacity-50"
                           title="Approve"
                         >
                           {actionLoading === `approve_${property.id}` ? (
-                            <FiRefreshCw className="text-xs animate-spin" />
+                            <FiRefreshCw className="text-[10px] animate-spin" />
                           ) : (
-                            <FiCheckCircle className="text-xs" />
+                            <FiCheckCircle className="text-[10px]" />
                           )}
                         </button>
                         <button
                           type="button"
                           onClick={() => handleRejectProperty(property.id)}
                           disabled={actionLoading === `reject_${property.id}`}
-                          className="w-7 h-7 rounded-lg hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-red-600 hover:scale-110 disabled:opacity-50"
+                          className="w-5 h-5 rounded-md hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-red-600 hover:scale-110 disabled:opacity-50"
                           title="Reject"
                         >
                           {actionLoading === `reject_${property.id}` ? (
-                            <FiRefreshCw className="text-xs animate-spin" />
+                            <FiRefreshCw className="text-[10px] animate-spin" />
                           ) : (
-                            <FiXCircle className="text-xs" />
+                            <FiXCircle className="text-[10px]" />
                           )}
                         </button>
-                      </>
+                        <div className="w-5 h-5"></div>
+                      </div>
                     ) : (
-                      <>
+                      <div className="grid grid-cols-3 gap-0.5">
                         <button
                           type="button"
                           onClick={() => handleViewProperty(property)}
-                          className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
+                          className="w-5 h-5 rounded-md hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
                           title="View"
                         >
-                          <FiEye className="text-xs" />
+                          <FiEye className="text-[10px]" />
                         </button>
                         <button
                           type="button"
                           onClick={() => handleEditProperty(property)}
-                          className="w-7 h-7 rounded-lg hover:bg-blue-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-blue-600 hover:scale-110"
+                          className="w-5 h-5 rounded-md hover:bg-blue-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-blue-600 hover:scale-110"
                           title="Edit"
                         >
-                          <FiEdit className="text-xs" />
+                          <FiEdit className="text-[10px]" />
                         </button>
                         <button
                           type="button"
                           onClick={() => handleToggleFeature(property.id)}
                           disabled={actionLoading === `feature_${property.id}`}
-                          className={`w-7 h-7 rounded-lg transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 ${
+                          className={`w-5 h-5 rounded-md transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 ${
                             property.isFeatured
                               ? 'text-purple-600 hover:bg-purple-50'
                               : 'text-amber-600 hover:bg-amber-50'
@@ -2254,16 +2131,16 @@ const PropertyManagersPropertyControl = () => {
                           title={property.isFeatured ? 'Unfeature' : 'Feature'}
                         >
                           {actionLoading === `feature_${property.id}` ? (
-                            <FiRefreshCw className="text-xs animate-spin" />
+                            <FiRefreshCw className="text-[10px] animate-spin" />
                           ) : (
-                            <FaStarSolid className="text-xs" />
+                            <FaStarSolid className="text-[10px]" />
                           )}
                         </button>
                         <button
                           type="button"
                           onClick={() => handleToggleVerify(property.id)}
                           disabled={actionLoading === `verify_${property.id}`}
-                          className={`w-7 h-7 rounded-lg transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 ${
+                          className={`w-5 h-5 rounded-md transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 ${
                             property.isVerified
                               ? 'text-blue-600 hover:bg-blue-50'
                               : 'text-emerald-600 hover:bg-emerald-50'
@@ -2271,16 +2148,16 @@ const PropertyManagersPropertyControl = () => {
                           title={property.isVerified ? 'Unverify' : 'Verify'}
                         >
                           {actionLoading === `verify_${property.id}` ? (
-                            <FiRefreshCw className="text-xs animate-spin" />
+                            <FiRefreshCw className="text-[10px] animate-spin" />
                           ) : (
-                            <FiShield className="text-xs" />
+                            <FiShield className="text-[10px]" />
                           )}
                         </button>
                         <button
                           type="button"
                           onClick={() => handleToggleSuspend(property.id)}
                           disabled={actionLoading === `suspend_${property.id}`}
-                          className={`w-7 h-7 rounded-lg transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 ${
+                          className={`w-5 h-5 rounded-md transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 ${
                             property.status === 'suspended'
                               ? 'text-emerald-600 hover:bg-emerald-50'
                               : 'text-red-600 hover:bg-red-50'
@@ -2288,39 +2165,28 @@ const PropertyManagersPropertyControl = () => {
                           title={property.status === 'suspended' ? 'Unsuspend' : 'Suspend'}
                         >
                           {actionLoading === `suspend_${property.id}` ? (
-                            <FiRefreshCw className="text-xs animate-spin" />
+                            <FiRefreshCw className="text-[10px] animate-spin" />
                           ) : property.status === 'suspended' ? (
-                            <FiCheckCircle className="text-xs" />
+                            <FiCheckCircle className="text-[10px]" />
                           ) : (
-                            <FiMinimize className="text-xs" />
+                            <FiMinimize className="text-[10px]" />
                           )}
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDeleteProperty(property.id)}
                           disabled={actionLoading === `delete_${property.id}`}
-                          className="w-7 h-7 rounded-lg hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-red-500 hover:scale-110 disabled:opacity-50"
+                          className="w-5 h-5 rounded-md hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-red-500 hover:scale-110 disabled:opacity-50"
                           title="Delete"
                         >
                           {actionLoading === `delete_${property.id}` ? (
-                            <FiRefreshCw className="text-xs animate-spin" />
+                            <FiRefreshCw className="text-[10px] animate-spin" />
                           ) : (
-                            <FiTrash2 className="text-xs" />
+                            <FiTrash2 className="text-[10px]" />
                           )}
                         </button>
-                      </>
+                      </div>
                     )}
-                  </div>
-
-                  <div className="col-span-12 mt-1 flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => handleViewManagerProfile(property.managerId)}
-                      className="px-3 py-1 text-[10px] font-medium text-[#00695C] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center gap-1 hover:scale-[1.02]"
-                    >
-                      <FiExternalLink className="text-[10px]" />
-                      View Manager Profile
-                    </button>
                   </div>
                 </div>
               );
@@ -2331,7 +2197,7 @@ const PropertyManagersPropertyControl = () => {
         {paginatedProperties.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-[#E8F0EE]">
             <div className="w-24 h-24 rounded-full bg-[#F5F9F8] flex items-center justify-center mb-4 animate-float">
-              <FaClipboardList className="text-4xl text-[#B5C9C5]" />
+              <FaHome className="text-4xl text-[#B5C9C5]" />
             </div>
             <h3 className="text-xl font-semibold text-[#1A2E2A]">No properties found</h3>
             <p className="text-sm text-[#5A7D78] mt-1">
@@ -2415,6 +2281,8 @@ const PropertyManagersPropertyControl = () => {
           </div>
         </div>
       )}
+
+      <div className="pb-5"/>
 
       {/* CSS Animations */}
       <style>{`

@@ -581,7 +581,7 @@ const BuyerTenantsOverview = () => {
   };
 
   return (
-    <div className="relative bg-gray-50 dark:bg-gray-900 min-h-screen p-4 md:p-6">
+    <div className="relative bg-gray-50 dark:bg-gray-900 min-h-full h-full overflow-y-auto custom-page-scroll p-4 md:p-6 pb-24">
       {/* ============ TOAST NOTIFICATION ============ */}
       {toast.show && (
         <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-xl animate-slide-in-right flex items-center gap-3 ${
@@ -1128,7 +1128,7 @@ const BuyerTenantsOverview = () => {
       </div>
 
       {/* ============ FOOTER NOTE ============ */}
-      <div className="mt-6 text-center animate-fade-in">
+      <div className="mt-6 text-center animate-fade-in pb-20">
         <p className="text-xs text-gray-500 flex items-center justify-center gap-2">
           <span className="w-1 h-1 rounded-full bg-[#26A69A] animate-pulse" />
           Live Data Updated Every 30 Seconds

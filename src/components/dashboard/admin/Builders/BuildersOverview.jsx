@@ -339,9 +339,9 @@ const BuildersOverview = () => {
   }, [navigate]);
 
   return (
-    <div className="space-y-6 p-4 lg:p-6 bg-gradient-to-br from-[#f8fafc] via-white to-[#f1f5f9] min-h-screen relative">
+    <div className="space-y-6 p-4 lg:p-6 pb-24 bg-[#F8FAF9] min-h-full h-full overflow-y-auto custom-page-scroll relative">
       {/* ===== ANIMATED BACKGROUND ===== */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-[#00695C]/5 rounded-full blur-3xl animate-float" />
         <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-[#26A69A]/5 rounded-full blur-3xl animate-float-delayed" />
         <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
@@ -566,36 +566,9 @@ const BuildersOverview = () => {
         </div>
       </div>
 
-      {/* ===== RECENT ACTIVITIES ===== */}
-      {/* <div>
-        <SectionHeader
-          icon={<FiActivity className="text-white text-sm" />}
-          title="Recent Activities"
-          subtitle="Live updates from builders and projects"
-          action={true}
-          actionLabel="View All"
-          onAction={() => navigateTo('/admin/notifications')}
-        />
-        
-        <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/50 shadow-lg p-4 hover:shadow-xl transition-all duration-300 hover:border-[#00695C]/20">
-          {activities.map((activity, index) => (
-            <ActivityItem
-              key={index}
-              icon={activity.icon}
-              title={activity.title}
-              time={activity.time}
-              description={activity.description}
-              color={activity.color}
-              gradient={activity.gradient}
-              index={index}
-              isLast={index === activities.length - 1}
-            />
-          ))}
-        </div>
-      </div> */}
 
       {/* ===== FOOTER ===== */}
-      <div className="text-center pt-4">
+      <div className="text-center pt-4 pb-10">
         <p className="text-[11px] text-gray-500 flex items-center justify-center gap-2">
           <span className="w-4 h-0.5 bg-gray-300 rounded-full" />
           <span>© 2026 Builders Overview • All rights reserved</span>
@@ -647,10 +620,7 @@ const BuildersOverview = () => {
         .animate-shimmer { animation: shimmer 3s ease-in-out infinite; }
         .animate-breathe { animation: breathe 3s ease-in-out infinite; }
         
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #00695C, #26A69A); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #00695C; }
+       
         
         ::selection { background: #00695C; color: white; }
       `}</style>

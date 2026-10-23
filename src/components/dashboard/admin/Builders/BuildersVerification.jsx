@@ -1167,8 +1167,8 @@ const BuildersVerification = () => {
   }, [showToast, updateStats]);
 
   return (
-    <div className="space-y-6 p-4 lg:p-6 bg-[#F8FAF9] min-h-screen">
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+    <div className="space-y-6 p-4 lg:p-6 pb-24 bg-[#F8FAF9] min-h-full h-full overflow-y-auto custom-page-scroll relative">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-[#00695C]/5 rounded-full blur-3xl animate-float" />
         <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-[#26A69A]/5 rounded-full blur-3xl animate-float-delayed" />
       </div>
@@ -1550,7 +1550,8 @@ const BuildersVerification = () => {
           </div>
         </div>
       )}
-
+    
+       <div className="pb-5"/>
       <style>{`
         @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slide-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }

@@ -2169,8 +2169,8 @@ const PaymentReports = () => {
   };
 
   return (
-    <div className="space-y-6 p-4 lg:p-6 min-h-screen bg-[#F8FAF9]">
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+    <div className="space-y-6 p-4 lg:p-6 pb-24 bg-[#F8FAF9] min-h-full h-full overflow-y-auto custom-page-scroll relative">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-1/2 -right-1/2 w-[500px] h-[500px] rounded-full blur-3xl animate-float bg-[#00695C]/5" />
         <div className="absolute -bottom-1/2 -left-1/2 w-[500px] h-[500px] rounded-full blur-3xl animate-float-delayed bg-[#26A69A]/5" />
         <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] rounded-full blur-3xl animate-pulse-slow bg-[#8B5CF6]/3" />
@@ -2256,6 +2256,8 @@ const PaymentReports = () => {
         </div>
       ) : renderChartSection()}
 
+      <div className="pb-5"/>
+
       <style>{`
         @keyframes fade-in { 
           from { opacity: 0; transform: translateY(10px); } 
@@ -2333,11 +2335,7 @@ const PaymentReports = () => {
         .animate-spin-reverse { animation: spin-reverse 3s linear infinite; }
         .animate-shimmer { animation: shimmer 2s ease-in-out infinite; }
         .animate-count-up { animation: count-up 0.6s ease-out forwards; }
-        
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #F1F5F4; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #8FA8A4; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #00695C; }
+
         
         button, select, input, [role="button"] {
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

@@ -1746,8 +1746,10 @@ const PropertyManagement = () => {
   }, [activeCategory, datePreset, customStart, customEnd, showToast]);
 
   return (
-    <div className="space-y-6 p-4 lg:p-6 min-h-screen bg-[#F8FAF9]">
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+    <div className="space-y-6 p-4 lg:p-6 pb-24 h-[calc(100vh-64px)] overflow-y-auto custom-page-scroll bg-[#F8FAF9] relative">
+      
+      {/* Animated Background Elements (Keep as absolute) */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-1/2 -right-1/2 w-[500px] h-[500px] rounded-full blur-3xl animate-float bg-[#00695C]/5" />
         <div className="absolute -bottom-1/2 -left-1/2 w-[500px] h-[500px] rounded-full blur-3xl animate-float-delayed bg-[#26A69A]/5" />
       </div>
@@ -1906,6 +1908,8 @@ const PropertyManagement = () => {
           </div>
         </>
       )}
+
+      <div className="pb-30"/>
 
       <style>{`
         @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

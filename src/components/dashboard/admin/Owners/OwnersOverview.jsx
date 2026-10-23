@@ -512,10 +512,7 @@ const OwnersOverview = () => {
         .animate-shimmer { animation: shimmer 3s ease-in-out infinite; }
         .animate-breathe { animation: breathe 3s ease-in-out infinite; }
         
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #00695C, #26A69A); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #00695C; }
+     
         
         ::selection { background: #00695C; color: white; }
       `}</style>

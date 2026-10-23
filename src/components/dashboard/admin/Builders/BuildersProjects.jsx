@@ -160,9 +160,67 @@ const ViewProjectModal = ({ project, show, onClose }) => {
 
   const amenities = project.amenities || ['Club House', 'Swimming Pool', 'Gymnasium', 'Children\'s Play Area'];
 
+  // ---- Seed for fallbacks only ----
+  const seed = project.id
+    ? project.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+    : 0;
+
+  const totalUnits = Number(project.totalUnits) || 10;
+  const availableUnits = Math.min(Number(project.availableUnits) || 0, totalUnits);
+  const nonAvailable = totalUnits - availableUnits;
+
+  // ---- PREFER saved values; only derive if absent ----
+  const bookedUnits   = project.bookedUnits   != null ? Number(project.bookedUnits)   : Math.floor(nonAvailable * 0.4);
+  const reservedUnits = project.reservedUnits != null ? Number(project.reservedUnits) : Math.floor(nonAvailable * 0.3);
+  const soldUnits     = project.soldUnits     != null ? Number(project.soldUnits)     : (nonAvailable - bookedUnits - reservedUnits);
+
+  const totalFloors    = project.totalFloors    != null ? Number(project.totalFloors)    : Math.max(1, Math.ceil(totalUnits / (2 + (seed % 3))));
+  const totalBuildings = project.totalBuildings != null ? Number(project.totalBuildings) : (totalUnits <= 20 ? 1 : totalUnits <= 80 ? 2 + (seed % 2) : 3 + (seed % 3));
+
+  const constructionProgress = project.constructionProgress != null
+    ? Number(project.constructionProgress)
+    : (project.status === 'completed' ? 100 :
+       project.status === 'ongoing' ? 35 + (seed % 55) :
+       project.status === 'upcoming' ? 0 :
+       project.status === 'new-launch' ? 5 + (seed % 10) :
+       project.status === 'onHold' ? 20 + (seed % 40) :
+       project.status === 'cancelled' ? 10 + (seed % 30) : 0);
+
+  const maxPrice = project.maxPrice != null
+    ? Number(project.maxPrice)
+    : Math.round((project.price * (1.8 + (seed % 7) / 10)) / 100000) * 100000;
+
+  const projectStartDate = project.startDate
+    || project.launchDate
+    || new Date(Date.now() - ((seed % 12) + 6) * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+  const streetNames = ['MG Road', 'Park Avenue', 'Ring Road', 'Lake View Road', 'Hill Street', 'Green Lane'];
+  const areasList = ['Sector 12', 'Sector 45', 'Phase 2', 'Block C', 'Extension Colony', 'Layout 7'];
+  const fallbackAddress = `${project.name}, Plot No. ${(seed % 90) + 1}, ${areasList[(seed + 3) % areasList.length]}, ${streetNames[seed % streetNames.length]}, ${project.location}`;
+
+  const fullAddress = project.fullAddress || fallbackAddress;
+  const pinCode = project.pinCode || String(400000 + (seed * 37) % 99999);
+
+  const reraApplicable = ['Apartment', 'Commercial', 'Land & Plots'].includes(project.type);
+  const reraNumber = reraApplicable
+    ? (project.reraNumber || `RERA/${project.location.split(',')[0].slice(0, 3).toUpperCase()}/${(seed % 9000) + 1000}/${new Date(projectStartDate).getFullYear()}`)
+    : null;
+
+  const verificationStatus = project.isVerified ? 'Verified' : 'Not Verified';
+
+  // Type Colors Map (matching the project cards)
+  const typeColors = {
+    'Individual': 'bg-rose-100 text-rose-700 border-rose-200',
+    'Apartment': 'bg-blue-100 text-blue-700 border-blue-200',
+    'Commercial': 'bg-orange-100 text-orange-700 border-orange-200',
+    'Land & Plots': 'bg-lime-100 text-lime-700 border-lime-200',
+    'Hostel': 'bg-fuchsia-100 text-fuchsia-700 border-fuchsia-200',
+  };
+
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
+        {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] px-5 py-3 rounded-t-2xl z-10 shrink-0 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white">
@@ -182,60 +240,172 @@ const ViewProjectModal = ({ project, show, onClose }) => {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-white">
-          {/* Title and Status */}
-          <div className="flex items-start justify-between">
+          
+          {/* --- UPDATED HEADER SECTION WITH TYPECOLOR BADGES --- */}
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
             <div>
               <h3 className="text-lg font-bold text-[#1A2E2A]">{project.name}</h3>
-              <p className="text-sm text-[#5A7D78]">{project.type} · {project.location}</p>
+              <p className="text-xs text-[#5A7D78] mt-0.5 flex items-center gap-1.5">
+                <FiMapPin className="text-[#00695C]" /> {project.location}
+              </p>
             </div>
+            
             <div className="flex items-center gap-2 flex-wrap">
-              <span className={`text-[10px] px-2.5 py-1 rounded-full font-semibold ${STATUS_BADGE[project.status] || 'bg-gray-100 text-gray-700'}`}>
-                {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+              {/* Status Badge */}
+              <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider border ${STATUS_BADGE[project.status] || 'bg-gray-100 text-gray-700 border-gray-200'}`}>
+                {project.status === 'onHold' ? 'On Hold' : project.status === 'new-launch' ? 'New Launch' : project.status.charAt(0).toUpperCase() + project.status.slice(1)}
               </span>
+
+              {/* Type Badge (Colorful) */}
+              <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold flex items-center gap-1.5 border ${typeColors[project.type] || 'bg-gray-100 text-gray-700 border-gray-200'}`}>
+                {project.type === 'Individual' && <FiUser className="text-xs" />}
+                {project.type === 'Apartment' && <MdApartment className="text-xs" />}
+                {project.type === 'Commercial' && <MdOutlineBusiness className="text-xs" />}
+                {project.type === 'Land & Plots' && <FiMapPin className="text-xs" />}
+                {project.type === 'Hostel' && <FiHome className="text-xs" />}
+                {project.type}
+              </span>
+
+              {/* Verified Badge */}
               {project.isVerified && (
-                <span className="text-[10px] px-2.5 py-1 rounded-full font-semibold bg-blue-100 text-blue-700">
+                <span className="text-[10px] px-2.5 py-1 rounded-full font-bold bg-blue-100 text-blue-700 border border-blue-200">
                   <FiShield className="inline mr-1 text-xs" /> Verified
                 </span>
               )}
+
+              {/* Featured Badge */}
               {project.isFeatured && (
-                <span className="text-[10px] px-2.5 py-1 rounded-full font-semibold bg-purple-100 text-purple-700">
+                <span className="text-[10px] px-2.5 py-1 rounded-full font-bold bg-purple-100 text-purple-700 border border-purple-200">
                   <FaStarSolid className="inline mr-1 text-xs" /> Featured
                 </span>
               )}
             </div>
           </div>
+          {/* ------------------------------------------------- */}
 
-          {/* Quick Stats */}
-          <div className="grid grid-cols-3 gap-3">
+          {/* Key stats row */}
+          <div className="grid grid-cols-3 gap-3 mt-1">
             <div className="text-center p-3 bg-[#F5F9F8] rounded-xl">
-              <p className="text-lg font-bold text-[#1A2E2A]">₹{project.price.toLocaleString()}</p>
+              <p className="text-lg font-bold text-[#1A2E2A]">₹{Number(project.price).toLocaleString()}</p>
               <p className="text-[9px] uppercase tracking-wider text-[#5A7D78]">Starting Price</p>
             </div>
             <div className="text-center p-3 bg-[#F5F9F8] rounded-xl">
-              <p className="text-lg font-bold text-[#1A2E2A]">{project.totalUnits}</p>
-              <p className="text-[9px] uppercase tracking-wider text-[#5A7D78]">Total Units</p>
+              <p className="text-lg font-bold text-[#1A2E2A]">₹{maxPrice.toLocaleString()}</p>
+              <p className="text-[9px] uppercase tracking-wider text-[#5A7D78]">Maximum Price</p>
             </div>
             <div className="text-center p-3 bg-[#F5F9F8] rounded-xl">
-              <p className="text-lg font-bold text-[#00695C]">{project.availableUnits}</p>
-              <p className="text-[9px] uppercase tracking-wider text-[#5A7D78]">Available</p>
+              <p className="text-lg font-bold text-[#1A2E2A]">{totalUnits}</p>
+              <p className="text-[9px] uppercase tracking-wider text-[#5A7D78]">Total Units</p>
             </div>
           </div>
 
-          {/* Details */}
+          {/* Unit availability breakdown */}
+          <div>
+            <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-2">Unit Availability</h4>
+            <div className="grid grid-cols-4 gap-2">
+              <div className="text-center p-2.5 bg-emerald-50 rounded-xl border-l-4 border-l-emerald-500">
+                <p className="text-base font-bold text-emerald-600">{availableUnits}</p>
+                <p className="text-[8px] text-emerald-600 uppercase tracking-wider">Available</p>
+              </div>
+              <div className="text-center p-2.5 bg-red-50 rounded-xl border-l-4 border-l-red-500">
+                <p className="text-base font-bold text-red-600">{bookedUnits}</p>
+                <p className="text-[8px] text-red-600 uppercase tracking-wider">Booked</p>
+              </div>
+              <div className="text-center p-2.5 bg-amber-50 rounded-xl border-l-4 border-l-amber-500">
+                <p className="text-base font-bold text-amber-600">{reservedUnits}</p>
+                <p className="text-[8px] text-amber-600 uppercase tracking-wider">Reserved</p>
+              </div>
+              <div className="text-center p-2.5 bg-gray-50 rounded-xl border-l-4 border-l-gray-500">
+                <p className="text-base font-bold text-gray-600">{soldUnits}</p>
+                <p className="text-[8px] text-gray-600 uppercase tracking-wider">Sold</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Project details */}
           <div>
             <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-2">Details</h4>
-            <div className="grid grid-cols-2 gap-2 text-sm bg-[#F5F9F8] rounded-xl p-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm bg-[#F5F9F8] rounded-xl p-3">
               <div className="flex items-center gap-2 text-[#5A7D78]">
-                <FiMapPin className="text-[#00695C]" /> {project.location}
+                <FiMapPin className="text-[#00695C] shrink-0" />Location: {project.location}
               </div>
               <div className="flex items-center gap-2 text-[#5A7D78]">
-                <FiSquare className="text-[#00695C]" /> {project.area} {project.areaUnit}
+                <FiSquare className="text-[#00695C] shrink-0" /> Project Area: {project.area} {project.areaUnit}
               </div>
               <div className="flex items-center gap-2 text-[#5A7D78]">
-                <FiTag className="text-[#00695C]" /> {project.type}
+                <FiTag className="text-[#00695C] shrink-0" /> Property Type: {project.type}
               </div>
               <div className="flex items-center gap-2 text-[#5A7D78]">
-                <FiCalendar className="text-[#00695C]" /> Expected: {project.expectedCompletion}
+                <FiCalendar className="text-[#00695C] shrink-0" /> Start Date: {projectStartDate}
+              </div>
+              <div className="flex items-center gap-2 text-[#5A7D78]">
+                <FiCalendar className="text-[#00695C] shrink-0" /> Expected: {project.expectedCompletion}
+              </div>
+              <div className="flex items-center gap-2 text-[#5A7D78]">
+                <FiLayers className="text-[#00695C] shrink-0" /> Total Floors: {totalFloors}
+              </div>
+              <div className="flex items-center gap-2 text-[#5A7D78]">
+                <MdOutlineBusiness className="text-[#00695C] shrink-0" /> Buildings/Blocks: {totalBuildings}
+              </div>
+            </div>
+          </div>
+
+          {/* Construction progress */}
+          <div>
+            <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-2">Construction Progress</h4>
+            <div className="bg-[#F5F9F8] rounded-xl p-3">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs text-[#5A7D78]">Overall completion</span>
+                <span className="text-sm font-bold text-[#00695C]">{constructionProgress}%</span>
+              </div>
+              <div className="w-full h-2.5 bg-white rounded-full overflow-hidden border border-[#E8F0EE]">
+                <div
+                  className="h-full bg-gradient-to-r from-[#00695C] to-[#26A69A] rounded-full transition-all duration-500"
+                  style={{ width: `${constructionProgress}%` }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Full address */}
+          <div>
+            <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-2">Full Address</h4>
+            <div className="bg-[#F5F9F8] rounded-xl p-3 space-y-1.5">
+              <div className="flex items-start gap-2 text-sm text-[#5A7D78]">
+                <FiMapPin className="text-[#00695C] mt-0.5 shrink-0" />
+                <span className="leading-relaxed">{fullAddress}</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-[#5A7D78]">
+                <FiInfo className="text-[#00695C] shrink-0" /> PIN Code: <span className="font-medium text-[#1A2E2A]">{pinCode}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Verification + RERA */}
+          <div>
+            <h4 className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider mb-2">Verification &amp; Compliance</h4>
+            <div className="bg-[#F5F9F8] rounded-xl p-3 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-[#5A7D78] flex items-center gap-2">
+                  <FiShield className="text-[#00695C]" /> Project Verification
+                </span>
+                <span className={`text-[10px] px-2.5 py-1 rounded-full font-semibold ${project.isVerified ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-700'}`}>
+                  {verificationStatus}
+                </span>
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t border-[#E8F0EE]">
+                <span className="text-sm text-[#5A7D78] flex items-center gap-2">
+                  <FiFileText className="text-[#00695C]" /> RERA Registration
+                </span>
+                {reraApplicable ? (
+                  <span className="text-[11px] font-medium text-[#1A2E2A] bg-white px-2.5 py-1 rounded-lg border border-[#E8F0EE]">
+                    {reraNumber}
+                  </span>
+                ) : (
+                  <span className="text-[10px] px-2.5 py-1 rounded-full font-semibold bg-gray-100 text-gray-600">
+                    Not Applicable
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -288,9 +458,45 @@ const EditProjectModal = ({ project, show, onClose, onSave, loading }) => {
 
   useEffect(() => {
     if (project && show) {
+      const seed = project.id
+        ? project.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+        : 0;
+
+      const totalUnits = project.totalUnits || 1;
+      const availableUnits = Math.min(project.availableUnits || 0, totalUnits);
+      const nonAvailable = totalUnits - availableUnits;
+
+      const fallbackBooked = Math.floor(nonAvailable * 0.4);
+      const fallbackReserved = Math.floor(nonAvailable * 0.3);
+      const fallbackSold = nonAvailable - fallbackBooked - fallbackReserved;
+
+      const fallbackFloors = Math.max(1, Math.ceil(totalUnits / (2 + (seed % 3))));
+      const fallbackBuildings =
+        totalUnits <= 20 ? 1 : totalUnits <= 80 ? 2 + (seed % 2) : 3 + (seed % 3);
+      const fallbackProgress =
+        project.status === 'completed' ? 100 :
+        project.status === 'ongoing' ? 35 + (seed % 55) :
+        project.status === 'upcoming' ? 0 :
+        project.status === 'new-launch' ? 5 + (seed % 10) :
+        project.status === 'onHold' ? 20 + (seed % 40) :
+        project.status === 'cancelled' ? 10 + (seed % 30) : 0;
+      const fallbackMaxPrice = Math.round((project.price * (1.8 + (seed % 7) / 10)) / 100000) * 100000;
+      const fallbackStartDate = project.launchDate
+        ? project.launchDate
+        : new Date(Date.now() - ((seed % 12) + 6) * 30 * 24 * 60 * 60 * 1000)
+            .toISOString().split('T')[0];
+      const fallbackPin = String(400000 + (seed * 37) % 99999);
+      const streetNames = ['MG Road', 'Park Avenue', 'Ring Road', 'Lake View Road', 'Hill Street', 'Green Lane'];
+      const areasList = ['Sector 12', 'Sector 45', 'Phase 2', 'Block C', 'Extension Colony', 'Layout 7'];
+      const fallbackAddress = `${project.name}, Plot No. ${(seed % 90) + 1}, ${areasList[(seed + 3) % areasList.length]}, ${streetNames[seed % streetNames.length]}, ${project.location}`;
+      const reraApplicable = ['Apartment', 'Commercial', 'Land & Plots'].includes(project.type);
+      const fallbackRera = reraApplicable
+        ? `RERA/${project.location.split(',')[0].slice(0, 3).toUpperCase()}/${(seed % 9000) + 1000}/${new Date(fallbackStartDate).getFullYear()}`
+        : '';
+
       setFormData({
         name: project.name || '',
-        type: project.type || 'Residential',
+        type: project.type || 'Apartment',
         location: project.location || '',
         price: project.price || '',
         totalUnits: project.totalUnits || 1,
@@ -305,6 +511,20 @@ const EditProjectModal = ({ project, show, onClose, onSave, loading }) => {
         amenities: project.amenities ? project.amenities.join(', ') : '',
         expectedCompletion: project.expectedCompletion || '',
         launchDate: project.launchDate || '',
+
+        // New fields
+        startDate: project.startDate || fallbackStartDate,
+        constructionProgress: project.constructionProgress ?? fallbackProgress,
+        totalFloors: project.totalFloors ?? fallbackFloors,
+        totalBuildings: project.totalBuildings ?? fallbackBuildings,
+        fullAddress: project.fullAddress || fallbackAddress,
+        pinCode: project.pinCode || fallbackPin,
+        maxPrice: project.maxPrice ?? fallbackMaxPrice,
+        bookedUnits: project.bookedUnits ?? fallbackBooked,
+        reservedUnits: project.reservedUnits ?? fallbackReserved,
+        soldUnits: project.soldUnits ?? fallbackSold,
+        reraNumber: project.reraNumber || fallbackRera,
+        reraApplicable,
       });
       setErrors({});
     }
@@ -312,7 +532,7 @@ const EditProjectModal = ({ project, show, onClose, onSave, loading }) => {
 
   if (!project || !show || !formData) return null;
 
-  const projectTypes = ['Residential', 'Commercial', 'Mixed-Use', 'Luxury', 'Affordable', 'Township'];
+  const projectTypes = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
   const statusOptions = ['ongoing', 'completed', 'upcoming', 'new-launch', 'onHold', 'cancelled'];
 
   const handleChange = (e) => {
@@ -332,6 +552,22 @@ const EditProjectModal = ({ project, show, onClose, onSave, loading }) => {
     if (!formData.location.trim()) newErrors.location = 'Location is required';
     if (!formData.price || formData.price <= 0) newErrors.price = 'Valid price is required';
     if (!formData.area || formData.area <= 0) newErrors.area = 'Valid area is required';
+
+    const total = Number(formData.totalUnits) || 0;
+    const avail = Number(formData.availableUnits) || 0;
+    const booked = Number(formData.bookedUnits) || 0;
+    const reserved = Number(formData.reservedUnits) || 0;
+    const sold = Number(formData.soldUnits) || 0;
+
+    if (avail + booked + reserved + sold !== total) {
+      newErrors.unitSum = `Available + Booked + Reserved + Sold (${avail + booked + reserved + sold}) must equal Total Units (${total})`;
+    }
+
+    const progress = Number(formData.constructionProgress);
+    if (progress < 0 || progress > 100) {
+      newErrors.constructionProgress = 'Progress must be between 0 and 100';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -349,9 +585,17 @@ const EditProjectModal = ({ project, show, onClose, onSave, loading }) => {
       ...formData,
       amenities: amenitiesArray,
       price: Number(formData.price),
+      maxPrice: Number(formData.maxPrice),
       totalUnits: Number(formData.totalUnits),
       availableUnits: Number(formData.availableUnits),
+      bookedUnits: Number(formData.bookedUnits),
+      reservedUnits: Number(formData.reservedUnits),
+      soldUnits: Number(formData.soldUnits),
       area: Number(formData.area),
+      constructionProgress: Number(formData.constructionProgress),
+      totalFloors: Number(formData.totalFloors),
+      totalBuildings: Number(formData.totalBuildings),
+      launchDate: formData.startDate,
     };
 
     setTimeout(() => {
@@ -362,7 +606,7 @@ const EditProjectModal = ({ project, show, onClose, onSave, loading }) => {
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
+      <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[88vh] overflow-hidden shadow-2xl animate-slide-up border border-[#E8F0EE] flex flex-col">
         <div className="sticky top-0 bg-gradient-to-r from-[#00695C] to-[#26A69A] px-5 py-3 rounded-t-2xl z-10 shrink-0 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white">
@@ -381,119 +625,231 @@ const EditProjectModal = ({ project, show, onClose, onSave, loading }) => {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-3 bg-white">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div className="md:col-span-2">
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Project Name <span className="text-red-500">*</span></label>
-              <input type="text" name="name" value={formData.name} onChange={handleChange}
-                className={`w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.name ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none`} />
-              {errors.name && <p className="text-[10px] text-red-500 mt-0.5">{errors.name}</p>}
-            </div>
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Type</label>
-              <select name="type" value={formData.type} onChange={handleChange}
-                className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none">
-                {projectTypes.map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Status</label>
-              <select name="status" value={formData.status} onChange={handleChange}
-                className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none">
-                {statusOptions.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
-              </select>
-            </div>
-          </div>
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div className="md:col-span-2">
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Location <span className="text-red-500">*</span></label>
-              <input type="text" name="location" value={formData.location} onChange={handleChange}
-                className={`w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.location ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none`} />
-              {errors.location && <p className="text-[10px] text-red-500 mt-0.5">{errors.location}</p>}
-            </div>
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Starting Price (₹) <span className="text-red-500">*</span></label>
-              <input type="number" name="price" value={formData.price} onChange={handleChange}
-                className={`w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.price ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none`} min="0" />
-              {errors.price && <p className="text-[10px] text-red-500 mt-0.5">{errors.price}</p>}
-            </div>
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Area <span className="text-red-500">*</span></label>
-              <input type="number" name="area" value={formData.area} onChange={handleChange}
-                className={`w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.area ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none`} min="0" />
-              {errors.area && <p className="text-[10px] text-red-500 mt-0.5">{errors.area}</p>}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Total Units</label>
-              <input type="number" name="totalUnits" value={formData.totalUnits} onChange={handleChange}
-                className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" min="0" />
-            </div>
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Available Units</label>
-              <input type="number" name="availableUnits" value={formData.availableUnits} onChange={handleChange}
-                className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" min="0" />
-            </div>
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Area Unit</label>
-              <select name="areaUnit" value={formData.areaUnit} onChange={handleChange}
-                className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none">
-                <option value="sq ft">sq ft</option>
-                <option value="sq m">sq m</option>
-                <option value="acres">acres</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Builder</label>
-              <input type="text" name="builderName" value={formData.builderName} onChange={handleChange}
-                className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Expected Completion</label>
-              <input type="date" name="expectedCompletion" value={formData.expectedCompletion} onChange={handleChange}
-                className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" />
-            </div>
-            <div>
-              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Launch Date</label>
-              <input type="date" name="launchDate" value={formData.launchDate} onChange={handleChange}
-                className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" />
-            </div>
-          </div>
-
+          {/* Basic Information */}
           <div>
-            <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Amenities <span className="text-[#B5C9C5]">(comma separated)</span></label>
-            <input type="text" name="amenities" value={formData.amenities} onChange={handleChange}
-              className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" placeholder="Club House, Swimming Pool, Gym" />
+            <h4 className="text-[10px] font-semibold text-[#00695C] uppercase tracking-wider mb-2">Basic Information</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="md:col-span-2">
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Project Name <span className="text-red-500">*</span></label>
+                <input type="text" name="name" value={formData.name} onChange={handleChange}
+                  className={`w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.name ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none`} />
+                {errors.name && <p className="text-[10px] text-red-500 mt-0.5">{errors.name}</p>}
+              </div>
+              <div>
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Type</label>
+                <select name="type" value={formData.type} onChange={handleChange}
+                  className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none">
+                  {projectTypes.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Status</label>
+                <select name="status" value={formData.status} onChange={handleChange}
+                  className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none">
+                  {statusOptions.map(s => <option key={s} value={s}>{s === 'onHold' ? 'On Hold' : s === 'new-launch' ? 'New Launch' : s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
+                </select>
+              </div>
+              <div className="md:col-span-2">
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Location (City) <span className="text-red-500">*</span></label>
+                <input type="text" name="location" value={formData.location} onChange={handleChange}
+                  className={`w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.location ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none`} />
+                {errors.location && <p className="text-[10px] text-red-500 mt-0.5">{errors.location}</p>}
+              </div>
+              <div>
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Builder</label>
+                <input type="text" name="builderName" value={formData.builderName} onChange={handleChange}
+                  className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" />
+              </div>
+              <div>
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Project Area <span className="text-[#B5C9C5]">(not unit area)</span> <span className="text-red-500">*</span></label>
+                <div className="flex gap-2">
+                  <input type="number" name="area" value={formData.area} onChange={handleChange}
+                    className={`flex-1 px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.area ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none`} min="0" />
+                  <select name="areaUnit" value={formData.areaUnit} onChange={handleChange}
+                    className="w-24 px-2 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none">
+                    <option value="sq ft">sq ft</option>
+                    <option value="sq m">sq m</option>
+                    <option value="acres">acres</option>
+                  </select>
+                </div>
+                {errors.area && <p className="text-[10px] text-red-500 mt-0.5">{errors.area}</p>}
+              </div>
+            </div>
           </div>
 
+          {/* Pricing */}
           <div>
-            <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Description</label>
-            <textarea name="description" value={formData.description} onChange={handleChange}
-              rows="2" className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none resize-none" />
+            <h4 className="text-[10px] font-semibold text-[#00695C] uppercase tracking-wider mb-2">Pricing</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Starting Price (₹) <span className="text-red-500">*</span></label>
+                <input type="number" name="price" value={formData.price} onChange={handleChange}
+                  className={`w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border ${errors.price ? 'border-red-400' : 'border-[#E8F0EE]'} focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none`} min="0" />
+                {errors.price && <p className="text-[10px] text-red-500 mt-0.5">{errors.price}</p>}
+              </div>
+              <div>
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Maximum Price (₹)</label>
+                <input type="number" name="maxPrice" value={formData.maxPrice} onChange={handleChange}
+                  className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" min="0" />
+              </div>
+            </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <label className="flex items-center gap-2 text-xs font-medium text-[#1A2E2A]">
-              <input type="checkbox" name="isFeatured" checked={formData.isFeatured} onChange={handleChange}
-                className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C]" />
-              Featured
-            </label>
-            <label className="flex items-center gap-2 text-xs font-medium text-[#1A2E2A]">
-              <input type="checkbox" name="isVerified" checked={formData.isVerified} onChange={handleChange}
-                className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C]" />
-              Verified
-            </label>
+          {/* Units & Availability */}
+          <div>
+            <h4 className="text-[10px] font-semibold text-[#00695C] uppercase tracking-wider mb-2">Units &amp; Availability</h4>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+              <div>
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Total Units</label>
+                <input type="number" name="totalUnits" value={formData.totalUnits} onChange={handleChange}
+                  className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" min="0" />
+              </div>
+              <div>
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Available</label>
+                <input type="number" name="availableUnits" value={formData.availableUnits} onChange={handleChange}
+                  className="w-full px-3 py-1.5 bg-emerald-50 rounded-lg border border-emerald-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300 text-sm outline-none" min="0" />
+              </div>
+              <div>
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Booked</label>
+                <input type="number" name="bookedUnits" value={formData.bookedUnits} onChange={handleChange}
+                  className="w-full px-3 py-1.5 bg-red-50 rounded-lg border border-red-200 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all duration-300 text-sm outline-none" min="0" />
+              </div>
+              <div>
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Reserved</label>
+                <input type="number" name="reservedUnits" value={formData.reservedUnits} onChange={handleChange}
+                  className="w-full px-3 py-1.5 bg-amber-50 rounded-lg border border-amber-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all duration-300 text-sm outline-none" min="0" />
+              </div>
+              <div>
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Sold</label>
+                <input type="number" name="soldUnits" value={formData.soldUnits} onChange={handleChange}
+                  className="w-full px-3 py-1.5 bg-gray-50 rounded-lg border border-gray-200 focus:border-gray-500 focus:ring-2 focus:ring-gray-500/20 transition-all duration-300 text-sm outline-none" min="0" />
+              </div>
+            </div>
+            {errors.unitSum && (
+              <p className="text-[10px] text-red-500 mt-1.5 flex items-center gap-1">
+                <FiAlertTriangle className="text-[10px]" /> {errors.unitSum}
+              </p>
+            )}
+            {!errors.unitSum && (
+              <p className="text-[10px] text-[#5A7D78] mt-1.5">
+                Sum: {Number(formData.availableUnits) + Number(formData.bookedUnits) + Number(formData.reservedUnits) + Number(formData.soldUnits)} / {formData.totalUnits} units
+              </p>
+            )}
+          </div>
+
+          {/* Structure & Timeline */}
+          <div>
+            <h4 className="text-[10px] font-semibold text-[#00695C] uppercase tracking-wider mb-2">Structure &amp; Timeline</h4>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div>
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Total Floors</label>
+                <input type="number" name="totalFloors" value={formData.totalFloors} onChange={handleChange}
+                  className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" min="0" />
+              </div>
+              <div>
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Buildings/Blocks</label>
+                <input type="number" name="totalBuildings" value={formData.totalBuildings} onChange={handleChange}
+                  className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" min="0" />
+              </div>
+              <div>
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Start Date</label>
+                <input type="date" name="startDate" value={formData.startDate} onChange={handleChange}
+                  className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" />
+              </div>
+              <div>
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Expected Completion</label>
+                <input type="date" name="expectedCompletion" value={formData.expectedCompletion} onChange={handleChange}
+                  className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" />
+              </div>
+            </div>
+
+            <div className="mt-3">
+              <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">
+                Construction Progress (%): <span className="font-bold text-[#00695C]">{formData.constructionProgress}%</span>
+              </label>
+              <input type="range" name="constructionProgress" value={formData.constructionProgress} onChange={handleChange}
+                min="0" max="100" step="1"
+                className="w-full accent-[#00695C]" />
+              {errors.constructionProgress && <p className="text-[10px] text-red-500 mt-0.5">{errors.constructionProgress}</p>}
+            </div>
+          </div>
+
+          {/* Address & Compliance */}
+          <div>
+            <h4 className="text-[10px] font-semibold text-[#00695C] uppercase tracking-wider mb-2">Address &amp; Compliance</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="md:col-span-2">
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Full Address</label>
+                <textarea name="fullAddress" value={formData.fullAddress} onChange={handleChange}
+                  rows="2"
+                  className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none resize-none" />
+              </div>
+              <div>
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">PIN Code</label>
+                <input type="text" name="pinCode" value={formData.pinCode} onChange={handleChange}
+                  maxLength={6}
+                  className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+              <div>
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">
+                  RERA Registration Number
+                  {!formData.reraApplicable && <span className="text-[#B5C9C5] ml-1">(not applicable for {formData.type})</span>}
+                </label>
+                <input type="text" name="reraNumber" value={formData.reraNumber} onChange={handleChange}
+                  disabled={!formData.reraApplicable}
+                  placeholder={formData.reraApplicable ? 'RERA/XXX/1234/2024' : 'Not Applicable'}
+                  className={`w-full px-3 py-1.5 rounded-lg border transition-all duration-300 text-sm outline-none ${
+                    !formData.reraApplicable
+                      ? 'bg-gray-100 border-gray-200 text-gray-500 cursor-not-allowed'
+                      : 'bg-[#F5F9F8] border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20'
+                  }`} />
+              </div>
+              <div className="flex items-end">
+                <div className="w-full flex items-center gap-4 pb-1">
+                  <label className="flex items-center gap-2 text-xs font-medium text-[#1A2E2A]">
+                    <input type="checkbox" name="isFeatured" checked={formData.isFeatured} onChange={handleChange}
+                      className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C]" />
+                    Featured
+                  </label>
+                  <label className="flex items-center gap-2 text-xs font-medium text-[#1A2E2A]">
+                    <input type="checkbox" name="isVerified" checked={formData.isVerified} onChange={handleChange}
+                      className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C]" />
+                    Verified
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Description & Amenities */}
+          <div>
+            <h4 className="text-[10px] font-semibold text-[#00695C] uppercase tracking-wider mb-2">Description &amp; Amenities</h4>
+            <div className="space-y-3">
+              <div>
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Amenities <span className="text-[#B5C9C5]">(comma separated)</span></label>
+                <input type="text" name="amenities" value={formData.amenities} onChange={handleChange}
+                  className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none"
+                  placeholder="Club House, Swimming Pool, Gym" />
+              </div>
+              <div>
+                <label className="text-[10px] font-medium text-[#5A7D78] block mb-0.5">Description</label>
+                <textarea name="description" value={formData.description} onChange={handleChange}
+                  rows="2"
+                  className="w-full px-3 py-1.5 bg-[#F5F9F8] rounded-lg border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none resize-none" />
+              </div>
+            </div>
           </div>
 
           <div className="sticky bottom-0 bg-white pt-3 border-t border-[#E8F0EE] flex items-center gap-3">
             <button type="button" onClick={onClose}
-              className="flex-1 px-4 py-2 bg-[#F5F9F8] text-[#1A2E2A] rounded-lg hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium">Cancel</button>
+              className="flex-1 px-4 py-2 bg-[#F5F9F8] text-[#1A2E2A] rounded-lg hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium">
+              Cancel
+            </button>
             <button type="submit" disabled={isSubmitting || loading}
               className="flex-1 px-4 py-2 bg-gradient-to-r from-[#00695C] to-[#26A69A] text-white rounded-lg hover:shadow-xl transition-all duration-300 text-sm font-medium shadow-md shadow-[#00695C]/30 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
               {isSubmitting || loading ? <><FiRefreshCw className="animate-spin text-sm" /> Saving...</> : <><FiSave className="text-sm" /> Save Changes</>}
@@ -509,18 +865,76 @@ const EditProjectModal = ({ project, show, onClose, onSave, loading }) => {
 const UnitAvailabilityModal = ({ project, show, onClose }) => {
   if (!show || !project) return null;
 
-  const units = [
-    { id: 1, number: '101', type: '2 BHK', area: '850 sq ft', price: '₹45,00,000', status: 'available' },
-    { id: 2, number: '102', type: '2 BHK', area: '850 sq ft', price: '₹46,00,000', status: 'booked' },
-    { id: 3, number: '103', type: '3 BHK', area: '1200 sq ft', price: '₹65,00,000', status: 'available' },
-    { id: 4, number: '104', type: '3 BHK', area: '1200 sq ft', price: '₹66,00,000', status: 'reserved' },
-    { id: 5, number: '105', type: '4 BHK', area: '1800 sq ft', price: '₹95,00,000', status: 'sold' },
-    { id: 6, number: '201', type: '2 BHK', area: '850 sq ft', price: '₹47,00,000', status: 'available' },
-    { id: 7, number: '202', type: '3 BHK', area: '1200 sq ft', price: '₹67,00,000', status: 'available' },
-    { id: 8, number: '203', type: '3 BHK', area: '1200 sq ft', price: '₹68,00,000', status: 'reserved' },
-    { id: 9, number: '301', type: '4 BHK', area: '1800 sq ft', price: '₹97,00,000', status: 'available' },
-    { id: 10, number: '302', type: '2 BHK', area: '850 sq ft', price: '₹48,00,000', status: 'booked' },
-  ];
+  const generateUnits = (project) => {
+    const totalUnits = project.totalUnits || 10;
+    const availableCount = Math.min(project.availableUnits || 0, totalUnits);
+    const nonAvailableCount = totalUnits - availableCount;
+
+    // Prefer explicitly saved counts so this always matches the project card & View modal
+    let bookedCount, reservedCount, soldCount;
+    if (project.bookedUnits != null || project.reservedUnits != null || project.soldUnits != null) {
+      bookedCount = Number(project.bookedUnits) || 0;
+      reservedCount = Number(project.reservedUnits) || 0;
+      soldCount = Number(project.soldUnits) || 0;
+      // Reconcile drift: force sum === nonAvailableCount
+      const sum = bookedCount + reservedCount + soldCount;
+      if (sum !== nonAvailableCount) {
+        soldCount = Math.max(0, nonAvailableCount - bookedCount - reservedCount);
+      }
+    } else {
+      bookedCount = Math.floor(nonAvailableCount * 0.4);
+      reservedCount = Math.floor(nonAvailableCount * 0.3);
+      soldCount = nonAvailableCount - bookedCount - reservedCount;
+    }
+
+    const statuses = [
+      ...Array(availableCount).fill('available'),
+      ...Array(bookedCount).fill('booked'),
+      ...Array(reservedCount).fill('reserved'),
+      ...Array(soldCount).fill('sold'),
+    ];
+
+    // Deterministic shuffle
+    const seed = project.id ? project.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) : 0;
+    const shuffled = [...statuses];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = (seed * (i + 1)) % (i + 1);
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    const unitTypes = [
+      { type: '1 BHK', areaRange: [400, 600], priceMultiplier: 1 },
+      { type: '2 BHK', areaRange: [700, 1000], priceMultiplier: 1.6 },
+      { type: '3 BHK', areaRange: [1000, 1400], priceMultiplier: 2.3 },
+      { type: '4 BHK', areaRange: [1500, 2200], priceMultiplier: 3.2 },
+    ];
+
+    const basePricePerSqFt = project.area > 0 ? project.price / project.area : 5000;
+
+    return shuffled.map((status, index) => {
+      const rand = (seed + index * 7) % 100;
+      const typeIndex = rand % unitTypes.length;
+      const unitType = unitTypes[typeIndex];
+      const area = Math.floor(
+        unitType.areaRange[0] + (rand % (unitType.areaRange[1] - unitType.areaRange[0]))
+      );
+      const price = Math.round((basePricePerSqFt * area * unitType.priceMultiplier) / 100000) * 100000;
+
+      const floor = Math.floor(index / 4) + 1;
+      const unitNum = (floor * 100) + (index % 4) + 1;
+
+      return {
+        id: index + 1,
+        number: String(unitNum),
+        type: unitType.type,
+        area: `${area} sq ft`,
+        price: `₹${price.toLocaleString('en-IN')}`,
+        status,
+      };
+    });
+  };
+
+  const units = generateUnits(project);
 
   const stats = {
     total: units.length,
@@ -608,14 +1022,75 @@ const UnitAvailabilityModal = ({ project, show, onClose }) => {
 const FloorPlansModal = ({ project, show, onClose }) => {
   if (!show || !project) return null;
 
-  const floorPlans = [
-    { id: 1, name: '2 BHK - Type A', area: '850 sq ft', bedrooms: 2, bathrooms: 2, price: '₹45,00,000', image: null },
-    { id: 2, name: '2 BHK - Type B', area: '920 sq ft', bedrooms: 2, bathrooms: 2, price: '₹48,00,000', image: null },
-    { id: 3, name: '3 BHK - Type A', area: '1200 sq ft', bedrooms: 3, bathrooms: 2, price: '₹65,00,000', image: null },
-    { id: 4, name: '3 BHK - Type B', area: '1350 sq ft', bedrooms: 3, bathrooms: 3, price: '₹70,00,000', image: null },
-    { id: 5, name: '4 BHK - Type A', area: '1800 sq ft', bedrooms: 4, bathrooms: 3, price: '₹95,00,000', image: null },
-    { id: 6, name: '4 BHK - Type B', area: '2000 sq ft', bedrooms: 4, bathrooms: 4, price: '₹1,05,00,000', image: null },
-  ];
+  const generateFloorPlans = (project) => {
+    const totalUnits = project.totalUnits || 10;
+
+    const layoutDefs = [
+      { type: '1 BHK', bedrooms: 1, bathrooms: 1, areaRange: [400, 600],   priceMultiplier: 1.0 },
+      { type: '1 BHK', bedrooms: 1, bathrooms: 1, areaRange: [550, 700],   priceMultiplier: 1.15 },
+      { type: '2 BHK', bedrooms: 2, bathrooms: 2, areaRange: [700, 900],   priceMultiplier: 1.6 },
+      { type: '2 BHK', bedrooms: 2, bathrooms: 2, areaRange: [900, 1100],  priceMultiplier: 1.75 },
+      { type: '3 BHK', bedrooms: 3, bathrooms: 2, areaRange: [1000, 1250], priceMultiplier: 2.3 },
+      { type: '3 BHK', bedrooms: 3, bathrooms: 3, areaRange: [1250, 1500], priceMultiplier: 2.5 },
+      { type: '4 BHK', bedrooms: 4, bathrooms: 3, areaRange: [1500, 1800], priceMultiplier: 3.2 },
+      { type: '4 BHK', bedrooms: 4, bathrooms: 4, areaRange: [1800, 2200], priceMultiplier: 3.5 },
+    ];
+
+    const basePricePerSqFt = project.area > 0 ? project.price / project.area : 5000;
+
+    const seed = project.id
+      ? project.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+      : 0;
+
+    const desiredLayouts = Math.max(2, Math.ceil(totalUnits / 4));
+    const layoutCount = Math.min(layoutDefs.length, desiredLayouts);
+
+    const selectedLayouts = [];
+    for (let i = 0; i < layoutCount; i++) {
+      selectedLayouts.push(layoutDefs[(seed + i) % layoutDefs.length]);
+    }
+
+    const baseCount = Math.floor(totalUnits / layoutCount);
+    let remainder = totalUnits - baseCount * layoutCount;
+
+    const flatCounts = selectedLayouts.map((_, i) => {
+      const getsExtra = (seed + i) % layoutCount < remainder ? 1 : 0;
+      return baseCount + getsExtra;
+    });
+
+    let sum = flatCounts.reduce((a, b) => a + b, 0);
+    let idx = 0;
+    while (sum < totalUnits) { flatCounts[idx % flatCounts.length]++; sum++; idx++; }
+    while (sum > totalUnits) { flatCounts[idx % flatCounts.length]--; sum--; idx++; }
+
+    return selectedLayouts.map((layout, index) => {
+      const rand = (seed + index * 13) % 100;
+      const area = Math.floor(
+        layout.areaRange[0] + (rand % (layout.areaRange[1] - layout.areaRange[0]))
+      );
+      const price = Math.round(
+        (basePricePerSqFt * area * layout.priceMultiplier) / 100000
+      ) * 100000;
+
+      const sameTypeBefore = selectedLayouts
+        .slice(0, index)
+        .filter(l => l.type === layout.type).length;
+
+      return {
+        id: index + 1,
+        name: `${layout.type} - Type ${String.fromCharCode(65 + sameTypeBefore)}`,
+        type: layout.type,
+        area,
+        bedrooms: layout.bedrooms,
+        bathrooms: layout.bathrooms,
+        price,
+        flatCount: flatCounts[index],
+      };
+    });
+  };
+
+  const floorPlans = generateFloorPlans(project);
+  const totalFlats = floorPlans.reduce((sum, p) => sum + p.flatCount, 0);
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
@@ -636,33 +1111,62 @@ const FloorPlansModal = ({ project, show, onClose }) => {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          <div className="grid grid-cols-3 gap-2">
+            <div className="text-center p-2 bg-[#F5F9F8] rounded-xl">
+              <p className="text-sm font-bold text-[#1A2E2A]">{floorPlans.length}</p>
+              <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Layouts</p>
+            </div>
+            <div className="text-center p-2 bg-[#F5F9F8] rounded-xl">
+              <p className="text-sm font-bold text-[#00695C]">{totalFlats}</p>
+              <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Total Flats</p>
+            </div>
+            <div className="text-center p-2 bg-[#F5F9F8] rounded-xl">
+              <p className="text-sm font-bold text-[#1A2E2A]">
+                {floorPlans.length > 0
+                  ? `${Math.min(...floorPlans.map(p => p.area))}–${Math.max(...floorPlans.map(p => p.area))} sq ft`
+                  : '—'}
+              </p>
+              <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Area Range</p>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {floorPlans.map((plan) => (
-              <div key={plan.id} className="bg-[#F5F9F8] rounded-xl p-4 border border-[#E8F0EE] hover:shadow-md transition-all duration-300">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h4 className="font-semibold text-[#1A2E2A]">{plan.name}</h4>
-                    <div className="flex items-center gap-3 mt-1 text-xs text-[#5A7D78]">
-                      <span>{plan.area}</span>
-                      <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
-                      <span>{plan.bedrooms} Beds</span>
-                      <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
-                      <span>{plan.bathrooms} Baths</span>
-                    </div>
+              <div
+                key={plan.id}
+                className="bg-[#F5F9F8] rounded-xl p-4 border border-[#E8F0EE] hover:shadow-md hover:border-[#00695C]/30 transition-all duration-300"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <h4 className="font-semibold text-[#1A2E2A] truncate">{plan.name}</h4>
+                    <p className="text-[10px] text-[#5A7D78] mt-0.5">{plan.type} Layout</p>
                   </div>
-                  <span className="text-sm font-bold text-[#00695C]">{plan.price}</span>
+                  <span className="text-sm font-bold text-[#00695C] shrink-0">
+                    ₹{(plan.price / 100000).toFixed(1)}L
+                  </span>
                 </div>
-                {plan.image ? (
-                  <div className="mt-2 h-32 bg-gray-200 rounded-lg flex items-center justify-center text-[#B5C9C5]">
-                    <FiImage className="text-2xl" />
-                    <span className="text-xs ml-2">Floor Plan Image</span>
+
+                <div className="grid grid-cols-3 gap-2 mt-3">
+                  <div className="bg-white rounded-lg p-2 text-center">
+                    <p className="text-xs font-semibold text-[#1A2E2A]">{plan.area}</p>
+                    <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Area (sq ft)</p>
                   </div>
-                ) : (
-                  <div className="mt-2 h-20 bg-white rounded-lg border border-dashed border-[#B5C9C5] flex items-center justify-center text-[#B5C9C5]">
-                    <FiImage className="text-xl" />
-                    <span className="text-xs ml-2">No image uploaded</span>
+                  <div className="bg-white rounded-lg p-2 text-center">
+                    <p className="text-xs font-semibold text-[#1A2E2A]">{plan.bedrooms}</p>
+                    <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Bedrooms</p>
                   </div>
-                )}
+                  <div className="bg-white rounded-lg p-2 text-center">
+                    <p className="text-xs font-semibold text-[#1A2E2A]">{plan.bathrooms}</p>
+                    <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Bathrooms</p>
+                  </div>
+                </div>
+
+                <div className="mt-3 pt-3 border-t border-[#E8F0EE] flex items-center justify-between">
+                  <span className="text-[10px] text-[#5A7D78] uppercase tracking-wider">Flats of this layout</span>
+                  <span className="text-xs font-semibold text-[#00695C] bg-[#E8F4F2] px-2 py-0.5 rounded-full">
+                    {plan.flatCount} flats
+                  </span>
+                </div>
               </div>
             ))}
           </div>
@@ -732,8 +1236,8 @@ const BuildersProjects = () => {
     completed: 0,
     upcoming: 0,
     newLaunches: 0,
-    totalUnits: 0,
-    availableUnits: 0,
+    onHold: 0,
+    cancelled: 0,
   });
 
   // ============ TOAST FUNCTION ============
@@ -751,34 +1255,53 @@ const BuildersProjects = () => {
       'Golden Sands Township', 'Emerald City', 'Palm Grove Estate'
     ];
 
-    const types = ['Residential', 'Commercial', 'Mixed-Use', 'Luxury', 'Affordable', 'Township'];
-    const statuses = ['ongoing', 'completed', 'upcoming', 'new-launch'];
+    const types = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
+    const statuses = ['ongoing', 'completed', 'upcoming', 'new-launch', 'onHold', 'cancelled'];
     const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur'];
     const builders = ['Shriram Properties', 'Prestige Group', 'Sobha Ltd', 'Godrej Properties', 'DLF Ltd', 'Brigade Group'];
 
+    const typeConfig = {
+      'Individual':    { totalRange: [1, 5],       areaRange: [800, 3000],   priceRange: [3000000, 15000000] },
+      'Apartment':     { totalRange: [50, 300],    areaRange: [500, 2500],   priceRange: [2500000, 20000000] },
+      'Commercial':    { totalRange: [10, 100],    areaRange: [400, 5000],   priceRange: [5000000, 50000000] },
+      'Land & Plots':  { totalRange: [5, 50],      areaRange: [1200, 10000], priceRange: [1500000, 10000000] },
+      'Hostel':        { totalRange: [20, 150],    areaRange: [200, 600],    priceRange: [500000, 3000000] },
+    };
+
     return projectNames.map((name, i) => {
       const status = statuses[Math.floor(Math.random() * statuses.length)];
-      const type = types[Math.floor(Math.random() * types.length)];
+      const type = types[i % types.length];
       const city = cities[Math.floor(Math.random() * cities.length)];
-      const totalUnits = Math.floor(Math.random() * 200) + 50;
+      const builder = builders[Math.floor(Math.random() * builders.length)];
+
+      const cfg = typeConfig[type];
+      const totalUnits = Math.floor(Math.random() * (cfg.totalRange[1] - cfg.totalRange[0])) + cfg.totalRange[0];
       const availableUnits = Math.floor(totalUnits * (Math.random() * 0.6 + 0.1));
+      const area = Math.floor(Math.random() * (cfg.areaRange[1] - cfg.areaRange[0])) + cfg.areaRange[0];
+      const price = Math.floor(Math.random() * (cfg.priceRange[1] - cfg.priceRange[0])) + cfg.priceRange[0];
+
+      const amenities = type === 'Land & Plots'
+        ? ['Gated Community', 'Road Access', 'Water Supply', 'Electricity']
+        : type === 'Hostel'
+        ? ['Wi-Fi', 'Mess Facility', 'Laundry', '24x7 Security', 'Study Room']
+        : ['Club House', 'Swimming Pool', 'Gymnasium', 'Children\'s Play Area', 'Landscaped Gardens', 'Security Systems'];
 
       return {
         id: `project_${i + 1}`,
         name: name,
         type: type,
         location: `${city}, India`,
-        price: Math.floor(Math.random() * 45000000) + 5000000,
+        price: price,
         totalUnits: totalUnits,
         availableUnits: availableUnits,
-        area: Math.floor(Math.random() * 3000) + 400,
+        area: area,
         areaUnit: 'sq ft',
         status: status,
         isFeatured: Math.random() > 0.75,
         isVerified: Math.random() > 0.6,
-        builderName: builders[Math.floor(Math.random() * builders.length)],
-        description: `${type} project by ${builders[Math.floor(Math.random() * builders.length)]} in ${city}. Premium amenities and prime location.`,
-        amenities: ['Club House', 'Swimming Pool', 'Gymnasium', 'Children\'s Play Area', 'Landscaped Gardens', 'Security Systems'],
+        builderName: builder,
+        description: `${type} project by ${builder} in ${city}. Premium amenities and prime location.`,
+        amenities: amenities,
         expectedCompletion: new Date(Date.now() + Math.floor(Math.random() * 365 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
         launchDate: new Date(Date.now() - Math.floor(Math.random() * 180 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
         completionDate: status === 'completed' ? new Date(Date.now() - Math.floor(Math.random() * 90 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0] : null,
@@ -796,17 +1319,14 @@ const BuildersProjects = () => {
 
   // ============ UPDATE STATS ============
   const updateStats = useCallback((projectsList) => {
-    const totalUnits = projectsList.reduce((sum, p) => sum + (p.totalUnits || 0), 0);
-    const availableUnits = projectsList.reduce((sum, p) => sum + (p.availableUnits || 0), 0);
-
     setStats({
       total: projectsList.length,
       ongoing: projectsList.filter(p => p.status === 'ongoing').length,
       completed: projectsList.filter(p => p.status === 'completed').length,
       upcoming: projectsList.filter(p => p.status === 'upcoming').length,
       newLaunches: projectsList.filter(p => p.status === 'new-launch').length,
-      totalUnits,
-      availableUnits,
+      onHold: projectsList.filter(p => p.status === 'onHold').length,
+      cancelled: projectsList.filter(p => p.status === 'cancelled').length,
     });
   }, []);
 
@@ -917,6 +1437,12 @@ const BuildersProjects = () => {
     } else if (filter === 'new-launch') {
       setSelectedStatus('new-launch');
       setSelectedType('all');
+    } else if (filter === 'onHold') {
+      setSelectedStatus('onHold');
+      setSelectedType('all');
+    } else if (filter === 'cancelled') {
+      setSelectedStatus('cancelled');
+      setSelectedType('all');
     } else if (filter === 'featured') {
       setSelectedStatus('all');
       setSelectedType('all');
@@ -994,15 +1520,50 @@ const BuildersProjects = () => {
   const handleSaveEdit = useCallback((updatedData) => {
     setActionLoading('edit');
     setTimeout(() => {
-      setProjects(prev => prev.map(p =>
-        p.id === editingProject.id ? { ...p, ...updatedData } : p
-      ));
+      setProjects(prev => {
+        const updated = prev.map(p => {
+          if (p.id !== editingProject.id) return p;
+
+          const merged = {
+            ...p,
+            ...updatedData,
+            bookedUnits: Number(updatedData.bookedUnits),
+            reservedUnits: Number(updatedData.reservedUnits),
+            soldUnits: Number(updatedData.soldUnits),
+            totalFloors: Number(updatedData.totalFloors),
+            totalBuildings: Number(updatedData.totalBuildings),
+            constructionProgress: Number(updatedData.constructionProgress),
+            maxPrice: Number(updatedData.maxPrice),
+            startDate: updatedData.startDate,
+            launchDate: updatedData.startDate,
+            fullAddress: updatedData.fullAddress,
+            pinCode: updatedData.pinCode,
+            reraNumber: updatedData.reraNumber,
+          };
+
+          // Reconcile unit sum so available+booked+reserved+sold === totalUnits
+          const total = Number(merged.totalUnits) || 0;
+          let avail = Number(merged.availableUnits) || 0;
+          const booked = Number(merged.bookedUnits) || 0;
+          const reserved = Number(merged.reservedUnits) || 0;
+          const sold = Number(merged.soldUnits) || 0;
+          if (avail + booked + reserved + sold !== total) {
+            avail = Math.max(0, total - booked - reserved - sold);
+            merged.availableUnits = avail;
+          }
+
+          return merged;
+        });
+
+        updateStats(updated);
+        return updated;
+      });
       setShowEditModal(false);
       setEditingProject(null);
       setActionLoading(null);
       showToast('Project updated successfully!', 'success');
     }, 600);
-  }, [editingProject, showToast]);
+  }, [editingProject, showToast, updateStats]);
 
   // ============ DELETE PROJECT ============
   const handleDeleteProject = useCallback((projectId) => {
@@ -1195,12 +1756,22 @@ const BuildersProjects = () => {
       Type: p.type,
       Location: p.location,
       'Starting Price': p.price,
+      'Maximum Price': p.maxPrice ?? '',
       'Total Units': p.totalUnits,
       'Available Units': p.availableUnits,
+      Booked: p.bookedUnits ?? '',
+      Reserved: p.reservedUnits ?? '',
+      Sold: p.soldUnits ?? '',
       Status: p.status,
       Builder: p.builderName,
+      'Total Floors': p.totalFloors ?? '',
+      'Buildings/Blocks': p.totalBuildings ?? '',
+      'Construction Progress': p.constructionProgress != null ? `${p.constructionProgress}%` : '',
+      'Start Date': p.startDate || p.launchDate || '',
       'Expected Completion': p.expectedCompletion,
-      'Launch Date': p.launchDate,
+      'Full Address': p.fullAddress || '',
+      'PIN Code': p.pinCode || '',
+      'RERA Number': p.reraNumber || '',
       Featured: p.isFeatured ? 'Yes' : 'No',
       Verified: p.isVerified ? 'Yes' : 'No',
     }));
@@ -1222,9 +1793,9 @@ const BuildersProjects = () => {
 
   // ============ RENDER ============
   return (
-    <div className="space-y-6 p-4 lg:p-6 bg-[#F8FAF9] min-h-screen">
+   <div className="space-y-6 p-4 lg:p-6 pb-24 bg-[#F8FAF9] min-h-full h-full overflow-y-auto custom-page-scroll relative">
       {/* Animated Background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-[#00695C]/5 rounded-full blur-3xl animate-float" />
         <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-[#26A69A]/5 rounded-full blur-3xl animate-float-delayed" />
       </div>
@@ -1330,8 +1901,8 @@ const BuildersProjects = () => {
       {/* Stats Section */}
       {showStats && (
         <div className="relative animate-slide-in">
-          <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3">
+          <div className="bg-white rounded-2xl p-2 border border-[#E8F0EE] shadow-sm">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               <StatCard
                 icon={<MdOutlineConstruction className="text-white text-sm" />}
                 title="Total Projects"
@@ -1346,7 +1917,7 @@ const BuildersProjects = () => {
                 title="Ongoing"
                 value={stats.ongoing}
                 color="bg-gradient-to-br from-blue-600 to-blue-400"
-                delay={100}
+                delay={80}
                 isActive={activeFilter === 'ongoing'}
                 onClick={() => handleStatClick('ongoing')}
               />
@@ -1355,7 +1926,7 @@ const BuildersProjects = () => {
                 title="Completed"
                 value={stats.completed}
                 color="bg-gradient-to-br from-emerald-600 to-emerald-400"
-                delay={200}
+                delay={160}
                 isActive={activeFilter === 'completed'}
                 onClick={() => handleStatClick('completed')}
               />
@@ -1364,7 +1935,7 @@ const BuildersProjects = () => {
                 title="Upcoming"
                 value={stats.upcoming}
                 color="bg-gradient-to-br from-amber-600 to-amber-400"
-                delay={300}
+                delay={240}
                 isActive={activeFilter === 'upcoming'}
                 onClick={() => handleStatClick('upcoming')}
               />
@@ -1373,36 +1944,27 @@ const BuildersProjects = () => {
                 title="New Launches"
                 value={stats.newLaunches}
                 color="bg-gradient-to-br from-purple-600 to-purple-400"
-                delay={350}
+                delay={320}
                 isActive={activeFilter === 'new-launch'}
                 onClick={() => handleStatClick('new-launch')}
               />
               <StatCard
-                icon={<FiHome className="text-white text-sm" />}
-                title="Total Units"
-                value={stats.totalUnits}
-                color="bg-gradient-to-br from-indigo-600 to-indigo-400"
+                icon={<FiAlertTriangle className="text-white text-sm" />}
+                title="On Hold"
+                value={stats.onHold}
+                color="bg-gradient-to-br from-gray-600 to-gray-400"
                 delay={400}
-                isActive={false}
-                onClick={() => {}}
+                isActive={activeFilter === 'onHold'}
+                onClick={() => handleStatClick('onHold')}
               />
               <StatCard
-                icon={<FiCheckSquare className="text-white text-sm" />}
-                title="Available Units"
-                value={stats.availableUnits}
-                color="bg-gradient-to-br from-teal-600 to-teal-400"
-                delay={450}
-                isActive={false}
-                onClick={() => {}}
-              />
-              <StatCard
-                icon={<FaStarSolid className="text-white text-sm" />}
-                title="Featured"
-                value={projects.filter(p => p.isFeatured).length}
-                color="bg-gradient-to-br from-amber-600 to-amber-400"
-                delay={500}
-                isActive={activeFilter === 'featured'}
-                onClick={() => handleStatClick('featured')}
+                icon={<FiXCircle className="text-white text-sm" />}
+                title="Cancelled"
+                value={stats.cancelled}
+                color="bg-gradient-to-br from-red-600 to-red-400"
+                delay={480}
+                isActive={activeFilter === 'cancelled'}
+                onClick={() => handleStatClick('cancelled')}
               />
             </div>
           </div>
@@ -1457,12 +2019,11 @@ const BuildersProjects = () => {
                 className="appearance-none px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none cursor-pointer pr-10 hover:bg-[#E8F0EE]"
               >
                 <option value="all">All Types</option>
-                <option value="residential">Residential</option>
+                <option value="individual">Individual</option>
+                <option value="apartment">Apartment</option>
                 <option value="commercial">Commercial</option>
-                <option value="mixed-use">Mixed-Use</option>
-                <option value="luxury">Luxury</option>
-                <option value="affordable">Affordable</option>
-                <option value="township">Township</option>
+                <option value="land & plots">Land &amp; Plots</option>
+                <option value="hostel">Hostel</option>
               </select>
               <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#5A7D78] text-sm pointer-events-none" />
             </div>
@@ -1547,6 +2108,7 @@ const BuildersProjects = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
             {paginatedProjects.map((project, index) => {
               const isSelected = selectedProjects.includes(project.id);
+
               const statusColors = {
                 ongoing: 'bg-blue-100 text-blue-700 border-blue-200',
                 completed: 'bg-emerald-100 text-emerald-700 border-emerald-200',
@@ -1555,6 +2117,7 @@ const BuildersProjects = () => {
                 onHold: 'bg-gray-100 text-gray-700 border-gray-200',
                 cancelled: 'bg-red-100 text-red-700 border-red-200',
               };
+
               const projectBorder = {
                 ongoing: 'border-l-blue-500',
                 completed: 'border-l-emerald-500',
@@ -1562,6 +2125,14 @@ const BuildersProjects = () => {
                 'new-launch': 'border-l-purple-500',
                 onHold: 'border-l-gray-400',
                 cancelled: 'border-l-red-500',
+              };
+
+              const typeColors = {
+                'Individual': 'bg-rose-100 text-rose-700',
+                'Apartment': 'bg-blue-100 text-blue-700',
+                'Commercial': 'bg-orange-100 text-orange-700',
+                'Land & Plots': 'bg-lime-100 text-lime-700',
+                'Hostel': 'bg-fuchsia-100 text-fuchsia-700',
               };
 
               return (
@@ -1585,15 +2156,26 @@ const BuildersProjects = () => {
                       </div>
                       <div>
                         <h3 className="font-semibold text-[#1A2E2A] text-sm truncate max-w-[120px]">{project.name}</h3>
-                        <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${statusColors[project.status] || 'bg-gray-100 text-gray-700'}`}>
-                            {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+
+                        <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                          <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${statusColors[project.status] || 'bg-gray-100 text-gray-700'}`}>
+                            {project.status === 'onHold' ? 'On Hold' : project.status === 'new-launch' ? 'New Launch' : project.status.charAt(0).toUpperCase() + project.status.slice(1)}
                           </span>
+
+                          <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1 ${typeColors[project.type] || 'bg-gray-100 text-gray-700'}`}>
+                            {project.type === 'Individual' && <FiUser className="text-[9px]" />}
+                            {project.type === 'Apartment' && <MdApartment className="text-[9px]" />}
+                            {project.type === 'Commercial' && <MdOutlineBusiness className="text-[9px]" />}
+                            {project.type === 'Land & Plots' && <FiMapPin className="text-[9px]" />}
+                            {project.type === 'Hostel' && <FiHome className="text-[9px]" />}
+                            {project.type}
+                          </span>
+
                           {project.isVerified && (
-                            <FiShield className="text-blue-600 text-[10px]" />
+                            <FiShield className="text-blue-600 text-[10px]" title="Verified" />
                           )}
                           {project.isFeatured && (
-                            <FaStarSolid className="text-amber-500 text-[10px]" />
+                            <FaStarSolid className="text-amber-500 text-[10px]" title="Featured" />
                           )}
                         </div>
                       </div>
@@ -1608,10 +2190,6 @@ const BuildersProjects = () => {
                   </div>
 
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
-                      <FiHome className="text-[#00695C] flex-shrink-0" />
-                      <span className="truncate">{project.type}</span>
-                    </div>
                     <div className="flex items-center gap-2 text-[11px] text-[#5A7D78]">
                       <FiMapPin className="text-[#00695C] flex-shrink-0" />
                       <span className="truncate">{project.location}</span>
@@ -1654,12 +2232,12 @@ const BuildersProjects = () => {
                     >
                       <FiSquare className="text-[10px]" /> Floor Plans
                     </button>
-                      <button
-                        onClick={() => handleViewProject(project)}
-                        className="flex-1 py-1.5 text-[10px] font-medium text-emerald-600 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
-                      >
-                        <FiEye className="text-[10px]" /> View
-                      </button>
+                    <button
+                      onClick={() => handleViewProject(project)}
+                      className="flex-1 py-1.5 text-[10px] font-medium text-emerald-600 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
+                    >
+                      <FiEye className="text-[10px]" /> View
+                    </button>
                     <button
                       onClick={() => handleEditProject(project)}
                       className="flex-1 py-1.5 text-[10px] font-medium text-[#00695C] bg-[#E8F4F2] rounded-xl hover:bg-[#C5EDE5] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105"
@@ -1718,7 +2296,7 @@ const BuildersProjects = () => {
               );
             })}
           </div>
-        ) : (
+                ) : (
           /* List View */
           <div className="bg-white rounded-2xl border border-[#E8F0EE] shadow-sm overflow-hidden">
             <div className="grid grid-cols-12 gap-2 items-center px-4 py-3 bg-[#F5F9F8] border-b border-[#E8F0EE] text-xs font-medium text-[#5A7D78] uppercase tracking-wider">
@@ -1786,33 +2364,48 @@ const BuildersProjects = () => {
                     <span className="text-xs text-[#5A7D78]">{index + 1}</span>
                   </div>
 
-                  <div className="col-span-2">
+                  {/* PROJECT NAME WITH TRUNCATE */}
+                  <div className="col-span-2 min-w-0">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white text-xs font-bold">
+                      <div className="w-8 h-8 shrink-0 rounded-full bg-gradient-to-br from-[#00695C] to-[#26A69A] flex items-center justify-center text-white text-xs font-bold">
                         <MdOutlineConstruction className="text-sm" />
                       </div>
-                      <div>
-                        <p className="font-semibold text-sm text-[#1A2E2A] truncate">{project.name}</p>
-                        <p className="text-[10px] text-[#5A7D78] truncate">{project.builderName}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-sm text-[#1A2E2A] truncate" title={project.name}>
+                          {project.name}
+                        </p>
+                        <p className="text-[10px] text-[#5A7D78] truncate" title={project.builderName}>
+                          {project.builderName}
+                        </p>
                       </div>
                     </div>
                   </div>
 
                   <div className="col-span-1">
                     <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColors[project.status] || 'bg-gray-100 text-gray-700'}`}>
-                      {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+                      {project.status === 'onHold' ? 'On Hold' : project.status === 'new-launch' ? 'New Launch' : project.status.charAt(0).toUpperCase() + project.status.slice(1)}
                     </span>
                   </div>
 
-                  <div className="col-span-1 text-xs text-[#5A7D78]">{project.type}</div>
+                  <div className="col-span-1 text-xs text-[#5A7D78] truncate" title={project.type}>
+                    {project.type}
+                  </div>
 
-                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">{project.location}</div>
+                  <div className="col-span-1 text-xs text-[#5A7D78] truncate" title={project.location}>
+                    {project.location}
+                  </div>
 
-                  <div className="col-span-1 text-center text-sm font-medium text-[#1A2E2A]">{project.totalUnits}</div>
+                  <div className="col-span-1 text-center text-sm font-medium text-[#1A2E2A]">
+                    {project.totalUnits}
+                  </div>
 
-                  <div className="col-span-1 text-center text-sm font-medium text-[#00695C]">{project.availableUnits}</div>
+                  <div className="col-span-1 text-center text-sm font-medium text-[#00695C]">
+                    {project.availableUnits}
+                  </div>
 
-                  <div className="col-span-1 text-center text-sm font-semibold text-[#1A2E2A]">₹{(project.price / 100000).toFixed(1)}L</div>
+                  <div className="col-span-1 text-center text-sm font-semibold text-[#1A2E2A]">
+                    ₹{(project.price / 100000).toFixed(1)}L
+                  </div>
 
                   <div className="col-span-1 text-center">
                     {project.isFeatured ? (
@@ -1821,9 +2414,6 @@ const BuildersProjects = () => {
                       <span className="text-[#B5C9C5] text-xs">-</span>
                     )}
                   </div>
-
-
-                   {/* In the List View */}
 
                   <div className="col-span-2 flex items-center justify-end gap-1 flex-wrap">
                     <button
@@ -1904,7 +2494,6 @@ const BuildersProjects = () => {
             })}
           </div>
         )}
-
         {paginatedProjects.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-[#E8F0EE]">
             <div className="w-24 h-24 rounded-full bg-[#F5F9F8] flex items-center justify-center mb-4 animate-float">
@@ -1992,6 +2581,8 @@ const BuildersProjects = () => {
           </div>
         </div>
       )}
+
+      <div className="pb-5"/>
 
       {/* CSS Animations */}
       <style>{`

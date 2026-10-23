@@ -56,7 +56,7 @@ const deriveTheme = (hex) => {
 const FALLBACK_THEME = deriveTheme('#94A3B8');
 
 // ============================================================
-// DEFAULT PROPERTY MANAGER PLAN TYPES - Clean version (no limits/capabilities)
+// DEFAULT PROPERTY MANAGEMENT PLAN TYPES - Clean version (no limits/capabilities)
 // ============================================================
 const DEFAULT_PLAN_TYPES = {
   'Standard': {
@@ -68,7 +68,7 @@ const DEFAULT_PLAN_TYPES = {
     label: 'Standard',
     price: 0,
     billingCycle: 'monthly',
-    description: 'Standard starter plan for individual property managers to manage properties efficiently',
+    description: 'Standard starter plan for individual property management to manage properties efficiently',
     features: [
       'Manage up to 5 properties',
       'Basic tenant management',
@@ -255,7 +255,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
 };
 
 // ============================================================
-// VIEW PROPERTY MANAGER DETAIL MODAL
+// VIEW PROPERTY MANAGEMENT DETAIL MODAL
 // ============================================================
 const ViewManagerDetailModal = ({ manager, show, onClose, onEdit, onDelete, planTypes }) => {
   if (!manager || !show) return null;
@@ -424,7 +424,7 @@ const ViewManagerDetailModal = ({ manager, show, onClose, onEdit, onDelete, plan
 };
 
 // ============================================================
-// EDIT PROPERTY MANAGER MODAL
+// EDIT PROPERTY MANAGEMENT MODAL
 // ============================================================
 const EditManagerModal = ({ manager, show, onClose, onSave, planTypes }) => {
   if (!manager || !show) return null;
@@ -477,7 +477,7 @@ const EditManagerModal = ({ manager, show, onClose, onSave, planTypes }) => {
           <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-white hover:scale-110">
             <FiX className="text-lg" />
           </button>
-          <h2 className="text-2xl font-bold text-white">Edit Property Manager</h2>
+          <h2 className="text-2xl font-bold text-white">Edit Property Management</h2>
           <p className="text-white/80 text-sm">Update manager and subscription details</p>
         </div>
 
@@ -679,7 +679,7 @@ const ViewPlanModal = ({ plan, show, onClose, onEdit, onDelete, ownerCount, owne
             <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-2xl p-4 border border-purple-200">
               <div className="flex items-center gap-2 mb-2">
                 <FiUsers className="text-purple-600 text-sm" />
-                <h4 className="text-xs font-bold text-purple-700 uppercase tracking-wider">Managers Using</h4>
+                <h4 className="text-xs font-bold text-purple-700 uppercase tracking-wider">Managements Using</h4>
               </div>
               <p className="text-2xl font-bold text-purple-700">{ownerCount || 0}</p>
               <p className="text-xs text-purple-600 mt-0.5">active subscribers</p>
@@ -712,7 +712,7 @@ const ViewPlanModal = ({ plan, show, onClose, onEdit, onDelete, ownerCount, owne
               <div className="flex items-center gap-2 mb-3">
                 <FiUsers className="text-amber-700 text-base" />
                 <h4 className="text-sm font-bold text-amber-700 uppercase tracking-wider">
-                  Property Managers on this Plan ({ownersOnPlan.length})
+                  Property Management on this Plan ({ownersOnPlan.length})
                 </h4>
               </div>
               <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -854,10 +854,10 @@ const EditPlanModal = ({ plan, show, onClose, onSave, isNew = false }) => {
             <FiX className="text-lg" />
           </button>
           <h2 className="text-2xl font-bold text-white">
-            {isNew ? 'Add New Property Manager Plan' : `Edit ${plan?.label || ''} Plan`}
+            {isNew ? 'Add New Property Management Plan' : `Edit ${plan?.label || ''} Plan`}
           </h2>
           <p className="text-white/80 text-sm">
-            {isNew ? 'Create a new subscription plan for property managers' : 'Update plan details, pricing, and features'}
+            {isNew ? 'Create a new subscription plan for property management' : 'Update plan details, pricing, and features'}
           </p>
         </div>
 
@@ -1033,7 +1033,7 @@ const PlanExplanationCard = ({ plan, ownerCount, onView, onEdit, onDelete }) => 
               <div className="w-8 h-8 rounded-lg bg-[#00695C] flex items-center justify-center text-white shadow-md">
                 <FiUsers className="text-sm" />
               </div>
-              <span className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Managers Using</span>
+              <span className="text-xs font-semibold text-[#5A7D78] uppercase tracking-wider">Managements Using</span>
             </div>
             <span className="text-xl font-bold text-[#00695C]">{ownerCount || 0}</span>
           </div>
@@ -1332,7 +1332,7 @@ const PropertyManagerPlans = () => {
       computeStats(list, planTypes);
       return list;
     });
-    setToast({ message: `Property Manager "${updated.name}" updated successfully`, type: 'success' });
+    setToast({ message: `Property Management "${updated.name}" updated successfully`, type: 'success' });
   }, [computeStats, planTypes]);
 
   // PLAN CRUD
@@ -1442,8 +1442,8 @@ const PropertyManagerPlans = () => {
 
     setConfirmationModal({
       isOpen: true,
-      title: 'Delete Property Manager',
-      message: `Are you sure you want to delete property manager "${manager.name}" (${manager.managerId})?`,
+      title: 'Delete Property Management',
+      message: `Are you sure you want to delete property management "${manager.name}" (${manager.managerId})?`,
       confirmText: 'Delete',
       cancelText: 'Cancel',
       type: 'danger',
@@ -1457,7 +1457,7 @@ const PropertyManagerPlans = () => {
           });
           setActionLoading(null);
           setShowViewModal(false);
-          setToast({ message: `Deleted property manager "${manager.name}"`, type: 'warning' });
+          setToast({ message: `Deleted property management "${manager.name}"`, type: 'warning' });
         }, 700);
       },
       onCancel: () => setConfirmationModal(prev => ({ ...prev, isOpen: false }))
@@ -1515,7 +1515,7 @@ const PropertyManagerPlans = () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `property_manager_plans_${new Date().toISOString().split('T')[0]}.csv`;
+      a.download = `property_management_plans_${new Date().toISOString().split('T')[0]}.csv`;
       a.click();
       window.URL.revokeObjectURL(url);
       setToast({ message: `${filteredManagers.length} records exported successfully`, type: 'success' });
@@ -1526,12 +1526,12 @@ const PropertyManagerPlans = () => {
 
   const handleBulkDelete = useCallback(() => {
     if (selectedManagers.length === 0) {
-      setToast({ message: 'Please select property managers first', type: 'warning' });
+      setToast({ message: 'Please select property management first', type: 'warning' });
       return;
     }
     setConfirmationModal({
       isOpen: true,
-      title: 'Delete Selected Property Managers',
+      title: 'Delete Selected Property Management',
       message: `Are you sure you want to delete ${selectedManagers.length} selected manager(s)?`,
       confirmText: 'Delete All', cancelText: 'Cancel', type: 'danger',
       onConfirm: () => {
@@ -1544,7 +1544,7 @@ const PropertyManagerPlans = () => {
           computeStats(updated, planTypes);
           setSelectedManagers([]);
           setActionLoading(null);
-          setToast({ message: `${count} property manager(s) deleted`, type: 'warning' });
+          setToast({ message: `${count} property management deleted`, type: 'warning' });
         }, 800);
       },
       onCancel: () => setConfirmationModal(prev => ({ ...prev, isOpen: false }))
@@ -1560,8 +1560,8 @@ const PropertyManagerPlans = () => {
     : [];
 
   return (
-    <div className="space-y-6 p-4 lg:p-6 bg-[#F8FAF9] min-h-screen">
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+    <div className="space-y-6 p-4 lg:p-6 pb-24 bg-[#F8FAF9] min-h-full h-full overflow-y-auto custom-page-scroll relative">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-[#00695C]/5 rounded-full blur-3xl animate-float" />
         <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-[#26A69A]/5 rounded-full blur-3xl animate-float-delayed" />
       </div>
@@ -1610,7 +1610,7 @@ const PropertyManagerPlans = () => {
           <div>
             <div className="flex items-center gap-3 mb-1 flex-wrap">
               <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
-                Property Manager Plans
+                Property Management Plans
               </h1>
               <span className="px-3 py-1 bg-[#E8F4F2] text-[#00695C] text-xs font-semibold rounded-full animate-pulse">
                 {filteredManagers.length} Managers
@@ -1622,7 +1622,7 @@ const PropertyManagerPlans = () => {
               )}
             </div>
             <p className="text-sm text-[#5A7D78] flex items-center gap-2 flex-wrap">
-              <span>Manage subscription plans and property managers</span>
+              <span>Manage subscription plans and property management</span>
               <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
               <span className="text-[#00695C] font-medium">
                 {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
@@ -1654,7 +1654,7 @@ const PropertyManagerPlans = () => {
         <div className="relative animate-slide-in">
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <StatCard icon={<FiUsers className="text-white text-sm" />} title="Total Managers" value={stats.total}
+              <StatCard icon={<FiUsers className="text-white text-sm" />} title="Total Managements" value={stats.total}
                 color="bg-gradient-to-br from-[#00695C] to-[#26A69A]" delay={0}
                 isActive={activePlan === 'all' && activePropertyType === 'all' && !searchQuery}
                 onClick={handleTotalClick} />
@@ -2007,9 +2007,9 @@ const PropertyManagerPlans = () => {
             <div className="w-24 h-24 rounded-full bg-[#F5F9F8] flex items-center justify-center mb-4 animate-float">
               <FaUserTie className="text-4xl text-[#B5C9C5]" />
             </div>
-            <h3 className="text-xl font-bold text-[#1A2E2A]">No property managers found</h3>
+            <h3 className="text-xl font-bold text-[#1A2E2A]">No property management found</h3>
             <p className="text-sm text-[#5A7D78] mt-1">
-              {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No property managers have been added yet'}
+              {filterCount > 0 ? 'Try adjusting your search or filter criteria' : 'No property management have been added yet'}
             </p>
             {filterCount > 0 && (
               <button onClick={clearAllFilters}
@@ -2065,6 +2065,8 @@ const PropertyManagerPlans = () => {
           </div>
         </div>
       )}
+
+      <div className="pb-5"/>
 
       <style>{`
         @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

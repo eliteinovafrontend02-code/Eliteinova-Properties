@@ -221,7 +221,7 @@ const SubscriptionsOverview = () => {
   // ---- Stats ----
   // Total Subscribers, Active Subscriptions, etc. are derived below from the
   // per-category tier counts, so the numbers always stay consistent with the
-  // Owner / Agent / Builder / Property Manager breakdown shown in the nav cards.
+  // Owner / Agent / Builder / Property Management breakdown shown in the nav cards.
   const [stats, setStats] = useState({
     pendingRenewals: 63,
     trialAccounts: 118,
@@ -242,7 +242,7 @@ const SubscriptionsOverview = () => {
     builderBasic: 58,
     builderPremium: 27,
     builderEnterprise: 12,
-    // Property Manager Plans
+    // Property Management Plans
     pmStandard: 71,
     pmBusiness: 34,
     pmEnterprise: 16,
@@ -301,9 +301,9 @@ const SubscriptionsOverview = () => {
   }, [navigate]);
 
   return (
-    <div className="space-y-6 p-4 lg:p-6 bg-gradient-to-br from-[#f8fafc] via-white to-[#f1f5f9] min-h-screen relative">
+    <div className="space-y-6 p-4 lg:p-6 pb-24 bg-[#F8FAF9] min-h-full h-full overflow-y-auto custom-page-scroll relative">
       {/* ===== ANIMATED BACKGROUND ===== */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-[#00695C]/5 rounded-full blur-3xl animate-float" />
         <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-[#26A69A]/5 rounded-full blur-3xl animate-float-delayed" />
         <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
@@ -324,7 +324,7 @@ const SubscriptionsOverview = () => {
                 Subscription Management
               </h1>
               <div className="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
-                <span>Complete control over Owner, Agent, Builder & Property Manager plans</span>
+                <span>Complete control over Owner, Agent, Builder & Property Management plans</span>
                 <span className="w-1 h-1 bg-gray-400 rounded-full hidden sm:block" />
                 <span className="text-[#00695C] font-medium">
                   {time.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
@@ -426,7 +426,7 @@ const SubscriptionsOverview = () => {
         />
         <StatCard
           icon={<MdOutlineBusinessCenter className="text-lg text-white" />}
-          title="Property Manager Plans"
+          title="Property Management Plans"
           value={pmTotal}
           subtitle={`${stats.pmEnterprise} on Enterprise`}
           color="bg-gradient-to-br"
@@ -508,10 +508,10 @@ const SubscriptionsOverview = () => {
             ]}
           />
 
-          {/* Property Manager Plans Card */}
+          {/* Property Management Plans Card */}
           <NavCard
             icon={<MdOutlineBusinessCenter className="text-white text-xl" />}
-            title="Property Manager Plans"
+            title="Property Management Plans"
             description="Standard, Business & Enterprise plans for property management companies."
             color="bg-gradient-to-br"
             gradient="from-emerald-600 to-emerald-400"
@@ -531,7 +531,7 @@ const SubscriptionsOverview = () => {
 
      
       {/* ===== FOOTER ===== */}
-      <div className="text-center pt-4">
+      <div className="text-center pt-4 pb-10">
         <p className="text-[11px] text-gray-500 flex items-center justify-center gap-2">
           <span className="w-4 h-0.5 bg-gray-300 rounded-full" />
           <span>© 2026 Subscription Management • All rights reserved</span>
@@ -581,12 +581,6 @@ const SubscriptionsOverview = () => {
         .animate-pulse-once { animation: pulse-once 0.8s ease-out; }
         .animate-pulse-glow { animation: pulse-glow 2.5s ease-in-out infinite; }
         .animate-shimmer { animation: shimmer 3s ease-in-out infinite; }
-        .animate-breathe { animation: breathe 3s ease-in-out infinite; }
-
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #00695C, #26A69A); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #00695C; }
 
         ::selection { background: #00695C; color: white; }
       `}</style>

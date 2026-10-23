@@ -25,7 +25,7 @@ import { MdOutlineRealEstateAgent, MdApartment, MdOutlineBusiness, MdOutlinePers
 import { HiOutlineBuildingOffice, HiOutlineUserGroup } from 'react-icons/hi2';
 
 /* ============================================================
-   STANDALONE COMPONENTS (same as Owners)
+   STANDALONE COMPONENTS
 ============================================================ */
 
 const Toast = ({ toast }) => {
@@ -115,6 +115,48 @@ const ApprovalConfirmModal = ({ show, action, actionLoading, managerName, onCanc
   );
 };
 
+// ============ BLOCK CONFIRM MODAL ============
+const BlockConfirmModal = ({ show, isBlocked, actionLoading, managerName, onCancel, onConfirm }) => {
+  if (!show) return null;
+
+  const isBlock = !isBlocked;
+  const color = isBlock ? 'red' : 'emerald';
+  const Icon = isBlock ? FiLock : FiUnlock;
+  const title = isBlock ? 'Block Manager' : 'Unblock Manager';
+  const message = isBlock 
+    ? `Are you sure you want to block ${managerName}? They will lose access to the platform.`
+    : `Are you sure you want to unblock ${managerName}? They will regain access to the platform.`;
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[#1A2E2A]/50 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl animate-slide-up border border-[#E8F0EE]">
+        <div className="text-center">
+          <div className={`w-16 h-16 rounded-full bg-${color}-50 flex items-center justify-center mx-auto mb-4`}>
+            <Icon className={`text-3xl text-${color}-600`} />
+          </div>
+          <h3 className="text-xl font-bold text-[#1A2E2A]">{title}</h3>
+          <p className="text-sm text-[#5A7D78] mt-2">{message}</p>
+          <div className="flex items-center gap-3 mt-6">
+            <button
+              onClick={onCancel}
+              className="flex-1 px-4 py-2.5 bg-[#F5F9F8] text-[#1A2E2A] rounded-xl hover:bg-[#E8F0EE] transition-all duration-300 text-sm font-medium"
+            >
+              No
+            </button>
+            <button
+              onClick={onConfirm}
+              disabled={actionLoading}
+              className={`flex-1 px-4 py-2.5 bg-${color}-600 text-white rounded-xl hover:bg-${color}-700 transition-all duration-300 text-sm font-medium shadow-lg shadow-${color}-600/30 disabled:opacity-50`}
+            >
+              {actionLoading ? <FiRefreshCw className="animate-spin mx-auto" /> : 'Yes'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ============ PROPERTY MANAGER PROPERTIES MODAL ============
 const ManagerPropertiesModal = ({ manager, show, onClose, onViewProperty }) => {
   const [properties, setProperties] = useState([]);
@@ -132,13 +174,6 @@ const ManagerPropertiesModal = ({ manager, show, onClose, onViewProperty }) => {
   }, [show, manager]);
 
   if (!show || !manager) return null;
-
-  const statusColors = {
-    pending: 'bg-amber-100 text-amber-700',
-    approved: 'bg-emerald-100 text-emerald-700',
-    rejected: 'bg-red-100 text-red-700',
-    suspended: 'bg-gray-100 text-gray-700'
-  };
 
   const typeIcons = {
     'Individual': <FiUser className="text-[#00695C]" />,
@@ -204,19 +239,6 @@ const ManagerPropertiesModal = ({ manager, show, onClose, onViewProperty }) => {
                           {typeIcons[property.type] || <FiTag className="text-[#00695C]" />}
                           {property.type}
                         </span>
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColors[property.status] || 'bg-gray-100 text-gray-700'}`}>
-                          {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
-                        </span>
-                        {property.isFeatured && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
-                            <FaStarSolid className="inline mr-0.5 text-[8px]" /> Featured
-                          </span>
-                        )}
-                        {property.isVerified && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
-                            <FiShield className="inline mr-0.5 text-[8px]" /> Verified
-                          </span>
-                        )}
                       </div>
                     </div>
                     <div className="shrink-0">
@@ -291,7 +313,6 @@ const ManagerPropertiesModal = ({ manager, show, onClose, onViewProperty }) => {
   );
 };
 
-// Helper function to generate mock properties for a manager
 const generateManagerProperties = (manager) => {
   const propertyTypes = ['Individual', 'Apartment', 'Commercial', 'Land & Plots', 'Hostel'];
   const statuses = ['pending', 'approved', 'rejected', 'suspended'];
@@ -345,7 +366,7 @@ const generateManagerProperties = (manager) => {
 };
 
 /* ============================================================
-   VIEW PROPERTY MANAGER MODAL — same design as Owners
+   VIEW PROPERTY MANAGER MODAL
 ============================================================ */
 
 const ViewManagerModal = ({ manager, show, actionLoading, onClose, onApprove, onReject, onEdit, onToggleBlock, onViewProperties }) => {
@@ -357,11 +378,14 @@ const ViewManagerModal = ({ manager, show, actionLoading, onClose, onApprove, on
 
   if (!manager || !show) return null;
 
+  // Updated 6 documents
   const kycItems = [
     { key: 'aadhaar', label: 'Aadhaar' },
     { key: 'pan', label: 'PAN' },
-    { key: 'gst', label: 'GST' },
-    { key: 'rera', label: 'RERA' },
+    { key: 'companyPan', label: 'Company PAN Card' },
+    { key: 'companyRegCert', label: 'Company Registration Certificate' },
+    { key: 'businessAddressProof', label: 'Business Address Proof' },
+    { key: 'gst', label: 'GST (Optional)' },
   ];
   const kycVerifiedCount = kycItems.filter(item => manager.kyc[item.key]).length;
   const kycPercent = Math.round((kycVerifiedCount / kycItems.length) * 100);
@@ -388,7 +412,7 @@ const ViewManagerModal = ({ manager, show, actionLoading, onClose, onApprove, on
           style={{ background: 'linear-gradient(135deg, var(--ovm-accent), var(--ovm-accent-2))' }}
         >
           <div className="flex items-start justify-between">
-            <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-white/70">Property Manager</span>
+            <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-white/70">Property Management</span>
             <button
               onClick={onClose}
               className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 transition-colors flex items-center justify-center text-white"
@@ -497,7 +521,7 @@ const ViewManagerModal = ({ manager, show, actionLoading, onClose, onApprove, on
               <div className="grid grid-cols-3 gap-3">
                 {[
                   { label: 'Properties', value: manager.propertiesCount },
-                  { label: 'Leads', value: manager.leadsCount },
+                  { label: 'Views', value: manager.leadsCount }, // Changed from Leads to Views
                   { label: 'Rating', value: manager.rating },
                 ].map((stat, i) => (
                   <div
@@ -570,7 +594,7 @@ const ViewManagerModal = ({ manager, show, actionLoading, onClose, onApprove, on
                   {manager.kycStatus.charAt(0).toUpperCase() + manager.kycStatus.slice(1)}
                 </span>
               </div>
-              <div className="grid grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 gap-2.5">
                 {kycItems.map(item => (
                   <div
                     key={item.key}
@@ -588,7 +612,7 @@ const ViewManagerModal = ({ manager, show, actionLoading, onClose, onApprove, on
                 ))}
               </div>
               <div className="mt-3 p-3 rounded-xl" style={{ background: 'var(--ovm-surface)', border: '1px solid var(--ovm-border)' }}>
-                <p className="text-[10px] font-medium" style={{ color: 'var(--ovm-muted)' }}>Fully KYC-verified managers get priority listing benefits.</p>
+                <p className="text-[10px] font-medium" style={{ color: 'var(--ovm-muted)' }}>Fully KYC-verified property management get priority listing benefits.</p>
               </div>
             </div>
           )}
@@ -680,7 +704,7 @@ const ViewManagerModal = ({ manager, show, actionLoading, onClose, onApprove, on
 };
 
 /* ============================================================
-   EDIT PROPERTY MANAGER MODAL — same as Owners
+   EDIT PROPERTY MANAGER MODAL
 ============================================================ */
 
 const EditManagerModal = ({ manager, show, onClose, onSave }) => {
@@ -699,15 +723,13 @@ const EditManagerModal = ({ manager, show, onClose, onSave }) => {
         subscriptionPlan: manager.subscriptionPlan,
         bio: manager.bio || '',
         kycStatus: manager.kycStatus || 'pending',
-        verification: {
-          email: !!manager.verification?.email,
-          phone: !!manager.verification?.phone,
-        },
         kyc: {
           aadhaar: !!manager.kyc?.aadhaar,
           pan: !!manager.kyc?.pan,
           gst: !!manager.kyc?.gst,
-          rera: !!manager.kyc?.rera,
+          companyPan: !!manager.kyc?.companyPan,
+          companyRegCert: !!manager.kyc?.companyRegCert,
+          businessAddressProof: !!manager.kyc?.businessAddressProof,
         },
       });
     }
@@ -719,20 +741,16 @@ const EditManagerModal = ({ manager, show, onClose, onSave }) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleVerificationToggle = (key) => {
-    setFormData(prev => ({
-      ...prev,
-      verification: { ...prev.verification, [key]: !prev.verification[key] },
-    }));
-  };
-
   const handleKycToggle = (key) => {
     setFormData(prev => {
       const updatedKyc = { ...prev.kyc, [key]: !prev.kyc[key] };
-      const allVerified = Object.values(updatedKyc).every(Boolean);
+      
+      // Auto-verify only when all required documents are verified
+      const requiredDocs = ['aadhaar', 'pan', 'companyPan', 'companyRegCert', 'businessAddressProof'];
+      const allRequiredVerified = requiredDocs.every(doc => updatedKyc[doc]);
 
       let nextStatus = prev.kycStatus;
-      if (allVerified) {
+      if (allRequiredVerified) {
         nextStatus = 'verified';
       } else if (prev.kycStatus === 'verified') {
         nextStatus = 'pending';
@@ -747,16 +765,13 @@ const EditManagerModal = ({ manager, show, onClose, onSave }) => {
     onSave(formData);
   };
 
-  const verificationItems = [
-    { key: 'email', label: 'Email', icon: <FiMail className="text-sm" /> },
-    { key: 'phone', label: 'Phone', icon: <FiPhone className="text-sm" /> },
-  ];
-
   const kycDocs = [
     { key: 'aadhaar', label: 'Aadhaar', icon: <FaIdCard className="text-sm" /> },
     { key: 'pan', label: 'PAN', icon: <FaFileAlt className="text-sm" /> },
-    { key: 'gst', label: 'GST', icon: <FaCertificate className="text-sm" /> },
-    { key: 'rera', label: 'RERA', icon: <FaShieldAlt className="text-sm" /> },
+    { key: 'companyPan', label: 'Company PAN Card', icon: <FaIdCard className="text-sm" /> },
+    { key: 'companyRegCert', label: 'Company Registration Certificate', icon: <FaCertificate className="text-sm" /> },
+    { key: 'businessAddressProof', label: 'Business Address Proof', icon: <FiMapPin className="text-sm" /> },
+    { key: 'gst', label: 'GST (Optional)', icon: <FaFileAlt className="text-sm" /> },
   ];
 
   return (
@@ -769,8 +784,8 @@ const EditManagerModal = ({ manager, show, onClose, onSave }) => {
           >
             <FiX className="text-lg" />
           </button>
-          <h2 className="text-2xl font-bold text-white">Edit Property Manager</h2>
-          <p className="text-white/80 text-sm">Update manager information</p>
+          <h2 className="text-2xl font-bold text-white">Edit Property Management</h2>
+          <p className="text-white/80 text-sm">Update management information</p>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 bg-white">
@@ -883,39 +898,8 @@ const EditManagerModal = ({ manager, show, onClose, onSave }) => {
               </div>
 
               <div className="col-span-2">
-                <label className="text-xs font-medium text-[#5A7D78] block mb-2">Mobile &amp; Email Verification</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {verificationItems.map(item => {
-                    const isVerified = formData.verification[item.key];
-                    return (
-                      <button
-                        key={item.key}
-                        type="button"
-                        onClick={() => handleVerificationToggle(item.key)}
-                        className={`flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border text-xs font-medium transition-all duration-300 hover:scale-[1.02] ${
-                          isVerified
-                            ? 'bg-[#E8F8F5] border-[#A8D5CD] text-[#00695C]'
-                            : 'bg-[#F5F9F8] border-[#E8F0EE] text-[#5A7D78]'
-                        }`}
-                      >
-                        <span className="flex items-center gap-1.5">
-                          {item.icon}
-                          {item.label}
-                        </span>
-                        {isVerified ? (
-                          <FiCheckCircle className="text-sm shrink-0" />
-                        ) : (
-                          <FiXCircle className="text-sm shrink-0" />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="col-span-2">
                 <label className="text-xs font-medium text-[#5A7D78] block mb-2">KYC Documents</label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {kycDocs.map(item => {
                     const isVerified = formData.kyc[item.key];
                     return (
@@ -942,7 +926,7 @@ const EditManagerModal = ({ manager, show, onClose, onSave }) => {
                     );
                   })}
                 </div>
-                <p className="text-[10px] text-[#5A7D78] mt-1.5">Tap a document to mark it verified / not verified. Verifying Aadhaar, PAN, GST &amp; RERA sets KYC Status to Verified automatically.</p>
+                <p className="text-[10px] text-[#5A7D78] mt-1.5">Tap a document to mark it verified / not verified. Verifying required documents sets KYC Status to Verified automatically.</p>
               </div>
 
               <div className="col-span-2">
@@ -953,7 +937,7 @@ const EditManagerModal = ({ manager, show, onClose, onSave }) => {
                   onChange={handleChange}
                   rows="2"
                   className="w-full px-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm outline-none resize-none text-[#1A2E2A]"
-                  placeholder="Brief description about the property manager"
+                  placeholder="Brief description about the property management"
                 />
               </div>
             </div>
@@ -991,7 +975,6 @@ const PropertyManagersRegistration = () => {
   const navigate = useNavigate();
   const searchInputRef = useRef(null);
 
-  // ============ STATE ============
   const [managers, setManagers] = useState([]);
   const [filteredManagers, setFilteredManagers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -1016,18 +999,18 @@ const PropertyManagersRegistration = () => {
   const [actionLoading, setActionLoading] = useState(null);
   const [filterCount, setFilterCount] = useState(0);
   const [activeFilter, setActiveFilter] = useState('all');
-
-  // ============ PROPERTIES MODAL STATE ============
+  
   const [showPropertiesModal, setShowPropertiesModal] = useState(false);
   const [selectedManagerForProperties, setSelectedManagerForProperties] = useState(null);
 
-  // ============ TOAST FUNCTION ============
+  // Block confirmation modal state
+  const [blockConfirmManager, setBlockConfirmManager] = useState(null);
+
   const showToast = useCallback((message, type = 'success', duration = 3000) => {
     setToast({ message, type });
     setTimeout(() => setToast(null), duration);
   }, []);
 
-  // ============ STATS ============
   const [stats, setStats] = useState({
     totalManagers: 0,
     pendingApprovals: 0,
@@ -1039,7 +1022,6 @@ const PropertyManagersRegistration = () => {
     approvedAndVerified: 0,
   });
 
-  // ============ GENERATE MOCK MANAGERS ============
   const generateMockManagers = useCallback(() => {
     const firstNames = ['Rajesh', 'Priya', 'Amit', 'Sneha', 'Vikram', 'Ananya', 'Deepak', 'Meera', 'Ravi', 'Kavya', 'Suresh', 'Pooja', 'Arjun', 'Lakshmi', 'Kiran', 'Mohan', 'Ritu', 'Gautam', 'Nisha', 'Tarun'];
     const lastNames = ['Kumar', 'Sharma', 'Singh', 'Patel', 'Reddy', 'Gupta', 'Verma', 'Joshi', 'Malhotra', 'Mehta', 'Nair', 'Pillai', 'Rao', 'Shetty', 'Agarwal', 'Khanna', 'Chopra', 'Saxena', 'Tiwari', 'Desai'];
@@ -1074,12 +1056,35 @@ const PropertyManagersRegistration = () => {
       const leadsCount = Math.floor(Math.random() * 35);
       const rating = (Math.random() * 4 + 1).toFixed(1);
 
-      const kyc = {
-        aadhaar: Math.random() > 0.3,
-        pan: Math.random() > 0.35,
-        gst: Math.random() > 0.7,
-        rera: Math.random() > 0.6,
+      // Ensure individual document booleans match the overall kycStatus
+      let kyc = { 
+        aadhaar: false, 
+        pan: false, 
+        gst: false, 
+        companyPan: false, 
+        companyRegCert: false, 
+        businessAddressProof: false 
       };
+      
+      if (kycStatus === 'verified') {
+        kyc = { 
+          aadhaar: true, 
+          pan: true, 
+          gst: true, 
+          companyPan: true, 
+          companyRegCert: true, 
+          businessAddressProof: true 
+        };
+      } else if (kycStatus === 'pending') {
+        kyc = {
+          aadhaar: Math.random() > 0.5,
+          pan: Math.random() > 0.5,
+          gst: Math.random() > 0.7,
+          companyPan: Math.random() > 0.5,
+          companyRegCert: Math.random() > 0.5,
+          businessAddressProof: Math.random() > 0.5,
+        };
+      }
 
       const verification = {
         email: Math.random() > 0.15,
@@ -1104,7 +1109,7 @@ const PropertyManagersRegistration = () => {
         rating: rating,
         avatar: firstName[0] + lastName[0],
         subscriptionPlan: subscriptionPlans[Math.floor(Math.random() * subscriptionPlans.length)],
-        bio: `Property manager with ${propertiesCount} properties managed. Specializing in ${city} real estate market.`,
+        bio: `Property management with ${propertiesCount} properties managed. Specializing in ${city} real estate market.`,
         lastActive: new Date(Date.now() - Math.floor(Math.random() * 14 * 24 * 60 * 60 * 1000)).toISOString(),
         totalSpent: Math.floor(Math.random() * 200000),
         featured: Math.random() > 0.85,
@@ -1135,7 +1140,6 @@ const PropertyManagersRegistration = () => {
     return managers;
   }, []);
 
-  // ============ INITIALIZE DATA ============
   useEffect(() => {
     const mockManagers = generateMockManagers();
     setManagers(mockManagers);
@@ -1144,7 +1148,6 @@ const PropertyManagersRegistration = () => {
     setTimeout(() => setStatsAnimating(false), 1000);
   }, [generateMockManagers]);
 
-  // ============ FILTER MANAGERS ============
   const filterManagers = useCallback(() => {
     let filtered = [...managers];
 
@@ -1193,7 +1196,6 @@ const PropertyManagersRegistration = () => {
     filterManagers();
   }, [filterManagers]);
 
-  // ============ PAGINATION ============
   const totalPages = Math.ceil(filteredManagers.length / pageSize);
   const paginatedManagers = useMemo(() =>
     filteredManagers.slice(
@@ -1202,7 +1204,6 @@ const PropertyManagersRegistration = () => {
     )
   , [filteredManagers, currentPage, pageSize]);
 
-  // ============ HANDLE SORT ============
   const handleSort = useCallback((field) => {
     if (sortField === field) {
       setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
@@ -1212,7 +1213,6 @@ const PropertyManagersRegistration = () => {
     }
   }, [sortField]);
 
-  // ============ HANDLE SELECT ALL ============
   const handleSelectAll = useCallback(() => {
     if (selectedManagers.length === paginatedManagers.length) {
       setSelectedManagers([]);
@@ -1221,7 +1221,6 @@ const PropertyManagersRegistration = () => {
     }
   }, [selectedManagers, paginatedManagers]);
 
-  // ============ HANDLE SELECT MANAGER ============
   const handleSelectManager = useCallback((managerId) => {
     setSelectedManagers(prev =>
       prev.includes(managerId)
@@ -1230,7 +1229,6 @@ const PropertyManagersRegistration = () => {
     );
   }, []);
 
-  // ============ HANDLE APPROVAL ============
   const handleApproval = useCallback((managerId, action) => {
     const manager = managers.find(o => o.id === managerId);
     if (!manager) return;
@@ -1238,7 +1236,6 @@ const PropertyManagersRegistration = () => {
     setApprovalAction(action);
   }, [managers]);
 
-  // ============ CONFIRM APPROVAL ============
   const confirmApproval = useCallback(() => {
     const managerId = showApprovalConfirm;
     const action = approvalAction;
@@ -1278,8 +1275,15 @@ const PropertyManagersRegistration = () => {
     }, 800);
   }, [showApprovalConfirm, approvalAction, managers, showToast]);
 
-  // ============ HANDLE TOGGLE BLOCK ============
-  const handleToggleBlock = useCallback((managerId) => {
+  // Called by the Block button to open the confirmation modal
+  const handleBlockRequest = useCallback((manager) => {
+    setBlockConfirmManager(manager);
+  }, []);
+
+  // Called when the user confirms the Block/Unblock action
+  const confirmToggleBlock = useCallback(() => {
+    if (!blockConfirmManager) return;
+    const managerId = blockConfirmManager.id;
     setActionLoading(`block_${managerId}`);
 
     setTimeout(() => {
@@ -1312,78 +1316,92 @@ const PropertyManagersRegistration = () => {
       updatedManagers = updatedManagers.map(o => o.id === managerId ? manager : o);
       setManagers(updatedManagers);
       setActionLoading(null);
+      setBlockConfirmManager(null);
 
       setViewingManager(prev => (prev && prev.id === managerId ? manager : prev));
     }, 600);
-  }, [managers, showToast]);
+  }, [blockConfirmManager, managers, showToast]);
 
-  // ============ VIEW MANAGER DETAIL ============
   const handleViewManager = useCallback((manager) => {
     setViewingManager(manager);
     setShowViewModal(true);
   }, []);
 
-  // ============ VIEW MANAGER PROPERTIES ============
   const handleViewManagerProperties = useCallback((manager) => {
     setSelectedManagerForProperties(manager);
     setShowPropertiesModal(true);
   }, []);
 
-  // ============ VIEW INDIVIDUAL PROPERTY DETAIL ============
   const handleViewPropertyDetail = useCallback((property) => {
     navigate(`/properties/${property.id}`);
     showToast(`Opening ${property.title}...`, 'info');
   }, [navigate, showToast]);
 
-  // ============ VIEW MANAGER PROFILE ============
   const handleViewManagerProfile = useCallback((managerId) => {
     navigate('/profile/property-management');
     showToast('Opening Manager Profile...', 'info');
   }, [navigate, showToast]);
 
-  // ============ EDIT MANAGER ============
   const handleEditManager = useCallback((manager) => {
     setEditingManager(manager);
     setShowEditModal(true);
   }, []);
 
-  // ============ SAVE EDIT ============
   const saveEdit = useCallback((updatedData) => {
-    setManagers(prev => prev.map(manager => {
+    const updatedManagers = managers.map(manager => {
       if (manager.id !== editingManager.id) return manager;
-      return { ...manager, ...updatedData };
-    }));
+      
+      let syncedKyc = { ...manager.kyc, ...updatedData.kyc };
+      if (updatedData.kycStatus === 'verified') {
+        syncedKyc = { 
+          aadhaar: true, 
+          pan: true, 
+          gst: true, 
+          companyPan: true, 
+          companyRegCert: true, 
+          businessAddressProof: true 
+        };
+      }
+      
+      return { ...manager, ...updatedData, kyc: syncedKyc };
+    });
 
-    setManagers(prev => {
-      const total = prev.length;
-      const pending = prev.filter(o => o.status === 'pending').length;
-      const approved = prev.filter(o => o.status === 'approved').length;
-      const rejected = prev.filter(o => o.status === 'rejected').length;
-      const blocked = prev.filter(o => o.status === 'blocked').length;
-      const verifiedKyc = prev.filter(o => o.kycStatus === 'verified').length;
-      const pendingKyc = prev.filter(o => o.kycStatus === 'pending').length;
-      const approvedAndVerified = prev.filter(o => o.status === 'approved' && o.kycStatus === 'verified').length;
+    setManagers(updatedManagers);
+    setFilteredManagers(updatedManagers);
 
-      setStats({
-        totalManagers: total,
-        pendingApprovals: pending,
-        approved: approved,
-        rejected: rejected,
-        blocked: blocked,
-        verifiedKyc: verifiedKyc,
-        pendingKyc: pendingKyc,
-        approvedAndVerified: approvedAndVerified,
-      });
+    const total = updatedManagers.length;
+    const pending = updatedManagers.filter(o => o.status === 'pending').length;
+    const approved = updatedManagers.filter(o => o.status === 'approved').length;
+    const rejected = updatedManagers.filter(o => o.status === 'rejected').length;
+    const blocked = updatedManagers.filter(o => o.status === 'blocked').length;
+    const verifiedKyc = updatedManagers.filter(o => o.kycStatus === 'verified').length;
+    const pendingKyc = updatedManagers.filter(o => o.kycStatus === 'pending').length;
+    const approvedAndVerified = updatedManagers.filter(o => o.status === 'approved' && o.kycStatus === 'verified').length;
 
+    setStats({
+      totalManagers: total,
+      pendingApprovals: pending,
+      approved: approved,
+      rejected: rejected,
+      blocked: blocked,
+      verifiedKyc: verifiedKyc,
+      pendingKyc: pendingKyc,
+      approvedAndVerified: approvedAndVerified,
+    });
+
+    setViewingManager(prev => {
+      if (prev && prev.id === editingManager.id) {
+        const found = updatedManagers.find(o => o.id === editingManager.id);
+        return found || prev;
+      }
       return prev;
     });
 
     setShowEditModal(false);
     setEditingManager(null);
     showToast('Property manager updated successfully', 'success');
-  }, [editingManager, showToast]);
+  }, [managers, editingManager, showToast]);
 
-  // ============ STAT CLICK HANDLER ============
   const handleStatClick = useCallback((filter) => {
     setActiveFilter(filter);
     if (filter === 'all') {
@@ -1415,7 +1433,6 @@ const PropertyManagersRegistration = () => {
     searchInputRef.current?.focus();
   }, []);
 
-  // ============ CLEAR ALL FILTERS ============
   const clearAllFilters = useCallback(() => {
     setSearchQuery('');
     setSelectedStatus('all');
@@ -1425,7 +1442,6 @@ const PropertyManagersRegistration = () => {
     showToast('All filters cleared', 'info');
   }, [showToast]);
 
-  // ============ REFRESH DATA ============
   const handleRefresh = useCallback(() => {
     setLoading(true);
     setTimeout(() => {
@@ -1439,7 +1455,6 @@ const PropertyManagersRegistration = () => {
     }, 1000);
   }, [generateMockManagers, showToast]);
 
-  // ============ EXPORT MANAGERS ============
   const handleExportManagers = useCallback(() => {
     const data = filteredManagers.map(manager => ({
       Name: manager.name,
@@ -1452,12 +1467,14 @@ const PropertyManagersRegistration = () => {
       'KYC Status': manager.kycStatus,
       'Aadhaar': manager.kyc.aadhaar ? 'Verified' : 'Pending',
       'PAN': manager.kyc.pan ? 'Verified' : 'Pending',
+      'Company PAN Card': manager.kyc.companyPan ? 'Verified' : 'Pending',
+      'Company Registration Certificate': manager.kyc.companyRegCert ? 'Verified' : 'Pending',
+      'Business Address Proof': manager.kyc.businessAddressProof ? 'Verified' : 'Pending',
       'GST': manager.kyc.gst ? 'Verified' : 'Pending',
-      'RERA': manager.kyc.rera ? 'Verified' : 'Pending',
       'Email Verified': manager.verification.email ? 'Yes' : 'No',
       'Phone Verified': manager.verification.phone ? 'Yes' : 'No',
       Properties: manager.propertiesCount,
-      Leads: manager.leadsCount,
+      Views: manager.leadsCount, // Changed from Leads to Views
       Rating: manager.rating,
       'Registration Date': new Date(manager.registrationDate).toLocaleDateString(),
       'Subscription Plan': manager.subscriptionPlan,
@@ -1478,7 +1495,6 @@ const PropertyManagersRegistration = () => {
     showToast(`${filteredManagers.length} managers exported successfully`, 'success');
   }, [filteredManagers, showToast]);
 
-  // ============ VIEW MODAL ACTION HANDLERS ============
   const handleViewModalApprove = useCallback((id) => {
     handleApproval(id, 'approve');
   }, [handleApproval]);
@@ -1495,15 +1511,15 @@ const PropertyManagersRegistration = () => {
 
   const handleViewModalToggleBlock = useCallback(() => {
     if (!viewingManager) return;
-    handleToggleBlock(viewingManager.id);
-  }, [viewingManager, handleToggleBlock]);
+    setShowViewModal(false);
+    handleBlockRequest(viewingManager);
+  }, [viewingManager, handleBlockRequest]);
 
   const handleViewModalViewProperties = useCallback((manager) => {
     setShowViewModal(false);
     handleViewManagerProperties(manager);
   }, [handleViewManagerProperties]);
 
-  // ============ BULK ACTIONS ============
   const handleBulkAction = useCallback((action) => {
     if (selectedManagers.length === 0) {
       showToast('Please select managers first', 'warning');
@@ -1555,19 +1571,15 @@ const PropertyManagersRegistration = () => {
     }, 800);
   }, [selectedManagers, managers, showToast]);
 
-  // ============ RENDER ============
   return (
-    <div className="space-y-6 p-4 lg:p-6 bg-[#F8FAF9] min-h-screen">
-      {/* Animated Background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+   <div className="space-y-6 p-4 lg:p-6 pb-24 bg-[#F8FAF9] min-h-full h-full overflow-y-auto custom-page-scroll relative">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-[#00695C]/5 rounded-full blur-3xl animate-float" />
         <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-[#26A69A]/5 rounded-full blur-3xl animate-float-delayed" />
       </div>
 
-      {/* Toast */}
       <Toast toast={toast} />
 
-      {/* Approval Confirm Modal */}
       <ApprovalConfirmModal
         show={!!showApprovalConfirm}
         action={approvalAction}
@@ -1577,7 +1589,16 @@ const PropertyManagersRegistration = () => {
         onConfirm={confirmApproval}
       />
 
-      {/* Manager Properties Modal */}
+      {/* Block/Unblock Confirmation Modal */}
+      <BlockConfirmModal
+        show={!!blockConfirmManager}
+        isBlocked={blockConfirmManager?.status === 'blocked'}
+        actionLoading={actionLoading === `block_${blockConfirmManager?.id}`}
+        managerName={blockConfirmManager?.name || ''}
+        onCancel={() => setBlockConfirmManager(null)}
+        onConfirm={confirmToggleBlock}
+      />
+
       <ManagerPropertiesModal
         manager={selectedManagerForProperties}
         show={showPropertiesModal}
@@ -1585,7 +1606,6 @@ const PropertyManagersRegistration = () => {
         onViewProperty={handleViewPropertyDetail}
       />
 
-      {/* Edit Modal */}
       <EditManagerModal
         manager={editingManager}
         show={showEditModal}
@@ -1593,7 +1613,6 @@ const PropertyManagersRegistration = () => {
         onSave={saveEdit}
       />
 
-      {/* View Modal */}
       <ViewManagerModal
         manager={viewingManager}
         show={showViewModal}
@@ -1606,13 +1625,12 @@ const PropertyManagersRegistration = () => {
         onViewProperties={handleViewModalViewProperties}
       />
 
-      {/* Header */}
       <div className="relative animate-fade-in">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-1 flex-wrap">
               <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#00695C] to-[#26A69A] bg-clip-text text-transparent">
-                Property Manager Registrations
+                Property Management Registrations
               </h1>
               <span className="px-3 py-1 bg-[#E8F4F2] text-[#00695C] text-xs font-semibold rounded-full animate-pulse">
                 {filteredManagers.length} Managers
@@ -1624,7 +1642,7 @@ const PropertyManagersRegistration = () => {
               )}
             </div>
             <p className="text-sm text-[#5A7D78] flex items-center gap-2 flex-wrap">
-              <span>Review and manage property manager registration requests</span>
+              <span>Review and manage property management registration requests</span>
               <span className="w-1 h-1 bg-[#B5C9C5] rounded-full" />
               <span className="text-[#00695C] font-medium">{new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
             </p>
@@ -1657,14 +1675,13 @@ const PropertyManagersRegistration = () => {
         </div>
       </div>
 
-      {/* Stats Section */}
       {showStats && (
         <div className="relative animate-slide-in">
           <div className="bg-white rounded-2xl p-4 border border-[#E8F0EE] shadow-sm">
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3">
               <StatCard
                 icon={<FiUsers className="text-white text-sm" />}
-                title="Total Managers"
+                title="Total management"
                 value={stats.totalManagers}
                 color="bg-gradient-to-br from-[#00695C] to-[#26A69A]"
                 delay={0}
@@ -1747,7 +1764,6 @@ const PropertyManagersRegistration = () => {
         </div>
       )}
 
-      {/* Search and Filters */}
       <div className="relative bg-white rounded-2xl p-4 shadow-sm border border-[#E8F0EE] hover:shadow-md transition-all duration-300">
         <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4">
           <div className="flex-1 w-full lg:w-auto relative">
@@ -1755,7 +1771,7 @@ const PropertyManagersRegistration = () => {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search managers by name, email, phone, city, or company..."
+              placeholder="Search property management by name, email, phone, city, or company..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 bg-[#F5F9F8] rounded-xl border border-[#E8F0EE] focus:border-[#00695C] focus:ring-2 focus:ring-[#00695C]/20 transition-all duration-300 text-sm text-[#1A2E2A] outline-none placeholder:text-[#B5C9C5]"
@@ -1828,7 +1844,6 @@ const PropertyManagersRegistration = () => {
           </div>
         </div>
 
-        {/* Bulk Actions */}
         {selectedManagers.length > 0 && (
           <div className="mt-4 pt-4 border-t border-[#E8F0EE] flex flex-wrap items-center justify-between gap-3 animate-slide-in">
             <span className="text-sm text-[#5A7D78]">
@@ -1862,7 +1877,6 @@ const PropertyManagersRegistration = () => {
         )}
       </div>
 
-      {/* Managers Grid/List */}
       <div className="relative">
         {loading ? (
           <div className="flex items-center justify-center py-20">
@@ -1964,12 +1978,14 @@ const PropertyManagersRegistration = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-4 gap-1 mt-2.5 pt-2.5 border-t border-[#E8F0EE]">
+                  {/* KYC Quick Status */}
+                  <div className="grid grid-cols-3 gap-1 mt-2.5 pt-2.5 border-t border-[#E8F0EE]">
                     {[
                       { key: 'aadhaar', label: 'Aadhaar' },
                       { key: 'pan', label: 'PAN' },
-                      { key: 'gst', label: 'GST' },
-                      { key: 'rera', label: 'RERA' }
+                      { key: 'companyPan', label: 'Co. PAN' },
+                      { key: 'companyRegCert', label: 'Co. Reg.' },
+                      { key: 'businessAddressProof', label: 'Address' }
                     ].map(item => (
                       <div key={item.key} className="text-center">
                         <div className={`text-xs ${manager.kyc[item.key] ? 'text-[#00695C]' : 'text-[#B5C9C5]'}`}>
@@ -1980,6 +1996,7 @@ const PropertyManagersRegistration = () => {
                     ))}
                   </div>
 
+                  {/* Stats row - Properties, Views, Rating */}
                   <div className="grid grid-cols-3 gap-2 mt-2.5 pt-2.5 border-t border-[#E8F0EE]">
                     <div className="text-center">
                       <p className="text-sm font-bold text-[#1A2E2A]">{manager.propertiesCount}</p>
@@ -1987,7 +2004,7 @@ const PropertyManagersRegistration = () => {
                     </div>
                     <div className="text-center">
                       <p className="text-sm font-bold text-[#1A2E2A]">{manager.leadsCount}</p>
-                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Leads</p>
+                      <p className="text-[8px] text-[#5A7D78] uppercase tracking-wider">Views</p>
                     </div>
                     <div className="text-center">
                       <p className="text-sm font-bold text-[#1A2E2A] flex items-center justify-center gap-0.5">
@@ -2021,6 +2038,7 @@ const PropertyManagersRegistration = () => {
                         </button>
                       </>
                     ) : (
+                      
                       <>
                         <button
                           type="button"
@@ -2045,7 +2063,7 @@ const PropertyManagersRegistration = () => {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleToggleBlock(manager.id)}
+                          onClick={() => handleBlockRequest(manager)}
                           disabled={actionLoading === `block_${manager.id}`}
                           className={`flex-1 py-1.5 text-xs font-medium rounded-xl transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 disabled:opacity-50 ${
                             manager.status === 'blocked'
@@ -2073,7 +2091,7 @@ const PropertyManagersRegistration = () => {
                         onClick={() => handleViewManagerProfile(manager.id)}
                         className="w-full py-1.5 text-xs font-medium text-[#167A54] bg-[#E7F6EF] border border-[#BEE4D2] rounded-xl hover:bg-[#D5EFE0] transition-all duration-300 flex items-center justify-center gap-1 hover:scale-[1.02]"
                       >
-                        <FiExternalLink className="text-[10px]" /> View Manager Profile
+                        <FiExternalLink className="text-[10px]" /> View management Profile
                       </button>
                     </div>
                   )}
@@ -2082,6 +2100,9 @@ const PropertyManagersRegistration = () => {
             })}
           </div>
         ) : (
+
+          // list view
+
           <div className="bg-white rounded-2xl border border-[#E8F0EE] shadow-sm overflow-hidden">
             <div className="grid grid-cols-12 gap-2 items-center px-4 py-3 bg-[#F5F9F8] border-b border-[#E8F0EE] text-xs font-medium text-[#5A7D78] uppercase tracking-wider">
               <div className="col-span-1 flex items-center gap-2">
@@ -2091,7 +2112,7 @@ const PropertyManagersRegistration = () => {
                   onChange={handleSelectAll}
                   className="w-4 h-4 rounded border-[#B5C9C5] text-[#00695C] focus:ring-[#00695C] focus:ring-2 transition-all duration-300"
                 />
-                <span>Manager</span>
+                <span>PM</span>
               </div>
               <div className="col-span-2 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('name')}>
                 Name {sortField === 'name' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
@@ -2101,7 +2122,7 @@ const PropertyManagersRegistration = () => {
               <div className="col-span-1 cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('city')}>
                 City {sortField === 'city' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
               </div>
-              <div className="col-span-1">Email</div>
+              <div className="col-span-1">Company</div>
               <div className="col-span-1 text-center">Phone</div>
               <div className="col-span-1 text-center cursor-pointer hover:text-[#00695C] transition-colors" onClick={() => handleSort('propertiesCount')}>
                 Props {sortField === 'propertiesCount' && <span className="text-[#00695C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
@@ -2177,18 +2198,7 @@ const PropertyManagersRegistration = () => {
 
                   <div className="col-span-1 text-xs text-[#5A7D78]">{manager.city}</div>
 
-                  <div className="col-span-1 flex items-center gap-1">
-                    {manager.verification.email ? (
-                      <FiCheckCircle className="text-[#00695C] text-xs" title="Email Verified" />
-                    ) : (
-                      <FiXCircle className="text-[#B5C9C5] text-xs" title="Email Not Verified" />
-                    )}
-                    {manager.verification.phone ? (
-                      <FiCheckCircle className="text-[#00695C] text-xs" title="Phone Verified" />
-                    ) : (
-                      <FiXCircle className="text-[#B5C9C5] text-xs" title="Phone Not Verified" />
-                    )}
-                  </div>
+                  <div className="col-span-1 text-xs text-[#5A7D78] truncate">{manager.company}</div>
 
                   <div className="col-span-1 text-center text-xs text-[#5A7D78]">{manager.phone}</div>
 
@@ -2217,7 +2227,7 @@ const PropertyManagersRegistration = () => {
                           className="w-7 h-7 rounded-lg hover:bg-[#E8F8F5] transition-all duration-300 flex items-center justify-center text-[#00695C] hover:scale-110 disabled:opacity-50"
                           title="Approve"
                         >
-                          {actionLoading === 'approve' ? <FiRefreshCw className="text-xs animate-spin" /> : <FiCheckCircle className="text-xs" />}
+                          {actionLoading === 'approve' ? <FiRefreshCw className="text-xs animate-spin" /> : <FiCheckCircle className="text-sm" />}
                         </button>
                         <button
                           type="button"
@@ -2226,7 +2236,7 @@ const PropertyManagersRegistration = () => {
                           className="w-7 h-7 rounded-lg hover:bg-red-50 transition-all duration-300 flex items-center justify-center text-red-500 hover:scale-110 disabled:opacity-50"
                           title="Reject"
                         >
-                          {actionLoading === 'reject' ? <FiRefreshCw className="text-xs animate-spin" /> : <FiXCircle className="text-xs" />}
+                          {actionLoading === 'reject' ? <FiRefreshCw className="text-xs animate-spin" /> : <FiXCircle className="text-sm" />}
                         </button>
                       </>
                     ) : (
@@ -2237,7 +2247,7 @@ const PropertyManagersRegistration = () => {
                           className="w-7 h-7 rounded-lg hover:bg-[#E8F4F2] transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-[#00695C] hover:scale-110"
                           title="View"
                         >
-                          <FiEye className="text-xs" />
+                          <FiEye className="text-sm" />
                         </button>
                         <button
                           type="button"
@@ -2245,7 +2255,7 @@ const PropertyManagersRegistration = () => {
                           className="w-7 h-7 rounded-lg hover:bg-blue-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-blue-600 hover:scale-110"
                           title="Edit"
                         >
-                          <FiEdit className="text-xs" />
+                          <FiEdit className="text-sm" />
                         </button>
                         <button
                           type="button"
@@ -2253,11 +2263,11 @@ const PropertyManagersRegistration = () => {
                           className="w-7 h-7 rounded-lg hover:bg-purple-50 transition-all duration-300 flex items-center justify-center text-[#5A7D78] hover:text-purple-600 hover:scale-110"
                           title="View Properties"
                         >
-                          <FiHome className="text-xs" />
+                          <FiHome className="text-sm" />
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleToggleBlock(manager.id)}
+                          onClick={() => handleBlockRequest(manager)}
                           disabled={actionLoading === `block_${manager.id}`}
                           className={`w-7 h-7 rounded-lg transition-all duration-300 flex items-center justify-center hover:scale-110 disabled:opacity-50 ${
                             manager.status === 'blocked'
@@ -2267,11 +2277,11 @@ const PropertyManagersRegistration = () => {
                           title={manager.status === 'blocked' ? 'Unblock' : 'Block'}
                         >
                           {actionLoading === `block_${manager.id}` ? (
-                            <FiRefreshCw className="text-xs animate-spin" />
+                            <FiRefreshCw className="text-sm animate-spin" />
                           ) : manager.status === 'blocked' ? (
-                            <FiUnlock className="text-xs" />
+                            <FiUnlock className="text-sm" />
                           ) : (
-                            <FiLock className="text-xs" />
+                            <FiLock className="text-sm" />
                           )}
                         </button>
                       </>
@@ -2304,7 +2314,6 @@ const PropertyManagersRegistration = () => {
         )}
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex flex-wrap items-center justify-between bg-white rounded-2xl px-4 py-3 border border-[#E8F0EE] shadow-sm gap-3">
           <div className="flex items-center gap-2 text-sm text-[#5A7D78] flex-wrap">
@@ -2370,6 +2379,8 @@ const PropertyManagersRegistration = () => {
           </div>
         </div>
       )}
+
+      <div className="pb-5"/>
 
       <style>{`
         @keyframes fade-in {

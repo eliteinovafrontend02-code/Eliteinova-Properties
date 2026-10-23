@@ -175,7 +175,7 @@ const SuperAdminOverview = () => {
   }, []);
 
   return (
-    <div>
+    <div className="p-4 md:p-6 pb-24 bg-gray-50 min-h-full h-full overflow-y-auto custom-page-scroll">
       {/* ============ HEADER ============ */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
@@ -208,6 +208,8 @@ const SuperAdminOverview = () => {
           <StatCard key={stat.id} stat={stat} onClick={() => navigate(stat.path)} />
         ))}
       </div>
+
+      <div className="pb-10"/>
 
       {/* ============ ALL ANIMATIONS (KEYFRAMES) ============ */}
       <style>{`
